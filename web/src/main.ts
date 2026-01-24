@@ -1,5 +1,6 @@
 import './style.css'
 import { CCSliderEvent, emitter, setup_slider } from "./slider";
+import ws from './websocket';
 
 //document.querySelector<HTMLDivElement>('#app')!.innerHTML = `<h1>FUCK MY LIFE</h1>`
 
@@ -9,6 +10,7 @@ const sliders = document.querySelector<HTMLDivElement>("#sliders")!
 
 emitter.addEventListener("ccupdate", (update: CCSliderEvent) => {
   console.log(update);
+  ws.send(JSON.stringify(update));
 });
 
 for (let i = 0; i < 5; i++) {

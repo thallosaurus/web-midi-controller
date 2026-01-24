@@ -1,10 +1,12 @@
 import { midi } from "https://deno.land/x/deno_midi/mod.ts";
 
+import type { CCSliderEvent } from './web/src/slider';
+
+const midi_name = "IAC Driver Bus 1";
+
 const midi_out = new midi.Output();
-console.log(midi_out.getPorts());
-
-midi_out.openPort(0);
-
+const output_index = midi_out.getPorts().findIndex((v, i) => v == midi_name);
+midi_out.openPort(output_index);
 // Send a note on.
 //midi_out.sendMessage(new midi.NoteOn({ note: 0x3C, velocity: 0x7F }))
 
@@ -27,8 +29,13 @@ if (import.meta.main) {
         console.log("CONNECTED");
       };
       socket.onmessage = (event) => {
-        console.log(`RECEIVED: ${event.data}`);
-        socket.send("pong");
+        const data = JSON.parse(event.data);
+        switch (data.event_name) {
+          case "ccupdate":
+            midi_out.sendMessage(new midi.ControlChange({ value: data.value, controller: data.cc, channel: data.channel }));
+            break;
+        }
+        console.log(data);
       };
       socket.onclose = () => console.log("DISCONNECTED");
       socket.onerror = (error) => console.error("ERROR:", error);
