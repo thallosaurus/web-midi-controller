@@ -84,6 +84,7 @@ export const setup_slider = (
         const y = rect.bottom - e.clientY;
 
         switch (options.mode) {
+            case "snapback":
             case "absolute":
                 {
                     const v = Math.floor(
@@ -99,7 +100,6 @@ export const setup_slider = (
                 }
                 break;
 
-            case "snapback":
             case "relative":
                 {
                     const deltaY = baseY - e.clientY;

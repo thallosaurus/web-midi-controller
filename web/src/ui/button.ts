@@ -65,6 +65,8 @@ export const setup_ccbutton = (
         update_value(options.value);
     }
 
+    
+
     button.addEventListener("pointerdown", start);
     //button.addEventListener("pointermove", move);
     button.addEventListener("pointerup", end);

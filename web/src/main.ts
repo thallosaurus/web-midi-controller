@@ -2,7 +2,7 @@ import "./style.css";
 import { setup_ccbutton } from "./ui/button.ts";
 import { change_overlay, setup_overlay, setup_tabs } from "./ui/overlay.ts";
 import { setup_slider } from "./ui/slider.ts";
-
+import { connect_local } from "./websocket.ts";
 
 export function vibrate() {
     if (navigator.vibrate) {
@@ -10,7 +10,12 @@ export function vibrate() {
     }
 }
 
+const open_dialog = () {
+  document.querySelectorAll<HTMLDivElement>("div.overlay")!
+}
+
 const init = () => {
+  connect_local();
   for (const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!) {
     setup_overlay(overlay)
   }
@@ -52,3 +57,16 @@ const init = () => {
 window.addEventListener("DOMContentLoaded", () => {
   init();
 });
+
+document.querySelector<HTMLButtonElement>("#menu_container button")!.addEventListener("click", (_ev) => {
+  //open dialog
+  alert("dialog")
+});
+
+document.querySelector<HTMLDivElement>("#connection_status")!.addEventListener("click", (_ev) => {
+  connect_local();
+});
+
+export default {
+  
+}

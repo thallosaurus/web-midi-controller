@@ -7,13 +7,21 @@
   display: none !important;
 }
 
+.tab_parent {
+  display: flex;
+  justify-content: end;
+}
+
 .tab_parent a {
+  display: block;
     margin: 0 1em;
     font-size: 1em;
 
     color: black;
     background-color: white;
-    padding: 1em 1em;
+    padding: .5em .5em;
+    align-self: center;
+    font-size: 1.2em;
 }
 
 #grid-demo.overlay {

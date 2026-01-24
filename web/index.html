@@ -15,8 +15,13 @@
   <body>
     <div id="app">
       <header>
-        <h1>MIDI Control</h1>
-        <div></div>
+        <div>
+
+          <h1>MIDI Control</h1>
+        </div>
+        <div id="menu_container">
+          <button>Menu</button>
+        </div>
         <div id="overlay_selector">
           
         </div>
@@ -24,9 +29,9 @@
       <main>
         <div class="overlay grid" id="grid-demo">
           <div id="sliders">
-            <div class="ccslider" data-channel="1" data-cc="67" data-mode="snapback" data-label="Snapback"></div>
-            <div class="ccslider" data-channel="1" data-cc="68" data-mode="absolute" data-label="Absolute"></div>
-            <div class="ccslider" data-channel="1" data-cc="69" data-mode="relative" data-label="Relative"></div>
+            <div class="ccslider bar-fullwidth" data-channel="1" data-cc="67" data-mode="snapback" data-label="Snapback"></div>
+            <div class="ccslider bar-fullwidth" data-channel="1" data-cc="68" data-mode="absolute" data-label="Absolute"></div>
+            <div class="ccslider bar-fullwidth" data-channel="1" data-cc="69" data-mode="relative" data-label="Relative"></div>
           </div>
           <div id="buttons">
             <div class="ccbutton" data-channel="1" data-cc="70" data-value="127" data-label="label" data-mode="trigger"></div>
@@ -35,12 +40,15 @@
             <div class="ccbutton" data-channel="1" data-cc="73" data-value="127" data-label="label"></div>
           </div>
         </div>
-        <div class="overlay grid" id="midi-demo"></div>
+        <div class="overlay grid" id="dj-demo"></div>
       </main>
       <footer>
-        <h2>Connection Status: <span id="connection_status"></span></h2>
+        <h2>Connection Status: <span id="connection_status">connecting...</span></h2>
       </footer>
     </div>
+    <dialog id="test_dialog" open>
+      <h1>hello</h1>
+    </dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

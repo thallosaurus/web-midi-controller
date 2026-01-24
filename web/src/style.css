@@ -25,14 +25,42 @@ body, #app {
   grid-area: header;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  border-bottom: .5em solid grey;
 }
+
 #app > main {
+  padding: 1em 0;
   grid-area: main;
   align-self: stretch;
   width: calc(100% - 2em);
   height: 100%;
   margin: 0 1em;
 }
+
 #app > footer {
+  border-top: .5em solid grey;
   grid-area: footer;
+}
+
+.bar-fullwidth {
+  width: 100%;
+}
+
+.bar-fixed-small {
+  width: 100px;
+}
+.bar-fixed-middle {
+  width: 200px;
+}
+.bar-fixed-large {
+  width: 300px;
+}
+#menu_container button {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color:white;
+  font-family: monospace;
+  font-size: 1.5em;
+  border: none;
 }
