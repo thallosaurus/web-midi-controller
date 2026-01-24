@@ -1,6 +1,6 @@
 import { vibrate } from "../main.ts";
 import "./button.css";
-import { CCEvent, bus } from "../events.ts";
+import { CCEvent, bus, process_internal, register_widget } from "../events.ts";
 
 export interface CCButtonOptions {
     label?: string;
@@ -25,14 +25,23 @@ export const setup_ccbutton = (
     }
 
     const reset = () => {
-        update_value(options.value_off ?? 0);
+        update_bus_value(options.value_off ?? 0);
     }
 
     const update_value = (v: number) => {
         value = v;
         set_label();
+        if (value > 0) {
+
+            button.classList.add("press");
+        } else {
+            button.classList.remove("press");
+        }
         //midi_messages.di
-        bus.dispatchEvent(new CCEvent(options.channel, value, options.cc))
+    }
+
+    const update_bus_value = (v:number) => {
+        process_internal(new CCEvent(options.channel, v, options.cc))
     }
 
     const start = (e: PointerEvent) => {
@@ -41,7 +50,6 @@ export const setup_ccbutton = (
         const el = e.currentTarget as HTMLElement;
         active_pointer = e.pointerId;
         el.setPointerCapture(e.pointerId);
-        el.classList.add("press");
 
 
         update();
@@ -62,10 +70,10 @@ export const setup_ccbutton = (
         reset();
     }
     const update = () => {
-        update_value(options.value);
+        update_bus_value(options.value);
     }
 
-    
+    register_widget(options.cc, update_value);
 
     button.addEventListener("pointerdown", start);
     //button.addEventListener("pointermove", move);

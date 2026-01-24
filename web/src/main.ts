@@ -10,8 +10,15 @@ export function vibrate() {
     }
 }
 
-const open_dialog = () {
-  document.querySelectorAll<HTMLDivElement>("div.overlay")!
+const close_dialog = (id: string) => {
+  const dialog = document.querySelector<HTMLDialogElement>("dialog#"+id)!;
+  console.log(dialog);
+  dialog.close("close");
+}
+
+const open_dialog = (id: string) => {
+  const dialog = document.querySelector<HTMLDialogElement>("dialog#"+id)!
+  dialog.showModal()
 }
 
 const init = () => {
@@ -54,17 +61,20 @@ const init = () => {
   change_overlay(0);
 };
 
-window.addEventListener("DOMContentLoaded", () => {
-  init();
-});
+self.addEventListener("DOMContentLoaded", init);
 
 document.querySelector<HTMLButtonElement>("#menu_container button")!.addEventListener("click", (_ev) => {
   //open dialog
-  alert("dialog")
+  open_dialog("menu")
 });
 
 document.querySelector<HTMLDivElement>("#connection_status")!.addEventListener("click", (_ev) => {
   connect_local();
+});
+
+document.querySelector<HTMLButtonElement>("dialog footer button[data-role='close']")!.addEventListener("click", (_ev: MouseEvent) => {
+  const target = (_ev.target! as HTMLButtonElement).dataset.target
+  close_dialog(target!);
 });
 
 export default {

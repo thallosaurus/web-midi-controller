@@ -64,3 +64,39 @@ body, #app {
   font-size: 1.5em;
   border: none;
 }
+
+dialog[open] {
+  position: absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  background-color: rgba(0,0,0,.8);
+  color: white;
+
+/*   display: grid;
+  grid-template-areas:
+    "dialog_header"
+    "dialog_content"
+    "dialog_actions"; */
+}
+
+dialog > header {
+  grid-area: dialog_header;
+  display:inline;
+}
+
+dialog > main {
+  grid-area: dialog_content;
+  height: 100%;
+  grid-row: 2 / 3;
+}
+
+dialog > footer {
+  grid-area: dialog_actions;
+  display:inline;
+}
+
+dialog > footer button {
+  
+}
