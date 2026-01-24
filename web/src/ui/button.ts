@@ -1,12 +1,11 @@
 import { vibrate } from "../main.ts";
 import "./button.css";
 import {
-    CCEvent,
-    NoteEvent,
     process_internal,
     register_cc_widget,
     register_midi_widget,
-} from "../events.ts";
+} from "../event_bus.ts";
+import { CCEvent, NoteEvent } from "../events.ts";
 
 export interface CCButtonOptions {
     label?: string;
@@ -32,9 +31,9 @@ export const setup_ccbutton = (
             (latch_on ? options.value : options.value_off);
     };
 
-    const reset = () => {
+    /*const _reset = () => {
         update_bus_value(options.value_off ?? 0);
-    };
+    };*/
 
     const update_value = (v: number) => {
         //value = v;
@@ -63,7 +62,6 @@ export const setup_ccbutton = (
 
         if (options.mode == "trigger") {
             latch_on = true;
-
         }
 
         touch_update();

@@ -1,6 +1,7 @@
 import { vibrate } from "../main.ts";
-import { CCEvent, process_internal, register_cc_widget } from "../events.ts";
+import { process_internal, register_cc_widget } from "../event_bus.ts";
 import "./slider.css";
+import { CCEvent } from "../events.ts";
 
 const MAX_LEVEL = 127;
 

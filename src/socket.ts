@@ -1,5 +1,5 @@
 import { upgradeWebSocket } from "hono/deno";
-import { midi_out, send_cc_update, send_note_update } from "./midi.ts";
+import { send_cc_update, send_note_update } from "./midi.ts";
 import { CCEvent, NoteEvent } from "../web/src/events.ts";
 
 type Client = {
