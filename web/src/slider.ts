@@ -24,20 +24,35 @@ export interface SliderOptions {
     mode: "absolute" | "relative" | "snapback";
 }
 
+function vibrate() {
+    navigator.vibrate(20);
+}
+
 export const setup_slider = (
     parent: HTMLDivElement,
     options: SliderOptions,
 ) => {
-    let value = 0;
+    let value = options.default_value ?? 0;
     let activePointer: number | null = null;
     let baseValue = 0;
     let baseY = 0;
 
-    let fill = document.createElement("div");
+    const fill = document.createElement("div");
     fill.classList.add("fill", options.mode);
+
+    const reset_button = document.createElement("button");
+    reset_button.addEventListener("click", () => {
+        reset();
+    })
+
+    const set_reset_label = () => {
+        reset_button.innerText = "CC" + options.cc + ": " + value;
+    }
+    set_reset_label();
 
     const start = (e: PointerEvent) => {
         e.preventDefault();
+        vibrate();
         const el = e.currentTarget as HTMLElement;
 
         activePointer = e.pointerId;
@@ -69,6 +84,7 @@ export const setup_slider = (
     const update_value = (v: number) => {
         value = v;
         fill.style.height = (value / MAX_LEVEL) * 100 + "%";
+        set_reset_label();
 
         emitter.dispatchEvent(
             new CCSliderEvent(options.channel, value, options.cc),
@@ -120,13 +136,17 @@ export const setup_slider = (
         //if ()
     };
 
+    const slider = document.createElement("div");
+    slider.classList.add("slider");
+    slider.addEventListener("pointerdown", start);
+    slider.addEventListener("pointermove", move);
+    slider.addEventListener("pointerup", end);
+    slider.addEventListener("pointercancel", end);
+    slider.appendChild(fill);
+    
     const container = document.createElement("div");
-    container.classList.add("slider");
-    container.addEventListener("pointerdown", start);
-    container.addEventListener("pointermove", move);
-    container.addEventListener("pointerup", end);
-    container.addEventListener("pointercancel", end);
-    container.appendChild(fill);
-
+    container.classList.add("container");
+    container.appendChild(slider);
+    container.appendChild(reset_button);
     parent.appendChild(container);
 };
