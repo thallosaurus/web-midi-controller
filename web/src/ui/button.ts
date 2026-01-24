@@ -1,6 +1,6 @@
-import { midi_messages } from "../main.ts";
+import { vibrate } from "../main.ts";
 import "./button.css";
-import { CCEvent } from "../events.ts";
+import { CCEvent, bus } from "../events.ts";
 
 export interface CCButtonOptions {
     label?: string;
@@ -8,7 +8,7 @@ export interface CCButtonOptions {
     cc: number;
     value: number;
     value_off?: number;
-    mode: "latch" | "trigger";
+    mode: string
 }
 
 export const setup_ccbutton = (
@@ -32,22 +32,24 @@ export const setup_ccbutton = (
         value = v;
         set_label();
         //midi_messages.di
-        midi_messages.dispatchEvent(new CCEvent(options.channel, value, options.cc))
+        bus.dispatchEvent(new CCEvent(options.channel, value, options.cc))
     }
 
     const start = (e: PointerEvent) => {
         e.preventDefault();
+        vibrate();
         const el = e.currentTarget as HTMLElement;
         active_pointer = e.pointerId;
         el.setPointerCapture(e.pointerId);
         el.classList.add("press");
 
-        update(e);
+
+        update();
     }
-    const move = (e: PointerEvent) => {
+    /*const move = (e: PointerEvent) => {
         if (e.pointerId !== active_pointer) return;
         update(e);
-    }
+    }*/
     const end = (e: PointerEvent) => {
         if (e.pointerId !== active_pointer) return;
 
@@ -59,12 +61,12 @@ export const setup_ccbutton = (
 
         reset();
     }
-    const update = (e: PointerEvent) => {
+    const update = () => {
         update_value(options.value);
     }
 
     button.addEventListener("pointerdown", start);
-    button.addEventListener("pointermove", move);
+    //button.addEventListener("pointermove", move);
     button.addEventListener("pointerup", end);
     button.addEventListener("pointercancel", end);
     set_label();

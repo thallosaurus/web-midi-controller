@@ -1,4 +1,5 @@
 .ccbutton {
+    touch-action: none;
 
 }
 
@@ -16,5 +17,6 @@
 
 .ccbutton .press {
     font-weight: bold;
-    
+    background-color: lightgrey;
+    color: black;
 }

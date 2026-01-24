@@ -1,5 +1,5 @@
-import { midi_messages } from "../main.ts";
-import { CCEvent } from "../events.ts";
+import { vibrate } from "../main.ts";
+import { CCEvent, bus } from "../events.ts";
 import "./slider.css";
 
 const MAX_LEVEL = 127;
@@ -9,13 +9,7 @@ export interface SliderOptions {
     channel: number;
     cc: number;
     default_value?: number;
-    mode: "absolute" | "relative" | "snapback";
-}
-
-function vibrate() {
-    if (navigator.vibrate) {
-        navigator.vibrate(20);
-    }
+    mode: string
 }
 
 export const setup_slider = (
@@ -76,7 +70,7 @@ export const setup_slider = (
         fill.style.height = (value / MAX_LEVEL) * 100 + "%";
         set_reset_label();
 
-        midi_messages.dispatchEvent(
+        bus.dispatchEvent(
             new CCEvent(options.channel, value, options.cc),
         );
     };

@@ -10,13 +10,6 @@ body, #app {
   flex-direction: column;
 }
 
-.overlay {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  width: 100%;
-  height: 100%;
-}
-
 #sliders {
   display: flex;
   flex-direction: row;
@@ -27,16 +20,19 @@ body, #app {
   grid-template-columns: repeat(3, 1fr);
 
 }
-header {
+
+#app > header {
   grid-area: header;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 }
-main {
+#app > main {
   grid-area: main;
   align-self: stretch;
   width: calc(100% - 2em);
   height: 100%;
   margin: 0 1em;
 }
-footer {
+#app > footer {
   grid-area: footer;
 }
