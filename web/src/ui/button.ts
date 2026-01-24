@@ -1,6 +1,12 @@
 import { vibrate } from "../main.ts";
 import "./button.css";
-import { CCEvent, NoteEvent, process_internal, register_cc_widget, register_midi_widget } from "../events.ts";
+import {
+    CCEvent,
+    NoteEvent,
+    process_internal,
+    register_cc_widget,
+    register_midi_widget,
+} from "../events.ts";
 
 export interface CCButtonOptions {
     label?: string;
@@ -15,13 +21,15 @@ export const setup_ccbutton = (
     parent: HTMLDivElement,
     options: CCButtonOptions,
 ) => {
-    let value = 0;
+    //let value = 0;
+    let latch_on = false;
     let active_pointer: number | null = null;
     const button = document.createElement("div");
     button.classList.add("target");
 
     const set_label = () => {
-        button.innerText = (options.label ?? "CC" + options.cc) + ":\n" + value;
+        button.innerText = (options.label ?? "CC" + options.cc) + ":\n" +
+            (latch_on ? options.value : options.value_off);
     };
 
     const reset = () => {
@@ -29,11 +37,14 @@ export const setup_ccbutton = (
     };
 
     const update_value = (v: number) => {
-        value = v;
+        //value = v;
+        latch_on = v > 0;
         set_label();
-        if (value > 0) {
+        if (latch_on) {
+            //latch_on = true;
             button.classList.add("press");
         } else {
+            //latch_on = false;
             button.classList.remove("press");
         }
         //midi_messages.di
@@ -50,6 +61,11 @@ export const setup_ccbutton = (
         active_pointer = e.pointerId;
         el.setPointerCapture(e.pointerId);
 
+        if (options.mode == "trigger") {
+            latch_on = true;
+
+        }
+
         touch_update();
     };
     /*const move = (e: PointerEvent) => {
@@ -64,11 +80,20 @@ export const setup_ccbutton = (
         active_pointer = null;
 
         el.classList.remove("press");
+        //reset();
+        //latch_on = false;
 
-        reset();
+        if (options.mode == "trigger") {
+            latch_on = false;
+        } else if (options.mode == "latch") {
+            latch_on = !latch_on;
+        }
+
+        touch_update();
     };
     const touch_update = () => {
-        update_bus_value(options.value);
+        console.log(latch_on);
+        update_bus_value(latch_on ? options.value : (options.value_off ?? 0));
     };
 
     register_cc_widget(options.cc, update_value);
@@ -101,7 +126,8 @@ export const setup_notebutton = (
     button.classList.add("target");
 
     const set_label = () => {
-        button.innerText = (options.label ?? "NOTE " + options.note) + ":\n" + value;
+        button.innerText = (options.label ?? "NOTE " + options.note) + ":\n" +
+            value;
     };
 
     const touch_start = (e: PointerEvent) => {
@@ -127,7 +153,9 @@ export const setup_notebutton = (
     };
 
     const update_bus_value = (v: number) => {
-        process_internal(new NoteEvent(options.channel, options.note, v > 0, v));
+        process_internal(
+            new NoteEvent(options.channel, options.note, v > 0, v),
+        );
     };
 
     const reset = () => {
@@ -137,7 +165,6 @@ export const setup_notebutton = (
 
     const touch_update = () => {
         update_bus_value(127);
-
     };
 
     const update_value = (n: number) => {
@@ -148,7 +175,7 @@ export const setup_notebutton = (
         } else {
             button.classList.remove("press");
         }
-    }
+    };
 
     register_midi_widget(options.note, update_value);
 
