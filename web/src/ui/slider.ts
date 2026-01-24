@@ -1,5 +1,5 @@
 import { vibrate } from "../main.ts";
-import { CCEvent, process_internal, register_widget } from "../events.ts";
+import { CCEvent, process_internal, register_cc_widget } from "../events.ts";
 import "./slider.css";
 
 const MAX_LEVEL = 127;
@@ -124,7 +124,7 @@ export const setup_slider = (
         //if ()
     };
 
-    register_widget(options.cc, update_value)
+    register_cc_widget(options.cc, update_value)
 
     const slider = document.createElement("div");
     slider.classList.add("slider");
