@@ -1,5 +1,5 @@
 import { vibrate } from "../main.ts";
-import { CCEvent, bus, register_widget } from "../events.ts";
+import { CCEvent, process_internal, register_widget } from "../events.ts";
 import "./slider.css";
 
 const MAX_LEVEL = 127;
@@ -70,14 +70,17 @@ export const setup_slider = (
         fill.style.height = (value / MAX_LEVEL) * 100 + "%";
         set_reset_label();
 
-        bus.dispatchEvent(
-            new CCEvent(options.channel, value, options.cc),
-        );
     };
-
+    
     const reset = () => {
-        update_value(options.default_value ?? 0);
+        update_bus_value(options.default_value ?? 0);
     };
+    
+    const update_bus_value = (v: number) => {
+        process_internal(
+            new CCEvent(options.channel, v, options.cc),
+        );
+    }
 
     const update = (e: PointerEvent) => {
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -95,7 +98,8 @@ export const setup_slider = (
                     );
 
                     if (v != value) {
-                        update_value(v);
+                        //update_value(v);
+                        update_bus_value(v);
                     }
                 }
                 break;
@@ -111,7 +115,7 @@ export const setup_slider = (
                     );
 
                     if (v != value) {
-                        update_value(v);
+                        update_bus_value(v);
                     }
                 }
 
@@ -120,7 +124,7 @@ export const setup_slider = (
         //if ()
     };
 
-    //register_widget(options.cc, update_value)
+    register_widget(options.cc, update_value)
 
     const slider = document.createElement("div");
     slider.classList.add("slider");
