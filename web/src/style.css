@@ -1,0 +1,18 @@
+body, #app {
+  margin: 0;
+  overflow: hidden;
+  background-color: black;
+}
+
+.overlay {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  color: white;
+  width: 100vw;
+  height: 100vh;
+}
+
+#sliders {
+    display: flex;
+    flex-direction: row;
+}

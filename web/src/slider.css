@@ -1,0 +1,27 @@
+.slider {
+  width: 100%;
+  height: 100%;
+  background: lightgrey;
+  touch-action: none;
+  position: relative;
+  margin: 0 .5em;
+}
+
+.slider .fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: darkgrey;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.slider .relative {
+    border-top: 1em solid green;
+}
+.slider .absolute {
+    border-top: 1em solid orange;
+}
+.slider .snapback {
+    border-top: 1em solid red;
+}

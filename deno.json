@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "dev": "deno run -A embedder.ts dev --task start",
+    "start": "deno run -A --watch main.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}
