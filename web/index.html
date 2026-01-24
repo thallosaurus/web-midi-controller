@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <title>Web Midi Controller</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
@@ -14,13 +14,28 @@
   </head>
   <body>
     <div id="app">
-      <div class="overlay">
-        <div id="sliders">
+      <header>
+        <h1>MIDI Control</h1>
+      </header>
+      <main>
+        
+        <div class="overlay">
+          <div id="sliders">
+            <div class="ccslider" data-channel="1" data-cc="67" data-mode="snapback" data-label="Snapback"></div>
+            <div class="ccslider" data-channel="1" data-cc="68" data-mode="absolute" data-label="Absolute"></div>
+            <div class="ccslider" data-channel="1" data-cc="69" data-mode="relative" data-label="Relative"></div>
+          </div>
+          <div id="buttons">
+            <div class="ccbutton" data-channel="1" data-cc="70" data-value="127" data-label="label"></div>
+            <div class="ccbutton" data-channel="1" data-cc="71" data-value="127" data-label="label"></div>
+            <div class="ccbutton" data-channel="1" data-cc="72" data-value="127" data-label="label"></div>
+            <div class="ccbutton" data-channel="1" data-cc="73" data-value="127" data-label="label"></div>
+          </div>
         </div>
-        <div id="logs">
-
-        </div>
-      </div>
+      </main>
+      <footer>
+        <h2></h2>
+      </footer>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

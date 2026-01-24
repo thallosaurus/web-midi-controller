@@ -1,6 +1,6 @@
 import { midi } from "https://deno.land/x/deno_midi/mod.ts";
 
-import type { CCSliderEvent } from './web/src/slider';
+import type { CCSliderEvent } from './web/src/events';
 
 const midi_name = "IAC Driver Bus 1";
 

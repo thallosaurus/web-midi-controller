@@ -1,23 +1,11 @@
+import { midi_messages } from "../main.ts";
+import { CCEvent } from "../events.ts";
 import "./slider.css";
-
-export const emitter = new EventTarget();
-
-export class CCSliderEvent extends Event {
-    midi_channel: number;
-    value: number;
-    cc: number;
-    event_name = "ccupdate";
-    constructor(midi_channel: number, value: number, cc: number) {
-        super("ccupdate");
-        this.midi_channel = midi_channel;
-        this.value = value;
-        this.cc = cc;
-    }
-}
 
 const MAX_LEVEL = 127;
 
 export interface SliderOptions {
+    label?: string;
     channel: number;
     cc: number;
     default_value?: number;
@@ -25,11 +13,13 @@ export interface SliderOptions {
 }
 
 function vibrate() {
-    navigator.vibrate(20);
+    if (navigator.vibrate) {
+        navigator.vibrate(20);
+    }
 }
 
 export const setup_slider = (
-    parent: HTMLDivElement,
+    container: HTMLDivElement,
     options: SliderOptions,
 ) => {
     let value = options.default_value ?? 0;
@@ -46,7 +36,7 @@ export const setup_slider = (
     })
 
     const set_reset_label = () => {
-        reset_button.innerText = "CC" + options.cc + ": " + value;
+        reset_button.innerText = (options.label ?? "CC" + options.cc) + ":\n" + value;
     }
     set_reset_label();
 
@@ -86,8 +76,8 @@ export const setup_slider = (
         fill.style.height = (value / MAX_LEVEL) * 100 + "%";
         set_reset_label();
 
-        emitter.dispatchEvent(
-            new CCSliderEvent(options.channel, value, options.cc),
+        midi_messages.dispatchEvent(
+            new CCEvent(options.channel, value, options.cc),
         );
     };
 
@@ -144,9 +134,8 @@ export const setup_slider = (
     slider.addEventListener("pointercancel", end);
     slider.appendChild(fill);
     
-    const container = document.createElement("div");
-    container.classList.add("container");
+    //const container = document.createElement("div");
     container.appendChild(slider);
     container.appendChild(reset_button);
-    parent.appendChild(container);
+    //parent.appendChild(container);
 };

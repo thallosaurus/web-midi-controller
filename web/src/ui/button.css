@@ -1,0 +1,20 @@
+.ccbutton {
+
+}
+
+.ccbutton .target {
+    background-color: grey;
+    width: calc(100% - 2em);
+    height: calc(100% - 2em);
+    margin: 1em;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+    font-family: monospace;
+}
+
+.ccbutton .press {
+    font-weight: bold;
+    
+}

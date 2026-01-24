@@ -1,22 +1,41 @@
-import './style.css'
-import { CCSliderEvent, emitter, setup_slider } from "./slider";
-import ws from './websocket';
+import "./style.css";
+import { setup_ccbutton } from "./ui/button.ts";
+import { setup_slider } from "./ui/slider.ts";
+import { CCEvent } from "./events";
+import ws from "./websocket";
 
-//document.querySelector<HTMLDivElement>('#app')!.innerHTML = `<h1>FUCK MY LIFE</h1>`
+export const midi_messages = new EventTarget();
 
+const init = () => {
+  midi_messages.addEventListener("ccupdate", (update: CCEvent) => {
+    console.log(update);
+    ws.send(JSON.stringify(update));
+  });
 
-//setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
-const sliders = document.querySelector<HTMLDivElement>("#sliders")!
+  for (const ccslider of document.querySelectorAll<HTMLDivElement>("div.ccslider")!) {
+    const { channel, cc, mode, label } = ccslider.dataset;
+    console.log(channel, cc, mode, label);
+    setup_slider(ccslider, {
+      channel,
+      cc,
+      mode,
+      label
+    });
+  }
 
-emitter.addEventListener("ccupdate", (update: CCSliderEvent) => {
-  console.log(update);
-  ws.send(JSON.stringify(update));
+  for (const ccbutton of document.querySelectorAll<HTMLDivElement>("div.ccbutton")!) {
+    const { channel, cc, value, value_off, label } = ccbutton.dataset;
+    console.log(channel, cc);
+    setup_ccbutton(ccbutton, {
+      cc,
+      channel,
+      value: parseInt(value),
+      value_off,
+      label
+    })
+  }
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  init();
 });
-
-for (let i = 0; i < 5; i++) {
-  setup_slider(sliders, {
-    channel: 1,
-    cc: i,
-    mode: "snapback"
-  })
-}

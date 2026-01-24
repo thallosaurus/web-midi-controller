@@ -1,11 +1,11 @@
-.container {
+.ccslider {
   width: 100%;
   display: flex;
   flex-direction: column;
   margin: 0 .5em;
 }
 
-.container button {
+.ccslider button {
   width: 100%;
   background-color: transparent;
   color: white;
