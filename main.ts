@@ -1,6 +1,6 @@
 import { midi } from "https://deno.land/x/deno_midi/mod.ts";
 
-import type { CCSliderEvent } from './web/src/events';
+//import type { CCSliderEvent } from "./web/src/events";
 
 const midi_name = "IAC Driver Bus 1";
 
@@ -18,7 +18,14 @@ if (import.meta.main) {
       if (request.headers.get("upgrade") !== "websocket") {
         // If the request is a normal HTTP request,
         // we serve the client HTML file.
-        const file = await Deno.open("./index.html", { read: true });
+
+        let url = new URL(request.url);
+        console.log(url.pathname);
+
+        let p = url.pathname;
+        if (p == "/") p = "/index.html"
+
+        const file = await Deno.open("./web/dist" + p, { read: true });
         return new Response(file.readable);
       }
       // If the request is a websocket upgrade,
@@ -32,7 +39,13 @@ if (import.meta.main) {
         const data = JSON.parse(event.data);
         switch (data.event_name) {
           case "ccupdate":
-            midi_out.sendMessage(new midi.ControlChange({ value: data.value, controller: data.cc, channel: data.channel }));
+            midi_out.sendMessage(
+              new midi.ControlChange({
+                value: data.value,
+                controller: data.cc,
+                channel: data.channel,
+              }),
+            );
             break;
         }
         console.log(data);

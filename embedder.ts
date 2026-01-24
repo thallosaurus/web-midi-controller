@@ -6,7 +6,7 @@ const options = {
     mappings: [
         {
             sourceDir: "web/build",
-            destDir: "embed/static"
+            destDir: "embed/st"
         },
     ]
 }
