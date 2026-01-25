@@ -3,6 +3,7 @@
     "dev": "deno run -A --watch main.ts",
     "start": "deno task dev",
     "build:ui": "cd web && yarn build",
+    "compile": "deno compile -A --include web/dist -o bin/ main.ts",
     "compile:mac64": "deno compile -A --include web/dist --target aarch64-apple-darwin -o bin/midi-control-darwin-aarch64 main.ts",
     "compile:mac86": "deno compile -A --include web/dist --target x86_64-apple-darwin -o bin/midi-control-darwin-x86_64 main.ts",
     "compile:linux86": "deno compile -A --include web/dist --target x86_64-unknown-linux-gnu -o bin/midi-control-linux-x86_64 main.ts",

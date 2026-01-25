@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Build Web UI
+        run: deno task build:ui
+
+      - name: Build executable
+        run: |
+          deno task compiles
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: midi-controller-${{ runner.os }}
+          path: bin/midi-controller*
