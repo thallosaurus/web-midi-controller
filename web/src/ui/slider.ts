@@ -10,7 +10,8 @@ export interface SliderOptions {
     channel: number;
     cc: number;
     default_value?: number;
-    mode: string
+    mode: string;
+    vertical: boolean;
 }
 
 export const setup_slider = (
@@ -21,6 +22,7 @@ export const setup_slider = (
     let activePointer: number | null = null;
     let baseValue = 0;
     let baseY = 0;
+    let baseX = 0;
 
     const fill = document.createElement("div");
     fill.classList.add("fill", options.mode);
@@ -28,11 +30,12 @@ export const setup_slider = (
     const reset_button = document.createElement("button");
     reset_button.addEventListener("click", () => {
         reset();
-    })
+    });
 
     const set_reset_label = () => {
-        reset_button.innerText = (options.label ?? "CC" + options.cc) + ":\n" + value;
-    }
+        reset_button.innerText = (options.label ?? "CC" + options.cc) + ":\n" +
+            value;
+    };
     set_reset_label();
 
     const start = (e: PointerEvent) => {
@@ -45,6 +48,7 @@ export const setup_slider = (
 
         baseValue = value;
         baseY = e.clientY;
+        baseX = e.clientX;
 
         update(e);
     };
@@ -68,38 +72,60 @@ export const setup_slider = (
 
     const update_value = (v: number) => {
         value = v;
-        fill.style.height = (value / MAX_LEVEL) * 100 + "%";
+        if (options.vertical) {
+            fill.style.width = (value / MAX_LEVEL) * 100 + "%";
+        } else {
+            fill.style.height = (value / MAX_LEVEL) * 100 + "%";
+        }
         set_reset_label();
-
     };
-    
+
     const reset = () => {
         update_bus_value(options.default_value ?? 0);
     };
-    
+
     const update_bus_value = (v: number) => {
         process_internal(
             new CCEvent(options.channel, v, options.cc),
         );
-    }
+    };
 
     const update = (e: PointerEvent) => {
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-        const y = rect.bottom - e.clientY;
+        //const y = rect.bottom - e.clientY;
 
         switch (options.mode) {
             case "snapback":
             case "absolute":
                 {
-                    const v = Math.floor(
-                        Math.max(
-                            0,
-                            Math.min(MAX_LEVEL, (y / rect.height) * MAX_LEVEL),
-                        ),
-                    );
-
+                    let v;
+                    if (!options.vertical) {
+                        const n = rect.bottom - e.clientY;
+                        v = Math.floor(
+                            Math.max(
+                                0,
+                                Math.min(
+                                    MAX_LEVEL,
+                                    (n / rect.height) * MAX_LEVEL,
+                                ),
+                            ),
+                        );
+                    } else {
+                        const n = e.clientX - rect.left;
+                        v = Math.floor(
+                            Math.max(
+                                0,
+                                Math.min(
+                                    (n / rect.width) * MAX_LEVEL,
+                                    MAX_LEVEL,
+                                ),
+                            ),
+                        );
+                    }
                     if (v != value) {
                         //update_value(v);
+                        console.log(rect);
+                        console.log(v);
                         update_bus_value(v);
                     }
                 }
@@ -107,13 +133,27 @@ export const setup_slider = (
 
             case "relative":
                 {
-                    const deltaY = baseY - e.clientY;
-                    const sensitivity = MAX_LEVEL / rect.height;
+                    let v;
+                    if (!options.vertical) {
+                        const n = baseY - e.clientY;
+                        const sensitivity = MAX_LEVEL / (rect.height);
+                        const next = baseValue + n * sensitivity;
+                        //(options.vertical ? (rect.width) : (rect.height));
+                        v = Math.floor(
+                            Math.max(0, Math.min(MAX_LEVEL, next)),
+                        );
+                    } else {
+        const delta = e.clientX - baseX;
+        const sensitivity = MAX_LEVEL / rect.width;
+        const next = baseValue + delta * sensitivity;
 
-                    const next = baseValue + deltaY * sensitivity;
-                    const v = Math.floor(
-                        Math.max(0, Math.min(MAX_LEVEL, next)),
-                    );
+        v = Math.floor(
+            Math.max(0, Math.min(MAX_LEVEL, next)),
+        );
+                    }
+                    //                    const delta = options.vertical
+                    //                        ? (baseX - e.clientX)
+                    //const deltaY = baseY - e.clientY;
 
                     if (v != value) {
                         update_bus_value(v);
@@ -125,16 +165,19 @@ export const setup_slider = (
         //if ()
     };
 
-    register_cc_widget(options.cc, update_value)
+    register_cc_widget(options.cc, update_value);
 
     const slider = document.createElement("div");
-    slider.classList.add("slider");
+    slider.classList.add(
+        "slider",
+        options.vertical ? "vertical" : "horizontal",
+    );
     slider.addEventListener("pointerdown", start);
     slider.addEventListener("pointermove", move);
     slider.addEventListener("pointerup", end);
     slider.addEventListener("pointercancel", end);
     slider.appendChild(fill);
-    
+
     //const container = document.createElement("div");
     container.appendChild(slider);
     container.appendChild(reset_button);

@@ -15,6 +15,10 @@
 
 }
 
+.slider .vertical {
+
+}
+
 .slider {
   width: 100%;
   height: 100%;
@@ -23,21 +27,40 @@
   position: relative;
 }
 
-.slider .fill {
-  position: absolute;
+.slider.horizontal .fill {
   bottom: 0;
   width: 100%;
+}
+
+
+.slider.vertical .fill {
+  left: 0;  
+  height: 100%;
+}
+
+.slider .fill {
+  position: absolute;
   background: darkgrey;
   box-sizing: border-box;
   pointer-events: none;
 }
 
-.slider .relative {
+.slider.horizontal .relative {
     border-top: 1em solid green;
 }
-.slider .absolute {
+.slider.horizontal .absolute {
     border-top: 1em solid orange;
 }
-.slider .snapback {
+.slider.horizontal .snapback {
     border-top: 1em solid red;
+}
+
+.slider.vertical .relative {
+    border-right: 1em solid green;
+}
+.slider.vertical .absolute {
+    border-right: 1em solid orange;
+}
+.slider.vertical .snapback {
+    border-right: 1em solid red;
 }

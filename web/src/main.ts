@@ -35,11 +35,13 @@ const init = () => {
     const cc = parseInt(ccslider.dataset.cc ?? "0");
     const mode = ccslider.dataset.mode ?? "absolute";
     const label = ccslider.dataset.label;
+    const vertical = Boolean(ccslider.dataset.vertical);
     setup_slider(ccslider, {
       channel,
       cc,
       mode,
       label,
+      vertical
     });
   }
 
@@ -69,15 +71,15 @@ const init = () => {
   ) {
     const channel = parseInt(ccbutton.dataset.channel ?? "0");
     const note = parseInt(ccbutton.dataset.note ?? "0");
-    const value = parseInt(ccbutton.dataset.value ?? "127");
-    const value_off = parseInt(ccbutton.dataset.value_off ?? "0");
+    //const value = parseInt(ccbutton.dataset.value ?? "127");
+    //const value_off = parseInt(ccbutton.dataset.value_off ?? "0");
     const label = ccbutton.dataset.label;
     const mode = ccbutton.dataset.mode ?? "trigger";
     setup_notebutton(ccbutton, {
       note,
       channel,
-      value,
-      value_off,
+      //value,
+      //value_off,
       label,
       mode,
     });

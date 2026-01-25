@@ -45,6 +45,9 @@ body, #app {
 .bar-fullwidth {
   width: 100%;
 }
+.bar-fullheight {
+  height: 100%;
+}
 
 .bar-fixed-small {
   width: 100px;
