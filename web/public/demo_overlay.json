@@ -1,8 +1,10 @@
 [{
   "name": "Testlayout",
+  "id": "testlayout123",
   "cells": [
     {
       "mode": "horiz-mixer",
+      "id": "testcell456",
       "controls": [{
         "type": "ccslider",
         "channel": 1,
@@ -140,6 +142,83 @@
         "mode": "relative",
         "label": "Absolute Test"
       }]
+    },
+    {
+      "mode": "vert-mixer",
+      "controls": [{
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 90,
+        "mode": "relative",
+        "label": "Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 91,
+        "mode": "relative",
+        "label": "Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 92,
+        "mode": "relative",
+        "label": "Test"
+      }]
+    },
+    {
+      "mode": "grid-mixer",
+      "w": 3,
+      "h": 2,
+      "controls": [
+        {
+          "type": "ccbutton",
+          "channel": 1,
+          "cc": 12,
+          "value": 127,
+          "value_off": 0,
+          "label": "ccbutton",
+          "mode": "trigger"
+        },
+        {
+          "type": "notebutton",
+          "channel": 1,
+          "note": 73,
+          "label": "notebutton",
+          "mode": "trigger"
+        },
+        {
+          "type": "ccbutton",
+          "channel": 1,
+          "cc": 12,
+          "value": 127,
+          "value_off": 0,
+          "label": "ccbutton",
+          "mode": "trigger"
+        },
+        {
+          "type": "notebutton",
+          "channel": 1,
+          "note": 73,
+          "label": "notebutton",
+          "mode": "trigger"
+        },
+        {
+          "type": "ccbutton",
+          "channel": 1,
+          "cc": 12,
+          "value": 127,
+          "value_off": 0,
+          "label": "ccbutton",
+          "mode": "trigger"
+        },
+        {
+          "type": "notebutton",
+          "channel": 1,
+          "note": 73,
+          "label": "notebutton",
+          "mode": "trigger"
+        }
+      ]
     }
   ]
 }, {

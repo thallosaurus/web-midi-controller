@@ -42,8 +42,6 @@ body, #app {
   grid-area: footer;
 }
 
-
-
 .bar-fixed-small {
   width: 100px;
 }
@@ -102,6 +100,7 @@ dialog > footer button {
 .cell {
   height: 100%;
   width: 100%;
+  margin: .5em;
 }
 
 .vert-mixer.cell {

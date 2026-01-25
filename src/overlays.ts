@@ -1,6 +1,3 @@
-import { assert } from "https://deno.land/std@0.184.0/_util/asserts.ts";
-import type { FC } from 'hono/jsx'
-
 enum OrientationMode {
     Horizontal = "horizontal",
     Vertical = "vertical"
@@ -133,8 +130,10 @@ export async function load_overlays(path: string): Promise<Array<Overlay>> {
     const a = [];
     for await (const d of dirs) {
         //console.log(d);
-        const data = Deno.readTextFileSync(path + "/" + d.name);
-        a.push(JSON.parse(data) as Overlay);
+        if (d.isFile) {
+            const data = Deno.readTextFileSync(path + "/" + d.name);
+            a.push(JSON.parse(data) as Overlay);
+        }
     }
     return a;
 }

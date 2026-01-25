@@ -34,6 +34,8 @@ export const change_overlay = (overlayId: number) => {
 const setup_overlay_widget = (widget: any, vertical: boolean) => {
     const w = document.createElement("div");
     //w.classList.add(widget.type);
+    if (widget.id) w.id = widget.id;
+
     console.log(widget);
     switch (widget.type) {
         case "empty":
@@ -91,13 +93,16 @@ export const setup_overlay = (
 ) => {
     const overlay = document.createElement("div");
     overlay.classList.add("overlay", "hide");
+        if (options.id) overlay.id = options.id;
 
     // testing
     //overlay.id = "grid-demo"
-
+    if (options.id) overlay.id = options.id;
+    
     for (const col of options.cells) {
         const cell = document.createElement("div");
-
+        if (col.id) cell.id = col.id;
+        
         switch (col.mode) {
             case "grid-mixer":
                 cell.style.setProperty("--cols", col.w);

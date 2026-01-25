@@ -1,9 +1,16 @@
 .ccslider {
   display: flex;
   flex-direction: column;
-  margin: 0 1em;
   width: calc(100% - 2em);
   height: 100%;
+}
+
+.horiz-mixer .ccslider {
+  margin: 0 .5em;
+}
+
+.vert-mixer .ccslider {
+  margin: .5em 0;
 }
 
 .ccslider button {
