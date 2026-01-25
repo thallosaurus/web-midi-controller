@@ -96,7 +96,7 @@ export const setup_ccbutton = (
         update_bus_value(latch_on ? options.value : (options.value_off ?? 0));
     };
 
-    register_cc_widget(options.channel, options.cc, update_value);
+    register_cc_widget(options.value_off ?? 0, options.channel, options.cc, update_value);
 
     button.addEventListener("pointerdown", touch_start);
     //button.addEventListener("pointermove", move);

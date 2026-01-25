@@ -1,7 +1,7 @@
 import "./style.css";
-import { setup_ccbutton, setup_notebutton } from "./ui/button.ts";
+//import { setup_ccbutton, setup_notebutton } from "./ui/button.ts";
 import { change_overlay, setup_overlay, setup_tabs } from "./ui/overlay.ts";
-import { setup_slider } from "./ui/slider.ts";
+//import { setup_slider } from "./ui/slider.ts";
 import { connect_local } from "./websocket.ts";
 
 export function vibrate() {
@@ -16,19 +16,32 @@ const close_dialog = (id: string) => {
   dialog.close("close");
 };
 
-const open_dialog = (id: string) => {
+/*const open_dialog = (id: string) => {
   const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
   dialog.showModal();
-};
+};*/
 
-const init = () => {
+const init = async () => {
   connect_local();
-  for (
-    const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!
-  ) {
-    setup_overlay(overlay);
+
+  const overlays_parent = document.querySelector<HTMLDivElement>("main#overlays")!
+  if (import.meta.env.DEV) {
+    console.log("dev")
   }
+  const overlays = await fetch(import.meta.env.DEV ? "demo_overlay.json" : "overlays");
+  //console.log(await overlays.json());
+
   for (
+    //const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!
+    const overlay of await overlays.json()
+  ) {
+    console.log(overlay);
+    overlays_parent.appendChild(
+      setup_overlay(overlay)
+    )
+  }
+  
+  /*for (
     const ccslider of document.querySelectorAll<HTMLDivElement>("div.ccslider")!
   ) {
     const channel = parseInt(ccslider.dataset.channel ?? "1");
@@ -83,7 +96,7 @@ const init = () => {
       label,
       mode,
     });
-  }
+  }*/
 
   const overlay_selector = document.querySelector<HTMLDivElement>(
     "#overlay_selector",
@@ -94,11 +107,11 @@ const init = () => {
 
 self.addEventListener("DOMContentLoaded", init);
 
-document.querySelector<HTMLButtonElement>("#menu_container button")!
+/*document.querySelector<HTMLButtonElement>("#menu_container button")!
   .addEventListener("click", (_ev) => {
     //open dialog
     open_dialog("menu");
-  });
+  });*/
 
 document.querySelector<HTMLDivElement>("#connection_status")!.addEventListener(
   "click",
@@ -113,5 +126,7 @@ document.querySelector<HTMLButtonElement>(
   const target = (_ev.target! as HTMLButtonElement).dataset.target;
   close_dialog(target!);
 });
+
+
 
 export default {};

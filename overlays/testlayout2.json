@@ -1,0 +1,57 @@
+{
+    "name": "Testlayout 2",
+    "cells": [
+        {
+            "mode": "horiz-mixer",
+            "controls": [{
+                "type": "ccslider",
+                "channel": 1,
+                "cc": 11,
+                "mode": "relative",
+                "label": "Test"
+            }, {
+                "type": "ccslider",
+                "channel": 1,
+                "cc": 11,
+                "mode": "relative",
+                "label": "Absolute Test"
+            }, {
+                "type": "ccslider",
+                "channel": 1,
+                "cc": 11,
+                "mode": "relative",
+                "label": "Absolute Test"
+            }, {
+                "type": "ccslider",
+                "channel": 1,
+                "cc": 11,
+                "mode": "relative",
+                "label": "Absolute Test"
+            }, {
+                "type": "ccslider",
+                "channel": 1,
+                "cc": 11,
+                "mode": "relative",
+                "label": "Absolute Test"
+            }, {
+                "type": "ccslider",
+                "channel": 1,
+                "cc": 11,
+                "mode": "relative",
+                "label": "Absolute Test"
+            }, {
+                "type": "ccslider",
+                "channel": 1,
+                "cc": 11,
+                "mode": "relative",
+                "label": "Absolute Test"
+            }, {
+                "type": "ccslider",
+                "channel": 1,
+                "cc": 11,
+                "mode": "relative",
+                "label": "Absolute Test"
+            }]
+        }
+    ]
+}

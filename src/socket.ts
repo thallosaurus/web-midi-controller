@@ -39,7 +39,6 @@ export const websocketMiddleware = upgradeWebSocket((c) => {
         ws: raw,
       });
 
-      console.log(clients);
     },
     onMessage(event, ws) {
       const id = get_connection_id(ws.raw as WebSocket);
@@ -74,7 +73,6 @@ export const websocketMiddleware = upgradeWebSocket((c) => {
       if (!client) return;
 
       clients.delete(raw);
-      console.log(clients);
     },
   };
 });

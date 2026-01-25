@@ -15,7 +15,7 @@ for (let ch = 0; ch < 16; ch++) {
 }
 
 // Register a CC Widget on the bus
-export const register_cc_widget = (channel: number, cc: number, cb: CCCallback) => {
+export const register_cc_widget = (init: number, channel: number, cc: number, cb: CCCallback) => {
     const channel_map = cc_map.get(channel)!;
     if (!channel_map.has(cc)) {
         channel_map.set(cc, []);
@@ -23,6 +23,8 @@ export const register_cc_widget = (channel: number, cc: number, cb: CCCallback) 
 
     const c = channel_map.get(cc)!;
     c.push(cb);
+
+    cb(init);
 };
 
 // Update all widgets that are bound to the cc number
@@ -32,7 +34,7 @@ export const cc_update_on_bus = (channel: number, cc: number, value: number) => 
     if (!ch.has(cc)) return;
 
     for (const cb of ch.get(cc)!) {
-        console.log("updating " + cc);
+        //console.log("updating " + cc);
         cb(value);
     }
 };

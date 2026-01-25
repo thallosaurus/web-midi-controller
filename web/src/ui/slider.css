@@ -1,7 +1,9 @@
 .ccslider {
   display: flex;
   flex-direction: column;
-  margin: 0 .5em;
+  margin: 0 1em;
+  width: calc(100% - 2em);
+  height: 100%;
 }
 
 .ccslider button {
@@ -12,10 +14,6 @@
   margin: .3em;
   font-family: monospace;
   border: none;
-
-}
-
-.slider .vertical {
 
 }
 
@@ -33,10 +31,10 @@
 }
 
 
-.slider.vertical .fill {
+/*.slider.vertical .fill {
   left: 0;  
   height: 100%;
-}
+}*/
 
 .slider .fill {
   position: absolute;
@@ -63,4 +61,18 @@
 }
 .slider.vertical .snapback {
     border-right: 1em solid red;
+}
+
+/* refactor */
+
+.ccslider .vertical {
+  width: 100%;
+}
+.cclider .horizontal {
+  height: 100%;
+}
+
+.ccslider .vertical .fill {
+  left: 0;  
+  height: 100%;
 }

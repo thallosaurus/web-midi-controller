@@ -1,0 +1,175 @@
+[{
+  "name": "Testlayout",
+  "cells": [
+    {
+      "mode": "horiz-mixer",
+      "controls": [{
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 10,
+        "mode": "snapback",
+        "label": "Snapback Test",
+        "default": 64
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "absolute",
+        "label": "Absolute Test"
+      }, {
+        "type": "ccbutton",
+        "channel": 1,
+        "cc": 12,
+        "value": 127,
+        "value_off": 0,
+        "label": "ccbutton",
+        "mode": "trigger"
+      }, {
+        "type": "notebutton",
+        "channel": 1,
+        "note": 73,
+        "label": "notebutton",
+        "mode": "trigger"
+      }]
+    },
+    {
+      "mode": "vert-mixer",
+      "controls": [
+        {
+          "type": "ccslider",
+          "channel": 1,
+          "cc": 10,
+          "mode": "snapback",
+          "label": "Snapback Test"
+        },
+        {
+          "type": "ccslider",
+          "channel": 1,
+          "cc": 10,
+          "mode": "snapback",
+          "label": "Snapback Test"
+        },
+        {
+          "type": "ccslider",
+          "channel": 1,
+          "cc": 10,
+          "mode": "snapback",
+          "vertical": true,
+          "label": "Vert Test"
+        }
+      ]
+    },
+    {
+      "mode": "vert-mixer",
+      "controls": [
+        {
+          "type": "ccslider",
+          "channel": 1,
+          "cc": 10,
+          "mode": "snapback",
+          "label": "Snapback Test"
+        },
+        {
+          "type": "ccslider",
+          "channel": 1,
+          "cc": 10,
+          "mode": "snapback",
+          "label": "Snapback Test"
+        },
+        {
+          "type": "ccslider",
+          "channel": 1,
+          "cc": 10,
+          "mode": "snapback",
+          "label": "Snapback Test"
+        }
+      ]
+    }
+  ]
+}, {
+  "name": "Testlayout 2",
+  "cells": [
+    {
+      "mode": "horiz-mixer",
+      "controls": [{
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "relative",
+        "label": "Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "relative",
+        "label": "Absolute Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "relative",
+        "label": "Absolute Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "relative",
+        "label": "Absolute Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "relative",
+        "label": "Absolute Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "relative",
+        "label": "Absolute Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "relative",
+        "label": "Absolute Test"
+      }, {
+        "type": "ccslider",
+        "channel": 1,
+        "cc": 11,
+        "mode": "relative",
+        "label": "Absolute Test"
+      }]
+    }
+  ]
+}, {
+  "name": "Grid Test",
+  "cells": [
+    {
+      "mode": "grid-mixer",
+      "w": 4,
+      "h": 4,
+      "controls": [
+        {
+          "type": "empty"
+        },
+        {
+          "type": "ccbutton",
+          "channel": 1,
+          "cc": 12,
+          "value": 127,
+          "value_off": 0,
+          "label": "ccbutton",
+          "mode": "trigger"
+        },
+        {
+          "type": "notebutton",
+          "channel": 1,
+          "note": 73,
+          "label": "notebutton",
+          "mode": "trigger"
+        }
+      ]
+    }
+  ]
+}]

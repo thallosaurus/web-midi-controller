@@ -27,6 +27,7 @@ interface Flex extends Layout {
 
 enum WidgetType {
     CCSlider = "ccslider",
+    CCButton = "ccbutton",
     NoteButton = "notebutton"
 }
 
@@ -44,12 +45,27 @@ interface CCSliderDef extends Widget {
     orientation: OrientationMode
 }
 
+enum CCButtonMode {
+    Trigger = "trigger",
+    Latch = "latch"
+}
+
+interface CCButtonDef extends Widget {
+    channel: number,
+    cc: number,
+    value: number,
+    value_off?: number,
+    label: string,
+    mode: CCButtonMode
+}
+
 interface NoteButtonDef extends Widget {
     channel: number,
     note: number,
     label: string
 }
 
+/*
 export const Index: FC<{overlays: Array<Overlay>}> = (props: {
     overlays: Array<Overlay>
 }) => {
@@ -110,13 +126,19 @@ export const OverlayPage: FC<{overlays: Array<Overlay>}> = (props: {
             {v.layout.body.map((w) => render_widget(w))}
         </div>
     })}</>
-}
+}*/
 
 export async function load_overlays(path: string): Promise<Array<Overlay>> {
-    const data = await Deno.readTextFile(path);
-    return JSON.parse(data) as Array<Overlay>;
+    const dirs = await Deno.readDir(path);
+    const a = [];
+    for await (const d of dirs) {
+        //console.log(d);
+        const data = Deno.readTextFileSync(path + "/" + d.name);
+        a.push(JSON.parse(data) as Overlay);
+    }
+    return a;
 }
-
+/*
 function render_widget(widget: Widget) {
     switch (widget.type) {
         case WidgetType.CCSlider:
@@ -124,12 +146,16 @@ function render_widget(widget: Widget) {
                 const w = widget as CCSliderDef;
                 return <div className={w.type} data-channel={w.channel} data-cc={w.cc} data-mode={w.mode} data-vertical={w.mode} data-label={w.label}></div>
             }
-            break;
+
+        case WidgetType.CCButton:
+            {
+                const w = widget as CCButtonDef;
+            }
+        break;
         case WidgetType.NoteButton:
             {
                 const w = widget as NoteButtonDef;
                 return <div className={w.type} data-note={w.note} data-label={w.label}></div>
             }
-            break;
     }
-}
+}*/

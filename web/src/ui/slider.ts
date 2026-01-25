@@ -143,17 +143,14 @@ export const setup_slider = (
                             Math.max(0, Math.min(MAX_LEVEL, next)),
                         );
                     } else {
-        const delta = e.clientX - baseX;
-        const sensitivity = MAX_LEVEL / rect.width;
-        const next = baseValue + delta * sensitivity;
+                        const delta = e.clientX - baseX;
+                        const sensitivity = MAX_LEVEL / rect.width;
+                        const next = baseValue + delta * sensitivity;
 
-        v = Math.floor(
-            Math.max(0, Math.min(MAX_LEVEL, next)),
-        );
+                        v = Math.floor(
+                            Math.max(0, Math.min(MAX_LEVEL, next)),
+                        );
                     }
-                    //                    const delta = options.vertical
-                    //                        ? (baseX - e.clientX)
-                    //const deltaY = baseY - e.clientY;
 
                     if (v != value) {
                         update_bus_value(v);
@@ -165,7 +162,12 @@ export const setup_slider = (
         //if ()
     };
 
-    register_cc_widget(options.channel, options.cc, update_value);
+    register_cc_widget(
+        options.default_value ?? 0,
+        options.channel,
+        options.cc,
+        update_value,
+    );
 
     const slider = document.createElement("div");
     slider.classList.add(
