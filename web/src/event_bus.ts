@@ -14,6 +14,7 @@ for (let ch = 0; ch < 16; ch++) {
     note_map.set(ch + 1, new Map<number, Array<NoteCallback>>());   //index + 1 for convenience
 }
 
+// Register a CC Widget on the bus
 export const register_cc_widget = (channel: number, cc: number, cb: CCCallback) => {
     const channel_map = cc_map.get(channel)!;
     if (!channel_map.has(cc)) {
@@ -24,6 +25,7 @@ export const register_cc_widget = (channel: number, cc: number, cb: CCCallback) 
     c.push(cb);
 };
 
+// Update all widgets that are bound to the cc number
 export const cc_update_on_bus = (channel: number, cc: number, value: number) => {
     const ch = cc_map.get(channel)!;
 
@@ -35,17 +37,19 @@ export const cc_update_on_bus = (channel: number, cc: number, value: number) => 
     }
 };
 
+// Register a midi widget on the bus
 export const register_midi_widget = (channel: number, note: number, cb: NoteCallback) => {
     const ch = note_map.get(channel)!;
-
+    
     if (!ch.has(note)) {
         ch.set(note, []);
     }
-
+    
     const n = ch.get(note)!;
     n.push(cb);
 };
 
+// Update all widgets bound to the midi number
 export const midi_update_on_bus = (channel: number, note: number, velocity: number) => {
     const ch = note_map.get(channel)!;
 

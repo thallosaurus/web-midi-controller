@@ -82,8 +82,6 @@ export const setup_ccbutton = (
         active_pointer = null;
 
         el.classList.remove("press");
-        //reset();
-        //latch_on = false;
 
         if (options.mode == "trigger") {
             latch_on = false;

@@ -1,0 +1,19 @@
+[{
+    "mode": "horizontal",
+    "layout": {
+        "cols": 2,
+        "body": [{
+            "type": "ccslider",
+            "channel": 1,
+            "cc": 10,
+            "mode": "snapback",
+            "label": "Snapback Test"
+        }, {
+            "type": "ccslider",
+            "channel": 1,
+            "cc": 11,
+            "mode": "absolute",
+            "label": "Absolute Test"
+        }]
+    }
+}]

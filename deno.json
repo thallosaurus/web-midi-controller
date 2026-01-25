@@ -1,10 +1,22 @@
 {
   "tasks": {
-    "dev": "deno run -A embedder.ts dev --task start",
-    "start": "deno run -A --watch main.ts"
+    "dev": "deno run -A --watch main.tsx",
+    "start": "deno task dev",
+    "build:ui": "cd web && yarn build",
+    "compile:mac64": "deno compile -A --include web/dist --target aarch64-apple-darwin -o bin/midi-control-darwin-aarch64 main.tsx",
+    "compile:mac86": "deno compile -A --include web/dist --target x86_64-apple-darwin -o bin/midi-control-darwin-x86_64 main.tsx",
+    "compile:linux86": "deno compile -A --include web/dist --target x86_64-unknown-linux-gnu -o bin/midi-control-linux-x86_64 main.tsx",
+    "compile:linux64": "deno compile -A --include web/dist --target aarch64-unknown-linux-gnu -o bin/midi-control-linux-aarch64 main.tsx",
+    "compile:win64": "deno compile -A --include web/dist --target x86_64-pc-windows-msvc -o bin/midi-control-windows-x86_64.exe main.tsx"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
-    "hono": "jsr:@hono/hono"
+    "hono": "jsr:@hono/hono",
+    "react": "npm:react",
+    "@types/react": "npm:@types/react"
+  },
+  "compilerOptions": {
+    "jsx": "precompile",
+    "jsxImportSource": "jsr:@hono/hono/jsx"
   }
 }

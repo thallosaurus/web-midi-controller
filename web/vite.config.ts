@@ -12,12 +12,12 @@ export default defineConfig({
   target: ["es5", "chrome81"],
   build: {
     minify: true,
-    /*rollupOptions: {
+    rollupOptions: {
       output: {
         entryFileNames: `assets/[name].js`,
         chunkFileNames: `assets/[name].js`,
         assetFileNames: `assets/[name].[ext]`,
       },
-    },*/
+    },
   },
 });
