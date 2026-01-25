@@ -38,7 +38,7 @@ export const midi_update_on_bus = (note: number, velocity: number) => {
     if (!note_map.has(note)) return;
 
     for (const cb of note_map.get(note)!) {
-        console.log("note updating " + note);
+        //console.log("note updating " + note);
         cb(velocity);
     }
 };
@@ -47,7 +47,7 @@ export const midi_update_on_bus = (note: number, velocity: number) => {
 export const process_external = (msg: string) => {
     //bus.dispatchEvent(ev);
     const data = JSON.parse(msg);
-    console.log(data);
+    //console.log(data);
     switch (data.event_name) {
         case "ccupdate":
             {

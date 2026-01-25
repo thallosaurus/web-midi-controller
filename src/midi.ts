@@ -9,18 +9,18 @@ const midi_out = new midi.Output();
 const output_index = midi_out.getPorts().findIndex((v, i) => v == midi_name_out);
 midi_out.openPort(output_index);
 
-const midi_in = new midi.Input();
+/*const midi_in = new midi.Input();
 const input_index = midi_in.getPorts().findIndex((v, i) => v == midi_name_in)
-midi_in.openPort(input_index);
+midi_in.openPort(input_index);*/
 
-midi_in.on("note", (ev) => {
+/*midi_in.on("note", (ev) => {
   //let event = new CCEvent()
   //let event = new NoteEvent()
   //broadcast()
   console.log(ev);
   const event = new NoteEvent(ev.message.data.channel ?? 1, ev.message.data.note, ev.message.isNoteOn(), ev.message.data.velocity);
   broadcast(JSON.stringify(event), [])
-})
+})*/
 
 export function send_note_update(msg: NoteEvent) {
   //console.log(msg);

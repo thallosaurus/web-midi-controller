@@ -16,6 +16,7 @@ export interface CCButtonOptions {
     mode: string;
 }
 
+/// Function that mounts the Button as a child of the specified Div Element
 export const setup_ccbutton = (
     parent: HTMLDivElement,
     options: CCButtonOptions,
@@ -35,6 +36,7 @@ export const setup_ccbutton = (
         update_bus_value(options.value_off ?? 0);
     };*/
 
+    // Update UI only
     const update_value = (v: number) => {
         //value = v;
         latch_on = v > 0;
@@ -49,10 +51,12 @@ export const setup_ccbutton = (
         //midi_messages.di
     };
 
+    // Update State on the Bus
     const update_bus_value = (v: number) => {
         process_internal(new CCEvent(options.channel, v, options.cc));
     };
 
+    // called, when the touch begins
     const touch_start = (e: PointerEvent) => {
         e.preventDefault();
         vibrate();
@@ -62,9 +66,9 @@ export const setup_ccbutton = (
 
         if (options.mode == "trigger") {
             latch_on = true;
+            touch_update();
         }
 
-        touch_update();
     };
     /*const move = (e: PointerEvent) => {
         if (e.pointerId !== active_pointer) return;
@@ -118,14 +122,15 @@ export const setup_notebutton = (
     options: NoteButtonOptions,
 ) => {
     // velocity
-    let value = 0;
+    let latch_on = false;
+    //let value = 0;
     let active_pointer: number | null = null;
     const button = document.createElement("div");
     button.classList.add("target");
 
     const set_label = () => {
-        button.innerText = (options.label ?? "NOTE " + options.note) + ":\n" +
-            value;
+        button.innerText = (options.label ?? "NOTE " + options.note) + ":\n" + (latch_on ? "On" : "Off")
+        //value;
     };
 
     const touch_start = (e: PointerEvent) => {
@@ -135,7 +140,11 @@ export const setup_notebutton = (
         active_pointer = e.pointerId;
         el.setPointerCapture(e.pointerId);
 
-        touch_update();
+        if (options.mode == "trigger") {
+            latch_on = true;
+            touch_update();
+        }
+
     };
 
     const touch_end = (e: PointerEvent) => {
@@ -147,7 +156,12 @@ export const setup_notebutton = (
 
         el.classList.remove("press");
 
-        reset();
+        if (options.mode == "trigger") {
+            latch_on = false;
+        } else if (options.mode == "latch") {
+            latch_on = !latch_on;
+        }
+        touch_update();
     };
 
     const update_bus_value = (v: number) => {
@@ -162,15 +176,20 @@ export const setup_notebutton = (
     };
 
     const touch_update = () => {
-        update_bus_value(127);
+        //update_bus_value(127);
+        console.log(latch_on);
+        update_bus_value(latch_on ? 127 : 0);
     };
 
     const update_value = (n: number) => {
-        value = n;
+        //value = n;
+        latch_on = n > 0;
         set_label();
-        if (value > 0) {
+        if (latch_on) {
+            //latch_on = true;
             button.classList.add("press");
         } else {
+            //latch_on = false;
             button.classList.remove("press");
         }
     };

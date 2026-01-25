@@ -28,3 +28,12 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
 }
+#dj-demo.overlay {
+  display: flex;
+
+}
+
+#dj-demo #sliders {
+  width: 100%;
+
+}
