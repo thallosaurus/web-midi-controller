@@ -4,40 +4,54 @@ import { send } from "./websocket.ts";
 type CCCallback = (value: number) => void;
 type NoteCallback = (value: number) => void;
 
-const cc_map = new Map<number, Array<CCCallback>>();
-const note_map = new Map<number, Array<NoteCallback>>();
+const cc_map = new Map<number, Map<number, Array<CCCallback>>>();
+for (let ch = 0; ch < 16; ch++) {
+    cc_map.set(ch + 1, new Map<number, Array<CCCallback>>());   //index + 1 for convenience
+}
 
-export const register_cc_widget = (cc: number, cb: CCCallback) => {
-    if (!cc_map.has(cc)) {
-        cc_map.set(cc, []);
+const note_map = new Map<number, Map<number, Array<NoteCallback>>>();
+for (let ch = 0; ch < 16; ch++) {
+    note_map.set(ch + 1, new Map<number, Array<NoteCallback>>());   //index + 1 for convenience
+}
+
+export const register_cc_widget = (channel: number, cc: number, cb: CCCallback) => {
+    const channel_map = cc_map.get(channel)!;
+    if (!channel_map.has(cc)) {
+        channel_map.set(cc, []);
     }
 
-    const c = cc_map.get(cc)!;
+    const c = channel_map.get(cc)!;
     c.push(cb);
 };
 
-export const cc_update_on_bus = (cc: number, value: number) => {
-    if (!cc_map.has(cc)) return;
+export const cc_update_on_bus = (channel: number, cc: number, value: number) => {
+    const ch = cc_map.get(channel)!;
 
-    for (const cb of cc_map.get(cc)!) {
+    if (!ch.has(cc)) return;
+
+    for (const cb of ch.get(cc)!) {
         console.log("updating " + cc);
         cb(value);
     }
 };
 
-export const register_midi_widget = (note: number, cb: NoteCallback) => {
-    if (!note_map.has(note)) {
-        note_map.set(note, []);
+export const register_midi_widget = (channel: number, note: number, cb: NoteCallback) => {
+    const ch = note_map.get(channel)!;
+
+    if (!ch.has(note)) {
+        ch.set(note, []);
     }
 
-    const n = note_map.get(note)!;
+    const n = ch.get(note)!;
     n.push(cb);
 };
 
-export const midi_update_on_bus = (note: number, velocity: number) => {
-    if (!note_map.has(note)) return;
+export const midi_update_on_bus = (channel: number, note: number, velocity: number) => {
+    const ch = note_map.get(channel)!;
 
-    for (const cb of note_map.get(note)!) {
+    if (!ch.has(note)) return;
+
+    for (const cb of ch.get(note)!) {
         //console.log("note updating " + note);
         cb(velocity);
     }
@@ -85,10 +99,10 @@ export const process_internal = (ev: MidiEvent) => {
 export const bus = new EventTarget();
 bus.addEventListener("ccupdate", (ev: Event) => {
     const update = ev as CCEvent;
-    cc_update_on_bus(update.cc, update.value);
+    cc_update_on_bus(update.midi_channel, update.cc, update.value);
     //console.log(update);
 });
 bus.addEventListener("noteupdate", (ev: Event) => {
     const update = ev as NoteEvent;
-    midi_update_on_bus(update.note, update.velocity);
+    midi_update_on_bus(update.midi_channel, update.note, update.velocity);
 });

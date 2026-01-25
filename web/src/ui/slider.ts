@@ -165,7 +165,7 @@ export const setup_slider = (
         //if ()
     };
 
-    register_cc_widget(options.cc, update_value);
+    register_cc_widget(options.channel, options.cc, update_value);
 
     const slider = document.createElement("div");
     slider.classList.add(

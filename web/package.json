@@ -13,6 +13,7 @@
     "vite": "^6.3.5"
   },
   "dependencies": {
-    "@vitejs/plugin-legacy": "^7.2.1"
+    "@vitejs/plugin-legacy": "^7.2.1",
+    "terser": "^5.46.0"
   }
 }

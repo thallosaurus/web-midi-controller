@@ -1,17 +1,23 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from "vite";
 
 // Polyfills via babel
-import legacy from '@vitejs/plugin-legacy'
+import legacy from "@vitejs/plugin-legacy";
 
 export default defineConfig({
   plugins: [legacy({
-      targets: ['Android >= 4.4'], // KitKat
-      additionalLegacyPolyfills: ['regenerator-runtime/runtime'], // für async/await
-      modernPolyfills: true
-    })
-  ],
-  target: ['es5', "chrome81"], // Transpile alles runter
+    targets: ["Android >= 4.4"],
+    additionalLegacyPolyfills: ["regenerator-runtime/runtime"],
+    modernPolyfills: true,
+  })],
+  target: ["es5", "chrome81"],
   build: {
-    minify: false // optional, für Debug einfacher
-  }
-})
+    minify: true,
+    /*rollupOptions: {
+      output: {
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`,
+      },
+    },*/
+  },
+});

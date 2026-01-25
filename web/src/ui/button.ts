@@ -98,7 +98,7 @@ export const setup_ccbutton = (
         update_bus_value(latch_on ? options.value : (options.value_off ?? 0));
     };
 
-    register_cc_widget(options.cc, update_value);
+    register_cc_widget(options.channel, options.cc, update_value);
 
     button.addEventListener("pointerdown", touch_start);
     //button.addEventListener("pointermove", move);
@@ -170,10 +170,10 @@ export const setup_notebutton = (
         );
     };
 
-    const reset = () => {
+    /*const reset = () => {
         //update_bus_value(options.value_off ?? 0);
         update_bus_value(0);
-    };
+    };*/
 
     const touch_update = () => {
         //update_bus_value(127);
@@ -194,7 +194,7 @@ export const setup_notebutton = (
         }
     };
 
-    register_midi_widget(options.note, update_value);
+    register_midi_widget(options.channel, options.note, update_value);
 
     button.addEventListener("pointerdown", touch_start);
     //button.addEventListener("pointermove", move);
