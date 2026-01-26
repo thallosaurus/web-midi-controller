@@ -126,8 +126,12 @@ export const OverlayPage: FC<{overlays: Array<Overlay>}> = (props: {
 }*/
 
 export async function get_custom_css(path: string): Promise<string> {
-    const data = await Deno.readTextFile(path + "/css/custom.css");
-    return data
+    try {
+        const data = await Deno.readTextFile(path + "/css/custom.css");
+        return data
+    } catch (e) {
+        return "/* no custom styles defined */";
+    }
 }
 
 export async function load_overlays(path: string): Promise<Array<Overlay>> {

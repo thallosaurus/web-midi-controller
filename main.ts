@@ -24,8 +24,13 @@ if (import.meta.main) {
   });
 
   app.get("/custom.css", async (c) => {
-    const ol = await get_custom_css(Deno.cwd());
-    return c.text(ol);
+    const ol = await get_custom_css(Deno.cwd() + "/overlays");
+    
+    return new Response(ol, {
+      headers: {
+        "Content-Type": "text/css"
+      }
+    })
   })
 
   app.get("/ws", websocketMiddleware);
