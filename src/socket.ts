@@ -24,7 +24,7 @@ export function broadcast(data: string, except: Array<string>) {
     return !except.includes(client.id);
   });
   for (const [ws, client] of filtered) {
-    console.log("sending to id " + client.id);
+    //console.log("sending to id " + client.id);
     ws.send(data);
   }
 }
@@ -45,7 +45,7 @@ export const websocketMiddleware = upgradeWebSocket((c) => {
       if (id) {
         //console.log(`Message from client: ${event.data}`);
         const data = JSON.parse(String(event.data));
-        console.log(data);
+        //console.log(data);
         switch (data.event_name) {
           case "ccupdate":
             {

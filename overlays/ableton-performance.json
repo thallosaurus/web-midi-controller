@@ -9,49 +9,49 @@
         "channel": 1,
         "cc": 10,
         "mode": "relative",
-        "label": "Volume1"
+        "label": "Volume 1"
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 20,
         "mode": "relative",
-        "label": "Volume2"
+        "label": "Volume 2"
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 30,
         "mode": "relative",
-        "label": "Volume3"
+        "label": "Volume 3"
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 40,
         "mode": "relative",
-        "label": "Volume4"
+        "label": "Volume 4"
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 50,
         "mode": "relative",
-        "label": "Volume5"
+        "label": "Volume 5"
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 60,
         "mode": "relative",
-        "label": "Volume6"
+        "label": "Volume 6"
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 70,
         "mode": "relative",
-        "label": "Volume7"
+        "label": "Volume 7"
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 80,
         "mode": "relative",
-        "label": "Volume8"
+        "label": "Volume 8"
       }]
     },
     {
@@ -61,14 +61,14 @@
         "type": "ccslider",
         "channel": 1,
         "cc": 90,
-        "mode": "relative",
-        "label": "Test"
+        "mode": "absolute",
+        "label": "Reverb"
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 91,
-        "mode": "relative",
-        "label": "Test"
+        "mode": "snapback",
+        "label": "Filter"
       }, {
         "type": "ccslider",
         "channel": 1,

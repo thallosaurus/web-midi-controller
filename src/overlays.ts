@@ -125,12 +125,18 @@ export const OverlayPage: FC<{overlays: Array<Overlay>}> = (props: {
     })}</>
 }*/
 
+export async function get_custom_css(path: string): Promise<string> {
+    const data = await Deno.readTextFile(path + "/css/custom.css");
+    return data
+}
+
 export async function load_overlays(path: string): Promise<Array<Overlay>> {
     const dirs = await Deno.readDir(path);
     const a = [];
     for await (const d of dirs) {
         //console.log(d);
-        if (d.isFile) {
+        const ext = d.name.split(".").pop();
+        if (d.isFile && ext === "json") {
             const data = Deno.readTextFileSync(path + "/" + d.name);
             a.push(JSON.parse(data) as Overlay);
         }

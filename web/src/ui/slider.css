@@ -21,7 +21,7 @@
   margin: .3em;
   font-family: monospace;
   border: none;
-
+  white-space: nowrap;
 }
 
 .slider {
