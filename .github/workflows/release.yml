@@ -35,7 +35,7 @@ jobs:
 
       - name: Build executable
         run: |
-          deno task compiles
+          deno task compile
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
