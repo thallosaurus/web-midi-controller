@@ -61,7 +61,7 @@
         "type": "ccslider",
         "channel": 1,
         "cc": 90,
-        "mode": "absolute",
+        "mode": "snapback",
         "label": "Reverb"
       }, {
         "type": "ccslider",
