@@ -329,7 +329,15 @@
     "https://deno.land/x/plug@1.0.2/download.ts": "b92bc1c1ae35fdb75828847f1ebfc7e51bf462f339729740e1cffe78384e1509",
     "https://deno.land/x/plug@1.0.2/mod.ts": "32e0006ed6142e7becdb4103c2aa4e1e9ef28459d7243d6cb404a028f7c4eb7e",
     "https://deno.land/x/plug@1.0.2/types.ts": "0490359117c53783138f2b6692a34f85bca9237314ba8cdef8ad682d81218d21",
-    "https://deno.land/x/plug@1.0.2/util.ts": "ded3db6e9bb16b8003899d9073fb310e13231ca617b35d6b7dfd53f38762cc76"
+    "https://deno.land/x/plug@1.0.2/util.ts": "ded3db6e9bb16b8003899d9073fb310e13231ca617b35d6b7dfd53f38762cc76",
+    "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/deno.json": "3fea887413cd9b3fa43020c3333b4c932e778b741354357f9e59387e64ab1bfd",
+    "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/lib/bindings/rtmidi.ts": "177f5538ba65376c22a2d7de82e6f20141790d689963fe96b4251b4ecb3cca80",
+    "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/lib/bindings/typeDefinitions.ts": "c9934ffed47151b7c5a99e743a60eccfad20635c23049216801f53d00eb2e4df",
+    "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/lib/events.ts": "01d771d5093b2133b2b8dbe82966494c496b819fc1d856ce835a1f3f820596d1",
+    "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/lib/messages.ts": "13f61a0a4d5802fb99ed3d04c2875feda2605734ae686ee88d237197c4d793b1",
+    "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/lib/midi.ts": "2f1fecc3a5a7789dd990e470404dd8eb1ce870ea1d65bf40f8a3459ba78dc8bf",
+    "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/lib/utils.ts": "baf732813d85396ec0f928f6f14d8bdc93eadc227e7f26191f781d95fc7642c5",
+    "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/mod.ts": "89757bdc7e1cd22fa097695841fd49f092c72f6154afb95889af8f77cbabfec9"
   },
   "workspace": {
     "dependencies": [

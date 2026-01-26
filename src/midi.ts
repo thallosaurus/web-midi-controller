@@ -1,4 +1,4 @@
-import { midi } from "https://deno.land/x/deno_midi/mod.ts";
+import { midi } from "deno_midi";
 import { NoteEvent, type CCEvent } from "../web/src/events.ts";
 import { broadcast } from "./socket.ts";
 

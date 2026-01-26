@@ -17,7 +17,8 @@
     "@std/assert": "jsr:@std/assert@1",
     "hono": "jsr:@hono/hono",
     "react": "npm:react",
-    "@types/react": "npm:@types/react"
+    "@types/react": "npm:@types/react",
+    "deno_midi": "https://raw.githubusercontent.com/thallosaurus/deno-midi/refs/heads/main/mod.ts"
   },
   "compilerOptions": {
     "jsx": "precompile",
