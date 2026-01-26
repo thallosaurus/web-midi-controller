@@ -16,15 +16,16 @@
   <body>
     <div id="app">
       <header>
-        <div>
-          <h1>MIDI Control v0.1</h1>
+        <div class="title">
+          <button type="button" id="overlay_menu_activator">
+            <img src="/menu.svg">
+          </button>
+          <span class="name">MIDI Control v0.1</span>
         </div>
         <div id="menu_container">
           <!-- <button>Menu</button> -->
         </div>
-        <div id="overlay_selector">
-          
-        </div>
+
       </header>
       <main id="overlays">
         <!-- <div class="overlay grid" id="grid-demo">
@@ -75,6 +76,19 @@
         <h2>Connection Status: <span id="connection_status">connecting...</span></h2>
       </footer>
     </div>
+    <dialog id="overlay_menu">
+      <main>
+
+        <h1>Select overlay</h1>
+        <ul id="overlay_selector">
+          
+        </ul>
+        <button class="shown" id="close">
+          Close
+        </button>
+
+      </main>
+    </dialog>
       <dialog id="menu">
         <header>
           <h1>hello</h1>

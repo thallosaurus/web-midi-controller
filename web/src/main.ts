@@ -16,31 +16,37 @@ const close_dialog = (id: string) => {
   dialog.close("close");
 };
 
-/*const open_dialog = (id: string) => {
+const open_dialog = (id: string) => {
   const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
   dialog.showModal();
-};*/
+};
 
 const init = async () => {
   connect_local();
 
-  const overlays_parent = document.querySelector<HTMLDivElement>("main#overlays")!
+  const overlays_parent = document.querySelector<HTMLDivElement>(
+    "main#overlays",
+  )!;
   if (import.meta.env.DEV) {
-    console.log("dev")
+    console.log("dev");
   }
-  const overlays = await fetch(import.meta.env.DEV ? "demo_overlay.json" : "overlays");
+  const overlays = await fetch(
+    import.meta.env.DEV ? "demo_overlay.json" : "overlays",
+  );
   //console.log(await overlays.json());
+
+  const ol = await overlays.json();
 
   for (
     //const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!
-    const overlay of await overlays.json()
+    const overlay of ol
   ) {
     console.log(overlay);
     overlays_parent.appendChild(
-      setup_overlay(overlay)
-    )
+      setup_overlay(overlay),
+    );
   }
-  
+
   /*for (
     const ccslider of document.querySelectorAll<HTMLDivElement>("div.ccslider")!
   ) {
@@ -101,7 +107,25 @@ const init = async () => {
   const overlay_selector = document.querySelector<HTMLDivElement>(
     "#overlay_selector",
   )!;
-  setup_tabs(overlay_selector);
+  setup_tabs(ol, overlay_selector, (i) => {
+    change_overlay(i);
+    close_dialog("overlay_menu")
+  });
+  
+  const slide_menu = document.querySelector<HTMLDivElement>(
+    "#overlay_menu_activator",
+  )!;
+  slide_menu.addEventListener("click", () => {
+    open_dialog("overlay_menu")
+  })
+
+  const slide_menu_close = document.querySelector<HTMLDivElement>(
+    "dialog#overlay_menu button#close",
+  )!;
+  slide_menu_close.addEventListener("click", () => {
+    close_dialog("overlay_menu")
+  })
+  
   change_overlay(0);
 };
 
@@ -126,7 +150,5 @@ document.querySelector<HTMLButtonElement>(
   const target = (_ev.target! as HTMLButtonElement).dataset.target;
   close_dialog(target!);
 });
-
-
 
 export default {};

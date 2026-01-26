@@ -4,6 +4,11 @@ import { setup_slider } from "./slider.ts";
 
 const overlay_emitter = new EventTarget();
 const overlays: Array<HTMLDivElement> = [];
+const unpress_overlays = () => {
+    for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
+        r.classList.remove("shown");
+    }
+}
 const hide_all_overlays = () => {
     overlays.map((v) => {
         if (!v.classList.contains("hide")) {
@@ -13,10 +18,15 @@ const hide_all_overlays = () => {
 };
 overlay_emitter.addEventListener("change", (ev: Event) => {
     hide_all_overlays();
+    unpress_overlays();
 
     const e = ev as ChangeOverlayEvent;
     console.log(e.id);
     overlays[e.id].classList.remove("hide");
+
+    for (const r of document.querySelectorAll<HTMLLIElement>("[data-overlay-index='"+e.id+"']")!) {
+        r.classList.add("shown");
+    }
 });
 
 class ChangeOverlayEvent extends Event {
@@ -36,14 +46,13 @@ const setup_overlay_widget = (widget: any, vertical: boolean) => {
     //w.classList.add(widget.type);
     if (widget.id) w.id = widget.id;
 
-    console.log(widget);
+    //console.log(widget);
     switch (widget.type) {
         case "empty":
             // for spaces in grids
-        break;
+            break;
         case "ccslider":
             w.classList.add("ccslider");
-            console.log(w);
             setup_slider(w, {
                 label: widget.label,
                 channel: widget.channel,
@@ -56,7 +65,6 @@ const setup_overlay_widget = (widget: any, vertical: boolean) => {
 
         case "ccbutton":
             w.classList.add("ccbutton");
-            console.log(w);
             setup_ccbutton(w, {
                 cc: widget.cc,
                 channel: widget.channel,
@@ -93,16 +101,16 @@ export const setup_overlay = (
 ) => {
     const overlay = document.createElement("div");
     overlay.classList.add("overlay", "hide");
-        if (options.id) overlay.id = options.id;
+    if (options.id) overlay.id = options.id;
 
     // testing
     //overlay.id = "grid-demo"
     if (options.id) overlay.id = options.id;
-    
+
     for (const col of options.cells) {
         const cell = document.createElement("div");
         if (col.id) cell.id = col.id;
-        
+
         switch (col.mode) {
             case "grid-mixer":
                 cell.style.setProperty("--cols", col.w);
@@ -120,14 +128,27 @@ export const setup_overlay = (
     return overlay;
 };
 
-export const setup_tabs = (parent: HTMLDivElement) => {
-    parent.classList.add("tab_parent");
-    for (let i = 0; i < overlays.length; i++) {
-        const t = document.createElement("a");
-        t.innerText = String(i);
+export const setup_tabs = (ols: Array<any>, parent: HTMLDivElement, cb: (index: number) => void) => {
+    //parent.classList.add("tab_parent");
+    
+    for (let i = 0; i < ols.length; i++) {
+        const t = document.createElement("li");
+        console.log(ols[i])
+
+        t.dataset.role = "overlay_switch";
+        t.dataset.overlayIndex = String(i);
+        //t.
+        t.innerText = String(ols[i].name);
+
         t.addEventListener("click", () => {
-            change_overlay(i);
+            //change_overlay(i);
+            
+            cb(i);
         });
         parent.appendChild(t);
     }
+};
+
+export const setup_chooser = (options: Array<any>, cb: (v: any) => void) => {
+    options.map(cb);
 };
