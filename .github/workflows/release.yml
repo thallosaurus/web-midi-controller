@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: 24
           cache: yarn
-          cache-dependency-path: web/yarn.json
+          cache-dependency-path: web/yarn.lock
 
 
       - uses: denoland/setup-deno@v1
