@@ -1,7 +1,10 @@
 import { defineConfig } from "vite";
+import fs from 'node:fs'
 
-// Polyfills via babel
 import legacy from "@vitejs/plugin-legacy";
+
+const ver = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+process.env.VITE_VERSION = ver.version;
 
 export default defineConfig({
   plugins: [legacy({

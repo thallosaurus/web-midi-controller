@@ -10,7 +10,8 @@
     "compile:linux86": "deno compile -A --include web/dist --target x86_64-unknown-linux-gnu -o bin/midi-control-linux-x86_64 main.ts",
     "compile:linux64": "deno compile -A --include web/dist --target aarch64-unknown-linux-gnu -o bin/midi-control-linux-aarch64 main.ts",
     "compile:win64": "deno compile -A --include web/dist --target x86_64-pc-windows-msvc -o bin/midi-control-windows-x86_64.exe main.ts",
-    "bump": "deno run -A jsr:@kellnerd/bump --tag=v --commit='Release: '"
+    "bump": "deno run -A jsr:@kellnerd/bump --file=web/package.json && deno run -A jsr:@kellnerd/bump --tag=v --commit='Release: '",
+    "version": "deno run -A jsr:@kellnerd/bump -V"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
