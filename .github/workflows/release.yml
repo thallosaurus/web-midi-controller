@@ -16,12 +16,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v2.x
 
       - name: Build Web UI
         run: deno task build:ui
+        
+
 
       - name: Build executable
         run: |
