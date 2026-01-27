@@ -21,16 +21,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          #cache: yarn
           cache-dependency-path: web/yarn.lock
-
-
-      #- run: cargo test --all-features
-
-
-      #- uses: denoland/setup-deno@v1
-      #  with:
-      #    deno-version: v2.x
 
       - name: Build Web UI
         working-directory: ./web
@@ -61,6 +52,12 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: mv target/release/midi-controller.exe midi-controller-win.exe
 
+      - name: Package WebUI and Vendor Files
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          zip -r webui.zip web/dist
+          zip -r overlays.zip overlays
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -69,6 +66,7 @@ jobs:
             midi-controller-linux
             midi-controller-macos
             midi-controller-win.exe
+            overlays.zip
 
       - name: Release (on tags only)
         uses: softprops/action-gh-release@master
@@ -81,3 +79,5 @@ jobs:
             midi-controller-linux
             midi-controller-macos
             midi-controller-win.exe
+            overlays.zip
+            webui.zip
