@@ -1,9 +1,6 @@
 use axum::{
     body::Bytes,
-    extract::{
-        FromRef,
-        ws::{Message, Utf8Bytes, WebSocket},
-    },
+    extract::ws::{Message, Utf8Bytes, WebSocket},
 };
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};

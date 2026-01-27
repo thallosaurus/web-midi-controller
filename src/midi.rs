@@ -1,12 +1,11 @@
-use std::{error::Error, sync::Arc};
 
-use midir::{InitError, MidiIO, MidiOutput, MidiOutputConnection};
+use midir::MidiOutput;
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualOutput;
 
 use tokio::{sync::mpsc, task::JoinHandle};
 
-use crate::{midi, socket::AppMessage};
+use crate::socket::AppMessage;
 
 pub(crate) struct MidiSystem {
     output_task: JoinHandle<Result<(), MidiSystemErrors>>,
