@@ -33,7 +33,7 @@ jobs:
       #    deno-version: v2.x
 
       - name: Build Web UI
-        working-directoy: ./web
+        working-directory: ./web
         run: yarn build
 
       - name: Build executable
