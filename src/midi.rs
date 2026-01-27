@@ -48,7 +48,7 @@ impl MidiSystem {
                 #[cfg(target_os = "windows")]
                 let mut connection = {
                     let c = select_port_by_name(&midi_out, &device_name);
-                    midi_out.connect(&c, &device_name).map_err(|e| MidiSystemErrors::ConnectError(e))?;
+                    midi_out.connect(&c, &device_name).map_err(|e| MidiSystemErrors::ConnectError(e))?
                 };
 
                 loop {
