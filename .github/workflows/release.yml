@@ -67,6 +67,7 @@ jobs:
             midi-controller-macos
             midi-controller-win.exe
             overlays.zip
+            webui.zip
 
       - name: Release (on tags only)
         uses: softprops/action-gh-release@master
