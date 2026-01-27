@@ -8,7 +8,7 @@ use tokio::{fs, sync::{Mutex, mpsc}};
 use tower_http::services;
 use include_dir::{Dir, include_dir};
 use tower_serve_static::ServeDir;
-use widgets::overlays::load;
+use web::overlays::load;
 
 mod midi;
 mod socket;

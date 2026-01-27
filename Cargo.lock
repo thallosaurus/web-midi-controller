@@ -713,7 +713,7 @@ dependencies = [
  "tracing-subscriber",
  "ts-rs",
  "uuid",
- "widgets",
+ "web",
 ]
 
 [[package]]
@@ -1491,6 +1491,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "web"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tokio",
+ "ts-rs",
+]
+
+[[package]]
 name = "web-sys"
 version = "0.3.85"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1498,16 +1508,6 @@ checksum = "312e32e551d92129218ea9a2452120f4aabc03529ef03e4d0d82fb2780608598"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "widgets"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "tokio",
- "ts-rs",
 ]
 
 [[package]]
