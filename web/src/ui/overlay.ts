@@ -1,5 +1,7 @@
 import { setup_ccbutton, setup_notebutton } from "./button.ts";
 import "./css/overlay.css";
+import "./css/grid.css";
+import "./css/layout.css";
 import { setup_slider } from "./slider.ts";
 
 const overlay_emitter = new EventTarget();

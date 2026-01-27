@@ -103,19 +103,13 @@ dialog > footer button {
   margin: .5em;
 }
 
-.vert-mixer.cell {
+/*.vert-mixer.cell {
   display: flex;
   flex-direction: column;
 }
 .horiz-mixer.cell {
   display: flex;
-}
-
-.grid-mixer.cell {
-  display: grid;
-  grid-template-columns: repeat(var(--cols), 1fr);
-  grid-template-rows: repeat(var(--rows), 1fr);
-}
+}*/
 
 .title {
   display: inline;

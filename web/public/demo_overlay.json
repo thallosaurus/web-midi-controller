@@ -1,5 +1,25 @@
 [
     {
+        "name": "Test Overlay",
+        "id": "test_overlay",
+        "cells": [
+            {
+                "type": "grid-mixer",
+                "w": 5,
+                "h": 3,
+                "controls": [{
+                    "type": "empty"
+                },{
+                    "type": "rotary",
+                    "channel": 1,
+                    "cc":5,
+                    "label": "test"
+                }
+            ]
+            }
+        ]
+    },
+    {
         "name": "Ableton Performance",
         "id": "ableton_performance",
         "cells": [

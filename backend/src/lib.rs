@@ -8,17 +8,18 @@ use tokio::{fs, sync::{Mutex, mpsc}};
 use tower_http::services;
 use include_dir::{Dir, include_dir};
 use tower_serve_static::ServeDir;
+use widgets::overlays::load;
 
 mod midi;
 mod socket;
 
-pub mod widgets;
+//pub mod widgets;
 
-static ASSETS_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/web/dist");
+static ASSETS_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/../web/dist");
 
 use crate::{
     midi::MidiSystem,
-    socket::{AppMessage, Clients, ws_handler}, widgets::overlays::{Overlay, load},
+    socket::{AppMessage, Clients, ws_handler}
 };
 
 #[derive(Clone)]

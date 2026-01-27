@@ -1,9 +1,13 @@
 use serde::{Deserialize, Serialize};
 use tokio::fs;
+use ts_rs::TS;
 
-use crate::widgets::cell::Cells;
+use crate::cell::Cells;
 
-#[derive(Serialize, Deserialize, Debug)]
+//use crate::widgets::cell::Cells;
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export)]
 pub struct Overlay {
     name: String,
     id: Option<String>,
