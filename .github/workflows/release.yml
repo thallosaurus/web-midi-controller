@@ -24,22 +24,22 @@ jobs:
           cache: yarn
           cache-dependency-path: web/yarn.lock
 
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      #- run: cargo test --all-features
 
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: v2.x
+
+      #- uses: denoland/setup-deno@v1
+      #  with:
+      #    deno-version: v2.x
 
       - name: Build Web UI
-        run: deno task build:ui
-        
-
+        run: cd web && yarn build
 
       - name: Build executable
-        run: |
-          deno task compile
+        run: cargo build --release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: midi-controller-${{ runner.os }}
-          path: bin/*
+          path: target/release/midi-controller*
