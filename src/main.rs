@@ -17,7 +17,7 @@ use tokio::{
 
 use crate::{
     midi::MidiSystem,
-    socket::{AppMessage, Clients, handle_socket},
+    socket::{AppMessage, Clients, ws_handler},
 };
 
 //#[cfg(not(all(debug_assertions,not(feature = "debug_embed"))))]
@@ -120,23 +120,6 @@ async fn main() {
     )
     .await
     .unwrap()
-}
-
-async fn ws_handler(
-    ws: WebSocketUpgrade,
-    user_agent: Option<TypedHeader<headers::UserAgent>>,
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
-    State(state): State<AppState>,
-) -> impl IntoResponse {
-    let user_agent = if let Some(TypedHeader(user_agent)) = user_agent {
-        user_agent.to_string()
-    } else {
-        String::from("Unknown browser")
-    };
-    println!("`{user_agent}` at {addr} connected.");
-    // finalize the upgrade process by returning upgrade callback.
-    // we can customize the callback by sending additional info such as address.
-    ws.on_upgrade(move |socket| handle_socket(socket, addr, state))
 }
 
 #[derive(Parser, Debug)]
