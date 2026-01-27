@@ -4,6 +4,7 @@ use axum::{
 use axum_extra::TypedHeader;
 use clap::Parser;
 use dashmap::DashMap;
+use serde_json::Value;
 use tower_http::services;
 use tower_serve_static::ServeDir;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -78,7 +79,27 @@ async fn main() {
         ) //custom css
         .route(
             "/overlays",
-            get(|| async { include_str!("../web/dist/demo_overlay.json") }),
+            get(|| async { 
+                let mut overlays = vec![];
+                let paths = std::fs::read_dir("overlays").unwrap();
+                for path in paths {
+                    let p = path.unwrap().path();
+                    if let Some(ext) = p.extension() && ext == "json" {
+                        let contents = fs::read_to_string(p.as_path()).await.unwrap();
+                        
+                        let json: Value = serde_json::from_str(&contents).unwrap();
+                        println!("{:?}", json);
+                        overlays.push(json);
+                    }
+                }
+                //include_str!("../web/dist/demo_overlay.json") }),
+
+                let o = serde_json::to_string(&overlays).unwrap();
+
+                let mut res = o.into_response();
+                res.headers_mut().insert("Content-Type", HeaderValue::from_static("text/css"));
+                res
+            })
         ) // serve overlays - TODO serve from disk
         .with_state(state);
     //.route("/", get(|| async { "Hello, World!" }));
