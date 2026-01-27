@@ -1,6 +1,9 @@
 use std::{error::Error, sync::Arc};
 
-use midir::{InitError, MidiIO, MidiOutput, MidiOutputConnection, os::unix::VirtualOutput};
+use midir::{InitError, MidiIO, MidiOutput, MidiOutputConnection};
+#[cfg(not(target_os = "windows"))]
+use midir::os::unix::VirtualOutput;
+
 use tokio::{sync::mpsc, task::JoinHandle};
 
 use crate::{midi, socket::AppMessage};
@@ -32,11 +35,15 @@ impl MidiSystem {
                 };
 
                 #[cfg(target_os = "windows")]
-                let mut connection = select_port_by_name(midi_out, device_name);
+                let mut connection = {
+                    let c = select_port_by_name(&midi_out, &device_name).unwrap();
+                    midi_out.connect(&c, &device_name).unwrap()
+                };
 
                 loop {
                     if let Some(msg) = rx.recv().await {
                         let m: Vec<u8> = msg.into();
+                        
                         if let Err(e) = connection.send(&m) {
                             println!("error while sending {:?} to midi", e);
                             break;
@@ -60,7 +67,7 @@ impl MidiSystem {
 
 #[cfg(target_os = "windows")]
 /// Select MIDI Device by Name
-fn select_port_by_name<T: MidiIO>(midi_io: &T, search: String) -> Result<T::Port, Box<dyn Error>> {
+fn select_port_by_name<T: MidiIO>(midi_io: &T, search: &String) -> Result<T::Port, Box<dyn Error>> {
     let midi_ports = midi_io.ports();
 
     let possible: Vec<T::Port> = midi_ports
