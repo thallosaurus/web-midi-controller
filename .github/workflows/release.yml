@@ -49,11 +49,26 @@ jobs:
       - name: Build executable
         run: cargo build --release
 
+      - name: Rename Output (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: mv target/release/midi-controller midi-controller-linux
+
+      - name: Rename Output (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: mv target/release/midi-controller midi-controller-macos
+
+      - name: Rename Output (Windows)
+        if: matrix.os == 'windows-latest'
+        run: mv target/release/midi-controller.exe midi-controller-win.exe
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: midi-controller-${{ runner.os }}
-          path: target/release/midi-controller*
+          path: |
+            midi-controller-linux
+            midi-controller-macos
+            midi-controller-win.exe
 
       - name: Release (on tags only)
         uses: softprops/action-gh-release@master
@@ -63,5 +78,6 @@ jobs:
         with:
           draft: true
           files: |
-            target/release/midi-controller
-            target/release/midi-controller.exe
+            midi-controller-linux
+            midi-controller-macos
+            midi-controller-win.exe
