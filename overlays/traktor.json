@@ -1,0 +1,230 @@
+{
+    "name": "Traktor Performance",
+    "id": "traktor_performance",
+    "cells": [
+        {
+            "mode": "grid-mixer",
+            "id": "deck_a",
+            "w": 4,
+            "h": 8,
+            "controls": [
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 16,
+                    "label": "1/4 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 15,
+                    "label": "1/2 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 14,
+                    "label": "1 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 13,
+                    "label": "2 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 12,
+                    "label": "4 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 11,
+                    "label": "8 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 10,
+                    "label": "16 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 9,
+                    "label": "32 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 17,
+                    "label": "Kill Bass",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 18,
+                    "label": "Kill Mid",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 19,
+                    "label": "Kill Hi",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "empty"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 1,
+                    "label": "Play/Pause",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 2,
+                    "label": "Sync",
+                    "mode": "trigger"
+                }
+            ]
+        },
+        {
+            "mode": "horiz-mixer",
+            "id": "levels",
+            "controls": [
+                {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 0,
+                    "mode": "relative",
+                    "label": "Test"
+                },
+                {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 1,
+                    "mode": "relative",
+                    "label": "Test"
+                }
+            ]
+        },
+        {
+            "mode": "grid-mixer",
+            "id": "deck_b",
+            "w": 4,
+            "h": 8,
+            "controls": [
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 36,
+                    "label": "1/4 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 35,
+                    "label": "1/2 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 34,
+                    "label": "1 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 33,
+                    "label": "2 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 32,
+                    "label": "4 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 31,
+                    "label": "8 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 30,
+                    "label": "16 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 29,
+                    "label": "32 Loop",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 47,
+                    "label": "Kill Bass",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 48,
+                    "label": "Kill Mid",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 49,
+                    "label": "Kill Hi",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "empty"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 21,
+                    "label": "Play/Pause",
+                    "mode": "trigger"
+                },
+                {
+                    "type": "notebutton",
+                    "channel": 1,
+                    "note": 22,
+                    "label": "Sync",
+                    "mode": "trigger"
+                }
+            ]
+        }
+    ]
+}

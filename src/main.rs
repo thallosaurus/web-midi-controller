@@ -102,13 +102,7 @@ async fn main() {
             })
         ) // serve overlays - TODO serve from disk
         .with_state(state);
-    //.route("/", get(|| async { "Hello, World!" }));
 
-    //let app = axum_spa::embedded(app, &ASSETS_DIR).unwrap();
-
-    /*let app = spa(app, Config {
-
-    })*/
     let listener = TcpListener::bind(args.address.unwrap_or(String::from("0.0.0.0:8888")))
         .await
         .unwrap();

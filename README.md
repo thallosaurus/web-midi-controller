@@ -31,3 +31,6 @@ cargo build
 ```
 
 This will compile everything to a usable state.
+
+#### Mapping
+You can create Mappings yourself by placing them inside the overlays folder. Refer to the Repo for examples

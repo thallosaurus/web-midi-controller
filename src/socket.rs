@@ -116,6 +116,12 @@ async fn process_message(midi_tx: &Arc<Mutex<Sender<AppMessage>>>, msg: Message,
                 .send(event.into()).await.unwrap();
             }
         }
+        Message::Pong(bytes) => {
+            println!("got pong {:?}", bytes);
+        }
+        Message::Ping(bytes) => {
+            println!("got ping {:?}", bytes);
+        }
         _ => {
             println!("got unimplemented message {:?}", msg);
         }
