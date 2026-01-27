@@ -1,5 +1,5 @@
 
-use std::error::Error;
+use std::{error::Error, fmt::{Display, write}};
 use midir::{MidiIO, MidiOutput};
 
 #[cfg(not(target_os = "windows"))]
@@ -8,6 +8,7 @@ use midir::os::unix::VirtualOutput;
 use tokio::{sync::mpsc, task::JoinHandle};
 
 use crate::socket::AppMessage;
+//use std::fmt::Display as DebugDisplay;
 
 pub(crate) struct MidiSystem {
     output_task: JoinHandle<Result<(), MidiSystemErrors>>,
@@ -18,6 +19,15 @@ pub(crate) struct MidiSystem {
 pub enum MidiSystemErrors {
     InitError(midir::InitError),
     ConnectError(midir::ConnectError<MidiOutput>)
+}
+
+impl Display for MidiSystemErrors {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MidiSystemErrors::InitError(init_error) => write!(f, "{}", init_error),
+            MidiSystemErrors::ConnectError(connect_error) => write!(f, "{}", connect_error),
+        }
+    }
 }
 
 impl MidiSystem {
@@ -37,8 +47,8 @@ impl MidiSystem {
 
                 #[cfg(target_os = "windows")]
                 let mut connection = {
-                    let c = select_port_by_name(&midi_out, &device_name).unwrap();
-                    midi_out.connect(&c, &device_name).unwrap()
+                    let c = select_port_by_name(&midi_out, &device_name);
+                    midi_out.connect(&c, &device_name).map_err(|e| MidiSystemErrors::ConnectError(e))?;
                 };
 
                 loop {
@@ -68,7 +78,7 @@ impl MidiSystem {
 
 #[cfg(target_os = "windows")]
 /// Select MIDI Device by Name
-fn select_port_by_name<T: MidiIO>(midi_io: &T, search: &String) -> Result<T::Port, Box<dyn Error>> {
+fn select_port_by_name<T: MidiIO>(midi_io: &T, search: &String) -> T::Port {
     let midi_ports = midi_io.ports();
 
     let possible: Vec<T::Port> = midi_ports
@@ -81,5 +91,5 @@ fn select_port_by_name<T: MidiIO>(midi_io: &T, search: &String) -> Result<T::Por
         .map(|(_, p)| p.clone())
         .collect();
 
-    Ok(possible.first().cloned().unwrap())
+    possible.first().cloned().unwrap()
 }

@@ -88,10 +88,11 @@ async fn process_message(midi_tx: &Arc<Mutex<Sender<AppMessage>>>, msg: Message,
             //let event: AppMessage = serde_json::from_str(&txt.to_string())?
             //.map_err(|e| AppError::InvalidUpdatePacket(e))?;
 
+            println!("{}", txt);
+
             let event = txt.into();
 
             broadcast(map, event, vec![who]).await;
-
             {
                 midi_tx.lock().await
                 .send(event.into()).await.unwrap();
@@ -126,7 +127,13 @@ pub(crate) enum AppMessage {
         value: u8,
         cc: u8,
     },
-    NoteUpdate,
+    #[serde(rename = "noteupdate")]
+    NoteUpdate {
+        midi_channel: u8,
+        on: bool,
+        note: u8,
+        velocity: u8,
+    },
     Dummy,
 }
 
@@ -153,7 +160,10 @@ impl From<AppMessage> for Vec<u8> {
             AppMessage::CCUpdate { midi_channel, value, cc } => {
                 vec![0xB0 + (midi_channel - 1), cc, value]
             },
-            AppMessage::NoteUpdate => todo!(),
+            AppMessage::NoteUpdate { midi_channel, on, note, velocity } => {
+                let base = if on { 0x90 } else { 0x80 };
+                vec![base + (midi_channel - 1), note, velocity]
+            },
             AppMessage::Dummy => todo!(),
         }
     }

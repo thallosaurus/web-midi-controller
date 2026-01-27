@@ -1,20 +1,17 @@
 use axum::{
-    Router,
-    extract::{State, WebSocketUpgrade, connect_info::ConnectInfo},
-    response::IntoResponse,
-    routing::{any, get},
+    Router, extract::{State, WebSocketUpgrade, connect_info::ConnectInfo}, http::HeaderValue, response::IntoResponse, routing::{any, get}
 };
 use axum_extra::TypedHeader;
 use clap::Parser;
 use dashmap::DashMap;
+use tower_http::services;
 use tower_serve_static::ServeDir;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 //use static_serve::embed_assets;
 use include_dir::{Dir, include_dir};
 use std::{net::SocketAddr, sync::Arc};
 use tokio::{
-    net::TcpListener,
-    sync::{Mutex, mpsc},
+    fs, net::TcpListener, sync::{Mutex, mpsc}
 };
 
 use crate::{
@@ -55,8 +52,7 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let midi_system = MidiSystem::new(args.name)
-        .expect("error while initializing midi system");
+    let midi_system = MidiSystem::new(args.name).expect("error while initializing midi system");
 
     let state = AppState {
         clients: Arc::new(DashMap::new()),
@@ -71,7 +67,15 @@ async fn main() {
         //.route("/", get( async || { include_str!("../web/dist/index.html") }))
         //.nest_service("/assets", service)
         .route("/ws", any(ws_handler)) //websocket route
-        .route("/custom.css", get(|| async { "Hello, World!" })) //custom css
+        .route(
+            "/custom.css",
+            get(|| async {
+                let content = fs::read_to_string("overlays/css/custom.css").await.unwrap_or(String::from("/* no custom styles available */"));
+                let mut response = content.into_response();
+                response.headers_mut().insert("Content-Type", HeaderValue::from_static("text/css"));
+                response
+            }),
+        ) //custom css
         .route(
             "/overlays",
             get(|| async { include_str!("../web/dist/demo_overlay.json") }),
@@ -84,7 +88,9 @@ async fn main() {
     /*let app = spa(app, Config {
 
     })*/
-    let listener = TcpListener::bind(args.address.unwrap_or(String::from("0.0.0.0:8888"))).await.unwrap();
+    let listener = TcpListener::bind(args.address.unwrap_or(String::from("0.0.0.0:8888")))
+        .await
+        .unwrap();
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
 
     axum::serve(
@@ -115,7 +121,6 @@ async fn ws_handler(
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-
     /// If you are on Windows:
     ///     The name of the device the application tries to open
     /// If you are anywhere else where supported:
@@ -124,5 +129,5 @@ struct Args {
     name: Option<String>,
 
     #[arg(short = 'p')]
-    address: Option<String>
+    address: Option<String>,
 }
