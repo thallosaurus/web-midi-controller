@@ -2,6 +2,6 @@
 cd web 
 VERSION=$(npm version patch)
 git add .
+git commit -m "New UI Version: $VERSION"
 cd ..
 cargo bump patch -g
-#git commit -m "Bump: $VERSION"
