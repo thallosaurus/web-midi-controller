@@ -3,7 +3,7 @@
   "id": "ableton_performance",
   "cells": [
     {
-      "mode": "horiz-mixer",
+      "type": "horiz-mixer",
       "controls": [{
         "type": "ccslider",
         "channel": 1,
@@ -55,7 +55,7 @@
       }]
     },
     {
-      "mode": "vert-mixer",
+      "type": "vert-mixer",
       "id": "returns",
       "controls": [{
         "type": "ccslider",

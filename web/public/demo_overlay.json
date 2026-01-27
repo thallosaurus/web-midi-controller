@@ -1,254 +1,313 @@
-[{
-  "name": "Testlayout",
-  "id": "testlayout123",
-  "cells": [
+[
     {
-      "mode": "horiz-mixer",
-      "id": "testcell456",
-      "controls": [{
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 10,
-        "mode": "snapback",
-        "label": "Snapback Test",
-        "default": 64
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "absolute",
-        "label": "Absolute Test"
-      }, {
-        "type": "ccbutton",
-        "channel": 1,
-        "cc": 12,
-        "value": 127,
-        "value_off": 0,
-        "label": "ccbutton",
-        "mode": "trigger"
-      }, {
-        "type": "notebutton",
-        "channel": 1,
-        "note": 73,
-        "label": "notebutton",
-        "mode": "trigger"
-      }]
+        "name": "Ableton Performance",
+        "id": "ableton_performance",
+        "cells": [
+            {
+                "type": "horiz-mixer",
+                "controls": [{
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 10,
+                    "mode": "relative",
+                    "label": "Volume 1"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 20,
+                    "mode": "relative",
+                    "label": "Volume 2"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 30,
+                    "mode": "relative",
+                    "label": "Volume 3"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 40,
+                    "mode": "relative",
+                    "label": "Volume 4"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 50,
+                    "mode": "relative",
+                    "label": "Volume 5"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 60,
+                    "mode": "relative",
+                    "label": "Volume 6"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 70,
+                    "mode": "relative",
+                    "label": "Volume 7"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 80,
+                    "mode": "relative",
+                    "label": "Volume 8"
+                }]
+            },
+            {
+                "type": "vert-mixer",
+                "id": "returns",
+                "controls": [{
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 90,
+                    "mode": "snapback",
+                    "label": "Reverb"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 91,
+                    "mode": "snapback",
+                    "label": "Filter"
+                }, {
+                    "type": "ccslider",
+                    "channel": 1,
+                    "cc": 92,
+                    "mode": "relative",
+                    "label": "Test"
+                }]
+            }
+        ]
     },
     {
-      "mode": "vert-mixer",
-      "controls": [
-        {
-          "type": "ccslider",
-          "channel": 1,
-          "cc": 10,
-          "mode": "snapback",
-          "label": "Snapback Test"
-        },
-        {
-          "type": "ccslider",
-          "channel": 1,
-          "cc": 10,
-          "mode": "snapback",
-          "label": "Snapback Test"
-        },
-        {
-          "type": "ccslider",
-          "channel": 1,
-          "cc": 10,
-          "mode": "snapback",
-          "vertical": true,
-          "label": "Vert Test"
-        }
-      ]
-    },
-    {
-      "mode": "vert-mixer",
-      "controls": [
-        {
-          "type": "ccslider",
-          "channel": 1,
-          "cc": 10,
-          "mode": "snapback",
-          "label": "Snapback Test"
-        },
-        {
-          "type": "ccslider",
-          "channel": 1,
-          "cc": 10,
-          "mode": "snapback",
-          "label": "Snapback Test"
-        },
-        {
-          "type": "ccslider",
-          "channel": 1,
-          "cc": 10,
-          "mode": "snapback",
-          "label": "Snapback Test"
-        }
-      ]
+        "name": "Traktor Performance",
+        "id": "traktor_performance",
+        "cells": [
+            {
+                "type": "grid-mixer",
+                "id": "deck_a",
+                "w": 4,
+                "h": 8,
+                "controls": [
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 16,
+                        "label": "1/4 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 15,
+                        "label": "1/2 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 14,
+                        "label": "1 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 13,
+                        "label": "2 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 12,
+                        "label": "4 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 11,
+                        "label": "8 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 10,
+                        "label": "16 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 9,
+                        "label": "32 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 17,
+                        "label": "Kill Bass",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 18,
+                        "label": "Kill Mid",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 19,
+                        "label": "Kill Hi",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 1,
+                        "label": "Play/Pause",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 2,
+                        "label": "Sync",
+                        "mode": "trigger"
+                    }
+                ]
+            },
+            {
+                "type": "horiz-mixer",
+                "id": "levels",
+                "controls": [
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 0,
+                        "mode": "relative",
+                        "label": "Test"
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 1,
+                        "mode": "relative",
+                        "label": "Test"
+                    }
+                ]
+            },
+            {
+                "type": "grid-mixer",
+                "id": "deck_b",
+                "w": 4,
+                "h": 8,
+                "controls": [
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 36,
+                        "label": "1/4 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 35,
+                        "label": "1/2 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 34,
+                        "label": "1 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 33,
+                        "label": "2 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 32,
+                        "label": "4 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 31,
+                        "label": "8 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 30,
+                        "label": "16 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 29,
+                        "label": "32 Loop",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 47,
+                        "label": "Kill Bass",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 48,
+                        "label": "Kill Mid",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 49,
+                        "label": "Kill Hi",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 21,
+                        "label": "Play/Pause",
+                        "mode": "trigger"
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 22,
+                        "label": "Sync",
+                        "mode": "trigger"
+                    }
+                ]
+            }
+        ]
     }
-  ]
-}, {
-  "name": "Testlayout 2",
-  "cells": [
-    {
-      "mode": "horiz-mixer",
-      "controls": [{
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "relative",
-        "label": "Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "relative",
-        "label": "Absolute Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "relative",
-        "label": "Absolute Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "relative",
-        "label": "Absolute Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "relative",
-        "label": "Absolute Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "relative",
-        "label": "Absolute Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "relative",
-        "label": "Absolute Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 11,
-        "mode": "relative",
-        "label": "Absolute Test"
-      }]
-    },
-    {
-      "mode": "vert-mixer",
-      "controls": [{
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 90,
-        "mode": "relative",
-        "label": "Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 91,
-        "mode": "relative",
-        "label": "Test"
-      }, {
-        "type": "ccslider",
-        "channel": 1,
-        "cc": 92,
-        "mode": "relative",
-        "label": "Test"
-      }]
-    },
-    {
-      "mode": "grid-mixer",
-      "w": 3,
-      "h": 2,
-      "controls": [
-        {
-          "type": "ccbutton",
-          "channel": 1,
-          "cc": 12,
-          "value": 127,
-          "value_off": 0,
-          "label": "ccbutton",
-          "mode": "trigger"
-        },
-        {
-          "type": "notebutton",
-          "channel": 1,
-          "note": 73,
-          "label": "notebutton",
-          "mode": "trigger"
-        },
-        {
-          "type": "ccbutton",
-          "channel": 1,
-          "cc": 12,
-          "value": 127,
-          "value_off": 0,
-          "label": "ccbutton",
-          "mode": "trigger"
-        },
-        {
-          "type": "notebutton",
-          "channel": 1,
-          "note": 73,
-          "label": "notebutton",
-          "mode": "trigger"
-        },
-        {
-          "type": "ccbutton",
-          "channel": 1,
-          "cc": 12,
-          "value": 127,
-          "value_off": 0,
-          "label": "ccbutton",
-          "mode": "trigger"
-        },
-        {
-          "type": "notebutton",
-          "channel": 1,
-          "note": 73,
-          "label": "notebutton",
-          "mode": "trigger"
-        }
-      ]
-    }
-  ]
-}, {
-  "name": "Grid Test",
-  "cells": [
-    {
-      "mode": "grid-mixer",
-      "w": 4,
-      "h": 4,
-      "controls": [
-        {
-          "type": "empty"
-        },
-        {
-          "type": "ccbutton",
-          "channel": 1,
-          "cc": 12,
-          "value": 127,
-          "value_off": 0,
-          "label": "ccbutton",
-          "mode": "trigger"
-        },
-        {
-          "type": "notebutton",
-          "channel": 1,
-          "note": 73,
-          "label": "notebutton",
-          "mode": "trigger"
-        }
-      ]
-    }
-  ]
-}]
+]

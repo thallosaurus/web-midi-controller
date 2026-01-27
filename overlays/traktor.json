@@ -3,7 +3,7 @@
     "id": "traktor_performance",
     "cells": [
         {
-            "mode": "grid-mixer",
+            "type": "grid-mixer",
             "id": "deck_a",
             "w": 4,
             "h": 8,
@@ -105,7 +105,7 @@
             ]
         },
         {
-            "mode": "horiz-mixer",
+            "type": "horiz-mixer",
             "id": "levels",
             "controls": [
                 {
@@ -125,7 +125,7 @@
             ]
         },
         {
-            "mode": "grid-mixer",
+            "type": "grid-mixer",
             "id": "deck_b",
             "w": 4,
             "h": 8,

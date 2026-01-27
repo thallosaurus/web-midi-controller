@@ -1,5 +1,5 @@
 import { setup_ccbutton, setup_notebutton } from "./button.ts";
-import "./overlay.css";
+import "./css/overlay.css";
 import { setup_slider } from "./slider.ts";
 
 const overlay_emitter = new EventTarget();
@@ -111,15 +111,15 @@ export const setup_overlay = (
         const cell = document.createElement("div");
         if (col.id) cell.id = col.id;
 
-        switch (col.mode) {
+        switch (col.type) {
             case "grid-mixer":
                 cell.style.setProperty("--cols", col.w);
                 cell.style.setProperty("--rows", col.h);
                 break;
         }
-        cell.classList.add("cell", col.mode);
+        cell.classList.add("cell", col.type);
         for (const w of col.controls) {
-            const c = setup_overlay_widget(w, is_vertical_layout(col.mode));
+            const c = setup_overlay_widget(w, is_vertical_layout(col.type));
             cell.appendChild(c);
         }
         overlay.appendChild(cell);

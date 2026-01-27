@@ -10,9 +10,9 @@ use tokio::{sync::mpsc, task::JoinHandle};
 use crate::socket::AppMessage;
 //use std::fmt::Display as DebugDisplay;
 
-pub(crate) struct MidiSystem {
+pub struct MidiSystem {
     output_task: JoinHandle<Result<(), MidiSystemErrors>>,
-    pub(crate) tx: mpsc::Sender<AppMessage>,
+    //pub(crate) tx: mpsc::Sender<AppMessage>,
 }
 
 #[derive(Debug)]
@@ -31,8 +31,8 @@ impl Display for MidiSystemErrors {
 }
 
 impl MidiSystem {
-    pub(crate) fn new(device_name: Option<String>) -> Result<Self, MidiSystemErrors> {
-        let (tx, mut rx) = mpsc::channel::<AppMessage>(64);
+    pub(crate) fn new(device_name: Option<String>, mut rx: mpsc::Receiver<AppMessage>) -> Result<Self, MidiSystemErrors> {
+
         Ok(Self {
             output_task: tokio::spawn(async move {
                 let device_name = device_name.unwrap_or(String::from("midi control output"));
@@ -66,14 +66,14 @@ impl MidiSystem {
                 }
                 Ok(())
             }),
-            tx
+            //tx
             //output: midi_out.create_virtual("virtual midi control output").map_err(|e|MidiSystemErrors::ConnectError(e))?
         })
     }
 
-    pub(crate) async fn send_update(&self, msg: AppMessage) {
+    /*pub(crate) async fn send_update(&self, msg: AppMessage) {
         self.tx.send(msg).await.expect("failed to send message to midi system")
-    }
+    }*/
 }
 
 #[cfg(target_os = "windows")]

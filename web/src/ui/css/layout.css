@@ -1,0 +1,12 @@
+.horiz-mixer {
+    display: flex;
+}
+
+.vert-mixer {
+    display: flex;
+    flex-direction: column;
+}
+
+.empty {
+    
+}

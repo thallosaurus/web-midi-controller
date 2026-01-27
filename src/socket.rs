@@ -14,7 +14,7 @@ use crate::AppState;
 type ClientMap = DashMap<Uuid, mpsc::Sender<AppMessage>>;
 pub(crate) type Clients = Arc<ClientMap>;
 
-pub async fn ws_handler(
+pub(crate) async fn ws_handler(
     ws: WebSocketUpgrade,
     user_agent: Option<TypedHeader<headers::UserAgent>>,
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
