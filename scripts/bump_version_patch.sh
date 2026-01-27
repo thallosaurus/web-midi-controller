@@ -1,9 +1,8 @@
 #/bin/sh
 cd web 
 VERSION=$(npm version patch)
-git add web/package.json
+git add .
 cd ..
 cargo bump patch
-git add Cargo.toml
-git add Cargo.lock
-git commit -m "Bump: $VERSION"
+git add .
+#git commit -m "Bump: $VERSION"
