@@ -82,3 +82,4 @@ jobs:
             midi-controller-win.exe
             overlays.zip
             webui.zip
+            LICENSE
