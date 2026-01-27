@@ -1,5 +1,7 @@
 
-use midir::MidiOutput;
+use std::error::Error;
+use midir::{MidiIO, MidiOutput};
+
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualOutput;
 
