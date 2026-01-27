@@ -88,7 +88,7 @@ async fn main() {
                         let contents = fs::read_to_string(p.as_path()).await.unwrap();
                         
                         let json: Value = serde_json::from_str(&contents).unwrap();
-                        println!("{:?}", json);
+                        //println!("{:?}", json);
                         overlays.push(json);
                     }
                 }

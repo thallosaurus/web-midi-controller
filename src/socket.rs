@@ -42,7 +42,7 @@ pub(crate) async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state:
                 Some(aux) = rx.recv() => {
                     // we got a message from other peers
                     //if socket.send(aux)
-                    println!("client with id {conn_id} got msg {:?}", aux);
+                    //println!("client with id {conn_id} got msg {:?}", aux);
                     if let Err(e) = socket.send(aux.into()).await {
 
                     }
@@ -99,8 +99,7 @@ async fn process_message(midi_tx: &Arc<Mutex<Sender<AppMessage>>>, msg: Message,
             }
         }
         _ => {
-            println!("got message {:?}", msg);
-            //Ok(AppMessage::Dummy)
+            println!("got unimplemented message {:?}", msg);
         }
     }
     ControlFlow::Continue(())
