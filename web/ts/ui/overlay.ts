@@ -2,10 +2,10 @@ import { CCButtonScript, NoteButtonScript, UnloadCCButtonScript, UnloadNoteButto
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
-import { CCSliderScript, setup_slider, UnloadCCSliderScript, type CCSliderState } from "./slider.ts";
+import { CCSliderScript, UnloadCCSliderScript, type CCSliderState } from "./slider.ts";
 import { type Overlay } from '../../bindings/Overlay.ts';
 import type { GridMixerProperties, HorizontalMixerProperties, Widget } from "../../bindings/Widget.ts";
-import { RotaryScript, setup_rotary, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
+import { RotaryScript, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
 import { render_widget } from "./render.ts";
 import { uuid } from "../utils.ts";
 

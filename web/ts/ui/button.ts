@@ -52,10 +52,6 @@ export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLD
             (state.latch_on ? options.value : options.value_off);
     };
 
-    /*const _reset = () => {
-        update_bus_value(options.value_off ?? 0);
-    };*/
-
     // Update UI only
     const update_value = (v: number) => {
         //value = v;
@@ -180,11 +176,6 @@ export const NoteButtonScript = (id: string, options: NoteButtonProperties, o: H
             new NoteEvent(options.channel, options.note, v > 0, v),
         );
     };
-
-    /*const reset = () => {
-        //update_bus_value(options.value_off ?? 0);
-        update_bus_value(0);
-    };*/
 
     const touch_update = () => {
         //update_bus_value(127);
