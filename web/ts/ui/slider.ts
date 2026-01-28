@@ -2,6 +2,7 @@ import { vibrate } from "../main.ts";
 import { process_internal, register_cc_widget } from "../event_bus.ts";
 import "./slider.css";
 import { CCEvent } from "../events.ts";
+import type { CCSliderProperties } from "../../bindings/Widget.ts";
 
 const MAX_LEVEL = 127;
 
@@ -16,7 +17,7 @@ export interface SliderOptions {
 
 export const setup_slider = (
     container: HTMLDivElement,
-    options: SliderOptions,
+    options: CCSliderProperties,
 ) => {
     let value = options.default_value ?? 0;
     let activePointer: number | null = null;

@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 #[serde(tag = "type")]
-pub(super) enum Cells {
+pub(super) enum Widget {
     #[serde(rename = "horiz-mixer")]
     HorizontalMixer(HorizontalMixerProperties),
     
@@ -31,27 +31,27 @@ pub(super) enum Cells {
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 pub(super) struct HorizontalMixerProperties {
-    controls: Vec<Cells>
+    controls: Vec<Widget>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 pub(super) struct VerticalMixerProperties {
-    controls: Vec<Cells>
+    controls: Vec<Widget>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 pub(super) struct GridMixerProperties {
-    controls: Vec<Cells>,
+    controls: Vec<Widget>,
     w: u8,
     h: u8,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 pub(super) struct NoteButtonProperties {
     channel: u8,
     note: u8,
@@ -60,16 +60,18 @@ pub(super) struct NoteButtonProperties {
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 pub(super) struct CCSliderProperties {
     channel: u8,
     cc: u8,
     mode: SliderMode,
-    vertical: Option<bool>
+    default_value: Option<u8>,
+    vertical: Option<bool>,
+    label: Option<String>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 enum SliderMode {
 
     #[serde(rename = "relative")]
@@ -82,18 +84,8 @@ enum SliderMode {
     Snapback
 }
 
-
-/*export interface CCButtonOptions {
-    label?: string;
-    channel: number;
-    cc: number;
-    value: number;
-    value_off?: number;
-    mode: string;
-}*/
-
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 pub(super) struct CCButtonProperties {
     label: Option<String>,
     channel: u8,
@@ -104,15 +96,29 @@ pub(super) struct CCButtonProperties {
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 pub(super) struct RotarySliderProperties {
     channel: u8,
     cc: u8,
-    label: Option<String>
+    label: Option<String>,
+    mode: RotaryMode,
+    default_value: Option<u8>,
+}
+
+
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+enum RotaryMode {
+    #[serde(rename = "relative")]
+    Relative,
+
+    #[serde(rename = "snapback")]
+    Snapback,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Widget.ts")]
 enum ButtonMode {
     
     #[serde(rename = "trigger")]

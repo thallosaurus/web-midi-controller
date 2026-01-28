@@ -2,17 +2,17 @@ use serde::{Deserialize, Serialize};
 use tokio::fs;
 use ts_rs::TS;
 
-use crate::cell::Cells;
+use crate::widget::Widget;
 
 //use crate::widgets::cell::Cells;
 
 #[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export)]
+#[ts(export, export_to = "Overlay.ts")]
 pub struct Overlay {
     name: String,
     id: Option<String>,
 
-    cells: Vec<Cells>,
+    cells: Vec<Widget>,
 }
 
 pub async fn load(path: &str) -> Vec<Overlay> {

@@ -1,8 +1,8 @@
 import "./style.css";
 //import { setup_ccbutton, setup_notebutton } from "./ui/button.ts";
-import { change_overlay, setup_overlay, setup_tabs } from "../ts/ui/overlay.ts";
+import { change_overlay, setup_overlay, setup_tabs } from "./ui/overlay.ts";
 //import { setup_slider } from "./ui/slider.ts";
-import { connect_local } from "../ts/websocket.ts";
+import { connect_local } from "./websocket.ts";
 
 export function vibrate() {
   if (navigator.vibrate) {

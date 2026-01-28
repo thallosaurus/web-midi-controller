@@ -6,20 +6,12 @@ import {
     register_midi_widget,
 } from "../event_bus.ts";
 import { CCEvent, NoteEvent } from "../events.ts";
-
-export interface CCButtonOptions {
-    label?: string;
-    channel: number;
-    cc: number;
-    value: number;
-    value_off?: number;
-    mode: string;
-}
+import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
 
 /// Function that mounts the Button as a child of the specified Div Element
 export const setup_ccbutton = (
     parent: HTMLDivElement,
-    options: CCButtonOptions,
+    options: CCButtonProperties,
 ) => {
     //let value = 0;
     let latch_on = false;
@@ -107,17 +99,9 @@ export const setup_ccbutton = (
     parent.appendChild(button);
 };
 
-export interface NoteButtonOptions {
-    label?: string;
-    channel: number;
-    note: number;
-    //velocity_on:
-    mode: string;
-}
-
 export const setup_notebutton = (
     parent: HTMLDivElement,
-    options: NoteButtonOptions,
+    options: NoteButtonProperties,
 ) => {
     // velocity
     let latch_on = false;

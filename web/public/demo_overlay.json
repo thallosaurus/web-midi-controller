@@ -13,8 +13,17 @@
                     "type": "rotary",
                     "channel": 1,
                     "cc":5,
-                    "label": "test"
+                    "label": "test",
+                    "mode": "relative"
+                },
+                {
+                    "type": "rotary",
+                    "channel": 1,
+                    "cc":5,
+                    "label": "test",
+                    "mode": "snapback"
                 }
+
             ]
             }
         ]

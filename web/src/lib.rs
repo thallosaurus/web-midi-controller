@@ -1,4 +1,4 @@
-pub mod cell;
+pub mod widget;
 pub mod overlays;
 
 #[cfg(test)]
@@ -12,13 +12,15 @@ mod tests {
     async fn test_loading() {
 
         let json: Overlay = serde_json::from_str(ABLETON_OVERLAY).unwrap();
+        println!("{:#?}", json);
         assert!(true);
     }
-
+    
     #[tokio::test]
     async fn test_demo_loading() {
-
+        
         let json: Vec<Overlay> = serde_json::from_str(DEMO_OVERLAY).unwrap();
+        println!("{:#?}", json);
         assert!(true);
     }
 }

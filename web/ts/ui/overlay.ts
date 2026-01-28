@@ -3,6 +3,9 @@ import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
 import { setup_slider } from "./slider.ts";
+import { type Overlay } from '../../bindings/Overlay.ts';
+import type { CCButtonProperties, CCSliderProperties, NoteButtonProperties, RotarySliderProperties, Widget } from "../../bindings/Widget.ts";
+import { setup_rotary } from "./rotary.ts";
 
 const overlay_emitter = new EventTarget();
 const overlays: Array<HTMLDivElement> = [];
@@ -43,50 +46,56 @@ export const change_overlay = (overlayId: number) => {
     overlay_emitter.dispatchEvent(new ChangeOverlayEvent(overlayId));
 };
 
-const setup_overlay_widget = (widget: any, vertical: boolean) => {
+const setup_overlay_widget = (widget: Widget, vertical: boolean) => {
     const w = document.createElement("div");
     //w.classList.add(widget.type);
     if (widget.id) w.id = widget.id;
 
     //console.log(widget);
+    w.classList.add(widget.type);
     switch (widget.type) {
         case "empty":
             // for spaces in grids
             break;
         case "ccslider":
-            w.classList.add("ccslider");
-            setup_slider(w, {
+
+            setup_slider(w, widget as CCSliderProperties)
+            /*setup_slider(w, {
                 label: widget.label,
                 channel: widget.channel,
                 cc: widget.cc,
                 default_value: widget.default,
                 mode: widget.mode,
                 vertical: widget.vertical ?? vertical,
-            });
+            });*/
             break;
 
         case "ccbutton":
-            w.classList.add("ccbutton");
-            setup_ccbutton(w, {
+            setup_ccbutton(w, widget as CCButtonProperties)
+            /*setup_ccbutton(w, {
                 cc: widget.cc,
                 channel: widget.channel,
                 value: widget.value,
                 value_off: widget.value_off ?? 0,
                 label: widget.label,
                 mode: widget.mode,
-            });
+            });*/
             break;
 
         case "notebutton":
-            w.classList.add("notebutton");
-            setup_notebutton(w, {
+            setup_notebutton(w, widget as NoteButtonProperties);
+/*            setup_notebutton(w, {
                 label: widget.label,
                 channel: widget.channel,
                 note: widget.note,
                 //velocity_on:
                 mode: widget.mode,
-            });
+            });*/
             break;
+
+        case "rotary":
+            setup_rotary(w, widget as RotarySliderProperties);
+        break;
     }
 
     return w;
@@ -99,7 +108,7 @@ function is_vertical_layout(lname: string) {
 export const setup_overlay = (
     //parent: HTMLDivElement,
     //options: OverlayOptions,
-    options: any,
+    options: Overlay,
 ) => {
     const overlay = document.createElement("div");
     overlay.classList.add("overlay", "hide");
@@ -130,7 +139,7 @@ export const setup_overlay = (
     return overlay;
 };
 
-export const setup_tabs = (ols: Array<any>, parent: HTMLDivElement, cb: (index: number) => void) => {
+export const setup_tabs = (ols: Array<Overlay>, parent: HTMLDivElement, cb: (index: number) => void) => {
     //parent.classList.add("tab_parent");
     
     for (let i = 0; i < ols.length; i++) {
