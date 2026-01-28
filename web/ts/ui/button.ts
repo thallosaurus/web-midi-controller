@@ -105,7 +105,11 @@ export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLD
     };
     const touch_update = () => {
         console.log(state.latch_on);
-        update_bus_value(state.latch_on ? options.value : (options.value_off ?? 0));
+        if (state.latch_on) {
+            update_bus_value(options.value ?? 127);
+        } else {
+            update_bus_value(options.value_off ?? 0);
+        }
     };
 
     register_cc_widget(id, options.value_off ?? 0, options.channel, options.cc, update_value);

@@ -2,16 +2,23 @@ use serde::{Deserialize, Serialize};
 use tokio::fs;
 use ts_rs::TS;
 
-use crate::widget::Widget;
+use crate::widget::{BaseProperties, Widget};
 
-//use crate::widgets::cell::Cells;
-
+/// A single overlay. Sets all properties for the resulting HTML element
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Overlay.ts")]
 pub struct Overlay {
-    name: String,
-    id: Option<String>,
 
+    /// Name used for Identification in the UI
+    name: String,
+
+    /// Overlay Global MIDI Channel
+    channel: Option<u8>,
+
+    #[serde(flatten)]
+    base: BaseProperties,
+
+    /// The child elements of this Overlay
     cells: Vec<Widget>,
 }
 

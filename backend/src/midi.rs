@@ -1,6 +1,6 @@
 
 use std::{error::Error, fmt::{Display, write}};
-use midir::{MidiIO, MidiOutput};
+use midir::{MidiIO, MidiInput, MidiOutput};
 
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualOutput;
@@ -38,6 +38,7 @@ impl MidiSystem {
                 let device_name = device_name.unwrap_or(String::from("midi control output"));
 
                 let midi_out = MidiOutput::new(&device_name).map_err(|e|MidiSystemErrors::InitError(e))?;
+                //let midi_in = MidiInput::new(&device_name).map_err(|e|MidiSystemErrors::InitError(e))?;
                 
                 // if not on windows
                 #[cfg(not(target_os = "windows"))]
