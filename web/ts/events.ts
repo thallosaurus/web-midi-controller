@@ -42,3 +42,14 @@ export class CCEvent extends MidiEvent {
         this.cc = cc;
     }
 }
+
+export enum JogDirection {
+    Forward = 65,
+    Backward = 63
+}
+
+export class JogEvent extends CCEvent {
+    constructor(midi_channel:number, cc: number, direction: JogDirection) {
+        super(midi_channel, direction, cc)
+    }
+}

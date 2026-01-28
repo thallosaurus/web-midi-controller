@@ -26,6 +26,9 @@ pub(super) enum Widget {
     #[serde(rename = "rotary")]
     RotarySlider(RotarySliderProperties),
 
+    #[serde(rename = "jogwheel")]
+    Jogwheel(JogwheelProperties),
+
     #[serde(rename = "empty")]
     Empty,
 }
@@ -99,6 +102,14 @@ pub(super) struct CCButtonProperties {
     value: u8,
     value_off: Option<u8>,
     mode: ButtonMode
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct JogwheelProperties {
+    channel: u8,
+    cc: u8,
+    id: Option<String>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]

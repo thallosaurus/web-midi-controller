@@ -2,7 +2,7 @@
     touch-action: none;
 }
 
-.ccbutton .target {
+/*.ccbutton .target {
     background-color: grey;
     width: calc(100% - 2em);
     height: calc(100% - 2em);
@@ -12,27 +12,27 @@
     align-content: center;
     text-align: center;
     font-family: monospace;
-}
+}*/
 
 .ccbutton .press {
     font-weight: bold;
     background-color: lightgrey;
     color: black;
 }
-
+.ccbutton,
 .notebutton {
+    display: grid;
     touch-action: none;
-    display: flex;
-    align-items: center;
+    align-content: center;
+    justify-content: center;
 }
 
+.ccbutton .target,
 .notebutton .target {
     background-color: grey;
-    width: calc(100% - 2em);
-    height: calc(100% - 2em);
-
-    display: grid;
-
+    height: 4em;
+    width: 100%;
+    
     align-content: center;
     text-align: center;
     font-family: monospace;

@@ -19,7 +19,7 @@
   <div id="app">
     <header>
       <div class="title">
-        <button type="button" id="overlay_menu_activator">
+        <button type="button" data-dialog-trigger="overlay_menu">
           <img src="/menu.svg">
         </button>
         <span class="name">MIDI Control v%VITE_VERSION%</span>
@@ -41,7 +41,7 @@
       <ul id="overlay_selector">
 
       </ul>
-      <button class="shown" id="close">
+      <button class="shown" id="close" data-dialog-close="overlay_menu">
         Close
       </button>
 

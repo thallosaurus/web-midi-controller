@@ -20,3 +20,12 @@ function pseudoUUID(): string {
     return v.toString(16);
   });
 }
+
+export function init_debug() {
+    window.addEventListener("error", e => {
+      alert("error:" + e.message + e.filename + e.lineno);
+    });
+    window.addEventListener("unhandledrejection", e => {
+      alert("promise error:" + e.reason);
+    });
+}

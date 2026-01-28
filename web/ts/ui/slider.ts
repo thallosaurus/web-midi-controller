@@ -1,6 +1,6 @@
 import { vibrate } from "../utils.ts";
 import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus.ts";
-import "./slider.css";
+import "./css/slider.css";
 import { CCEvent } from "../events.ts";
 import type { CCSliderProperties } from "../../bindings/Widget.ts";
 import type { WidgetState } from "./overlay.ts";

@@ -6,12 +6,42 @@ import { CCSliderScript, UnloadCCSliderScript, type CCSliderState } from "./slid
 import { type Overlay } from '../../bindings/Overlay.ts';
 import type { GridMixerProperties, HorizontalMixerProperties, Widget } from "../../bindings/Widget.ts";
 import { RotaryScript, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
-import { render_widget } from "./render.ts";
+import { render_overlay, render_widget } from "./render.ts";
 import { uuid } from "../utils.ts";
+import { JogwheelScript, type JogState } from "./jogwheel.ts";
+import { close_dialog } from "../dialogs.ts";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
 const overlays: Array<LoadedOverlay> = [];
+
+export async function init_overlays() {
+    const o = await fetch(
+        import.meta.env.DEV ? "demo_overlay.json" : "overlays",
+    );
+    const ol: Array<Overlay> = await o.json();
+
+    for (
+        //const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!
+        const overlay of ol
+    ) {
+        // Test Render Flow here
+        const oo = render_overlay(overlay);
+        register_overlay(oo);
+        console.log(oo);
+        //debugger;
+    }
+
+    // setup overlay chooser
+    const overlay_selector = document.querySelector<HTMLDivElement>(
+        "#overlay_selector",
+    )!;
+    setup_tabs(ol, overlay_selector, (i) => {
+        console.log("setting tab ", i)
+        change_overlay(i);
+        close_dialog("overlay_menu")
+    });
+}
 
 export const register_overlay = (o: LoadedOverlay) => {
     overlays.push(o);
@@ -20,21 +50,21 @@ export const register_overlay = (o: LoadedOverlay) => {
 overlay_emitter.addEventListener("change", (ev: Event) => {
     //hide_all_overlays();
     //unpress_overlays();
-    
+
     const overlays_parent = document.querySelector<HTMLDivElement>(
         "main#overlays",
     )!;
-    
+
     const current = overlays[current_overlay_id];
     if (current) {
         current.unload();
         overlays_parent.removeChild(current.html);
     }
-    
+
     const e = ev as ChangeOverlayEvent;
     console.log(e.id);
     current_overlay_id = e.id;
-    
+
     const new_overlay = overlays[e.id];
     if (new_overlay) {
         overlays_parent.appendChild(new_overlay.html);
@@ -54,7 +84,7 @@ export interface WidgetState {
 export class LoadedWidget {
     option: Widget
     html: HTMLDivElement
-    
+
     state: WidgetState
     id: string
 
@@ -91,7 +121,7 @@ export class LoadedOverlay {
             //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
 
             //o.state.abort.abort();
-            switch(o.option.type) {
+            switch (o.option.type) {
                 case "rotary":
                     UnloadRotaryScript(o.id, o.option, o.html, o.state as RotaryState);
                     break;
@@ -106,16 +136,16 @@ export class LoadedOverlay {
                     break;
             }
         }
-        
+
     }
-    
+
     load() {
         console.log("loading overlay id " + this.overlay.id)
 
         for (const o of this.childs) {
             //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
 
-            switch(o.option.type) {
+            switch (o.option.type) {
                 case "rotary":
                     RotaryScript(o.id, o.option, o.html, o.state as RotaryState);
                     break;
@@ -128,15 +158,18 @@ export class LoadedOverlay {
                 case "notebutton":
                     NoteButtonScript(o.id, o.option, o.html, o.state as ButtonState);
                     break;
+                case "jogwheel":
+                    JogwheelScript(o.id, o.option, o.html, o.state as JogState);
+                    break;
             }
         }
     }
 }
 
 const unpress_overlays = () => {
-    /*for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
-        //r.classList.remove("shown");
-    }*/
+    for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
+        r.classList.remove("shown");
+    }
 }
 const hide_all_overlays = () => {
     overlays.map((v) => {
@@ -183,13 +216,13 @@ export const FlexMixer = (container: HTMLDivElement, options: HorizontalMixerPro
         container.appendChild(ww.html);
         children.push(ww);
     }
-    
+
     return container;
 }
 
 export const setup_tabs = (ols: Array<Overlay>, parent: HTMLDivElement, cb: (index: number) => void) => {
     //parent.classList.add("tab_parent");
-    
+
     for (let i = 0; i < ols.length; i++) {
         const t = document.createElement("li");
         console.log(ols[i])
@@ -201,7 +234,7 @@ export const setup_tabs = (ols: Array<Overlay>, parent: HTMLDivElement, cb: (ind
 
         t.addEventListener("click", () => {
             //change_overlay(i);
-            
+
             cb(i);
         });
         parent.appendChild(t);

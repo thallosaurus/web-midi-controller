@@ -2,8 +2,7 @@ import type { RotarySliderProperties } from "../../bindings/Widget";
 import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus";
 import { CCEvent } from "../events";
 import type { WidgetState } from "./overlay";
-
-import "./rotary.css";
+import "./css/rotary.css";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
@@ -26,18 +25,14 @@ export const Rotary = (container: HTMLDivElement, _options: RotarySliderProperti
     return container;
 }
 
-const set_element_properties_2 = (state: RotaryState) => {
-
-}
-
 // Called, when the rotary gets displayed on the screen
 export const UnloadRotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
     console.log("unloading rotary")
 
-    o.addEventListener("pointerdown", state.handlers.pointerdown);
-    o.addEventListener("pointermove", state.handlers.pointermove);
-    o.addEventListener("pointerup", state.handlers.pointerup);
-    o.addEventListener("pointercancel", state.handlers.pointercancel);
+    o.removeEventListener("pointerdown", state.handlers.pointerdown);
+    o.removeEventListener("pointermove", state.handlers.pointermove);
+    o.removeEventListener("pointerup", state.handlers.pointerup);
+    o.removeEventListener("pointercancel", state.handlers.pointercancel);
     unregister_cc_widget(id, s.channel, s.cc);
 }
 
@@ -79,13 +74,15 @@ export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivEl
         //console.log(el);
         el.setPointerCapture(e.pointerId);
         //lastX = e.clientY;
+        state.lastX = e.clientX;
         state.active = true;
     };
 
     const touch_move = (e: PointerEvent) => {
         if (!state.active) return;
 
-        const dy = state.lastX - e.clientX;
+        //const dy = state.lastX - e.clientX;
+        const dy = e.clientX - state.lastX;
         state.lastX = e.clientX;
 
         const new_value = Math.floor(Math.max(0, Math.min(127, state.value + (dy * sensitivity))));
