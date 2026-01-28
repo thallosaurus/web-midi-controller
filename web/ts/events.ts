@@ -50,6 +50,6 @@ export enum JogDirection {
 
 export class JogEvent extends CCEvent {
     constructor(midi_channel:number, cc: number, direction: JogDirection) {
-        super(midi_channel, cc, direction)
+        super(midi_channel, direction, cc)
     }
 }
