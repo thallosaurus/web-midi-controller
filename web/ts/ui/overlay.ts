@@ -8,6 +8,7 @@ import type { GridMixerProperties, HorizontalMixerProperties, Widget } from "../
 import { RotaryScript, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
 import { render_widget } from "./render.ts";
 import { uuid } from "../utils.ts";
+import { JogwheelScript, type JogState } from "./jogwheel.ts";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
@@ -128,15 +129,18 @@ export class LoadedOverlay {
                 case "notebutton":
                     NoteButtonScript(o.id, o.option, o.html, o.state as ButtonState);
                     break;
+                case "jogwheel":
+                    JogwheelScript(o.id, o.option, o.html, o.state as JogState);
+                    break;
             }
         }
     }
 }
 
 const unpress_overlays = () => {
-    /*for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
-        //r.classList.remove("shown");
-    }*/
+    for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
+        r.classList.remove("shown");
+    }
 }
 const hide_all_overlays = () => {
     overlays.map((v) => {

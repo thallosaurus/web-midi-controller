@@ -2,8 +2,7 @@ import type { RotarySliderProperties } from "../../bindings/Widget";
 import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus";
 import { CCEvent } from "../events";
 import type { WidgetState } from "./overlay";
-
-import "./rotary.css";
+import "./css/rotary.css";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
@@ -24,10 +23,6 @@ export const Rotary = (container: HTMLDivElement, _options: RotarySliderProperti
     widget.appendChild(dial);
     container.appendChild(widget);
     return container;
-}
-
-const set_element_properties_2 = (state: RotaryState) => {
-
 }
 
 // Called, when the rotary gets displayed on the screen
@@ -79,6 +74,7 @@ export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivEl
         //console.log(el);
         el.setPointerCapture(e.pointerId);
         //lastX = e.clientY;
+        state.lastX = e.clientX;
         state.active = true;
     };
 

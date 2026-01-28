@@ -1,0 +1,7 @@
+.jog-target {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(#333, #111);
+  touch-action: none;
+}

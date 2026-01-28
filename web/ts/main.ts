@@ -6,17 +6,7 @@ import { change_overlay, register_overlay, setup_tabs } from "./ui/overlay.ts";
 import { render_overlay } from "./ui/render.ts";
 //import { setup_slider } from "./ui/slider.ts";
 import { connect_local } from "./websocket.ts";
-
-const close_dialog = (id: string) => {
-  const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
-  console.log(dialog);
-  dialog.close("close");
-};
-
-const open_dialog = (id: string) => {
-  const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
-  dialog.showModal();
-};
+import { close_dialog, init_dialogs, open_dialog } from './dialogs.ts'
 
 const init = async () => {
   window.addEventListener("error", e => {
@@ -26,6 +16,7 @@ const init = async () => {
     alert("promise error:" + e.reason);
   });
   init_event_bus();
+  init_dialogs();
   connect_local();
 
   /*const overlays_parent = document.querySelector<HTMLDivElement>(
@@ -50,10 +41,6 @@ const init = async () => {
     register_overlay(oo);
     console.log(oo);
     //debugger;
-
-    /*overlays_parent.appendChild(
-      setup_overlay(overlay),
-    );*/
   }
 
   const overlay_selector = document.querySelector<HTMLDivElement>(
@@ -91,12 +78,6 @@ self.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/*document.querySelector<HTMLButtonElement>("#menu_container button")!
-  .addEventListener("click", (_ev) => {
-    //open dialog
-    open_dialog("menu");
-  });*/
-
 document.querySelector<HTMLDivElement>("#connection_status")!.addEventListener(
   "click",
   (_ev) => {
@@ -104,11 +85,7 @@ document.querySelector<HTMLDivElement>("#connection_status")!.addEventListener(
   },
 );
 
-document.querySelector<HTMLButtonElement>(
-  "dialog footer button[data-role='close']",
-)!.addEventListener("click", (_ev: MouseEvent) => {
-  const target = (_ev.target! as HTMLButtonElement).dataset.target;
-  close_dialog(target!);
-});
+
 
 export default {};
+

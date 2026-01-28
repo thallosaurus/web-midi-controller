@@ -1,5 +1,5 @@
 import { vibrate } from "../utils.ts";
-import "./button.css";
+import "./css/button.css";
 import {
     process_internal,
     register_cc_widget,

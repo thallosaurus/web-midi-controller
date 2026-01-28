@@ -96,6 +96,11 @@
                         "note": 123,
                         "label": "test",
                         "mode": "trigger"
+                    },
+                    {
+                        "type": "jogwheel",
+                        "channel": 1,
+                        "cc": 60
                     }
                 ]
             }
