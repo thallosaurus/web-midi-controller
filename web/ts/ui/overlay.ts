@@ -7,6 +7,7 @@ import { type Overlay } from '../../bindings/Overlay.ts';
 import type { GridMixerProperties, HorizontalMixerProperties, Widget } from "../../bindings/Widget.ts";
 import { RotaryScript, setup_rotary, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
 import { render_widget } from "./render.ts";
+import { uuid } from "../utils.ts";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
@@ -55,7 +56,7 @@ export class LoadedWidget {
     html: HTMLDivElement
     
     state: WidgetState
-    //id: string
+    id: string
 
     constructor(option: Widget, html: HTMLDivElement) {
         this.option = option;
@@ -66,8 +67,8 @@ export class LoadedWidget {
         //this.state = s
         //this.abort = new AbortController();
 
-        /*this.id = crypto.randomUUID();
-        this.html.dataset.id = this.id;*/
+        this.id = uuid();
+        this.html.dataset.id = this.id;
     }
 }
 
@@ -92,16 +93,16 @@ export class LoadedOverlay {
             //o.state.abort.abort();
             switch(o.option.type) {
                 case "rotary":
-                    UnloadRotaryScript(o.option, o.html, o.state as RotaryState);
+                    UnloadRotaryScript(o.id, o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
-                    UnloadCCButtonScript(o.option, o.html, o.state as ButtonState);
+                    UnloadCCButtonScript(o.id, o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
-                    UnloadCCSliderScript(o.option, o.html, o.state as CCSliderState);
+                    UnloadCCSliderScript(o.id, o.option, o.html, o.state as CCSliderState);
                     break;
                 case "notebutton":
-                    UnloadNoteButtonScript(o.option, o.html, o.state as ButtonState);
+                    UnloadNoteButtonScript(o.id, o.option, o.html, o.state as ButtonState);
                     break;
             }
         }
@@ -116,16 +117,16 @@ export class LoadedOverlay {
 
             switch(o.option.type) {
                 case "rotary":
-                    RotaryScript(o.option, o.html, o.state as RotaryState);
+                    RotaryScript(o.id, o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
-                    CCButtonScript(o.option, o.html, o.state as ButtonState);
+                    CCButtonScript(o.id, o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
-                    CCSliderScript(o.option, o.html, o.state as CCSliderState);
+                    CCSliderScript(o.id, o.option, o.html, o.state as CCSliderState);
                     break;
                 case "notebutton":
-                    NoteButtonScript(o.option, o.html, o.state as ButtonState);
+                    NoteButtonScript(o.id, o.option, o.html, o.state as ButtonState);
                     break;
             }
         }

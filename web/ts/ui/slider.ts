@@ -1,5 +1,5 @@
 import { vibrate } from "../utils.ts";
-import { process_internal, register_cc_widget } from "../event_bus.ts";
+import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus.ts";
 import "./slider.css";
 import { CCEvent } from "../events.ts";
 import type { CCSliderProperties } from "../../bindings/Widget.ts";
@@ -25,6 +25,11 @@ export interface CCSliderState extends WidgetState {
     baseX: number
 }
 
+/**
+ * @deprecated
+ * @param container 
+ * @param options 
+ */
 export const setup_slider = (
     container: HTMLDivElement,
     options: CCSliderProperties,
@@ -173,12 +178,13 @@ export const setup_slider = (
         //if ()
     };
 
-    register_cc_widget(
+    /*register_cc_widget(
+
         options.default_value ?? 0,
         options.channel,
         options.cc,
         update_value,
-    );
+    );*/
 
     const slider = document.createElement("div");
     slider.classList.add(
@@ -216,11 +222,16 @@ export const CCSlider = (container: HTMLDivElement, options: CCSliderProperties)
     return container;
 }
 
-export const UnloadCCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
-    
+export const UnloadCCSliderScript = (id: string, options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
+    const slider = o.querySelector<HTMLDivElement>(".slider")!;
+    slider.addEventListener("pointerdown", state.handlers.pointerdown);
+    slider.addEventListener("pointermove", state.handlers.pointermove);
+    slider.addEventListener("pointerup", state.handlers.pointerup);
+    slider.addEventListener("pointercancel", state.handlers.pointercancel);
+    unregister_cc_widget(id, options.channel, options.cc);
 }
 
-export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
+export const CCSliderScript = (id: string, options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
     state.value = options.default_value ?? 0;
     state.active_pointer = null;
     state.baseValue = 0;
@@ -366,6 +377,7 @@ export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, s
     };
 
     register_cc_widget(
+        id,
         options.default_value ?? 0,
         options.channel,
         options.cc,
@@ -377,8 +389,12 @@ export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, s
         "slider",
         options.vertical ? "vertical" : "horizontal",
     );*/
-    slider.addEventListener("pointerdown", start);
-    slider.addEventListener("pointermove", move);
-    slider.addEventListener("pointerup", end);
-    slider.addEventListener("pointercancel", end);
+    state.handlers.pointerdown = start;
+    state.handlers.pointermove = move;
+    state.handlers.pointerup = end;
+    state.handlers.pointercancel = end;
+    slider.addEventListener("pointerdown", state.handlers.pointerdown);
+    slider.addEventListener("pointermove", state.handlers.pointermove);
+    slider.addEventListener("pointerup", state.handlers.pointerup);
+    slider.addEventListener("pointercancel", state.handlers.pointercancel);
 }

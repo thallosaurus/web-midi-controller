@@ -1,31 +1,52 @@
 import { CCEvent, MidiEvent, NoteEvent } from "./events.ts";
 import { send } from "./websocket.ts";
 
+type CCWidget = Map<string, CCCallback>;//Array<CCCallback>;
+type CCChannel = Map<number, CCWidget>;
 type CCCallback = (value: number) => void;
+type NoteWidget = Map<string, NoteCallback>;//Array<NoteCallback>;
+type NoteChannel = Map<number, NoteWidget>;
 type NoteCallback = (value: number) => void;
 
-const cc_map = new Map<number, Map<number, Array<CCCallback>>>();
-for (let ch = 0; ch < 16; ch++) {
-    cc_map.set(ch + 1, new Map<number, Array<CCCallback>>());   //index + 1 for convenience
-}
+const cc_map = new Map<number, CCChannel>();
+const note_map = new Map<number, NoteChannel>();
 
-const note_map = new Map<number, Map<number, Array<NoteCallback>>>();
-for (let ch = 0; ch < 16; ch++) {
-    note_map.set(ch + 1, new Map<number, Array<NoteCallback>>());   //index + 1 for convenience
+const init_backend_maps = () => {
+    for (let ch = 0; ch < 16; ch++) {
+        const cc_channel = new Map<number, Map<string, CCCallback>>();//Array<CCCallback>>();
+        cc_map.set(ch + 1, cc_channel);   //index + 1 for convenience
+    }
+    
+    for (let ch = 0; ch < 16; ch++) {
+        const note_channel = new Map<number, Map<string, NoteCallback>>();//Array<NoteCallback>>();
+        note_map.set(ch + 1, note_channel);   //index + 1 for convenience
+    }
 }
 
 // Register a CC Widget on the bus
-export const register_cc_widget = (init: number, channel: number, cc: number, cb: CCCallback) => {
+export const register_cc_widget = (id: string, init: number, channel: number, cc: number, cb: CCCallback) => {
     const channel_map = cc_map.get(channel)!;
     if (!channel_map.has(cc)) {
-        channel_map.set(cc, []);
+        channel_map.set(cc, new Map<string, CCCallback>());
     }
 
     const c = channel_map.get(cc)!;
-    c.push(cb);
+    c.set(id, cb);
+    //c.push(cb);
 
     cb(init);
 };
+
+export const unregister_cc_widget = (id: string, channel: number, cc: number) => {
+    const ccch = cc_map.get(channel)!;
+    
+    if (!ccch.has(cc)) {
+        return
+    }
+
+    const ccmap = ccch.get(cc)!;
+    ccmap.delete(id);
+}
 
 // Update all widgets that are bound to the cc number
 export const cc_update_on_bus = (channel: number, cc: number, value: number) => {
@@ -33,25 +54,38 @@ export const cc_update_on_bus = (channel: number, cc: number, value: number) => 
 
     if (!ch.has(cc)) return;
 
-    for (const cb of ch.get(cc)!) {
+    for (const [_, cb] of new Map(ch.get(cc))!) {
         //console.log("updating " + cc);
+
         cb(value);
+
     }
 };
 
 // Register a midi widget on the bus
-export const register_midi_widget = (channel: number, note: number, cb: NoteCallback) => {
+export const register_midi_widget = (id: string, channel: number, note: number, cb: NoteCallback) => {
     const ch = note_map.get(channel)!;
     //debugger;
     console.log("registering midi ", note, " on channel ", channel);
     
     if (!ch.has(note)) {
-        ch.set(note, []);
+        ch.set(note, new Map<string, NoteCallback>());
     }
     
     const n = ch.get(note)!;
-    n.push(cb);
+    n.set(id, cb)
 };
+
+export const unregister_midi_widget = (id: string, channel: number, note: number) => {
+    const notech = note_map.get(channel)!;
+
+    if (!notech.has(note)) {
+        return
+    }
+
+    const notemap = notech.get(note)!;
+    notemap.delete(id);
+}
 
 // Update all widgets bound to the midi number
 export const midi_update_on_bus = (channel: number, note: number, velocity: number) => {
@@ -59,10 +93,16 @@ export const midi_update_on_bus = (channel: number, note: number, velocity: numb
 
     if (!ch.has(note)) return;
 
-    for (const cb of ch.get(note)!) {
+        for (const [_, cb] of new Map(ch.get(note))!) {
+        //console.log("updating " + cc);
+
+        cb(velocity);
+
+    }
+/*    for (const cb of ch.get(note)!) {
         //console.log("note updating " + note);
         cb(velocity);
-    }
+    }*/
 };
 
 /// Gets called, when the websocket client gets a message from another peer
@@ -106,6 +146,7 @@ export const process_internal = (ev: MidiEvent) => {
 
 export const bus = new EventTarget();
 export const init_event_bus = () => {
+    init_backend_maps();
 
     bus.addEventListener("ccupdate", (ev: Event) => {
         const update = ev as CCEvent;

@@ -1,5 +1,5 @@
 import type { RotarySliderProperties } from "../../bindings/Widget";
-import { process_internal, register_cc_widget } from "../event_bus";
+import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus";
 import { CCEvent } from "../events";
 import type { WidgetState } from "./overlay";
 
@@ -31,16 +31,17 @@ const set_element_properties_2 = (state: RotaryState) => {
 }
 
 // Called, when the rotary gets displayed on the screen
-export const UnloadRotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
+export const UnloadRotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
     console.log("unloading rotary")
 
     o.addEventListener("pointerdown", state.handlers.pointerdown);
     o.addEventListener("pointermove", state.handlers.pointermove);
     o.addEventListener("pointerup", state.handlers.pointerup);
     o.addEventListener("pointercancel", state.handlers.pointercancel);
+    unregister_cc_widget(id, s.channel, s.cc);
 }
 
-export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
+export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
     const sensitivity = 0.5;    // px -> value
 
     state.value = 0;
@@ -52,7 +53,7 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state
     let active = false;*/
 
     const dial = o.querySelector<HTMLDivElement>(".rotary .widget .dial")!;
-    console.log(dial);
+    //console.log(dial);
 
     const set_element_properties = () => {
         const angle = MIN_ANGLE + (state.value/127) * (MAX_ANGLE - MIN_ANGLE);
@@ -75,7 +76,7 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state
         const el = e.target as HTMLElement;
         //alert("touch");
         //debugger;
-        console.log(el);
+        //console.log(el);
         el.setPointerCapture(e.pointerId);
         //lastX = e.clientY;
         state.active = true;
@@ -104,7 +105,7 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state
         }
     }
 
-    register_cc_widget(s.default_value ?? 0, s.channel, s.cc, update_value);
+    register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
     
     state.handlers.pointerdown = touch_start;
     state.handlers.pointermove = touch_move;
@@ -118,6 +119,11 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state
     set_element_properties();
 }
 
+/**
+ * @deprecated
+ * @param parent 
+ * @param options 
+ */
 export const setup_rotary = (
     parent: HTMLDivElement,
     options: RotarySliderProperties,
@@ -186,7 +192,7 @@ export const setup_rotary = (
         }
     }
 
-    register_cc_widget(options.default_value ?? 0, options.channel, options.cc, update_value);
+    //register_cc_widget(options.default_value ?? 0, options.channel, options.cc, update_value);
     
     //pointerdown
     parent.addEventListener("pointerdown", touch_start);

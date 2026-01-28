@@ -4,6 +4,8 @@ import {
     process_internal,
     register_cc_widget,
     register_midi_widget,
+    unregister_cc_widget,
+    unregister_midi_widget,
 } from "../event_bus.ts";
 import { CCEvent, NoteEvent } from "../events.ts";
 import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
@@ -14,18 +16,20 @@ export interface ButtonState extends WidgetState {
     active_pointer: number | null
 }
 
-export const UnloadNoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+export const UnloadNoteButtonScript = (id: string, options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     const button = o.querySelector<HTMLDivElement>(".target")!;
     button.removeEventListener("pointerdown", state.handlers.pointerdown)
     button.removeEventListener("pointerup", state.handlers.pointerup)
     button.removeEventListener("pointercancel", state.handlers.pointercancel)
+    unregister_midi_widget(id, options.channel, options.note);
 }
 
-export const UnloadCCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+export const UnloadCCButtonScript = (id: string, options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     const button = o.querySelector<HTMLDivElement>(".target")!;
     button.removeEventListener("pointerdown", state.handlers.pointerdown)
     button.removeEventListener("pointerup", state.handlers.pointerup)
     button.removeEventListener("pointercancel", state.handlers.pointercancel)
+    unregister_cc_widget(id, options.channel, options.cc)
 }
 
 /// Function that mounts the Button as a child of the specified Div Element
@@ -37,7 +41,7 @@ export const CCButton = (container: HTMLDivElement, options: CCButtonProperties)
     return container;
 }
 
-export const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     state.latch_on = false;
     state.active_pointer = null;
 
@@ -108,7 +112,7 @@ export const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, s
         update_bus_value(state.latch_on ? options.value : (options.value_off ?? 0));
     };
 
-    register_cc_widget(options.value_off ?? 0, options.channel, options.cc, update_value);
+    register_cc_widget(id, options.value_off ?? 0, options.channel, options.cc, update_value);
 
     state.handlers.pointerdown = touch_start;
     state.handlers.pointerup = touch_end;
@@ -127,14 +131,14 @@ export const NoteButton = (container: HTMLDivElement, options: NoteButtonPropert
     return container;
 }
 
-export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+export const NoteButtonScript = (id: string, options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     // velocity
     state.latch_on = false;
     //let value = 0;
     state.active_pointer = null;
 
     const button = o.querySelector<HTMLDivElement>(".target")!;
-    console.log(button);
+    //console.log(button);
     const set_label = () => {
         button.innerText = (options.label ?? "NOTE " + options.note) + ":\n" + (state.latch_on ? "On" : "Off")
         //value;
@@ -201,7 +205,7 @@ export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElemen
         }
     };
 
-    register_midi_widget(options.channel, options.note, update_value);
+    register_midi_widget(id, options.channel, options.note, update_value);
 
     state.handlers.pointerdown = touch_start;
     state.handlers.pointerup = touch_end;

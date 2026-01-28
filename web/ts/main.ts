@@ -19,6 +19,12 @@ const open_dialog = (id: string) => {
 };
 
 const init = async () => {
+  window.addEventListener("error", e => {
+    alert("error:" + e.message + e.filename + e.lineno);
+  });
+  window.addEventListener("unhandledrejection", e => {
+    alert("promise error:" + e.reason);
+  });
   init_event_bus();
   connect_local();
 
@@ -76,7 +82,14 @@ const init = async () => {
   change_overlay(0);
 };
 
-self.addEventListener("DOMContentLoaded", init);
+self.addEventListener("DOMContentLoaded", () => {
+  try {
+
+    init();
+  } catch (e) {
+    alert(e);
+  }
+});
 
 /*document.querySelector<HTMLButtonElement>("#menu_container button")!
   .addEventListener("click", (_ev) => {
