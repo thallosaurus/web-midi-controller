@@ -1,16 +1,11 @@
 import type { Overlay } from "../bindings/Overlay.ts";
+import { init_event_bus } from "./event_bus.ts";
 import "./style.css";
 //import { setup_ccbutton, setup_notebutton } from "./ui/button.ts";
 import { change_overlay, register_overlay, setup_tabs } from "./ui/overlay.ts";
 import { render_overlay } from "./ui/render.ts";
 //import { setup_slider } from "./ui/slider.ts";
 import { connect_local } from "./websocket.ts";
-
-export function vibrate() {
-  if (navigator.vibrate) {
-    navigator.vibrate(20);
-  }
-}
 
 const close_dialog = (id: string) => {
   const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
@@ -24,6 +19,7 @@ const open_dialog = (id: string) => {
 };
 
 const init = async () => {
+  init_event_bus();
   connect_local();
 
   /*const overlays_parent = document.querySelector<HTMLDivElement>(
@@ -43,8 +39,6 @@ const init = async () => {
     //const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!
     const overlay of ol
   ) {
-    console.log(overlay);
-
     // Test Render Flow here
     const oo = render_overlay(overlay);
     register_overlay(oo);
@@ -60,6 +54,7 @@ const init = async () => {
     "#overlay_selector",
   )!;
   setup_tabs(ol, overlay_selector, (i) => {
+    console.log("setting tab ", i)
     change_overlay(i);
     close_dialog("overlay_menu")
   });
@@ -78,7 +73,7 @@ const init = async () => {
     close_dialog("overlay_menu")
   })
   
-  change_overlay(0);
+  //change_overlay(0);
 };
 
 self.addEventListener("DOMContentLoaded", init);

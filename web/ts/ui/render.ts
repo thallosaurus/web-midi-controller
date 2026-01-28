@@ -1,7 +1,7 @@
 import type { Overlay } from "../../bindings/Overlay";
 import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, RotarySliderProperties, Widget } from "../../bindings/Widget";
 import { CCButton, NoteButton } from "./button";
-import { FlexMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
+import { FlexMixer, GridMixer, LoadedOverlay, LoadedWidget, type WidgetState } from "./overlay";
 import { Rotary } from "./rotary";
 import { CCSlider } from "./slider";
 
@@ -10,9 +10,10 @@ import { CCSlider } from "./slider";
     unload(): void;
 }*/
 
+// Converts the given Overlay to a LoadedOverlay which contains runtime variables
 export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): LoadedOverlay => {
     const e = element ?? document.createElement("div") as HTMLDivElement;
-    let children = [];
+    let children: Array<LoadedWidget<WidgetState>> = [];
     
     if (overlay.id) e.id = overlay.id;
     
@@ -24,7 +25,7 @@ export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): Load
     return new LoadedOverlay(overlay, e, children);
 }
 
-export const render_widget = (cell: Widget, children: Array<LoadedWidget>, element?: HTMLDivElement): LoadedWidget => {
+export const render_widget = (cell: Widget, children: Array<LoadedWidget<WidgetState>>, element?: HTMLDivElement): LoadedWidget<WidgetState> => {
     let e = element ?? document.createElement("div") as HTMLDivElement;
     e.classList.add(cell.type, "widget");
     
@@ -71,8 +72,9 @@ export const render_widget = (cell: Widget, children: Array<LoadedWidget>, eleme
                 const w = cell as NoteButtonProperties;
                 NoteButton(e, w);
             }
+            break;
     }
-    let ww = new LoadedWidget(cell, e);
-    children.push(ww);
+    let ww = new LoadedWidget(cell, e, {});
+    //children.push(ww);
     return ww;
 }

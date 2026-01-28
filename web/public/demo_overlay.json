@@ -25,6 +25,13 @@
                         "label": "test",
                         "mode": "snapback",
                         "default_value": 64
+                    },
+                    {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 123,
+                        "label": "test",
+                        "mode": "trigger"
                     }
                 ]
             }

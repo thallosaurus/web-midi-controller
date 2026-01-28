@@ -2,10 +2,10 @@ import { CCButtonScript, NoteButtonScript } from "./button.ts";
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
-import { CCSliderScript, setup_slider } from "./slider.ts";
+import { CCSliderScript, setup_slider, type CCSliderState } from "./slider.ts";
 import { type Overlay } from '../../bindings/Overlay.ts';
 import type { GridMixerProperties, HorizontalMixerProperties, Widget } from "../../bindings/Widget.ts";
-import { RotaryScript, setup_rotary } from "./rotary.ts";
+import { RotaryScript, setup_rotary, type RotaryState } from "./rotary.ts";
 import { render_widget } from "./render.ts";
 
 let current_overlay_id = -1;
@@ -17,8 +17,8 @@ export const register_overlay = (o: LoadedOverlay) => {
 }
 
 overlay_emitter.addEventListener("change", (ev: Event) => {
-    hide_all_overlays();
-    unpress_overlays();
+    //hide_all_overlays();
+    //unpress_overlays();
     
     const overlays_parent = document.querySelector<HTMLDivElement>(
         "main#overlays",
@@ -39,34 +39,37 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
         overlays_parent.appendChild(new_overlay.html);
         //const dom_overlay = document.querySelector<HTMLDivElement>("main#overlay #" + new_overlay.overlay.id)!;
 
+        console.log(new_overlay);
         new_overlay.load()
     } else {
         throw new Error("overlay with id " + e.id + " not found")
     }
-
-    //overlays[e.id].html.classList.remove("hide");
-    
-    /*for (const r of document.querySelectorAll<HTMLLIElement>("[data-overlay-index='"+e.id+"']")!) {
-        r.classList.add("shown");
-    }*/
 });
 
-export class LoadedWidget {
+export interface WidgetState {}
+
+export class LoadedWidget<T extends WidgetState> {
     option: Widget
     html: HTMLDivElement
+    state: T
+    //id: string
 
-    constructor(option: Widget, html: HTMLDivElement) {
+    constructor(option: Widget, html: HTMLDivElement, s: T) {
         this.option = option;
         this.html = html;
+        this.state = s
+
+        /*this.id = crypto.randomUUID();
+        this.html.dataset.id = this.id;*/
     }
 }
 
 export class LoadedOverlay {
     overlay: Overlay
     html: HTMLDivElement
-    childs: Array<LoadedWidget>
+    childs: Array<LoadedWidget<WidgetState>>
 
-    constructor(overlay: Overlay, html: HTMLDivElement, childs: Array<LoadedWidget>) {
+    constructor(overlay: Overlay, html: HTMLDivElement, childs: Array<LoadedWidget<WidgetState>>) {
         this.overlay = overlay;
         this.html = html
         this.childs = childs;
@@ -78,21 +81,31 @@ export class LoadedOverlay {
     
     load() {
         console.log("loading overlay id " + this.overlay.id)
+        console.log(this.childs);
+
+/*        this.html.querySelectorAll(".rotary").forEach(e => {
+            RotaryScript(e as HTMLDivElement, e, {});
+
+        })*/
+
         for (const o of this.childs) {
+            //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
+            let state = {};
             switch(o.option.type) {
                 case "rotary":
                     //console.log(dom_element);
                     //debugger;
-                    RotaryScript(o.option, o.html);
+                    RotaryScript(o.option, o.html, state as RotaryState);
                     break;
                 case "ccbutton":
                     CCButtonScript(o.option, o.html);
                     break;
                 case "ccslider":
-                    CCSliderScript(o.option, o.html);
+                    CCSliderScript(o.option, o.html, state as CCSliderState);
                     break;
                 case "notebutton":
                     NoteButtonScript(o.option, o.html);
+                    break;
             }
         }
     }
@@ -123,42 +136,7 @@ export const change_overlay = (overlayId: number) => {
     overlay_emitter.dispatchEvent(new ChangeOverlayEvent(overlayId));
 };
 
-/*const setup_overlay_widget = (widget: Widget, vertical: boolean) => {
-    const w = document.createElement("div");
-    //w.classList.add(widget.type);
-    if (widget.id) w.id = widget.id;
-
-    //console.log(widget);
-    w.classList.add(widget.type);
-    switch (widget.type) {
-        case "empty":
-            // for spaces in grids
-            break;
-        case "ccslider":
-            setup_slider(w, widget as CCSliderProperties)
-            break;
-
-        case "ccbutton":
-            setup_ccbutton(w, widget as CCButtonProperties)
-            break;
-
-        case "notebutton":
-            setup_notebutton(w, widget as NoteButtonProperties);
-            break;
-
-        case "rotary":
-            setup_rotary(w, widget as RotarySliderProperties);
-        break;
-    }
-
-    return w;
-};*/
-
-/*function _is_vertical_layout(lname: string) {
-    return lname == "vert-mixer";
-}*/
-
-export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) => {
+export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget<WidgetState>>) => {
     //const grid = document.createElement("div");
     if (options.id) container.id = options.id;
 
@@ -175,56 +153,17 @@ export const GridMixer = (container: HTMLDivElement, options: GridMixerPropertie
     return container;
 }
 
-export const FlexMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
+export const FlexMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget<WidgetState>>) => {
     if (options.id) container.id = options.id;
 
     for (const child of options.controls) {
-        const ww = render_widget(child, children)
+        const ww = render_widget(child, children);
         container.appendChild(ww.html);
         children.push(ww);
     }
     
     return container;
 }
-
-/**
- * @deprecated
- * @param options 
- * @returns 
- */
-/*export const setup_overlay = (
-    //parent: HTMLDivElement,
-    //options: OverlayOptions,
-    options: Overlay,
-) => {
-    const overlay = document.createElement("div");
-    overlay.classList.add("overlay", "hide");
-    if (options.id) overlay.id = options.id;
-
-    // testing
-    //overlay.id = "grid-demo"
-    if (options.id) overlay.id = options.id;
-
-    for (const col of options.cells) {
-        const cell = document.createElement("div");
-        if (col.id) cell.id = col.id;
-
-        switch (col.type) {
-            case "grid-mixer":
-                cell.style.setProperty("--cols", col.w);
-                cell.style.setProperty("--rows", col.h);
-                break;
-        }
-        cell.classList.add("cell", col.type);
-        for (const w of col.controls) {
-            const c = setup_overlay_widget(w, is_vertical_layout(col.type));
-            cell.appendChild(c);
-        }
-        overlay.appendChild(cell);
-    }
-    register_overlay(new LoadedOverlay(options, overlay));
-    return overlay;
-};*/
 
 export const setup_tabs = (ols: Array<Overlay>, parent: HTMLDivElement, cb: (index: number) => void) => {
     //parent.classList.add("tab_parent");

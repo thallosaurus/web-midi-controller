@@ -42,6 +42,8 @@ export const cc_update_on_bus = (channel: number, cc: number, value: number) => 
 // Register a midi widget on the bus
 export const register_midi_widget = (channel: number, note: number, cb: NoteCallback) => {
     const ch = note_map.get(channel)!;
+    //debugger;
+    console.log("registering midi ", note, " on channel ", channel);
     
     if (!ch.has(note)) {
         ch.set(note, []);
@@ -103,12 +105,15 @@ export const process_internal = (ev: MidiEvent) => {
 };
 
 export const bus = new EventTarget();
-bus.addEventListener("ccupdate", (ev: Event) => {
-    const update = ev as CCEvent;
-    cc_update_on_bus(update.midi_channel, update.cc, update.value);
-    //console.log(update);
-});
-bus.addEventListener("noteupdate", (ev: Event) => {
-    const update = ev as NoteEvent;
-    midi_update_on_bus(update.midi_channel, update.note, update.velocity);
-});
+export const init_event_bus = () => {
+
+    bus.addEventListener("ccupdate", (ev: Event) => {
+        const update = ev as CCEvent;
+        cc_update_on_bus(update.midi_channel, update.cc, update.value);
+        //console.log(update);
+    });
+    bus.addEventListener("noteupdate", (ev: Event) => {
+        const update = ev as NoteEvent;
+        midi_update_on_bus(update.midi_channel, update.note, update.velocity);
+    });
+}
