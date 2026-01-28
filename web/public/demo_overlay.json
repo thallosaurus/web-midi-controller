@@ -1,5 +1,69 @@
 [
     {
+        "name": "Nested Test",
+        "id": "nested",
+        "cells": [
+            {
+                "type": "horiz-mixer",
+                "controls": [
+                    {
+                        "type": "horiz-mixer",
+                        "controls": [
+                            {
+                                "type": "ccslider",
+                                "channel": 1,
+                                "cc": 0,
+                                "mode": "relative",
+                                "label": "Test"
+                            },
+                            {
+                                "type": "ccslider",
+                                "channel": 1,
+                                "cc": 1,
+                                "mode": "relative",
+                                "label": "Test"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "vert-mixer",
+                        "controls": [
+                            {
+                                "type": "horiz-mixer",
+                                "controls": [
+                                    {
+                                        "type": "ccslider",
+                                        "channel": 1,
+                                        "cc": 0,
+                                        "mode": "relative",
+                                        "label": "Test",
+                                        "vertical": true
+                                    },
+                                    {
+                                        "type": "ccslider",
+                                        "channel": 1,
+                                        "cc": 0,
+                                        "mode": "relative",
+                                        "label": "Test",
+                                        "vertical": true
+                                    }
+                                ]
+                            },
+                            
+                            {
+                                "type": "ccslider",
+                                "channel": 1,
+                                "cc": 1,
+                                "mode": "relative",
+                                "label": "Test"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "name": "Test Overlay",
         "id": "test_overlay",
         "cells": [

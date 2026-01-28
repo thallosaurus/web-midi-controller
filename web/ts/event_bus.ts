@@ -29,6 +29,7 @@ export const register_cc_widget = (id: string, init: number, channel: number, cc
     if (!channel_map.has(cc)) {
         channel_map.set(cc, new Map<string, CCCallback>());
     }
+    console.log("registering cc ", cc, " on channel ", channel);
 
     const c = channel_map.get(cc)!;
     c.set(id, cb);
@@ -43,7 +44,8 @@ export const unregister_cc_widget = (id: string, channel: number, cc: number) =>
     if (!ccch.has(cc)) {
         return
     }
-
+    
+    console.log("unregistering cc widget ", cc, " on channel ", channel);
     const ccmap = ccch.get(cc)!;
     ccmap.delete(id);
 }
@@ -66,23 +68,24 @@ export const cc_update_on_bus = (channel: number, cc: number, value: number) => 
 export const register_midi_widget = (id: string, channel: number, note: number, cb: NoteCallback) => {
     const ch = note_map.get(channel)!;
     //debugger;
-    console.log("registering midi ", note, " on channel ", channel);
     
     if (!ch.has(note)) {
         ch.set(note, new Map<string, NoteCallback>());
     }
     
+    console.log("registering midi ", note, " on channel ", channel);
     const n = ch.get(note)!;
     n.set(id, cb)
 };
 
 export const unregister_midi_widget = (id: string, channel: number, note: number) => {
     const notech = note_map.get(channel)!;
-
+    
     if (!notech.has(note)) {
         return
     }
-
+    
+    console.log("unregistering midi ", note, " on channel ", channel);
     const notemap = notech.get(note)!;
     notemap.delete(id);
 }

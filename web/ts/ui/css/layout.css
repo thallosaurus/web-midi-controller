@@ -1,10 +1,12 @@
 .horiz-mixer {
     display: flex;
+    gap: 1em;
 }
 
 .vert-mixer {
     display: flex;
     flex-direction: column;
+    gap: 1em;
 }
 
 .empty {
@@ -20,5 +22,5 @@
 
 .widget {
     height: 100%;
-    width: 100%;
+    width: calc(100% - 1em);
 }
