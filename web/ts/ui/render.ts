@@ -1,6 +1,6 @@
 import type { Overlay } from "../../bindings/Overlay";
 import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, RotaryMode, RotarySliderProperties, Widget } from "../../bindings/Widget";
-import { NoteButton } from "./button";
+import { CCButton, NoteButton } from "./button";
 import { FlexMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
 import { Rotary } from "./rotary";
 import { CCSlider } from "./slider";
@@ -26,15 +26,14 @@ export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): Load
 
 export const render_widget = (cell: Widget, children: Array<LoadedWidget>, element?: HTMLDivElement): LoadedWidget => {
     let e = element ?? document.createElement("div") as HTMLDivElement;
-    e.classList.add(cell.type);
+    e.classList.add(cell.type, "widget");
     
     switch (cell.type) {
         case "ccbutton":
             {
                 const w = cell as CCButtonProperties;
                 //if (w.id) e.id = cell.id;
-                const button = document.createElement("div");
-                button.classList.add("target");
+                CCButton(e, w);
             }
             break;
 

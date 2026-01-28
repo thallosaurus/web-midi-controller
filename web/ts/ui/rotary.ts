@@ -27,7 +27,6 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement) => {
 
     const dial = o.querySelector<HTMLDivElement>(".rotary .widget .dial")!;
     console.log(dial);
-    debugger;
 
     const set_element_properties = () => {
         //parent.innerText = options.label ?? "fuck you";

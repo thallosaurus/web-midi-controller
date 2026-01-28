@@ -213,9 +213,9 @@ export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement) =
     let baseY = 0;
     let baseX = 0;
 
-    const fill = document.querySelector<HTMLDivElement>("div.fill")!;
-    const reset_button = document.querySelector<HTMLDivElement>("button")!;
-    const slider = document.querySelector<HTMLDivElement>(".slider")!;
+    const fill = o.querySelector<HTMLDivElement>("div.fill")!;
+    const reset_button = o.querySelector<HTMLDivElement>("button")!;
+    const slider = o.querySelector<HTMLDivElement>(".slider")!;
 
     reset_button.addEventListener("click", () => {
         reset();
@@ -250,7 +250,7 @@ export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement) =
     const end = (e: PointerEvent) => {
         if (e.pointerId !== activePointer) return;
 
-        const el = e.currentTarget as HTMLElement;
+        const el = e.target as HTMLElement;
         el.releasePointerCapture(e.pointerId);
         activePointer = null;
 
@@ -280,7 +280,7 @@ export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement) =
     };
 
     const update = (e: PointerEvent) => {
-        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const rect = (e.target as HTMLElement).getBoundingClientRect();
         //const y = rect.bottom - e.clientY;
 
         switch (options.mode) {

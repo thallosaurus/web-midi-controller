@@ -7,25 +7,26 @@
                 "type": "grid-mixer",
                 "w": 5,
                 "h": 3,
-                "controls": [{
-                    "type": "empty"
-                },{
-                    "type": "rotary",
-                    "channel": 1,
-                    "cc":5,
-                    "label": "test",
-                    "mode": "relative"
-                },
-                {
-                    "type": "rotary",
-                    "channel": 1,
-                    "cc":6,
-                    "label": "test",
-                    "mode": "snapback",
-                    "default_value": 64
-                }
-
-            ]
+                "controls": [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "rotary",
+                        "channel": 1,
+                        "cc": 5,
+                        "label": "test",
+                        "mode": "relative"
+                    },
+                    {
+                        "type": "rotary",
+                        "channel": 1,
+                        "cc": 6,
+                        "label": "test",
+                        "mode": "snapback",
+                        "default_value": 64
+                    }
+                ]
             }
         ]
     },
@@ -35,78 +36,94 @@
         "cells": [
             {
                 "type": "horiz-mixer",
-                "controls": [{
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 10,
-                    "mode": "relative",
-                    "label": "Volume 1"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 20,
-                    "mode": "relative",
-                    "label": "Volume 2"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 30,
-                    "mode": "relative",
-                    "label": "Volume 3"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 40,
-                    "mode": "relative",
-                    "label": "Volume 4"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 50,
-                    "mode": "relative",
-                    "label": "Volume 5"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 60,
-                    "mode": "relative",
-                    "label": "Volume 6"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 70,
-                    "mode": "relative",
-                    "label": "Volume 7"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 80,
-                    "mode": "relative",
-                    "label": "Volume 8"
-                }]
+                "controls": [
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 10,
+                        "mode": "relative",
+                        "label": "Volume 1"
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 20,
+                        "mode": "relative",
+                        "label": "Volume 2"
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 30,
+                        "mode": "relative",
+                        "label": "Volume 3"
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 40,
+                        "mode": "relative",
+                        "label": "Volume 4"
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 50,
+                        "mode": "relative",
+                        "label": "Volume 5"
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 60,
+                        "mode": "relative",
+                        "label": "Volume 6"
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 70,
+                        "mode": "relative",
+                        "label": "Volume 7"
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 80,
+                        "mode": "relative",
+                        "label": "Volume 8"
+                    }
+                ]
             },
             {
                 "type": "vert-mixer",
                 "id": "returns",
-                "controls": [{
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 90,
-                    "mode": "snapback",
-                    "label": "Reverb"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 91,
-                    "mode": "snapback",
-                    "label": "Filter"
-                }, {
-                    "type": "ccslider",
-                    "channel": 1,
-                    "cc": 92,
-                    "mode": "relative",
-                    "label": "Test"
-                }]
+                "controls": [
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 90,
+                        "mode": "snapback",
+                        "label": "Reverb",
+                        "vertical": true
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 91,
+                        "mode": "snapback",
+                        "label": "Filter",
+                        "vertical": true
+                    },
+                    {
+                        "type": "ccslider",
+                        "channel": 1,
+                        "cc": 92,
+                        "mode": "relative",
+                        "label": "Test",
+                        "vertical": true
+                    }
+                ]
             }
         ]
     },
