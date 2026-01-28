@@ -31,6 +31,10 @@ const set_element_properties_2 = (state: RotaryState) => {
 }
 
 // Called, when the rotary gets displayed on the screen
+export const UnloadRotaryScript = (s: RotarySliderProperties, o: HTMLDivElement) => {
+    console.log("unloading rotary")
+}
+
 export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
     const sensitivity = 0.5;    // px -> value
 

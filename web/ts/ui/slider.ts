@@ -216,6 +216,10 @@ export const CCSlider = (container: HTMLDivElement, options: CCSliderProperties)
     return container;
 }
 
+export const UnloadCCSliderScript = (options: CCSliderProperties, o: HTMLDivElement) => {
+    
+}
+
 export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
     state.value = options.default_value ?? 0;
     state.active_pointer = null;

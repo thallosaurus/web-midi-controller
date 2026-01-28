@@ -1,11 +1,11 @@
-import { CCButtonScript, NoteButtonScript } from "./button.ts";
+import { CCButtonScript, NoteButtonScript, UnloadCCButtonScript, UnloadNoteButtonScript, type ButtonState } from "./button.ts";
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
-import { CCSliderScript, setup_slider, type CCSliderState } from "./slider.ts";
+import { CCSliderScript, setup_slider, UnloadCCSliderScript, type CCSliderState } from "./slider.ts";
 import { type Overlay } from '../../bindings/Overlay.ts';
 import type { GridMixerProperties, HorizontalMixerProperties, Widget } from "../../bindings/Widget.ts";
-import { RotaryScript, setup_rotary, type RotaryState } from "./rotary.ts";
+import { RotaryScript, setup_rotary, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
 import { render_widget } from "./render.ts";
 
 let current_overlay_id = -1;
@@ -77,34 +77,43 @@ export class LoadedOverlay {
 
     unload() {
         console.log("unloading overlay id " + this.overlay.id)
+        for (const o of this.childs) {
+            //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
+            switch(o.option.type) {
+                case "rotary":
+                    UnloadRotaryScript(o.option, o.html);
+                    break;
+                case "ccbutton":
+                    UnloadCCButtonScript(o.option, o.html);
+                    break;
+                case "ccslider":
+                    UnloadCCSliderScript(o.option, o.html);
+                    break;
+                case "notebutton":
+                    UnloadNoteButtonScript(o.option, o.html);
+                    break;
+            }
+        }
     }
     
     load() {
         console.log("loading overlay id " + this.overlay.id)
-        console.log(this.childs);
-
-/*        this.html.querySelectorAll(".rotary").forEach(e => {
-            RotaryScript(e as HTMLDivElement, e, {});
-
-        })*/
 
         for (const o of this.childs) {
             //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
             let state = {};
             switch(o.option.type) {
                 case "rotary":
-                    //console.log(dom_element);
-                    //debugger;
                     RotaryScript(o.option, o.html, state as RotaryState);
                     break;
                 case "ccbutton":
-                    CCButtonScript(o.option, o.html);
+                    CCButtonScript(o.option, o.html, state as ButtonState);
                     break;
                 case "ccslider":
                     CCSliderScript(o.option, o.html, state as CCSliderState);
                     break;
                 case "notebutton":
-                    NoteButtonScript(o.option, o.html);
+                    NoteButtonScript(o.option, o.html, state as ButtonState);
                     break;
             }
         }

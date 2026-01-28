@@ -73,7 +73,7 @@ const init = async () => {
     close_dialog("overlay_menu")
   })
   
-  //change_overlay(0);
+  change_overlay(0);
 };
 
 self.addEventListener("DOMContentLoaded", init);
