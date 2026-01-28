@@ -6,14 +6,14 @@ import type { CCSliderProperties } from "../../bindings/Widget.ts";
 
 const MAX_LEVEL = 127;
 
-export interface SliderOptions {
+/*export interface SliderOptions {
     label?: string;
     channel: number;
     cc: number;
     default_value?: number;
     mode: string;
     vertical: boolean;
-}
+}*/
 
 export const setup_slider = (
     container: HTMLDivElement,
@@ -186,3 +186,185 @@ export const setup_slider = (
     container.appendChild(reset_button);
     //parent.appendChild(container);
 };
+
+// Renders the slider markup
+export const CCSlider = (container: HTMLDivElement, options: CCSliderProperties) => {
+    const fill = document.createElement("div");
+    fill.classList.add("fill", options.mode);
+
+    const reset_button = document.createElement("button");
+
+    const slider = document.createElement("div");
+    slider.classList.add(
+        "slider",
+        options.vertical ? "vertical" : "horizontal",
+    );
+    slider.appendChild(fill);
+
+    container.appendChild(slider);
+    container.appendChild(reset_button);
+    return container;
+}
+
+export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement) => {
+    let value = options.default_value ?? 0;
+    let activePointer: number | null = null;
+    let baseValue = 0;
+    let baseY = 0;
+    let baseX = 0;
+
+    const fill = document.querySelector<HTMLDivElement>("div.fill")!;
+    const reset_button = document.querySelector<HTMLDivElement>("button")!;
+    const slider = document.querySelector<HTMLDivElement>(".slider")!;
+
+    reset_button.addEventListener("click", () => {
+        reset();
+    });
+
+    const set_reset_label = () => {
+        reset_button.innerText = (options.label ?? "CC" + options.cc) + ":\n" +
+            value;
+    };
+    set_reset_label();
+
+    const start = (e: PointerEvent) => {
+        e.preventDefault();
+        vibrate();
+        const el = e.currentTarget as HTMLElement;
+
+        activePointer = e.pointerId;
+        el.setPointerCapture(e.pointerId);
+
+        baseValue = value;
+        baseY = e.clientY;
+        baseX = e.clientX;
+
+        update(e);
+    };
+
+    const move = (e: PointerEvent) => {
+        if (e.pointerId !== activePointer) return;
+        update(e);
+    };
+
+    const end = (e: PointerEvent) => {
+        if (e.pointerId !== activePointer) return;
+
+        const el = e.currentTarget as HTMLElement;
+        el.releasePointerCapture(e.pointerId);
+        activePointer = null;
+
+        if (options.mode == "snapback") {
+            reset();
+        }
+    };
+
+    const update_value = (v: number) => {
+        value = v;
+        if (options.vertical) {
+            fill.style.width = (value / MAX_LEVEL) * 100 + "%";
+        } else {
+            fill.style.height = (value / MAX_LEVEL) * 100 + "%";
+        }
+        set_reset_label();
+    };
+
+    const reset = () => {
+        update_bus_value(options.default_value ?? 0);
+    };
+
+    const update_bus_value = (v: number) => {
+        process_internal(
+            new CCEvent(options.channel, v, options.cc),
+        );
+    };
+
+    const update = (e: PointerEvent) => {
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        //const y = rect.bottom - e.clientY;
+
+        switch (options.mode) {
+            case "snapback":
+            case "absolute":
+                {
+                    let v;
+                    if (!options.vertical) {
+                        const n = rect.bottom - e.clientY;
+                        v = Math.floor(
+                            Math.max(
+                                0,
+                                Math.min(
+                                    MAX_LEVEL,
+                                    (n / rect.height) * MAX_LEVEL,
+                                ),
+                            ),
+                        );
+                    } else {
+                        const n = e.clientX - rect.left;
+                        v = Math.floor(
+                            Math.max(
+                                0,
+                                Math.min(
+                                    (n / rect.width) * MAX_LEVEL,
+                                    MAX_LEVEL,
+                                ),
+                            ),
+                        );
+                    }
+                    if (v != value) {
+                        //update_value(v);
+                        console.log(rect);
+                        console.log(v);
+                        update_bus_value(v);
+                    }
+                }
+                break;
+
+            case "relative":
+                {
+                    let v;
+                    if (!options.vertical) {
+                        const n = baseY - e.clientY;
+                        const sensitivity = MAX_LEVEL / (rect.height);
+                        const next = baseValue + n * sensitivity;
+                        //(options.vertical ? (rect.width) : (rect.height));
+                        v = Math.floor(
+                            Math.max(0, Math.min(MAX_LEVEL, next)),
+                        );
+                    } else {
+                        const delta = e.clientX - baseX;
+                        const sensitivity = MAX_LEVEL / rect.width;
+                        const next = baseValue + delta * sensitivity;
+
+                        v = Math.floor(
+                            Math.max(0, Math.min(MAX_LEVEL, next)),
+                        );
+                    }
+
+                    if (v != value) {
+                        update_bus_value(v);
+                    }
+                }
+
+                break;
+        }
+        //if ()
+    };
+
+    register_cc_widget(
+        options.default_value ?? 0,
+        options.channel,
+        options.cc,
+        update_value,
+    );
+
+    /*const slider = document.createElement("div");
+    slider.classList.add(
+        "slider",
+        options.vertical ? "vertical" : "horizontal",
+    );*/
+    slider.addEventListener("pointerdown", start);
+    slider.addEventListener("pointermove", move);
+    slider.addEventListener("pointerup", end);
+    slider.addEventListener("pointercancel", end);
+}

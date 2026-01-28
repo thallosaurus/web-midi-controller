@@ -1,8 +1,4 @@
-.overlay {
-  width: 100%;
-  height: 100%;
-  display: flex;
-}
+
 
 .overlay.hide {
   display: none !important;

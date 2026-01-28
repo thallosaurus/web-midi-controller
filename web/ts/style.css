@@ -97,11 +97,7 @@ dialog > footer button {
   
 }
 
-.cell {
-  height: 100%;
-  width: 100%;
-  margin: .5em;
-}
+
 
 /*.vert-mixer.cell {
   display: flex;

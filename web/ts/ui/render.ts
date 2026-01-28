@@ -1,30 +1,79 @@
 import type { Overlay } from "../../bindings/Overlay";
-import type { Widget } from "../../bindings/Widget";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, RotaryMode, RotarySliderProperties, Widget } from "../../bindings/Widget";
+import { NoteButton } from "./button";
+import { FlexMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
+import { Rotary } from "./rotary";
+import { CCSlider } from "./slider";
 
 /*interface RenderLifecycle {
     load(): void;
     unload(): void;
 }*/
 
-export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): HTMLDivElement => {
+export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): LoadedOverlay => {
     const e = element ?? document.createElement("div") as HTMLDivElement;
+    let children = [];
     
     if (overlay.id) e.id = overlay.id;
     
     for (const ol of overlay.cells) {
-        e.append(render_widget(ol));
+        let w = render_widget(ol, children);
+        e.append(w.html);
+        children.push(w);
     }
-    return e;
+    return new LoadedOverlay(overlay, e, children);
 }
 
-const render_widget = (cell: Widget, element?: HTMLDivElement): HTMLDivElement => {
+export const render_widget = (cell: Widget, children: Array<LoadedWidget>, element?: HTMLDivElement): LoadedWidget => {
     let e = element ?? document.createElement("div") as HTMLDivElement;
     e.classList.add(cell.type);
-
+    
     switch (cell.type) {
         case "ccbutton":
-            const button = document.createElement("div");
-            button.classList.add("target");
+            {
+                const w = cell as CCButtonProperties;
+                //if (w.id) e.id = cell.id;
+                const button = document.createElement("div");
+                button.classList.add("target");
+            }
+            break;
+
+        case "rotary":
+            {
+                const w = cell as RotarySliderProperties;
+                Rotary(e, w);
+            }
+            break;
+
+        case "ccslider":
+            {
+                const w = cell as CCSliderProperties;
+                CCSlider(e, w);
+            }
+            break;
+
+        case "grid-mixer":
+            {
+                const w = cell as GridMixerProperties;
+                GridMixer(e, w, children);
+            }
+            break;
+
+        case "vert-mixer":
+        case "horiz-mixer":
+            {
+                const w = cell as HorizontalMixerProperties;
+                FlexMixer(e, w, children);
+            }
+            break;
+
+        case "notebutton":
+            {
+                const w = cell as NoteButtonProperties;
+                NoteButton(e, w);
+            }
     }
-    return e
+    let ww = new LoadedWidget(cell, e);
+    children.push(ww);
+    return ww;
 }

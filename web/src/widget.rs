@@ -33,18 +33,21 @@ pub(super) enum Widget {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct HorizontalMixerProperties {
+    id: Option<String>,
     controls: Vec<Widget>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct VerticalMixerProperties {
+    id: Option<String>,
     controls: Vec<Widget>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct GridMixerProperties {
+    id: Option<String>,
     controls: Vec<Widget>,
     w: u8,
     h: u8,
@@ -53,6 +56,7 @@ pub(super) struct GridMixerProperties {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct NoteButtonProperties {
+    id: Option<String>,
     channel: u8,
     note: u8,
     label: Option<String>,
@@ -62,6 +66,7 @@ pub(super) struct NoteButtonProperties {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct CCSliderProperties {
+    id: Option<String>,
     channel: u8,
     cc: u8,
     mode: SliderMode,
@@ -87,6 +92,7 @@ enum SliderMode {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct CCButtonProperties {
+    id: Option<String>,
     label: Option<String>,
     channel: u8,
     cc: u8,
@@ -98,6 +104,7 @@ pub(super) struct CCButtonProperties {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct RotarySliderProperties {
+    id: Option<String>,
     channel: u8,
     cc: u8,
     label: Option<String>,

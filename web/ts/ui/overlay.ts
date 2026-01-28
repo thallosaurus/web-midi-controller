@@ -1,38 +1,115 @@
-import { setup_ccbutton, setup_notebutton } from "./button.ts";
+import { CCButtonScript, NoteButtonScript, setup_ccbutton, setup_notebutton } from "./button.ts";
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
-import { setup_slider } from "./slider.ts";
+import { CCSliderScript, setup_slider } from "./slider.ts";
 import { type Overlay } from '../../bindings/Overlay.ts';
-import type { CCButtonProperties, CCSliderProperties, NoteButtonProperties, RotarySliderProperties, Widget } from "../../bindings/Widget.ts";
-import { setup_rotary } from "./rotary.ts";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, RotarySliderProperties, Widget } from "../../bindings/Widget.ts";
+import { RotaryScript, setup_rotary } from "./rotary.ts";
+import { render_widget } from "./render.ts";
 
+let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
-const overlays: Array<HTMLDivElement> = [];
+const overlays: Array<LoadedOverlay> = [];
+
+export const register_overlay = (o: LoadedOverlay) => {
+    overlays.push(o);
+}
+
+overlay_emitter.addEventListener("change", (ev: Event) => {
+    hide_all_overlays();
+    unpress_overlays();
+    
+    const overlays_parent = document.querySelector<HTMLDivElement>(
+        "main#overlays",
+    )!;
+    
+    const current = overlays[current_overlay_id];
+    if (current) {
+        current.unload();
+        overlays_parent.removeChild(current.html);
+    }
+    
+    const e = ev as ChangeOverlayEvent;
+    console.log(e.id);
+    current_overlay_id = e.id;
+    
+    const new_overlay = overlays[e.id];
+    if (new_overlay) {
+        overlays_parent.appendChild(new_overlay.html);
+        //const dom_overlay = document.querySelector<HTMLDivElement>("main#overlay #" + new_overlay.overlay.id)!;
+
+        new_overlay.load()
+    } else {
+        throw new Error("overlay with id " + e.id + " not found")
+    }
+
+    //overlays[e.id].html.classList.remove("hide");
+    
+    /*for (const r of document.querySelectorAll<HTMLLIElement>("[data-overlay-index='"+e.id+"']")!) {
+        r.classList.add("shown");
+    }*/
+});
+
+export class LoadedWidget {
+    option: Widget
+    html: HTMLDivElement
+
+    constructor(option: Widget, html: HTMLDivElement) {
+        this.option = option;
+        this.html = html;
+    }
+}
+
+export class LoadedOverlay {
+    overlay: Overlay
+    html: HTMLDivElement
+    childs: Array<LoadedWidget>
+
+    constructor(overlay: Overlay, html: HTMLDivElement, childs: Array<LoadedWidget>) {
+        this.overlay = overlay;
+        this.html = html
+        this.childs = childs;
+    }
+
+    unload() {
+        console.log("unloading overlay id " + this.overlay.id)
+    }
+    
+    load() {
+        console.log("loading overlay id " + this.overlay.id)
+        for (const o of this.childs) {
+            switch(o.option.type) {
+                case "rotary":
+                    //console.log(dom_element);
+                    //debugger;
+                    RotaryScript(o.option, o.html);
+                    break;
+                case "ccbutton":
+                    CCButtonScript(o.option, o.html);
+                    break;
+                case "ccslider":
+                    CCSliderScript(o.option, o.html);
+                    break;
+                case "notebutton":
+                    NoteButtonScript(o.option, o.html);
+            }
+        }
+    }
+}
+
 const unpress_overlays = () => {
     for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
-        r.classList.remove("shown");
+        //r.classList.remove("shown");
     }
 }
 const hide_all_overlays = () => {
     overlays.map((v) => {
-        if (!v.classList.contains("hide")) {
-            v.classList.add("hide");
+        if (!v.html.classList.contains("hide")) {
+            //v.html.classList.add("hide");
         }
     });
 };
-overlay_emitter.addEventListener("change", (ev: Event) => {
-    hide_all_overlays();
-    unpress_overlays();
-
-    const e = ev as ChangeOverlayEvent;
-    console.log(e.id);
-    overlays[e.id].classList.remove("hide");
-
-    for (const r of document.querySelectorAll<HTMLLIElement>("[data-overlay-index='"+e.id+"']")!) {
-        r.classList.add("shown");
-    }
-});
 
 class ChangeOverlayEvent extends Event {
     id: number;
@@ -58,39 +135,15 @@ const setup_overlay_widget = (widget: Widget, vertical: boolean) => {
             // for spaces in grids
             break;
         case "ccslider":
-
             setup_slider(w, widget as CCSliderProperties)
-            /*setup_slider(w, {
-                label: widget.label,
-                channel: widget.channel,
-                cc: widget.cc,
-                default_value: widget.default,
-                mode: widget.mode,
-                vertical: widget.vertical ?? vertical,
-            });*/
             break;
 
         case "ccbutton":
             setup_ccbutton(w, widget as CCButtonProperties)
-            /*setup_ccbutton(w, {
-                cc: widget.cc,
-                channel: widget.channel,
-                value: widget.value,
-                value_off: widget.value_off ?? 0,
-                label: widget.label,
-                mode: widget.mode,
-            });*/
             break;
 
         case "notebutton":
             setup_notebutton(w, widget as NoteButtonProperties);
-/*            setup_notebutton(w, {
-                label: widget.label,
-                channel: widget.channel,
-                note: widget.note,
-                //velocity_on:
-                mode: widget.mode,
-            });*/
             break;
 
         case "rotary":
@@ -105,6 +158,40 @@ function is_vertical_layout(lname: string) {
     return lname == "vert-mixer";
 }
 
+export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) => {
+    //const grid = document.createElement("div");
+    if (options.id) container.id = options.id;
+
+    container.style.setProperty("--cols", String(options.w));
+    container.style.setProperty("--rows", String(options.h));
+
+    for (const child of options.controls) {
+        let ww = render_widget(child, children);
+        container.appendChild(ww.html);
+        children.push(ww);
+    }
+
+    //container.appendChild(grid);
+    return container;
+}
+
+export const FlexMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
+    if (options.id) container.id = options.id;
+
+    for (const child of options.controls) {
+        const ww = render_widget(child, children)
+        container.appendChild(ww.html);
+        children.push(ww);
+    }
+    
+    return container;
+}
+
+/**
+ * @deprecated
+ * @param options 
+ * @returns 
+ */
 export const setup_overlay = (
     //parent: HTMLDivElement,
     //options: OverlayOptions,
@@ -135,7 +222,7 @@ export const setup_overlay = (
         }
         overlay.appendChild(cell);
     }
-    overlays.push(overlay);
+    register_overlay(new LoadedOverlay(options, overlay));
     return overlay;
 };
 

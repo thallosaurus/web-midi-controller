@@ -1,6 +1,8 @@
+import type { Overlay } from "../bindings/Overlay.ts";
 import "./style.css";
 //import { setup_ccbutton, setup_notebutton } from "./ui/button.ts";
-import { change_overlay, setup_overlay, setup_tabs } from "./ui/overlay.ts";
+import { change_overlay, register_overlay, setup_overlay, setup_tabs } from "./ui/overlay.ts";
+import { render_overlay } from "./ui/render.ts";
 //import { setup_slider } from "./ui/slider.ts";
 import { connect_local } from "./websocket.ts";
 
@@ -35,16 +37,23 @@ const init = async () => {
   );
   //console.log(await overlays.json());
 
-  const ol = await overlays.json();
+  const ol: Array<Overlay> = await overlays.json();
 
   for (
     //const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!
     const overlay of ol
   ) {
     console.log(overlay);
-    overlays_parent.appendChild(
+
+    // Test Render Flow here
+    const oo = render_overlay(overlay);
+    register_overlay(oo);
+    console.log(oo);
+    //debugger;
+
+    /*overlays_parent.appendChild(
       setup_overlay(overlay),
-    );
+    );*/
   }
 
   const overlay_selector = document.querySelector<HTMLDivElement>(

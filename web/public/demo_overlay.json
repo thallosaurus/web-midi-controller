@@ -19,9 +19,10 @@
                 {
                     "type": "rotary",
                     "channel": 1,
-                    "cc":5,
+                    "cc":6,
                     "label": "test",
-                    "mode": "snapback"
+                    "mode": "snapback",
+                    "default_value": 64
                 }
 
             ]
