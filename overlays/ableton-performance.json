@@ -3,7 +3,7 @@
   "id": "ableton_performance",
   "cells": [
     {
-      "mode": "horiz-mixer",
+      "type": "horiz-mixer",
       "controls": [{
         "type": "ccslider",
         "channel": 1,
@@ -55,26 +55,29 @@
       }]
     },
     {
-      "mode": "vert-mixer",
+      "type": "vert-mixer",
       "id": "returns",
       "controls": [{
         "type": "ccslider",
         "channel": 1,
         "cc": 90,
         "mode": "snapback",
-        "label": "Reverb"
+        "label": "Reverb",
+        "vertical": true
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 91,
         "mode": "snapback",
-        "label": "Filter"
+        "label": "Filter",
+        "vertical": true
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 92,
         "mode": "relative",
-        "label": "Test"
+        "label": "Test",
+        "vertical": true
       }]
     }
   ]

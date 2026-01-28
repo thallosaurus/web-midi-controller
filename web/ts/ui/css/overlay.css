@@ -1,0 +1,20 @@
+
+
+.overlay.hide {
+  display: none !important;
+}
+
+.tab_parent {
+  display: flex;
+  justify-content: end;
+}
+
+.tab_parent a {
+  display: block;
+  font-size: 1em;
+  color: black;
+  background-color: white;
+  padding: .5em .5em;
+  align-self: center;
+  font-size: 1.2em;
+}

@@ -3,3 +3,7 @@
     margin: 10em 0 !important;
     height: calc(100% - 20em);
 }
+
+#traktor_performance #levels {
+    width: 50%;
+}

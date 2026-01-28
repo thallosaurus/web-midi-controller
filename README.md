@@ -8,7 +8,9 @@
 
 ## Installation
 #### Prebuilt Release
-Download and run the latest Release from the "Releases" Tab. Jump to [Mapping](#mapping)
+Download and run the latest Release from the "Releases" Tab. Download the executable for your OS and the `overlay.zip` file which contains prebuilt mappings
+
+Jump to [Mapping](#mapping)
 
 #### Compile from Source
 To even get the next features today you also have the possibility to compile everything from source.
@@ -16,15 +18,19 @@ To even get the next features today you also have the possibility to compile eve
 You need:
 - NodeJS
 - yarn
-- Deno
+- Rust
 
-Clone the Repo and run the following commands:
+Clone the Repo and run the following commands in order:
 ```bash
-deno task build:ui
-deno task compile
+cd web 
+yarn
+yarn build
+
+cd ..
+cargo build
 ```
 
-You will find the compiled binary in the `bin` Folder.
+This will compile everything to a usable state.
 
-## Mapping
-To see something on the screen, you can create the mapping yourself or use a premapped file (See [overlays/ableton-performance.json](overlays/ableton-performance.json) for an example). Create a folder called `overlays`, put it next to the binary and put all mapping JSON files into it. Create `overlays/css/custom.css` to add custom CSS Styles for your mappings
+#### Mapping
+You can create Mappings yourself by placing them inside the overlays folder. Refer to the Repo for examples

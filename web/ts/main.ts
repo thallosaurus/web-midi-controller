@@ -1,14 +1,11 @@
+import type { Overlay } from "../bindings/Overlay.ts";
+import { init_event_bus } from "./event_bus.ts";
 import "./style.css";
 //import { setup_ccbutton, setup_notebutton } from "./ui/button.ts";
-import { change_overlay, setup_overlay, setup_tabs } from "./ui/overlay.ts";
+import { change_overlay, register_overlay, setup_tabs } from "./ui/overlay.ts";
+import { render_overlay } from "./ui/render.ts";
 //import { setup_slider } from "./ui/slider.ts";
 import { connect_local } from "./websocket.ts";
-
-export function vibrate() {
-  if (navigator.vibrate) {
-    navigator.vibrate(20);
-  }
-}
 
 const close_dialog = (id: string) => {
   const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
@@ -22,11 +19,18 @@ const open_dialog = (id: string) => {
 };
 
 const init = async () => {
+  window.addEventListener("error", e => {
+    alert("error:" + e.message + e.filename + e.lineno);
+  });
+  window.addEventListener("unhandledrejection", e => {
+    alert("promise error:" + e.reason);
+  });
+  init_event_bus();
   connect_local();
 
-  const overlays_parent = document.querySelector<HTMLDivElement>(
+  /*const overlays_parent = document.querySelector<HTMLDivElement>(
     "main#overlays",
-  )!;
+  )!;*/
   if (import.meta.env.DEV) {
     console.log("dev");
   }
@@ -35,79 +39,28 @@ const init = async () => {
   );
   //console.log(await overlays.json());
 
-  const ol = await overlays.json();
+  const ol: Array<Overlay> = await overlays.json();
 
   for (
     //const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!
     const overlay of ol
   ) {
-    console.log(overlay);
-    overlays_parent.appendChild(
+    // Test Render Flow here
+    const oo = render_overlay(overlay);
+    register_overlay(oo);
+    console.log(oo);
+    //debugger;
+
+    /*overlays_parent.appendChild(
       setup_overlay(overlay),
-    );
+    );*/
   }
-
-  /*for (
-    const ccslider of document.querySelectorAll<HTMLDivElement>("div.ccslider")!
-  ) {
-    const channel = parseInt(ccslider.dataset.channel ?? "1");
-    const cc = parseInt(ccslider.dataset.cc ?? "0");
-    const mode = ccslider.dataset.mode ?? "absolute";
-    const label = ccslider.dataset.label;
-    const vertical = Boolean(ccslider.dataset.vertical);
-    setup_slider(ccslider, {
-      channel,
-      cc,
-      mode,
-      label,
-      vertical
-    });
-  }
-
-  for (
-    const ccbutton of document.querySelectorAll<HTMLDivElement>("div.ccbutton")!
-  ) {
-    const channel = parseInt(ccbutton.dataset.channel ?? "0");
-    const cc = parseInt(ccbutton.dataset.cc ?? "0");
-    const value = parseInt(ccbutton.dataset.value ?? "127");
-    const value_off = parseInt(ccbutton.dataset.value_off ?? "0");
-    const label = ccbutton.dataset.label;
-    const mode = ccbutton.dataset.mode ?? "trigger";
-    setup_ccbutton(ccbutton, {
-      cc,
-      channel,
-      value,
-      value_off,
-      label,
-      mode,
-    });
-  }
-
-  for (
-    const ccbutton of document.querySelectorAll<HTMLDivElement>(
-      "div.notebutton",
-    )!
-  ) {
-    const channel = parseInt(ccbutton.dataset.channel ?? "0");
-    const note = parseInt(ccbutton.dataset.note ?? "0");
-    //const value = parseInt(ccbutton.dataset.value ?? "127");
-    //const value_off = parseInt(ccbutton.dataset.value_off ?? "0");
-    const label = ccbutton.dataset.label;
-    const mode = ccbutton.dataset.mode ?? "trigger";
-    setup_notebutton(ccbutton, {
-      note,
-      channel,
-      //value,
-      //value_off,
-      label,
-      mode,
-    });
-  }*/
 
   const overlay_selector = document.querySelector<HTMLDivElement>(
     "#overlay_selector",
   )!;
   setup_tabs(ol, overlay_selector, (i) => {
+    console.log("setting tab ", i)
     change_overlay(i);
     close_dialog("overlay_menu")
   });
@@ -129,7 +82,14 @@ const init = async () => {
   change_overlay(0);
 };
 
-self.addEventListener("DOMContentLoaded", init);
+self.addEventListener("DOMContentLoaded", () => {
+  try {
+
+    init();
+  } catch (e) {
+    alert(e);
+  }
+});
 
 /*document.querySelector<HTMLButtonElement>("#menu_container button")!
   .addEventListener("click", (_ev) => {

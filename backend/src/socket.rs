@@ -1,7 +1,8 @@
 use axum::{
     body::Bytes,
-    extract::ws::{Message, Utf8Bytes, WebSocket},
+    extract::{ConnectInfo, State, WebSocketUpgrade, ws::{Message, Utf8Bytes, WebSocket}}, response::IntoResponse,
 };
+use axum_extra::TypedHeader;
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, ops::ControlFlow, sync::Arc};
@@ -13,7 +14,24 @@ use crate::AppState;
 type ClientMap = DashMap<Uuid, mpsc::Sender<AppMessage>>;
 pub(crate) type Clients = Arc<ClientMap>;
 
-pub(crate) async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) {
+pub(crate) async fn ws_handler(
+    ws: WebSocketUpgrade,
+    user_agent: Option<TypedHeader<headers::UserAgent>>,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
+    let user_agent = if let Some(TypedHeader(user_agent)) = user_agent {
+        user_agent.to_string()
+    } else {
+        String::from("Unknown browser")
+    };
+    println!("`{user_agent}` at {addr} connected.");
+    // finalize the upgrade process by returning upgrade callback.
+    // we can customize the callback by sending additional info such as address.
+    ws.on_upgrade(move |socket| handle_socket(socket, addr, state))
+}
+
+async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) {
     let conn_id = Uuid::new_v4();
     if socket
         .send(axum::extract::ws::Message::Ping(Bytes::from_static(&[
@@ -97,6 +115,12 @@ async fn process_message(midi_tx: &Arc<Mutex<Sender<AppMessage>>>, msg: Message,
                 midi_tx.lock().await
                 .send(event.into()).await.unwrap();
             }
+        }
+        Message::Pong(bytes) => {
+            println!("got pong {:?}", bytes);
+        }
+        Message::Ping(bytes) => {
+            println!("got ping {:?}", bytes);
         }
         _ => {
             println!("got unimplemented message {:?}", msg);

@@ -22,6 +22,8 @@
 
 .notebutton {
     touch-action: none;
+    display: flex;
+    align-items: center;
 }
 
 .notebutton .target {
@@ -30,7 +32,7 @@
     height: calc(100% - 2em);
 
     display: grid;
-    justify-content: center;
+
     align-content: center;
     text-align: center;
     font-family: monospace;

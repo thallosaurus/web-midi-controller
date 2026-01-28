@@ -1,40 +1,66 @@
-import { vibrate } from "../main.ts";
-import { process_internal, register_cc_widget } from "../event_bus.ts";
+import { vibrate } from "../utils.ts";
+import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus.ts";
 import "./slider.css";
 import { CCEvent } from "../events.ts";
+import type { CCSliderProperties } from "../../bindings/Widget.ts";
+import type { WidgetState } from "./overlay.ts";
 
 const MAX_LEVEL = 127;
 
-export interface SliderOptions {
-    label?: string;
-    channel: number;
-    cc: number;
-    default_value?: number;
-    mode: string;
-    vertical: boolean;
+export interface CCSliderState extends WidgetState {
+    value: number,
+    active_pointer: number | null,
+    baseValue: number,
+    baseY: number,
+    baseX: number
 }
 
-export const setup_slider = (
-    container: HTMLDivElement,
-    options: SliderOptions,
-) => {
-    let value = options.default_value ?? 0;
-    let activePointer: number | null = null;
-    let baseValue = 0;
-    let baseY = 0;
-    let baseX = 0;
-
+// Renders the slider markup
+export const CCSlider = (container: HTMLDivElement, options: CCSliderProperties) => {
     const fill = document.createElement("div");
     fill.classList.add("fill", options.mode);
 
     const reset_button = document.createElement("button");
+
+    const slider = document.createElement("div");
+    slider.classList.add(
+        "slider",
+        options.vertical ? "vertical" : "horizontal",
+    );
+    slider.appendChild(fill);
+
+    container.appendChild(slider);
+    container.appendChild(reset_button);
+    return container;
+}
+
+export const UnloadCCSliderScript = (id: string, options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
+    const slider = o.querySelector<HTMLDivElement>(".slider")!;
+    slider.addEventListener("pointerdown", state.handlers.pointerdown);
+    slider.addEventListener("pointermove", state.handlers.pointermove);
+    slider.addEventListener("pointerup", state.handlers.pointerup);
+    slider.addEventListener("pointercancel", state.handlers.pointercancel);
+    unregister_cc_widget(id, options.channel, options.cc);
+}
+
+export const CCSliderScript = (id: string, options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
+    state.value = options.default_value ?? 0;
+    state.active_pointer = null;
+    state.baseValue = 0;
+    state.baseY = 0;
+    state.baseX = 0;
+
+    const fill = o.querySelector<HTMLDivElement>("div.fill")!;
+    const reset_button = o.querySelector<HTMLDivElement>("button")!;
+    const slider = o.querySelector<HTMLDivElement>(".slider")!;
+
     reset_button.addEventListener("click", () => {
         reset();
     });
 
     const set_reset_label = () => {
         reset_button.innerText = (options.label ?? "CC" + options.cc) + ":\n" +
-            value;
+            state.value;
     };
     set_reset_label();
 
@@ -43,27 +69,27 @@ export const setup_slider = (
         vibrate();
         const el = e.currentTarget as HTMLElement;
 
-        activePointer = e.pointerId;
+        state.active_pointer = e.pointerId;
         el.setPointerCapture(e.pointerId);
 
-        baseValue = value;
-        baseY = e.clientY;
-        baseX = e.clientX;
+        state.baseValue = state.value;
+        state.baseY = e.clientY;
+        state.baseX = e.clientX;
 
         update(e);
     };
 
     const move = (e: PointerEvent) => {
-        if (e.pointerId !== activePointer) return;
+        if (e.pointerId !== state.active_pointer) return;
         update(e);
     };
 
     const end = (e: PointerEvent) => {
-        if (e.pointerId !== activePointer) return;
+        if (e.pointerId !== state.active_pointer) return;
 
-        const el = e.currentTarget as HTMLElement;
+        const el = e.target as HTMLElement;
         el.releasePointerCapture(e.pointerId);
-        activePointer = null;
+        state.active_pointer = null;
 
         if (options.mode == "snapback") {
             reset();
@@ -71,11 +97,11 @@ export const setup_slider = (
     };
 
     const update_value = (v: number) => {
-        value = v;
+        state.value = v;
         if (options.vertical) {
-            fill.style.width = (value / MAX_LEVEL) * 100 + "%";
+            fill.style.width = (state.value / MAX_LEVEL) * 100 + "%";
         } else {
-            fill.style.height = (value / MAX_LEVEL) * 100 + "%";
+            fill.style.height = (state.value / MAX_LEVEL) * 100 + "%";
         }
         set_reset_label();
     };
@@ -91,7 +117,7 @@ export const setup_slider = (
     };
 
     const update = (e: PointerEvent) => {
-        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const rect = (e.target as HTMLElement).getBoundingClientRect();
         //const y = rect.bottom - e.clientY;
 
         switch (options.mode) {
@@ -122,7 +148,7 @@ export const setup_slider = (
                             ),
                         );
                     }
-                    if (v != value) {
+                    if (v != state.value) {
                         //update_value(v);
                         console.log(rect);
                         console.log(v);
@@ -135,24 +161,24 @@ export const setup_slider = (
                 {
                     let v;
                     if (!options.vertical) {
-                        const n = baseY - e.clientY;
+                        const n = state.baseY - e.clientY;
                         const sensitivity = MAX_LEVEL / (rect.height);
-                        const next = baseValue + n * sensitivity;
+                        const next = state.baseValue + n * sensitivity;
                         //(options.vertical ? (rect.width) : (rect.height));
                         v = Math.floor(
                             Math.max(0, Math.min(MAX_LEVEL, next)),
                         );
                     } else {
-                        const delta = e.clientX - baseX;
+                        const delta = e.clientX - state.baseX;
                         const sensitivity = MAX_LEVEL / rect.width;
-                        const next = baseValue + delta * sensitivity;
+                        const next = state.baseValue + delta * sensitivity;
 
                         v = Math.floor(
                             Math.max(0, Math.min(MAX_LEVEL, next)),
                         );
                     }
 
-                    if (v != value) {
+                    if (v != state.value) {
                         update_bus_value(v);
                     }
                 }
@@ -163,25 +189,24 @@ export const setup_slider = (
     };
 
     register_cc_widget(
+        id,
         options.default_value ?? 0,
         options.channel,
         options.cc,
         update_value,
     );
 
-    const slider = document.createElement("div");
+    /*const slider = document.createElement("div");
     slider.classList.add(
         "slider",
         options.vertical ? "vertical" : "horizontal",
-    );
-    slider.addEventListener("pointerdown", start);
-    slider.addEventListener("pointermove", move);
-    slider.addEventListener("pointerup", end);
-    slider.addEventListener("pointercancel", end);
-    slider.appendChild(fill);
-
-    //const container = document.createElement("div");
-    container.appendChild(slider);
-    container.appendChild(reset_button);
-    //parent.appendChild(container);
-};
+    );*/
+    state.handlers.pointerdown = start;
+    state.handlers.pointermove = move;
+    state.handlers.pointerup = end;
+    state.handlers.pointercancel = end;
+    slider.addEventListener("pointerdown", state.handlers.pointerdown);
+    slider.addEventListener("pointermove", state.handlers.pointermove);
+    slider.addEventListener("pointerup", state.handlers.pointerup);
+    slider.addEventListener("pointercancel", state.handlers.pointercancel);
+}

@@ -1,0 +1,26 @@
+.horiz-mixer {
+    display: flex;
+    gap: 1em;
+}
+
+.vert-mixer {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.empty {
+    
+}
+
+#overlays > * {
+  margin: .5em;
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.widget {
+    height: 100%;
+    width: calc(100% - 1em);
+}

@@ -15,11 +15,11 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "ts/ui", "ts/event_bus.ts", "ts/events.ts", "ts/main.ts", "ts/vite-env.d.ts", "ts/websocket.ts"]
 }
