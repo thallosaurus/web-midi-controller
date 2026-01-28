@@ -7,14 +7,10 @@ import { render_overlay } from "./ui/render.ts";
 //import { setup_slider } from "./ui/slider.ts";
 import { connect_local } from "./websocket.ts";
 import { close_dialog, init_dialogs, open_dialog } from './dialogs.ts'
+import { init_debug } from "./utils.ts";
 
 const init = async () => {
-  window.addEventListener("error", e => {
-    alert("error:" + e.message + e.filename + e.lineno);
-  });
-  window.addEventListener("unhandledrejection", e => {
-    alert("promise error:" + e.reason);
-  });
+  //init_debug();
   init_event_bus();
   init_dialogs();
   connect_local();
@@ -52,19 +48,19 @@ const init = async () => {
     close_dialog("overlay_menu")
   });
   
-  const slide_menu = document.querySelector<HTMLDivElement>(
+  /*const slide_menu = document.querySelector<HTMLDivElement>(
     "#overlay_menu_activator",
   )!;
   slide_menu.addEventListener("click", () => {
     open_dialog("overlay_menu")
-  })
+  })*/
 
-  const slide_menu_close = document.querySelector<HTMLDivElement>(
+  /*const slide_menu_close = document.querySelector<HTMLDivElement>(
     "dialog#overlay_menu button#close",
   )!;
   slide_menu_close.addEventListener("click", () => {
     close_dialog("overlay_menu")
-  })
+  })*/
   
   change_overlay(0);
 };

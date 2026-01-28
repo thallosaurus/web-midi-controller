@@ -101,6 +101,14 @@
                         "type": "jogwheel",
                         "channel": 1,
                         "cc": 60
+                    },
+                    {
+                        "type": "ccbutton",
+                        "channel": 1,
+                        "cc": 123,
+                        "value": 127,
+                        "label": "ccbutton",
+                        "mode": "trigger"
                     }
                 ]
             }

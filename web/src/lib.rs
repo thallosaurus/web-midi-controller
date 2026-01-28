@@ -18,7 +18,6 @@ mod tests {
     
     #[tokio::test]
     async fn test_demo_loading() {
-        
         let json: Vec<Overlay> = serde_json::from_str(DEMO_OVERLAY).unwrap();
         println!("{:#?}", json);
         assert!(true);

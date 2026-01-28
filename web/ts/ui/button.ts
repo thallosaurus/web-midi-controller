@@ -114,9 +114,9 @@ export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLD
     state.handlers.pointerup = touch_end;
     state.handlers.pointercancel = touch_end;
     //button.addEventListener("pointermove", move);
-    button.addEventListener("pointerdown", state.handlers.pointerdown);
-    button.addEventListener("pointerup", state.handlers.pointerup);
-    button.addEventListener("pointercancel", state.handlers.pointercancel);
+    o.addEventListener("pointerdown", state.handlers.pointerdown);
+    o.addEventListener("pointerup", state.handlers.pointerup);
+    o.addEventListener("pointercancel", state.handlers.pointercancel);
     set_label();
 }
 
@@ -202,8 +202,8 @@ export const NoteButtonScript = (id: string, options: NoteButtonProperties, o: H
     state.handlers.pointerup = touch_end;
     state.handlers.pointercancel = touch_end;
     //button.addEventListener("pointermove", move);
-    button.addEventListener("pointerdown", state.handlers.pointerdown);
-    button.addEventListener("pointerup", state.handlers.pointerup);
-    button.addEventListener("pointercancel", state.handlers.pointercancel);
+    o.addEventListener("pointerdown", state.handlers.pointerdown);
+    o.addEventListener("pointerup", state.handlers.pointerup);
+    o.addEventListener("pointercancel", state.handlers.pointercancel);
     set_label();
 }

@@ -1,0 +1,4 @@
+[data-dialog-trigger] > * {
+  touch-action: none;
+  pointer-events: none;
+}
