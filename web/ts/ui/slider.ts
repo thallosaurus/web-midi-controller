@@ -216,7 +216,7 @@ export const CCSlider = (container: HTMLDivElement, options: CCSliderProperties)
     return container;
 }
 
-export const UnloadCCSliderScript = (options: CCSliderProperties, o: HTMLDivElement) => {
+export const UnloadCCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
     
 }
 

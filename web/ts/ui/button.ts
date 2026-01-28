@@ -9,6 +9,25 @@ import { CCEvent, NoteEvent } from "../events.ts";
 import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
 import type { WidgetState } from "./overlay.ts";
 
+export interface ButtonState extends WidgetState {
+    latch_on: boolean,
+    active_pointer: number | null
+}
+
+export const UnloadNoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+    const button = o.querySelector<HTMLDivElement>(".target")!;
+    button.removeEventListener("pointerdown", state.handlers.pointerdown)
+    button.removeEventListener("pointerup", state.handlers.pointerup)
+    button.removeEventListener("pointercancel", state.handlers.pointercancel)
+}
+
+export const UnloadCCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+    const button = o.querySelector<HTMLDivElement>(".target")!;
+    button.removeEventListener("pointerdown", state.handlers.pointerdown)
+    button.removeEventListener("pointerup", state.handlers.pointerup)
+    button.removeEventListener("pointercancel", state.handlers.pointercancel)
+}
+
 /// Function that mounts the Button as a child of the specified Div Element
 export const CCButton = (container: HTMLDivElement, options: CCButtonProperties): HTMLDivElement => {
     const button = document.createElement("div");
@@ -16,15 +35,6 @@ export const CCButton = (container: HTMLDivElement, options: CCButtonProperties)
     container.appendChild(button);
     
     return container;
-}
-
-export interface ButtonState extends WidgetState {
-    latch_on: boolean,
-    active_pointer: number | null
-}
-
-export const UnloadCCButtonScript = (options: CCButtonProperties, o: HTMLDivElement) => {
-
 }
 
 export const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
@@ -100,10 +110,13 @@ export const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, s
 
     register_cc_widget(options.value_off ?? 0, options.channel, options.cc, update_value);
 
-    button.addEventListener("pointerdown", touch_start);
+    state.handlers.pointerdown = touch_start;
+    state.handlers.pointerup = touch_end;
+    state.handlers.pointercancel = touch_end;
     //button.addEventListener("pointermove", move);
-    button.addEventListener("pointerup", touch_end);
-    button.addEventListener("pointercancel", touch_end);
+    button.addEventListener("pointerdown", state.handlers.pointerdown);
+    button.addEventListener("pointerup", state.handlers.pointerup);
+    button.addEventListener("pointercancel", state.handlers.pointercancel);
     set_label();
 }
 
@@ -114,10 +127,6 @@ export const NoteButton = (container: HTMLDivElement, options: NoteButtonPropert
     return container;
 }
 
-export const UnloadNoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement) => {
-    const button = o.querySelector<HTMLDivElement>(".target")!;
-}
-
 export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     // velocity
     state.latch_on = false;
@@ -125,6 +134,7 @@ export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElemen
     state.active_pointer = null;
 
     const button = o.querySelector<HTMLDivElement>(".target")!;
+    console.log(button);
     const set_label = () => {
         button.innerText = (options.label ?? "NOTE " + options.note) + ":\n" + (state.latch_on ? "On" : "Off")
         //value;
@@ -193,9 +203,12 @@ export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElemen
 
     register_midi_widget(options.channel, options.note, update_value);
 
-    button.addEventListener("pointerdown", touch_start);
+    state.handlers.pointerdown = touch_start;
+    state.handlers.pointerup = touch_end;
+    state.handlers.pointercancel = touch_end;
     //button.addEventListener("pointermove", move);
-    button.addEventListener("pointerup", touch_end);
-    button.addEventListener("pointercancel", touch_end);
+    button.addEventListener("pointerdown", state.handlers.pointerdown);
+    button.addEventListener("pointerup", state.handlers.pointerup);
+    button.addEventListener("pointercancel", state.handlers.pointercancel);
     set_label();
 }

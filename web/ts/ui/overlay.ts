@@ -46,18 +46,25 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
     }
 });
 
-export interface WidgetState {}
+export interface WidgetState {
+    handlers: any
+}
 
-export class LoadedWidget<T extends WidgetState> {
+export class LoadedWidget {
     option: Widget
     html: HTMLDivElement
-    state: T
+    
+    state: WidgetState
     //id: string
 
-    constructor(option: Widget, html: HTMLDivElement, s: T) {
+    constructor(option: Widget, html: HTMLDivElement) {
         this.option = option;
         this.html = html;
-        this.state = s
+        this.state = {
+            handlers: {}
+        };
+        //this.state = s
+        //this.abort = new AbortController();
 
         /*this.id = crypto.randomUUID();
         this.html.dataset.id = this.id;*/
@@ -67,33 +74,38 @@ export class LoadedWidget<T extends WidgetState> {
 export class LoadedOverlay {
     overlay: Overlay
     html: HTMLDivElement
-    childs: Array<LoadedWidget<WidgetState>>
+    childs: Array<LoadedWidget>
+    //abort: AbortController
 
-    constructor(overlay: Overlay, html: HTMLDivElement, childs: Array<LoadedWidget<WidgetState>>) {
+    constructor(overlay: Overlay, html: HTMLDivElement, childs: Array<LoadedWidget>) {
         this.overlay = overlay;
         this.html = html
         this.childs = childs;
+        //this.abort = new AbortController();
     }
 
     unload() {
         console.log("unloading overlay id " + this.overlay.id)
         for (const o of this.childs) {
             //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
+
+            //o.state.abort.abort();
             switch(o.option.type) {
                 case "rotary":
-                    UnloadRotaryScript(o.option, o.html);
+                    UnloadRotaryScript(o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
-                    UnloadCCButtonScript(o.option, o.html);
+                    UnloadCCButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
-                    UnloadCCSliderScript(o.option, o.html);
+                    UnloadCCSliderScript(o.option, o.html, o.state as CCSliderState);
                     break;
                 case "notebutton":
-                    UnloadNoteButtonScript(o.option, o.html);
+                    UnloadNoteButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
             }
         }
+        
     }
     
     load() {
@@ -101,19 +113,19 @@ export class LoadedOverlay {
 
         for (const o of this.childs) {
             //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
-            let state = {};
+
             switch(o.option.type) {
                 case "rotary":
-                    RotaryScript(o.option, o.html, state as RotaryState);
+                    RotaryScript(o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
-                    CCButtonScript(o.option, o.html, state as ButtonState);
+                    CCButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
-                    CCSliderScript(o.option, o.html, state as CCSliderState);
+                    CCSliderScript(o.option, o.html, o.state as CCSliderState);
                     break;
                 case "notebutton":
-                    NoteButtonScript(o.option, o.html, state as ButtonState);
+                    NoteButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
             }
         }
@@ -145,7 +157,7 @@ export const change_overlay = (overlayId: number) => {
     overlay_emitter.dispatchEvent(new ChangeOverlayEvent(overlayId));
 };
 
-export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget<WidgetState>>) => {
+export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) => {
     //const grid = document.createElement("div");
     if (options.id) container.id = options.id;
 
@@ -162,7 +174,7 @@ export const GridMixer = (container: HTMLDivElement, options: GridMixerPropertie
     return container;
 }
 
-export const FlexMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget<WidgetState>>) => {
+export const FlexMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
     if (options.id) container.id = options.id;
 
     for (const child of options.controls) {

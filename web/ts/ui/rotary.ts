@@ -31,8 +31,13 @@ const set_element_properties_2 = (state: RotaryState) => {
 }
 
 // Called, when the rotary gets displayed on the screen
-export const UnloadRotaryScript = (s: RotarySliderProperties, o: HTMLDivElement) => {
+export const UnloadRotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
     console.log("unloading rotary")
+
+    o.addEventListener("pointerdown", state.handlers.pointerdown);
+    o.addEventListener("pointermove", state.handlers.pointermove);
+    o.addEventListener("pointerup", state.handlers.pointerup);
+    o.addEventListener("pointercancel", state.handlers.pointercancel);
 }
 
 export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
@@ -41,6 +46,7 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state
     state.value = 0;
     state.lastX = 0;
     state.active = false;
+
 /*    let value = 0;
     let lastX = 0;
     let active = false;*/
@@ -100,11 +106,15 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state
 
     register_cc_widget(s.default_value ?? 0, s.channel, s.cc, update_value);
     
+    state.handlers.pointerdown = touch_start;
+    state.handlers.pointermove = touch_move;
+    state.handlers.pointerup = touch_stop;
+    state.handlers.pointercancel = touch_stop;
     //pointerdown
-    o.addEventListener("pointerdown", touch_start);
-    o.addEventListener("pointermove", touch_move);
-    o.addEventListener("pointerup", touch_stop);
-    o.addEventListener("pointercancel", touch_stop);
+    o.addEventListener("pointerdown", state.handlers.pointerdown);
+    o.addEventListener("pointermove", state.handlers.pointermove);
+    o.addEventListener("pointerup", state.handlers.pointerup);
+    o.addEventListener("pointercancel", state.handlers.pointercancel);
     set_element_properties();
 }
 

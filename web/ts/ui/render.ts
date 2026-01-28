@@ -13,7 +13,7 @@ import { CCSlider } from "./slider";
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables
 export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): LoadedOverlay => {
     const e = element ?? document.createElement("div") as HTMLDivElement;
-    let children: Array<LoadedWidget<WidgetState>> = [];
+    let children: Array<LoadedWidget> = [];
     
     if (overlay.id) e.id = overlay.id;
     
@@ -25,7 +25,7 @@ export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): Load
     return new LoadedOverlay(overlay, e, children);
 }
 
-export const render_widget = (cell: Widget, children: Array<LoadedWidget<WidgetState>>, element?: HTMLDivElement): LoadedWidget<WidgetState> => {
+export const render_widget = (cell: Widget, children: Array<LoadedWidget>, element?: HTMLDivElement): LoadedWidget => {
     let e = element ?? document.createElement("div") as HTMLDivElement;
     e.classList.add(cell.type, "widget");
     
@@ -74,7 +74,7 @@ export const render_widget = (cell: Widget, children: Array<LoadedWidget<WidgetS
             }
             break;
     }
-    let ww = new LoadedWidget(cell, e, {});
+    let ww = new LoadedWidget(cell, e);
     //children.push(ww);
     return ww;
 }
