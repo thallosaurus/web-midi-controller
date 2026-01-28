@@ -1,10 +1,10 @@
-import { CCButtonScript, NoteButtonScript, setup_ccbutton, setup_notebutton } from "./button.ts";
+import { CCButtonScript, NoteButtonScript } from "./button.ts";
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
 import { CCSliderScript, setup_slider } from "./slider.ts";
 import { type Overlay } from '../../bindings/Overlay.ts';
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, RotarySliderProperties, Widget } from "../../bindings/Widget.ts";
+import type { GridMixerProperties, HorizontalMixerProperties, Widget } from "../../bindings/Widget.ts";
 import { RotaryScript, setup_rotary } from "./rotary.ts";
 import { render_widget } from "./render.ts";
 
@@ -99,9 +99,9 @@ export class LoadedOverlay {
 }
 
 const unpress_overlays = () => {
-    for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
+    /*for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
         //r.classList.remove("shown");
-    }
+    }*/
 }
 const hide_all_overlays = () => {
     overlays.map((v) => {
@@ -123,7 +123,7 @@ export const change_overlay = (overlayId: number) => {
     overlay_emitter.dispatchEvent(new ChangeOverlayEvent(overlayId));
 };
 
-const setup_overlay_widget = (widget: Widget, vertical: boolean) => {
+/*const setup_overlay_widget = (widget: Widget, vertical: boolean) => {
     const w = document.createElement("div");
     //w.classList.add(widget.type);
     if (widget.id) w.id = widget.id;
@@ -152,11 +152,11 @@ const setup_overlay_widget = (widget: Widget, vertical: boolean) => {
     }
 
     return w;
-};
+};*/
 
-function is_vertical_layout(lname: string) {
+/*function _is_vertical_layout(lname: string) {
     return lname == "vert-mixer";
-}
+}*/
 
 export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) => {
     //const grid = document.createElement("div");
@@ -192,7 +192,7 @@ export const FlexMixer = (container: HTMLDivElement, options: HorizontalMixerPro
  * @param options 
  * @returns 
  */
-export const setup_overlay = (
+/*export const setup_overlay = (
     //parent: HTMLDivElement,
     //options: OverlayOptions,
     options: Overlay,
@@ -224,7 +224,7 @@ export const setup_overlay = (
     }
     register_overlay(new LoadedOverlay(options, overlay));
     return overlay;
-};
+};*/
 
 export const setup_tabs = (ols: Array<Overlay>, parent: HTMLDivElement, cb: (index: number) => void) => {
     //parent.classList.add("tab_parent");

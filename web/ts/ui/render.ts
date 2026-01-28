@@ -1,5 +1,5 @@
 import type { Overlay } from "../../bindings/Overlay";
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, RotaryMode, RotarySliderProperties, Widget } from "../../bindings/Widget";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, RotarySliderProperties, Widget } from "../../bindings/Widget";
 import { CCButton, NoteButton } from "./button";
 import { FlexMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
 import { Rotary } from "./rotary";

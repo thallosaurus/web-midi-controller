@@ -1,7 +1,7 @@
 import type { Overlay } from "../bindings/Overlay.ts";
 import "./style.css";
 //import { setup_ccbutton, setup_notebutton } from "./ui/button.ts";
-import { change_overlay, register_overlay, setup_overlay, setup_tabs } from "./ui/overlay.ts";
+import { change_overlay, register_overlay, setup_tabs } from "./ui/overlay.ts";
 import { render_overlay } from "./ui/render.ts";
 //import { setup_slider } from "./ui/slider.ts";
 import { connect_local } from "./websocket.ts";
@@ -26,9 +26,9 @@ const open_dialog = (id: string) => {
 const init = async () => {
   connect_local();
 
-  const overlays_parent = document.querySelector<HTMLDivElement>(
+  /*const overlays_parent = document.querySelector<HTMLDivElement>(
     "main#overlays",
-  )!;
+  )!;*/
   if (import.meta.env.DEV) {
     console.log("dev");
   }

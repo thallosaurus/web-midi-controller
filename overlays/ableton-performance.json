@@ -62,19 +62,22 @@
         "channel": 1,
         "cc": 90,
         "mode": "snapback",
-        "label": "Reverb"
+        "label": "Reverb",
+        "vertical": true
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 91,
         "mode": "snapback",
-        "label": "Filter"
+        "label": "Filter",
+        "vertical": true
       }, {
         "type": "ccslider",
         "channel": 1,
         "cc": 92,
         "mode": "relative",
-        "label": "Test"
+        "label": "Test",
+        "vertical": true
       }]
     }
   ]

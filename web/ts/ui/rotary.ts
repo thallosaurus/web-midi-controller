@@ -7,7 +7,7 @@ import "./rotary.css";
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
 
-export const Rotary = (container: HTMLDivElement, options: RotarySliderProperties): HTMLDivElement => {
+export const Rotary = (container: HTMLDivElement, _options: RotarySliderProperties): HTMLDivElement => {
     const widget = document.createElement("div");
     widget.classList.add("widget");
 
