@@ -1,6 +1,7 @@
 import type { Overlay } from "../bindings/Overlay.ts";
 import { init_event_bus } from "./event_bus.ts";
 import "./style.css";
+import "./ui/css/colors.css";
 //import { setup_ccbutton, setup_notebutton } from "./ui/button.ts";
 import { change_overlay, init_overlays, register_overlay, setup_tabs } from "./ui/overlay.ts";
 import { render_overlay } from "./ui/render.ts";

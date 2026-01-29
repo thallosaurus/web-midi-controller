@@ -19,14 +19,14 @@ export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): Load
     if (overlay.id) e.id = overlay.id;
     
     for (const ol of overlay.cells) {
-        let w = render_widget(ol, children);
+        let w = render_widget(ol, children, overlay);
         e.append(w.html);
         children.push(w);
     }
     return new LoadedOverlay(overlay, e, children);
 }
 
-export const render_widget = (cell: Widget, children: Array<LoadedWidget>, element?: HTMLDivElement): LoadedWidget => {
+export const render_widget = (cell: Widget, children: Array<LoadedWidget>, parentOverlay: Overlay, element?: HTMLDivElement): LoadedWidget => {
     let e = element ?? document.createElement("div") as HTMLDivElement;
     e.classList.add(cell.type, "widget");
     

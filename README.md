@@ -1,11 +1,5 @@
 # MIDI-Controller
 
-### TODOs
-    - MIDI Input
-    - More Widgets:
-        - Rotaries
-        - Step Sequencer
-
 ## Installation
 #### Prebuilt Release
 Download and run the latest Release from the "Releases" Tab. Download the executable for your OS and the `overlay.zip` file which contains prebuilt mappings
