@@ -34,18 +34,21 @@ export function init_debug() {
     });
 
     // add debug connection toggles
-    let menu_connected_label = document.querySelector<HTMLDivElement>("#menu-connected-label")!;
-    menu_connected_label.addEventListener("click", (e) => {
-      DisconnectSocketEvent();
-    })
-
-    let menu_disconnected_label = document.querySelector<HTMLDivElement>("#menu-disconnected-label")!;
-    menu_disconnected_label.addEventListener("click", (e) => {
-      //ConnectSocketEvent();
-      //debugger
-      init_with_worker().then(e => {
-        console.log("debug reconnect successful", e);
+    document.querySelectorAll<HTMLDivElement>(".menu-connected-label").forEach(menu_connected_label => {
+      menu_connected_label.addEventListener("click", (e) => {
+        DisconnectSocketEvent();
       })
-    })
+    });
+
+    document.querySelectorAll<HTMLDivElement>(".menu-disconnected-label").forEach(menu_disconnected_label => {
+
+      menu_disconnected_label.addEventListener("click", (e) => {
+        //ConnectSocketEvent();
+        //debugger
+        init_with_worker().then(e => {
+          console.log("debug reconnect successful", e);
+        })
+      })
+    });
   }
 }

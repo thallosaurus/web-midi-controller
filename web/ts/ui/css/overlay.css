@@ -1,10 +1,4 @@
-
-
-.overlay.hide {
-  display: none !important;
-}
-
-.tab_parent {
+/*.tab_parent {
   display: flex;
   justify-content: end;
   justify-content: flex-end;
@@ -18,4 +12,29 @@
   padding: .5em .5em;
   align-self: center;
   font-size: 1.2em;
+}*/
+
+#disconnect-fallback {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#disconnect-fallback .container p {
+  font-size: 2em;
+  color: var(--error);
+}
+
+#disconnect-fallback .container {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+#disconnect-fallback .container button {
+  display: block !important;
+  border: none;
+  padding: 1em 0;
+  background-color: var(--fg);
+  color: var(--bg);
+  font-family: monospace;
 }

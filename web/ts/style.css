@@ -93,11 +93,11 @@ body, #app {
 }
 
 #app:not(.disconnected) .disconnect-fallback {
-  display: block;
+  display: none !important;
 }
 
 .disconnect-fallback {
-  display: none !important;
+  display: block;
 }
 
 
@@ -110,11 +110,19 @@ body, #app {
 @media (min-device-width:320px) and (max-device-width:768px) {
 
   #app > header {
-    display: block;
+    display: flex;
+    justify-content: space-between;
   }
 
   #app > header > #menu_controller {
     display: none;
+  }
+
+  #app #menu_container .menu-connected-label {
+    display: none !important;
+  }
+  #app #menu_container .menu-disconnected-label {
+    display: none !important;
   }
 }
 
@@ -129,18 +137,18 @@ body, #app {
   display: inline;
 }*/
 
-#app #menu_container > #menu-connected-label {
+#app #menu_container > .menu-connected-label {
   display: inline;
 }
-#app.disconnected #menu_container > #menu-connected-label {
+#app.disconnected #menu_container > .menu-connected-label {
   display: none !important;
 }
 
-#app #menu_container > #menu-disconnected-label {
+#app #menu_container > .menu-disconnected-label {
   display: none;
 }
 
-#app.disconnected #menu_container > #menu-disconnected-label {
+#app.disconnected #menu_container > .menu-disconnected-label {
   display: inline !important;
 }
 /* 
@@ -155,12 +163,12 @@ body, #app {
   display: inline;
 } */
 
-#menu_container > #menu-disconnected-label {
+.menu-disconnected-label {
   display: none;
   color: red;
 }
 
-#menu_container > #menu-connected-label {
+.menu-connected-label {
   display: inline;
   color: greenyellow;
 }

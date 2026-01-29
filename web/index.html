@@ -29,8 +29,8 @@
       </div>
       <div></div>
       <div id="menu_container">
-        <span id="menu-connected-label">connected</span>
-        <span id="menu-disconnected-label">disconnected</span>
+        <span class="menu-connected-label">connected</span>
+        <span class="menu-disconnected-label">disconnected</span>
         <button type="button" data-dialog-trigger="menu">Menu</button>
       </div>
 
@@ -39,8 +39,11 @@
     <main id="overlays_fallback" class="online">
       <span>Show me when there is no overlay loaded</span>
     </main>
-    <main id="connection_overview" class="disconnect-fallback">
-      <p>disconnected</p>
+    <main id="disconnect-fallback" class="disconnect-fallback">
+      <div class="container">
+
+        <button type="button" class="menu-disconnected-label">Connect</button>
+      </div>
     </main>
     <footer></footer>
   </div>
