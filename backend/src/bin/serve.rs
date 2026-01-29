@@ -33,8 +33,7 @@ async fn main() {
         .init();
 
 
-    let app = Router::new();
-    let app = serve_app(app)
+    let app = serve_app()
         .with_state(appstate);
         
     let listener = TcpListener::bind(args.address.unwrap_or(String::from("0.0.0.0:8888")))

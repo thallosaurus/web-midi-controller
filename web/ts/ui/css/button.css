@@ -16,7 +16,7 @@
 
 .ccbutton .press {
     font-weight: bold;
-    background-color: lightgrey;
+    background-color: lightgrey !important;
     color: black;
 }
 .ccbutton,
