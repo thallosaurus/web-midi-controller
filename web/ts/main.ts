@@ -14,6 +14,10 @@ import { init_debug } from "./utils.ts";
 import { init_websocket_worker } from './workers/main.ts';
 
 const init = async () => {
+  if (import.meta.env.DEV) {
+    console.log("running in development server");
+  }
+  
   init_debug();
   init_event_bus();
   init_dialogs();
@@ -23,9 +27,6 @@ const init = async () => {
   /*const overlays_parent = document.querySelector<HTMLDivElement>(
     "main#overlays",
   )!;*/
-  if (import.meta.env.DEV) {
-    console.log("dev");
-  }
 
   //console.log(await overlays.json());
 

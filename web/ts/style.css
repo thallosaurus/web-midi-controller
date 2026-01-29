@@ -1,13 +1,14 @@
 body, #app {
   margin: 0;
-  color: white;
-  background-color: black;
+  color: var(--fg);
+  background-color: var(--bg);
   font-family: monospace;
   width: 100vw;
   height: 100vh;
 
   display: flex;
   flex-direction: column;
+  overflow: none;
 }
 
 #app > header {
@@ -62,7 +63,26 @@ body, #app {
   color: white;
 }
 
+.title .name #app_version {
+  font-size: .5em;
+  justify-self: center;
+  vertical-align: middle;
+}
+
 .title .name {
   font-size: 2em;
   vertical-align: super;
+}
+
+/* iPhone specifics */
+
+@media (min-device-width:320px) and (max-device-width:768px) {
+
+  #app > header {
+    display: block;
+  }
+
+  #app > header > #menu_controller {
+    display: none;
+  }
 }

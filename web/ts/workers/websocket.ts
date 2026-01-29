@@ -36,15 +36,16 @@ export function setupSocketAsync(socket: WebSocket) {
     }
 }
 
+// Setup the given socket for legacy synchronized communication
 function setupSocketSync(socket: WebSocket) {
     socket.addEventListener("message", (e) => {
         //const msg = JSON.parse(e.data);
         //console.log("external data", msg);
+        // send directly to the event bus on the thread
         process_external(e.data);
-
     })
     socket.onclose = () => {
-        //document.querySelector<HTMLDivElement>("#connection_status")!.innerText = "disconnected";
+        document.querySelector<HTMLDivElement>("#connection_status")!.innerText = "disconnected";
         ws = null;
 
         if (reconnect) scheduleReconnect();

@@ -13,6 +13,10 @@ type NoteCallback = (value: number) => void;
 const cc_map = new Map<number, CCChannel>();
 const note_map = new Map<number, NoteChannel>();
 
+export abstract class EventBusReceiver {
+    
+}
+
 const init_backend_maps = () => {
     for (let ch = 0; ch < 16; ch++) {
         const cc_channel = new Map<number, Map<string, CCCallback>>();//Array<CCCallback>>();
