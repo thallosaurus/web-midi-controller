@@ -1,6 +1,6 @@
 import { process_external } from "./event_bus.ts";
 
-const wsUri = "ws://" + location.hostname + ":8888/ws";
+export const wsUri = "ws://" + location.hostname + ":8888/ws";
 
 let ws: WebSocket | null = null;
 let connecting: Promise<WebSocket> | null = null;
@@ -10,17 +10,17 @@ const BACKOFF_MAX = 5000;
 
 function scheduleReconnect() {
     setTimeout(() => {
-        connect(wsUri).catch(() => {});
+        connect(wsUri).catch(() => { });
         backoff = Math.min(backoff * 2, BACKOFF_MAX);
     }, backoff)
 }
 
-function setupSocket(socket: WebSocket) {
+function setupSocketSync(socket: WebSocket) {
     socket.onmessage = (e) => {
         process_external(e.data);
     }
     socket.onclose = () => {
-        document.querySelector<HTMLDivElement>("#connection_status")!.innerText = "disconnected";
+        //document.querySelector<HTMLDivElement>("#connection_status")!.innerText = "disconnected";
         ws = null;
 
         if (reconnect) scheduleReconnect();
@@ -30,6 +30,8 @@ function setupSocket(socket: WebSocket) {
         socket.close();
     }
 }
+
+//type WebSocketHandler = (((ws: WebSocket) => void) | ((ws: WebSocket) => Promise<void>))
 
 export async function connect(uri: string = wsUri): Promise<WebSocket> {
     //if (ws) close_socket();
@@ -44,12 +46,14 @@ export async function connect(uri: string = wsUri): Promise<WebSocket> {
             connecting = null;
             backoff = 250;
 
-            document.querySelector<HTMLDivElement>("#connection_status")!
-                .innerText = "connected";
-
-            setupSocket(socket);
-
+            /*document.querySelector<HTMLDivElement>("#connection_status")!
+                .innerText = "connected";*/
+            //(handler ?? setupSocketSync)(socket);
+            setupSocketSync(socket);
             resolve(socket);
+
+            //setupSocket(socket);
+
         };
 
         socket.onerror = (e) => {

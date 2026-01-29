@@ -10,11 +10,14 @@ import { connect, disconnect } from "./websocket.ts";
 import { init_dialogs } from './dialogs.ts'
 import { init_debug } from "./utils.ts";
 
+
+import { init_websocket_worker } from './workers/ws_worker';
+
 const init = async () => {
   init_debug();
   init_event_bus();
   init_dialogs();
-  await connect();
+  //await connect();
   //await connect_local();
 
   /*const overlays_parent = document.querySelector<HTMLDivElement>(
@@ -37,10 +40,19 @@ const init = async () => {
   );
 };
 
+// Function that loads the state and socket management in the background
+const init_with_worker = async () => {
+  
+  let status = document.querySelector<HTMLDivElement>("#connection_status")!;
+  if (await init_websocket_worker()) {
+    status.innerText = "connected";
+  }
+}
+
 self.addEventListener("DOMContentLoaded", () => {
   try {
-
     init();
+    init_with_worker();
   } catch (e) {
     alert(e);
   }

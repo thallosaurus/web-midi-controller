@@ -1,5 +1,7 @@
 import { CCEvent, MidiEvent, NoteEvent } from "./events.ts";
 import { send } from "./websocket.ts";
+import { sendFrontendMidiEvent } from "./workers/message.ts";
+import { FrontendSocketEvent } from "./workers/ws_worker.ts";
 
 type CCWidget = Map<string, CCCallback>;//Array<CCCallback>;
 type CCChannel = Map<number, CCWidget>;
@@ -142,8 +144,9 @@ export const process_external = (msg: string) => {
 /// Should be called when an widget gets modified to update the state
 // and send it to the server which broadcasts it around
 export const process_internal = (ev: MidiEvent) => {
-    //update_on_bus(cc, value)
-    send(JSON.stringify(ev));
+
+    //send(JSON.stringify(ev));
+    FrontendSocketEvent(ev);
     bus.dispatchEvent(ev);
 };
 
