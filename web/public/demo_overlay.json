@@ -110,6 +110,22 @@
                         "value_off": 0,
                         "label": "ccbutton",
                         "mode": "trigger"
+                    },
+                    {
+                        "type": "ccbutton",
+                        "channel": 1,
+                        "cc": 123,
+                        "value": 127,
+                        "value_off": 0,
+                        "label": "readonly ccbutton",
+                        "mode": "readonly"
+                    },
+                                        {
+                        "type": "notebutton",
+                        "channel": 1,
+                        "note": 123,
+                        "label": "readonly notetest",
+                        "mode": "readonly"
                     }
                 ]
             }
