@@ -47,12 +47,18 @@ impl MidiSystem {
         mut output_rx: mpsc::Receiver<AppMessage>,
         input_tx: broadcast::Sender<AppMessage>,
     ) -> Result<Self, MidiSystemErrors> {
-        let output_name = device_name.clone();
-        let input_name = device_name.clone();
+        let output_name = device_name.clone().unwrap_or(String::from("midi control output"));
+        let input_name = device_name.clone().unwrap_or(String::from("midi control input"));
         let midi_in = MidiInput::new("input name").map_err(|e| MidiSystemErrors::InitError(e))?;
+        #[cfg(target_os = "windows")]
+        let midi_in_conn = {
+            let port = select_port_by_name(&midi_in, &input_name.clone());
+            midi_in.connect(&port, &input_name, midi_in_handler, input_tx).expect("error connecting to midi port")
+        };
+
         Ok(Self {
             output_task: tokio::spawn(async move {
-                let device_name = output_name.unwrap_or(String::from("midi control output"));
+                let device_name = output_name;
 
                 let midi_out =
                     MidiOutput::new(&device_name).map_err(|e| MidiSystemErrors::InitError(e))?;
@@ -70,7 +76,7 @@ impl MidiSystem {
                     let c = select_port_by_name(&midi_out, &device_name);
                     midi_out
                         .connect(&c, &device_name)
-                        .map_err(|e| MidiSystemErrors::ConnectError(e))?
+                        .map_err(|e| MidiSystemErrors::OutputConnectError(e))?
                 };
 
                 loop {
@@ -102,7 +108,10 @@ impl MidiSystem {
                 #[cfg(not(target_os = "windows"))]
                 midi_input: midi_in
                         .create_virtual(&("virtual input port"),midi_in_handler, input_tx)
-                        .map_err(|e| MidiSystemErrors::InputConnectError(e))?
+                        .map_err(|e| MidiSystemErrors::InputConnectError(e))?,
+
+                #[cfg(target_os = "windows")]
+                midi_input:midi_in_conn
         })
     }
 
