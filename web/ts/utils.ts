@@ -1,4 +1,5 @@
-import { wsWorker, DisconnectSocketEvent } from "./websocket/main";
+import { init_with_worker } from "./main";
+import { wsWorker, DisconnectSocketEvent, ConnectSocketEvent } from "./websocket/main";
 
 export function vibrate() {
   if (navigator.vibrate) {
@@ -36,6 +37,15 @@ export function init_debug() {
     let menu_connected_label = document.querySelector<HTMLDivElement>("#menu-connected-label")!;
     menu_connected_label.addEventListener("click", (e) => {
       DisconnectSocketEvent();
+    })
+
+    let menu_disconnected_label = document.querySelector<HTMLDivElement>("#menu-disconnected-label")!;
+    menu_disconnected_label.addEventListener("click", (e) => {
+      //ConnectSocketEvent();
+      //debugger
+      init_with_worker().then(e => {
+        console.log("debug reconnect successful", e);
+      })
     })
   }
 }

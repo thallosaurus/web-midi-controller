@@ -5,7 +5,7 @@ import { sendMidiEvent } from "./message.ts";
 export const wsUri = "ws://" + location.hostname + ":8888/ws";
 
 let ws: WebSocket | null = null;
-let connecting: Promise<WebSocket> | null = null;
+//let connecting: Promise<WebSocket> | null = null;
 let reconnect = true;
 let backoff = 250;
 const BACKOFF_MAX = 5000;
@@ -17,81 +17,67 @@ function scheduleReconnect() {
     }, backoff)
 }
 
-export function setupSocketAsync(socket: WebSocket) {
+function setupSocket(socket: WebSocket): WebSocket {
+
+    // Listen for incoming websocket messages
     socket.addEventListener("message", (e) => {
         const msg: MidiEvent = JSON.parse(e.data);
         //console.log("external data", msg);
         sendMidiEvent(msg);
+    });
 
-    })
-    socket.onclose = () => {
-        //document.querySelector<HTMLDivElement>("#connection_status")!.innerText = "disconnected";
-        ws = null;
-
-        if (reconnect) scheduleReconnect();
-    }
-    socket.onerror = (e) => {
-        console.error("ws error", e);
-        socket.close();
-    }
-}
-
-// Setup the given socket for legacy synchronized communication
-function setupSocketSync(socket: WebSocket) {
-    socket.addEventListener("message", (e) => {
-        //const msg = JSON.parse(e.data);
-        //console.log("external data", msg);
-        // send directly to the event bus on the thread
-        process_external(e.data);
-    })
-    socket.onclose = () => {
-        document.querySelector<HTMLDivElement>("#connection_status")!.innerText = "disconnected";
-        ws = null;
-
-        if (reconnect) scheduleReconnect();
-    }
-    socket.onerror = (e) => {
-        console.error("ws error", e);
-        socket.close();
-    }
+    return socket
 }
 
 //type WebSocketHandler = (((ws: WebSocket) => void) | ((ws: WebSocket) => Promise<void>))
 
-export async function connect(uri: string = wsUri, handler = setupSocketSync): Promise<WebSocket> {
+export async function connect(uri: string = wsUri, handler = setupSocket): Promise<WebSocket> {
     //if (ws) close_socket();
     if (ws) return ws;
-    if (connecting) return connecting;
+    //if (connecting) return connecting;
 
-    connecting = new Promise((resolve, reject) => {
-        const socket = new WebSocket(uri);
+    const socket = new WebSocket(uri);
+    await new Promise((resolve, reject) => {
 
-        socket.onopen = () => {
-            ws = socket;
-            connecting = null;
-            backoff = 250;
-            handler(socket);
+        socket.addEventListener("open", () => {
             resolve(socket);
-        };
+        })
 
-        socket.onerror = (e) => {
-            connecting = null;
+        socket.addEventListener("close", (e) => {
             reject(e);
-        }
+        });
+
+        socket.addEventListener("error", (e) => {
+            reject(e);
+        });
+
+        return socket;
     });
 
-    return connecting;
+    ws = handler(socket);
+    return ws;
 }
 
-export function disconnect() {
-    reconnect = false;
-    if (ws) ws.close();
-    ws = null;
-    console.log("websocket disconnected")
+export async function disconnect(): Promise<CloseEvent> {
+    //reconnect = false;
+    return new Promise((res, rej) => {
+        if (ws) {
+            ws.addEventListener("close", (ev) => {
+                console.debug("websocket sent close event")
+                ws = null;
+                res(ev);
+            });
+            ws.close();
+        } else {
+            throw new Error("no websocket connection")
+        }
+
+    })
 }
 
-export const send = (update: string) => {
+export function send(update: string) {
     if (ws && ws.readyState == WebSocket.OPEN) {
+        console.debug("worker > server", update);
         ws.send(update);
     } else {
         // put in queue?

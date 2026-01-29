@@ -7,6 +7,7 @@
 .tab_parent {
   display: flex;
   justify-content: end;
+  justify-content: flex-end;
 }
 
 .tab_parent a {

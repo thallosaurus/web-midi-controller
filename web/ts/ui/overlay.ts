@@ -15,6 +15,10 @@ let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
 let overlays: Array<LoadedOverlay> = [];
 
+export function get_current_overlay_id() {
+    return overlays.length
+}
+
 export const overlayUri = "http://" + location.hostname + ":8888/overlays";
 
 /**
@@ -82,7 +86,9 @@ function unload_overlay(id: number) {
  * @returns 
  */
 function parse_overlay(overlay: Overlay) {
-    const oo = render_overlay(overlay);
+    const oo = render_overlay(overlay, {
+        id: get_current_overlay_id()
+    });
     register_overlay(oo);
     return oo;
 }
@@ -135,12 +141,14 @@ export class LoadedOverlay {
     html: HTMLDivElement
     childs: Array<LoadedWidget>
     //abort: AbortController
+    id: number
 
-    constructor(overlay: Overlay, html: HTMLDivElement, childs: Array<LoadedWidget>) {
+    constructor(id: number, overlay: Overlay, html: HTMLDivElement, childs: Array<LoadedWidget>) {
         this.overlay = overlay;
         this.html = html
         this.childs = childs;
         //this.abort = new AbortController();
+        this.id = id
     }
 
     unload() {
@@ -260,7 +268,7 @@ export const VertMixer = (container: HTMLDivElement, options: VerticalMixerPrope
     return container;
 }
 
-export const setup_tabs = (ols: Array<Overlay>, parent: HTMLDivElement, cb: (index: number) => void) => {
+export const setup_tabs = (ols: LoadedOverlay[], parent: HTMLDivElement, cb: (index: number) => void) => {
     //parent.classList.add("tab_parent");
 
     for (let i = 0; i < ols.length; i++) {
@@ -270,7 +278,7 @@ export const setup_tabs = (ols: Array<Overlay>, parent: HTMLDivElement, cb: (ind
         t.dataset.role = "overlay_switch";
         t.dataset.overlayIndex = String(i);
         //t.
-        t.innerText = String(ols[i].name);
+        t.innerText = String(ols[i].overlay.name);
 
         t.addEventListener("click", () => {
             //change_overlay(i);

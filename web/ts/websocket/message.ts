@@ -1,5 +1,5 @@
 import type { MidiEvent } from "../events";
-import { wsUri } from "./websocket";
+import { connect, disconnect, send, wsUri } from "./websocket";
 
 export enum WorkerMessageType {
     Connect = "connect",
@@ -8,14 +8,17 @@ export enum WorkerMessageType {
     Disconnected = "disconnected",
     DataTest = "data",
     ConnectError = "connect_error",
-    MidiFrontendInput = "midi_frontend_input"
+    MidiFrontendInput = "midi_frontend_input",
+    WorkerError = "worker_error"
 }
 
 export type WorkerMessage =
     | ConnectSocketMessage
     | DisconnectSocketMessage
+    | ConnectErrorMessage
     | ConnectedMessage
     | DisconnectedMessage
+    | WorkerErrorMessage
     | SurfaceMidiEvent;
 
 /**
@@ -26,6 +29,16 @@ interface ConnectSocketMessage {
     uri: string
 }
 
+interface WorkerErrorMessage {
+    type: WorkerMessageType.WorkerError,
+    error: Error
+}
+
+interface ConnectErrorMessage {
+    type: WorkerMessageType.ConnectError,
+    error: Error
+}
+
 /**
  * Send this from the frontend if you want to disconnect
  */
@@ -33,8 +46,9 @@ interface DisconnectSocketMessage {
     type: WorkerMessageType.Disconnect
 }
 
-interface ConnectedMessage {
-    type: WorkerMessageType.Connected
+export interface ConnectedMessage {
+    type: WorkerMessageType.Connected,
+    overlay_path: string
 }
 
 interface DisconnectedMessage {
@@ -57,11 +71,66 @@ function sendMessageInput(worker: Worker, m: WorkerMessage) {
     worker.postMessage(msg);
 }
 
-/// MARK: - shorthands for message passing
+export function process_worker_message(msg: WorkerMessage) {
+        switch (msg.type) {
+        case WorkerMessageType.Connect:
+            {
+                let n = msg as ConnectSocketMessage;
+                connect(n.uri).then(s => {
+                    // connection established
+                    sendDefaultConnected();
+                    
+                }).catch(e => {
+                    // there was an error
+                    //console.error(e);
+                    sendWorkerError(e);
+                });
 
-export function sendConnected() {
+                // connect to websocket
+                //connect(wsUri, (socket) => {
+                    // Setup Websocket async with Handler for backend events
+                    //setupSocketAsync(socket);
+
+
+
+                /*}).then(e => {
+                    sendConnected();
+                    //self.postMessage("connected from worker");
+                }).catch(e => {
+                    sendDisconnected();
+                })*/
+
+            }
+            break;
+
+        case WorkerMessageType.MidiFrontendInput:
+            //console.log("data for the frontend")
+            send(JSON.stringify(msg.data));
+            break;
+
+        case WorkerMessageType.Disconnect:
+            disconnect().then(e => {
+                sendDisconnected();
+            });
+            break;
+    }
+}
+
+/// MARK: - shorthands for message passing
+export function sendWorkerError(error: Error) {
     sendMessage({
-        type: WorkerMessageType.Connected
+        type: WorkerMessageType.WorkerError,
+        error
+    })
+}
+export const overlayUri = "http://" + location.hostname + ":8888/overlays";
+export function sendDefaultConnected() {
+    sendConnected(overlayUri)
+}
+export function sendConnected(overlay_path: string) {
+    sendMessage({
+        type: WorkerMessageType.Connected,
+        overlay_path
     })
 }
 
@@ -83,7 +152,10 @@ export function disconnectSocketMessage(worker: Worker) {
         type: WorkerMessageType.Disconnect
     });
 }
-
+/**
+ * Send Midi Events to the caller
+ * @param data 
+ */
 export function sendMidiEvent(data: MidiEvent) {
     sendMessage({
         type: WorkerMessageType.MidiFrontendInput,

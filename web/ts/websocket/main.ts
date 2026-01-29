@@ -1,5 +1,5 @@
-import { connect, disconnect, send, setupSocketAsync, wsUri } from "./websocket.ts";
-import { disconnectSocketMessage, sendConnected, sendDisconnected, sendFrontendMidiEvent, sendMidiEvent } from "./message.ts";
+import { connect, disconnect, send, wsUri } from "./websocket.ts";
+import { disconnectSocketMessage, process_worker_message, sendConnected, sendDisconnected, sendFrontendMidiEvent, sendMidiEvent, type ConnectedMessage, type WorkerMessage } from "./message.ts";
 //import websocketWorkerUrl from './?worker&url';
 import { WorkerMessageType, connectSocketMessage } from './message.ts';
 import type { MidiEvent } from "../events.ts";
@@ -7,68 +7,56 @@ import { process_external } from "../event_bus.ts";
 
 // Worker got a message
 onmessage = (m) => {
-    const msg = JSON.parse(m.data);
+    const msg: WorkerMessage = JSON.parse(m.data);
     //console.log("worker got a message", msg);
-
-    switch (msg.type) {
-        case WorkerMessageType.Connect:
-            {
-                // connect to websocket
-                connect(wsUri, (socket) => {
-                    // Setup Websocket async with Handler for backend events
-                    setupSocketAsync(socket);
-                }).then(e => {
-                    sendConnected();
-                    //self.postMessage("connected from worker");
-                }).catch(e => {
-                    sendDisconnected();
-                })
-
-            }
-            break;
-
-        case WorkerMessageType.MidiFrontendInput:
-            //console.log("data for the frontend")
-            send(JSON.stringify(msg.data));
-            break;
-
-        case WorkerMessageType.Disconnect:
-            disconnect();
-            break;
-    }
+    process_worker_message(msg);
 }
 
-// Runs in another thread
-export let wsWorker: Worker | null = null;
 type WorkerEventHandler = (msg: MidiEvent) => void;
-export function init_websocket_worker(event_handler: WorkerEventHandler): Promise<boolean> {
-    return new Promise((res, rej) => {
 
-        const worker = new Worker(import.meta.url, { type: 'module' })
-        connectSocketMessage(worker);
-        worker.addEventListener("message", ev => {
-            const msg = JSON.parse(ev.data);
-            event_handler(msg);
-        })
+// should run in another thread
+export let wsWorker: Worker | null = null;
+export async function initWebsocketWorker(): Promise<[Worker, ConnectedMessage]> {
+    if (wsWorker !== null) throw new Error("the websocket thread is already running")
 
-        // functions for the 
-        worker.onmessage = (ev) => {
-            const msg = JSON.parse(ev.data);
+    let w = await new Promise<[Worker, ConnectedMessage]>((res, rej) => {
+
+        let worker = new Worker(import.meta.url, { type: 'module' })
+
+        worker.addEventListener("message", (ev) => {
+            const msg: WorkerMessage = JSON.parse(ev.data);
             //console.log("worker message", msg);
-            if (msg.type == "connected") {
-                wsWorker = worker;
-                res(true);
-            };
-            if (msg.type == "connect_error") {
-                rej(false);
+
+            switch (msg.type) {
+                case WorkerMessageType.Connected:
+                    console.log("main -", "worker connection successful", msg)
+                    wsWorker = worker;
+                    res([worker, msg]);
+                    break;
+
+                case WorkerMessageType.ConnectError:
+                    console.log("main", msg);
+                    rej(msg.error)
+                    break;
+
+                case WorkerMessageType.Disconnected:
+                    wsWorker = null;
+                    rej()
+                    break;
             }
-        };
-    })
+        });
+        connectSocketMessage(worker);
+    });
+
+    //send message to the worker so it connects to the given URI
+    return w;
 }
 
 export function FrontendSocketEvent(ev: MidiEvent) {
     if (wsWorker != null) {
         sendFrontendMidiEvent(wsWorker, ev);
+    } else {
+        throw new Error("wsWorker was null");
     }
 }
 
@@ -76,6 +64,14 @@ export function DisconnectSocketEvent() {
     if (wsWorker != null) {
         disconnectSocketMessage(wsWorker);
     } else {
-        console.error("wsWorker was null", wsWorker);
+        throw new Error("wsWorker was null");
+    }
+}
+
+export function ConnectSocketEvent() {
+    if (wsWorker != null) {
+        connectSocketMessage(wsWorker);
+    } else {
+        throw new Error("wsWorker was null");
     }
 }

@@ -7,8 +7,8 @@ import { Rotary } from "./rotary";
 import { CCSlider } from "./slider";
 
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables
-export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): LoadedOverlay => {
-    const e = element ?? document.createElement("div") as HTMLDivElement;
+export const render_overlay = (overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay => {
+    const e = render_options.element ?? document.createElement("div") as HTMLDivElement;
     let children: Array<LoadedWidget> = [];
     
     if (overlay.id) e.id = overlay.id;
@@ -18,7 +18,7 @@ export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): Load
         e.append(w.html);
         children.push(w);
     }
-    return new LoadedOverlay(overlay, e, children);
+    return new LoadedOverlay(render_options.id ?? -1, overlay, e, children);
 }
 
 // Creates the widget Markup
