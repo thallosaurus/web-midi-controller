@@ -4,7 +4,7 @@ import "./css/grid.css";
 import "./css/layout.css";
 import { CCSliderScript, UnloadCCSliderScript, type CCSliderState } from "./slider.ts";
 import { type Overlay } from '../../bindings/Overlay.ts';
-import type { GridMixerProperties, HorizontalMixerProperties, Widget } from "../../bindings/Widget.ts";
+import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "../../bindings/Widget.ts";
 import { RotaryScript, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
 import { render_overlay, render_widget } from "./render.ts";
 import { uuid } from "../utils.ts";
@@ -15,10 +15,11 @@ let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
 const overlays: Array<LoadedOverlay> = [];
 
-export async function init_overlays() {
-    const o = await fetch(
-        import.meta.env.DEV ? "demo_overlay.json" : "overlays",
-    );
+const overlayUri = "http://" + location.hostname + ":8888/overlays";
+
+export async function init_overlays(uri = overlayUri) {
+    console.log("fetching overlays")
+    const o = await fetch(uri);
     const ol: Array<Overlay> = await o.json();
 
     for (
@@ -208,7 +209,19 @@ export const GridMixer = (container: HTMLDivElement, options: GridMixerPropertie
     return container;
 }
 
-export const FlexMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
+export const HorizMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
+    if (options.id) container.id = options.id;
+
+    for (const child of options.controls) {
+        const ww = render_widget(child, children);
+        container.appendChild(ww.html);
+        children.push(ww);
+    }
+
+    return container;
+}
+
+export const VertMixer = (container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>) => {
     if (options.id) container.id = options.id;
 
     for (const child of options.controls) {

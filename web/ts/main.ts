@@ -7,9 +7,10 @@ import { render_overlay } from "./ui/render.ts";
 //import { setup_slider } from "./ui/slider.ts";
 import { connect, disconnect } from "./websocket.ts";
 import { init_dialogs } from './dialogs.ts'
+import { init_debug } from "./utils.ts";
 
 const init = async () => {
-  //init_debug();
+  init_debug();
   init_event_bus();
   init_dialogs();
   await connect();

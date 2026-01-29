@@ -1,8 +1,8 @@
 import type { Overlay } from "../../bindings/Overlay";
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, Widget } from "../../bindings/Widget";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, VerticalMixerProperties, Widget } from "../../bindings/Widget";
 import { CCButton, NoteButton } from "./button";
 import { Jogwheel } from "./jogwheel";
-import { FlexMixer, GridMixer, LoadedOverlay, LoadedWidget, type WidgetState } from "./overlay";
+import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget, type WidgetState } from "./overlay";
 import { Rotary } from "./rotary";
 import { CCSlider } from "./slider";
 
@@ -61,10 +61,16 @@ export const render_widget = (cell: Widget, children: Array<LoadedWidget>, eleme
             break;
 
         case "vert-mixer":
+            {
+                const w = cell as VerticalMixerProperties;
+                VertMixer(e, w, children);
+            }
+            break;
+            
         case "horiz-mixer":
             {
                 const w = cell as HorizontalMixerProperties;
-                FlexMixer(e, w, children);
+                HorizMixer(e, w, children);
             }
             break;
 
