@@ -1,12 +1,19 @@
 use axum::{
     body::Bytes,
-    extract::{ConnectInfo, State, WebSocketUpgrade, ws::{Message, Utf8Bytes, WebSocket}}, response::IntoResponse,
+    extract::{
+        ConnectInfo, State, WebSocketUpgrade,
+        ws::{Message, Utf8Bytes, WebSocket},
+    },
+    response::IntoResponse,
 };
 use axum_extra::TypedHeader;
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, ops::ControlFlow, sync::Arc};
-use tokio::sync::{Mutex, mpsc::{self, Sender}};
+use tokio::sync::{
+    Mutex,
+    mpsc::{self, Sender},
+};
 use uuid::Uuid;
 
 use crate::AppState;
@@ -52,9 +59,14 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) 
     state.clients.insert(conn_id, tx);
 
     let client_map = Arc::clone(&state.clients);
+    //let in_socket = Arc::clone(&state.midi_socket_input);
+    let mut in_socket = {
+        let lock = &state.midi_socket_input.lock().await;
+        lock.resubscribe()
+    };
 
     _ = tokio::spawn(async move {
-        //println!("{:?}", client_map);
+        // lock the midi input channel
         loop {
             tokio::select! {
                 Some(aux) = rx.recv() => {
@@ -62,14 +74,32 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) 
                     //if socket.send(aux)
                     //println!("client with id {conn_id} got msg {:?}", aux);
                     if let Err(e) = socket.send(aux.into()).await {
-
+                        eprintln!("error while pushing update: {e}")
                     }
                     //state.clients.get(key)
                 }
+
+                msg = in_socket.recv() => {
+                        // virtual midi input update
+                        match msg {
+                            Ok(msg) => {
+                                println!("send to socket: {:?}", msg);
+
+                                if let Err(e) = socket.send(msg.into()).await {
+                                    eprintln!("error while pushing update: {e}")
+                                }
+                            },
+                            Err(e) => {
+                                eprintln!("{}", e)
+                            }
+                        }
+
+                }
+
                 m = socket.recv() => {
                     match m {
                         Some(Ok(msg)) => {
-                            if process_message(&state.midi_socket, msg, conn_id, &client_map).await.is_break() { break };
+                            if process_message(&state.midi_socket_output, msg, conn_id, &client_map).await.is_break() { break };
                         },
                         _ => {
                             println!("client {who} disconnected");
@@ -84,7 +114,12 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) 
     });
 }
 
-async fn process_message(midi_tx: &Arc<Mutex<Sender<AppMessage>>>, msg: Message, who: Uuid, map: &Clients) -> ControlFlow<(), ()> {
+async fn process_message(
+    midi_tx: &Arc<Mutex<Sender<AppMessage>>>,
+    msg: Message,
+    who: Uuid,
+    map: &Clients,
+) -> ControlFlow<(), ()> {
     match msg {
         Message::Close(c) => {
             if let Some(cf) = c {
@@ -112,8 +147,7 @@ async fn process_message(midi_tx: &Arc<Mutex<Sender<AppMessage>>>, msg: Message,
 
             broadcast(map, event, vec![who]).await;
             {
-                midi_tx.lock().await
-                .send(event.into()).await.unwrap();
+                midi_tx.lock().await.send(event.into()).await.unwrap();
             }
         }
         Message::Pong(bytes) => {
@@ -157,6 +191,7 @@ pub(crate) enum AppMessage {
         note: u8,
         velocity: u8,
     },
+    Unsupported,
     Dummy,
 }
 
@@ -177,17 +212,85 @@ impl From<Utf8Bytes> for AppMessage {
     }
 }
 
+impl From<Vec<u8>> for AppMessage {
+    fn from(data: Vec<u8>) -> Self {
+        match data.as_slice() {
+            [0x90..=0x9F, note, vel] if *vel > 0 => {
+                let ch = data[0] - 0x90;
+                //let n = (*note).into();
+                //Self::NoteOn(ch, n, *vel)
+                Self::NoteUpdate {
+                    midi_channel: ch + 1,
+                    on: true,
+                    note: *note,
+                    velocity: *vel,
+                }
+            }
+            [0x80..=0x8F, note, _] => {
+                let ch = data[0] - 0x80;
+                //let n = (*note).into();
+                Self::NoteUpdate {
+                    midi_channel: ch + 1,
+                    on: false,
+                    note: *note,
+                    velocity: 0,
+                }
+                //Self::NoteOff(ch, n)
+            }
+            [0x90..=0x9F, note, 0] => {
+                let ch = data[0] - 0x90;
+                //Self::Note(ch, n)
+                Self::NoteUpdate {
+                    midi_channel: ch + 1,
+                    on: false,
+                    note: *note,
+                    velocity: 0,
+                }
+            }
+
+            [0xB0..=0xBF, cc, val] => {
+                let ch = data[0] - 0xB0;
+                //let n = (*note).into();
+                //Self::AfterTouch(ch, n, *vel)
+                Self::CCUpdate {
+                    midi_channel: ch + 1,
+                    value: *val,
+                    cc: *cc,
+                }
+            }
+            _ => Self::Unsupported, /*
+                                    [0xF8] => {
+                                        //Self::Clock
+                                    }*/
+                                    /*_ => {
+                                        error!("{:?}", data);
+                                        //Self::Unknown
+                                    }*/
+        }
+    }
+}
+
 impl From<AppMessage> for Vec<u8> {
     fn from(value: AppMessage) -> Self {
         match value {
-            AppMessage::CCUpdate { midi_channel, value, cc } => {
+            AppMessage::CCUpdate {
+                midi_channel,
+                value,
+                cc,
+            } => {
                 vec![0xB0 + (midi_channel - 1), cc, value]
-            },
-            AppMessage::NoteUpdate { midi_channel, on, note, velocity } => {
+            }
+            AppMessage::NoteUpdate {
+                midi_channel,
+                on,
+                note,
+                velocity,
+            } => {
                 let base = if on { 0x90 } else { 0x80 };
                 vec![base + (midi_channel - 1), note, velocity]
-            },
+            }
             AppMessage::Dummy => todo!(),
+            AppMessage::Unsupported => panic!("can't cast unsupported message to bytes"),
         }
     }
 }

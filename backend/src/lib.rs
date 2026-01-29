@@ -4,7 +4,7 @@ use axum::{Router, http::HeaderValue, response::IntoResponse, routing::{any, get
 use dashmap::DashMap;
 
 use serde_json::Value;
-use tokio::{fs, sync::{Mutex, mpsc}};
+use tokio::{fs, sync::{Mutex, broadcast, mpsc}};
 use tower_http::services;
 use include_dir::{Dir, include_dir};
 use tower_serve_static::ServeDir;
@@ -25,20 +25,26 @@ use crate::{
 #[derive(Clone)]
 pub struct AppState {
     clients: Clients,
-    midi_socket: Arc<Mutex<mpsc::Sender<AppMessage>>>,
+    midi_socket_output: Arc<Mutex<mpsc::Sender<AppMessage>>>,
+    midi_socket_input: Arc<Mutex<broadcast::Receiver<AppMessage>>>,
 }
 
 /// Initializes the channel and the midi system
 pub fn state(name: Option<String>) -> (AppState, MidiSystem) {
-    let (tx, mut rx) = mpsc::channel::<AppMessage>(64);
+    // output sender
+    let (output_tx, mut output_rx) = mpsc::channel::<AppMessage>(64);
+    let (input_tx, mut input_rx) = broadcast::channel::<AppMessage>(64);
+
+
     (AppState {
         clients: Arc::new(DashMap::new()),
-        midi_socket: Arc::new(Mutex::new(tx)),
+        midi_socket_output: Arc::new(Mutex::new(output_tx)),
+        midi_socket_input: Arc::new(Mutex::new(input_rx)),
     }, 
-    MidiSystem::new(name, rx).expect("error while initializing midi system"))
+    MidiSystem::new(name, output_rx, input_tx).expect("error while initializing midi system"))
 }
 
-pub fn serve_app(router: Router<AppState>) -> Router<AppState> {
+pub fn serve_app() -> Router<AppState> {
 
     let service = ServeDir::new(&ASSETS_DIR);
     
