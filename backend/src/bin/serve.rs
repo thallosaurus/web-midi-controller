@@ -1,10 +1,11 @@
 use axum::{
-    Router, extract::{State, WebSocketUpgrade, connect_info::ConnectInfo}, http::HeaderValue, response::IntoResponse, routing::{any, get}
+    Router, extract::{State, WebSocketUpgrade, connect_info::ConnectInfo}, http::{HeaderValue, Method}, response::IntoResponse, routing::{any, get}
 };
 use axum_extra::TypedHeader;
 use clap::Parser;
 
 use midi_controller::{serve_app, state};
+use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use std::{net::SocketAddr, sync::Arc};
@@ -32,9 +33,14 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+        let cors = CorsLayer::new()
+            .allow_methods([Method::GET, Method::POST])
+            .allow_origin(Any);
 
     let app = serve_app()
         .with_state(appstate);
+
+        let app = app.layer(cors);
         
     let listener = TcpListener::bind(args.address.unwrap_or(String::from("0.0.0.0:8888")))
         .await

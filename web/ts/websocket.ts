@@ -1,6 +1,7 @@
 import { process_external } from "./event_bus.ts";
 
 const wsUri = "ws://" + location.hostname + ":8888/ws";
+
 let ws: WebSocket | null = null;
 let connecting: Promise<WebSocket> | null = null;
 let reconnect = true;

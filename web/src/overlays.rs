@@ -31,10 +31,15 @@ pub async fn load(path: &str) -> Vec<Overlay> {
             && ext == "json"
         {
             let contents = fs::read_to_string(p.as_path()).await.unwrap();
-
+            
             let json: Overlay = serde_json::from_str(&contents).unwrap();
             //println!("{:?}", json);
             overlays.push(json);
+        } else if let Some(ext) = p.extension() && ext == "toml" {
+            let contents = fs::read_to_string(p.as_path()).await.unwrap();
+
+            let toml: Overlay = toml::from_str(&contents).unwrap();
+            overlays.push(toml);
         }
     }
 

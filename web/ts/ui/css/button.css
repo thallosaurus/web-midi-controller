@@ -2,18 +2,6 @@
     touch-action: none;
 }
 
-/*.ccbutton .target {
-    background-color: grey;
-    width: calc(100% - 2em);
-    height: calc(100% - 2em);
-
-    display: grid;
-    justify-content: center;
-    align-content: center;
-    text-align: center;
-    font-family: monospace;
-}*/
-
 .ccbutton .press {
     font-weight: bold;
     background-color: lightgrey !important;
@@ -32,8 +20,8 @@
     background-color: grey;
     height: 4em;
     width: 100%;
+    display: flex;
     
-    align-content: center;
     text-align: center;
     font-family: monospace;
 }

@@ -1,0 +1,25 @@
+name = "Nested Test TOML"
+id = "nested_toml"
+
+[[cells]]
+type = "horiz-mixer"
+
+[[cells.controls]]
+type = "horiz-mixer"
+
+[[cells.controls.controls]]
+type = "vert-mixer"
+
+[[cells.controls.controls.controls]]
+type = "ccslider"
+channel = 1
+cc = 1
+mode = "relative"
+label = "Test 1"
+
+[[cells.controls.controls.controls]]
+type = "ccslider"
+channel = 1
+cc = 2
+mode = "relative"
+label = "Test 1"

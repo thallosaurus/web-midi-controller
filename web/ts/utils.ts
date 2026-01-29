@@ -22,10 +22,13 @@ function pseudoUUID(): string {
 }
 
 export function init_debug() {
+    if (import.meta.env.DEV) {
+    console.log("activating development listeners");
     window.addEventListener("error", e => {
       alert("error:" + e.message + e.filename + e.lineno);
     });
     window.addEventListener("unhandledrejection", e => {
       alert("promise error:" + e.reason);
     });
+  }
 }
