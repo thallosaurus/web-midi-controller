@@ -6,16 +6,16 @@ type = "horiz-mixer"
 
 [[cells.controls]]
 type = "ccslider"
-channel = 2
-cc = 1
+channel = 1
+cc = 0
 default_value = 127
 mode = "snapback"
 label = "Volume 1"
 
 [[cells.controls]]
 type = "ccslider"
-channel = 2
-cc = 2
+channel = 1
+cc = 1
 default_value = 127
 mode = "snapback"
 label = "Volume 1"

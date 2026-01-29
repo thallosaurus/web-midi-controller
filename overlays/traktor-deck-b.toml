@@ -1,0 +1,102 @@
+name = "Traktor Deck B"
+id = "traktor_deck_b"
+
+[[cells]]
+type = "grid-mixer"
+id = "deck_b"
+w = 4
+h = 8
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 36
+label = "1/4 Loop"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 35
+label = "1/2 Loop"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 34
+label = "1 Loop"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 33
+label = "2 Loop"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 32
+label = "4 Loop"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 31
+label = "8 Loop"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 30
+label = "16 Loop"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 29
+label = "32 Loop"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 47
+label = "Kill Bass"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 48
+label = "Kill Mid"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 49
+label = "Kill Hi"
+mode = "trigger"
+
+[[cells.controls]]
+type = "empty"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 21
+label = "Play/Pause"
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 22
+label = "Sync"
+mode = "trigger"

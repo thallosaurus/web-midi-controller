@@ -16,7 +16,7 @@
 </head>
 
 <body>
-  <div id="app">
+  <div id="app" class="disconnected">
     <header>
       <div class="title">
         <button type="button" data-dialog-trigger="overlay_menu">
@@ -27,15 +27,22 @@
         </span>
       </span>
       </div>
+      <div></div>
       <div id="menu_container">
-        <!-- <button>Menu</button> -->
+        <span id="menu-connected-label">connected</span>
+        <span id="menu-disconnected-label">disconnected</span>
+        <button type="button" data-dialog-trigger="menu">Menu</button>
       </div>
 
     </header>
-    <main id="overlays"></main>
-    <footer>
-      <h2>Connection Status: <span id="connection_status">connecting...</span></h2>
-    </footer>
+    <main id="overlays" class="online"></main>
+    <main id="overlays_fallback" class="online">
+      <span>Show me when there is no overlay loaded</span>
+    </main>
+    <main id="connection_overview" class="disconnect-fallback">
+      <p>disconnected</p>
+    </main>
+    <footer></footer>
   </div>
   <dialog id="overlay_menu">
     <main>
@@ -58,7 +65,7 @@
       <h1>main</h1>
     </main>
     <footer>
-      <button data-role="close" data-target="menu">Close</button>
+      <button data-dialog-close="menu">Close</button>
     </footer>
   </dialog>
   <script type="module" src="/ts/main.ts"></script>

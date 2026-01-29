@@ -13,38 +13,81 @@ import { close_dialog } from "./dialogs.ts";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
-const overlays: Array<LoadedOverlay> = [];
+let overlays: Array<LoadedOverlay> = [];
 
-const overlayUri = "http://" + location.hostname + ":8888/overlays";
+export const overlayUri = "http://" + location.hostname + ":8888/overlays";
 
-export async function init_overlays(uri = overlayUri) {
-    console.log("fetching overlays")
-    const o = await fetch(uri);
-    const ol: Array<Overlay> = await o.json();
-
-    for (
-        //const overlay of document.querySelectorAll<HTMLDivElement>("div.overlay")!
-        const overlay of ol
-    ) {
-        // Test Render Flow here
-        const oo = render_overlay(overlay);
-        register_overlay(oo);
-        console.log(oo);
-        //debugger;
-    }
-
-    // setup overlay chooser
-    const overlay_selector = document.querySelector<HTMLDivElement>(
-        "#overlay_selector",
-    )!;
-    setup_tabs(ol, overlay_selector, (i) => {
-        console.log("setting tab ", i)
-        change_overlay(i);
-        close_dialog("overlay_menu")
-    });
+/**
+ * loads overlays into the system by calling the parse function sequencially. useful for loading from json data
+ * @param ol 
+ * @returns The loaded overlays as parsed
+ */
+export function load_overlays_from_array(ol: Array<Overlay>): LoadedOverlay[] {
+    let r: LoadedOverlay[] = [];
+    ol.forEach(ol => {
+        r.push(parse_overlay(ol));
+    })
+    return r;
 }
 
-export const register_overlay = (o: LoadedOverlay) => {
+/**
+ * unloads the currently loaded overlays and clears the registry
+ */
+export function clear_loaded_overlays() {
+    unload_overlay(current_overlay_id);
+    overlays = []
+}
+
+/**
+ * Searches an overlay in the registry and shows it on the screen. Gets called by the EventEmitter
+ * @param id 
+ */
+function load_overlay(id: number) {
+    const new_overlay = overlays[id];
+    if (new_overlay) {
+        const overlays_parent = document.querySelector<HTMLDivElement>(
+            "main#overlays",
+        )!;
+        overlays_parent.appendChild(new_overlay.html);
+        //const dom_overlay = document.querySelector<HTMLDivElement>("main#overlay #" + new_overlay.overlay.id)!;
+
+        console.log(new_overlay);
+        new_overlay.load()
+    }
+}
+
+/**
+ * searches for the given index and unloads 
+ * @param id 
+ */
+function unload_overlay(id: number) {
+    if (id >= -1) {
+
+        const o = overlays[id];
+        if (o) {
+            const overlays_parent = document.querySelector<HTMLDivElement>(
+                "main#overlays",
+            )!;
+            o.unload();
+            overlays_parent.removeChild(o.html);
+        }
+    } else {
+        throw new Error("couldn't unload overlay" + id);
+    }
+}
+
+/**
+ * Creates the HTML Elements and registers the overlay in the overlay registry
+ * @param overlay 
+ * @returns 
+ */
+function parse_overlay(overlay: Overlay) {
+    const oo = render_overlay(overlay);
+    register_overlay(oo);
+    return oo;
+}
+
+const register_overlay = (o: LoadedOverlay) => {
     overlays.push(o);
 }
 
@@ -52,30 +95,14 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
     //hide_all_overlays();
     //unpress_overlays();
 
-    const overlays_parent = document.querySelector<HTMLDivElement>(
-        "main#overlays",
-    )!;
-
-    const current = overlays[current_overlay_id];
-    if (current) {
-        current.unload();
-        overlays_parent.removeChild(current.html);
-    }
+    unload_overlay(current_overlay_id);
 
     const e = ev as ChangeOverlayEvent;
     console.log(e.id);
     current_overlay_id = e.id;
 
-    const new_overlay = overlays[e.id];
-    if (new_overlay) {
-        overlays_parent.appendChild(new_overlay.html);
-        //const dom_overlay = document.querySelector<HTMLDivElement>("main#overlay #" + new_overlay.overlay.id)!;
+    load_overlay(e.id);
 
-        console.log(new_overlay);
-        new_overlay.load()
-    } else {
-        throw new Error("overlay with id " + e.id + " not found")
-    }
 });
 
 export interface WidgetState {

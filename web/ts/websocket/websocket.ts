@@ -87,6 +87,7 @@ export function disconnect() {
     reconnect = false;
     if (ws) ws.close();
     ws = null;
+    console.log("websocket disconnected")
 }
 
 export const send = (update: string) => {

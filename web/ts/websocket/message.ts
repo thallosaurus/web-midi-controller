@@ -3,6 +3,7 @@ import { wsUri } from "./websocket";
 
 export enum WorkerMessageType {
     Connect = "connect",
+    Disconnect = "disconnect",
     Connected = "connected",
     Disconnected = "disconnected",
     DataTest = "data",
@@ -12,13 +13,24 @@ export enum WorkerMessageType {
 
 export type WorkerMessage =
     | ConnectSocketMessage
+    | DisconnectSocketMessage
     | ConnectedMessage
     | DisconnectedMessage
     | SurfaceMidiEvent;
 
+/**
+ * Send this from the frontend if you want to connect
+ */
 interface ConnectSocketMessage {
     type: WorkerMessageType.Connect,
     uri: string
+}
+
+/**
+ * Send this from the frontend if you want to disconnect
+ */
+interface DisconnectSocketMessage {
+    type: WorkerMessageType.Disconnect
 }
 
 interface ConnectedMessage {
@@ -41,7 +53,7 @@ function sendMessage(m: WorkerMessage) {
 }
 
 function sendMessageInput(worker: Worker, m: WorkerMessage) {
-        const msg = JSON.stringify(m)
+    const msg = JSON.stringify(m)
     worker.postMessage(msg);
 }
 
@@ -63,6 +75,12 @@ export function connectSocketMessage(worker: Worker, uri = wsUri) {
     sendMessageInput(worker, {
         type: WorkerMessageType.Connect,
         uri
+    });
+}
+
+export function disconnectSocketMessage(worker: Worker) {
+    sendMessageInput(worker, {
+        type: WorkerMessageType.Disconnect
     });
 }
 

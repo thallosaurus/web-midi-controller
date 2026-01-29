@@ -1,3 +1,4 @@
+import { wsWorker, DisconnectSocketEvent } from "./websocket/main";
 
 export function vibrate() {
   if (navigator.vibrate) {
@@ -22,7 +23,7 @@ function pseudoUUID(): string {
 }
 
 export function init_debug() {
-    if (import.meta.env.DEV) {
+  if (import.meta.env.DEV) {
     console.log("activating development listeners");
     window.addEventListener("error", e => {
       alert("error:" + e.message + e.filename + e.lineno);
@@ -30,5 +31,11 @@ export function init_debug() {
     window.addEventListener("unhandledrejection", e => {
       alert("promise error:" + e.reason);
     });
+
+    // add debug connection toggles
+    let menu_connected_label = document.querySelector<HTMLDivElement>("#menu-connected-label")!;
+    menu_connected_label.addEventListener("click", (e) => {
+      DisconnectSocketEvent();
+    })
   }
 }

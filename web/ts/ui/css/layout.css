@@ -11,8 +11,12 @@
     width: calc(100% - 1em) !important;
 }
 
-.empty {
-    
+#overlays:empty {
+    display: none !important;
+}
+
+#overlays:not(:empty) + #overlays_fallback {
+    display: none !important;
 }
 
 #overlays > * {

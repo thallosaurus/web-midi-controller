@@ -1,5 +1,5 @@
 import { connect, disconnect, send, setupSocketAsync, wsUri } from "./websocket.ts";
-import { sendConnected, sendDisconnected, sendFrontendMidiEvent, sendMidiEvent } from "./message.ts";
+import { disconnectSocketMessage, sendConnected, sendDisconnected, sendFrontendMidiEvent, sendMidiEvent } from "./message.ts";
 //import websocketWorkerUrl from './?worker&url';
 import { WorkerMessageType, connectSocketMessage } from './message.ts';
 import type { MidiEvent } from "../events.ts";
@@ -31,30 +31,36 @@ onmessage = (m) => {
             //console.log("data for the frontend")
             send(JSON.stringify(msg.data));
             break;
+
+        case WorkerMessageType.Disconnect:
+            disconnect();
+            break;
     }
 }
 
-let wsWorker: Worker | null = null;
-export function init_websocket_worker(): Promise<boolean> {
+// Runs in another thread
+export let wsWorker: Worker | null = null;
+type WorkerEventHandler = (msg: MidiEvent) => void;
+export function init_websocket_worker(event_handler: WorkerEventHandler): Promise<boolean> {
     return new Promise((res, rej) => {
 
         const worker = new Worker(import.meta.url, { type: 'module' })
         connectSocketMessage(worker);
+        worker.addEventListener("message", ev => {
+            const msg = JSON.parse(ev.data);
+            event_handler(msg);
+        })
+
+        // functions for the 
         worker.onmessage = (ev) => {
             const msg = JSON.parse(ev.data);
             //console.log("worker message", msg);
             if (msg.type == "connected") {
                 wsWorker = worker;
                 res(true);
-                return;
             };
             if (msg.type == "connect_error") {
                 rej(false);
-                return;
-            }
-            if (msg.type == "midi_frontend_input") {
-                process_external(msg.data)
-                return;
             }
         };
     })
@@ -63,5 +69,13 @@ export function init_websocket_worker(): Promise<boolean> {
 export function FrontendSocketEvent(ev: MidiEvent) {
     if (wsWorker != null) {
         sendFrontendMidiEvent(wsWorker, ev);
+    }
+}
+
+export function DisconnectSocketEvent() {
+    if (wsWorker != null) {
+        disconnectSocketMessage(wsWorker);
+    } else {
+        console.error("wsWorker was null", wsWorker);
     }
 }
