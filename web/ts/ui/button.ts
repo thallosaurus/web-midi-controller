@@ -17,18 +17,24 @@ export interface ButtonState extends WidgetState {
 }
 
 export const UnloadNoteButtonScript = (id: string, options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
-    const button = o.querySelector<HTMLDivElement>(".target")!;
-    button.removeEventListener("pointerdown", state.handlers.pointerdown)
-    button.removeEventListener("pointerup", state.handlers.pointerup)
-    button.removeEventListener("pointercancel", state.handlers.pointercancel)
+    if (options.mode != "readonly") {
+
+        const button = o.querySelector<HTMLDivElement>(".target")!;
+        button.removeEventListener("pointerdown", state.handlers.pointerdown)
+        button.removeEventListener("pointerup", state.handlers.pointerup)
+        button.removeEventListener("pointercancel", state.handlers.pointercancel)
+    }
     unregister_midi_widget(id, options.channel, options.note);
 }
 
 export const UnloadCCButtonScript = (id: string, options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
-    const button = o.querySelector<HTMLDivElement>(".target")!;
-    button.removeEventListener("pointerdown", state.handlers.pointerdown)
-    button.removeEventListener("pointerup", state.handlers.pointerup)
-    button.removeEventListener("pointercancel", state.handlers.pointercancel)
+    if (options.mode != "readonly") {
+
+        const button = o.querySelector<HTMLDivElement>(".target")!;
+        button.removeEventListener("pointerdown", state.handlers.pointerdown)
+        button.removeEventListener("pointerup", state.handlers.pointerup)
+        button.removeEventListener("pointercancel", state.handlers.pointercancel)
+    }
     unregister_cc_widget(id, options.channel, options.cc)
 }
 
@@ -114,13 +120,15 @@ export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLD
 
     register_cc_widget(id, options.value_off ?? 0, options.channel, options.cc, update_value);
 
-    state.handlers.pointerdown = touch_start;
-    state.handlers.pointerup = touch_end;
-    state.handlers.pointercancel = touch_end;
-    //button.addEventListener("pointermove", move);
-    o.addEventListener("pointerdown", state.handlers.pointerdown);
-    o.addEventListener("pointerup", state.handlers.pointerup);
-    o.addEventListener("pointercancel", state.handlers.pointercancel);
+    if (options.mode != "readonly") {
+        state.handlers.pointerdown = touch_start;
+        state.handlers.pointerup = touch_end;
+        state.handlers.pointercancel = touch_end;
+        //button.addEventListener("pointermove", move);
+        o.addEventListener("pointerdown", state.handlers.pointerdown);
+        o.addEventListener("pointerup", state.handlers.pointerup);
+        o.addEventListener("pointercancel", state.handlers.pointercancel);
+    }
     set_label();
 }
 
@@ -202,12 +210,15 @@ export const NoteButtonScript = (id: string, options: NoteButtonProperties, o: H
 
     register_midi_widget(id, options.channel, options.note, update_value);
 
-    state.handlers.pointerdown = touch_start;
-    state.handlers.pointerup = touch_end;
-    state.handlers.pointercancel = touch_end;
-    //button.addEventListener("pointermove", move);
-    o.addEventListener("pointerdown", state.handlers.pointerdown);
-    o.addEventListener("pointerup", state.handlers.pointerup);
-    o.addEventListener("pointercancel", state.handlers.pointercancel);
+    if (options.mode != "readonly") {
+
+        state.handlers.pointerdown = touch_start;
+        state.handlers.pointerup = touch_end;
+        state.handlers.pointercancel = touch_end;
+        //button.addEventListener("pointermove", move);
+        o.addEventListener("pointerdown", state.handlers.pointerdown);
+        o.addEventListener("pointerup", state.handlers.pointerup);
+        o.addEventListener("pointercancel", state.handlers.pointercancel);
+    }
     set_label();
 }

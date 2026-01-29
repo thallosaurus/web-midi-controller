@@ -242,5 +242,8 @@ enum ButtonMode {
     Trigger,
     
     #[serde(rename = "latch")]
-    Latch
+    Latch,
+
+    #[serde(rename = "readonly")]
+    ReadOnly
 }

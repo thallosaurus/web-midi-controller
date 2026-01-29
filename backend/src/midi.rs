@@ -120,7 +120,7 @@ fn midi_in_handler(ts: u64, data: &[u8], e: &mut broadcast::Sender<AppMessage>) 
     }
 }
 
-#[cfg(target_os = "windows")]
+//#[cfg(target_os = "windows")]
 /// Select MIDI Device by Name
 fn select_port_by_name<T: MidiIO>(midi_io: &T, search: &String) -> T::Port {
     let midi_ports = midi_io.ports();
