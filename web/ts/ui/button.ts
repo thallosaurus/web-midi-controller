@@ -76,6 +76,9 @@ export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLD
     // Update State on the Bus
     const update_bus_value = (v: number) => {
         process_internal(new CCEvent(options.channel, v, options.cc));
+        
+        // also update ui directly
+        update_value(v);
     };
 
     // called, when the touch begins
@@ -187,6 +190,9 @@ export const NoteButtonScript = (id: string, options: NoteButtonProperties, o: H
         process_internal(
             new NoteEvent(options.channel, options.note, v > 0, v),
         );
+
+        // also update ui directly
+        update_value(v);
     };
 
     const touch_update = () => {

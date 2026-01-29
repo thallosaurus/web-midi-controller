@@ -72,7 +72,7 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) 
                 Some(aux) = rx.recv() => {
                     // we got a message from other peers
                     //if socket.send(aux)
-                    //println!("client with id {conn_id} got msg {:?}", aux);
+                    println!("client with id {conn_id} got msg {:?}", aux);
                     if let Err(e) = socket.send(aux.into()).await {
                         eprintln!("error while pushing update: {e}")
                     }

@@ -10,17 +10,6 @@ body, #app {
   flex-direction: column;
 }
 
-#sliders {
-  display: flex;
-  flex-direction: row;
-}
-
-#buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-
-}
-
 #app > header {
   grid-area: header;
   display: grid;
@@ -61,52 +50,6 @@ body, #app {
   border: none;
 }
 
-dialog[open] {
-  position: absolute;
-  top:0;
-  bottom:0;
-  left:0;
-  right:0;
-  background-color: rgba(0,0,0,.8);
-  color: white;
-
-/*   display: grid;
-  grid-template-areas:
-    "dialog_header"
-    "dialog_content"
-    "dialog_actions"; */
-}
-
-dialog > header {
-  grid-area: dialog_header;
-  display:inline;
-}
-
-dialog > main {
-  grid-area: dialog_content;
-  height: 100%;
-  grid-row: 2 / 3;
-}
-
-dialog > footer {
-  grid-area: dialog_actions;
-  display:inline;
-}
-
-dialog > footer button {
-  
-}
-
-
-
-/*.vert-mixer.cell {
-  display: flex;
-  flex-direction: column;
-}
-.horiz-mixer.cell {
-  display: flex;
-}*/
-
 .title {
   display: inline;
 }
@@ -122,53 +65,4 @@ dialog > footer button {
 .title .name {
   font-size: 2em;
   vertical-align: super;
-}
-
-dialog#overlay_menu main .cancel {
-
-}
-
-dialog#overlay_menu main {
-  display: flex;
-  flex-direction: column;
-}
-
-dialog#overlay_menu {
-  position: fixed;
-  left: 0;
-  margin: 0;
-  height: 90vh
-}
-
-dialog ul#overlay_selector {
-  margin-block-start: 0;
-  margin-block-end: 0;
-  list-style-type: none;
-  padding-inline-start: 0;
-  text-align: center;
-  overflow-y:auto;
-}
-dialog#overlay_menu button.shown,
-dialog ul#overlay_selector li.shown {
-  background-color: white;
-  color: black;
-  font-weight: bold;
-}
-dialog ul#overlay_selector li {
-  list-style-type: none;
-  display: block;
-  width: calc(100% - 2em);
-  padding: 1em;
-}
-
-dialog#overlay_menu button {
-  display: block;
-  width: 100%;
-  padding: 1em;
-  background-color: white;
-  color: black;
-  font-weight: bold;
-  border: none;
-  font-family: monospace;
-  margin-top: auto;
 }

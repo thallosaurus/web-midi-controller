@@ -1,4 +1,4 @@
-import "./ui/css/dialogs.css";
+import "./css/dialogs.css";
 
 export const close_dialog = (id: string) => {
   const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;

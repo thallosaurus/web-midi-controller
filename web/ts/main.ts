@@ -6,12 +6,12 @@ import "./ui/css/colors.css";
 import { change_overlay, init_overlays, register_overlay, setup_tabs } from "./ui/overlay.ts";
 import { render_overlay } from "./ui/render.ts";
 //import { setup_slider } from "./ui/slider.ts";
-import { connect, disconnect } from "./websocket.ts";
-import { init_dialogs } from './dialogs.ts'
+import { connect, disconnect } from "./workers/websocket.ts";
+import { init_dialogs } from './ui/dialogs.ts'
 import { init_debug } from "./utils.ts";
 
 
-import { init_websocket_worker } from './workers/ws_worker';
+import { init_websocket_worker } from './workers/main.ts';
 
 const init = async () => {
   init_debug();

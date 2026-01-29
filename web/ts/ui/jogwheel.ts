@@ -1,7 +1,7 @@
 import type { JogwheelProperties } from "../../bindings/Widget"
 import type { WidgetState } from "./overlay"
 import "./css/jogwheel.css"
-import { process_external, process_internal } from "../event_bus"
+import { process_internal } from "../event_bus"
 import { JogDirection, JogEvent } from "../events"
 
 export interface JogState extends WidgetState {

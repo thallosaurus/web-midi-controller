@@ -1,4 +1,6 @@
-import { process_external } from "./event_bus.ts";
+import { process_external } from "../event_bus.ts";
+import type { MidiEvent } from "../events.ts";
+import { sendMidiEvent } from "./message.ts";
 
 export const wsUri = "ws://" + location.hostname + ":8888/ws";
 
@@ -15,10 +17,32 @@ function scheduleReconnect() {
     }, backoff)
 }
 
-function setupSocketSync(socket: WebSocket) {
-    socket.onmessage = (e) => {
-        process_external(e.data);
+export function setupSocketAsync(socket: WebSocket) {
+    socket.addEventListener("message", (e) => {
+        const msg: MidiEvent = JSON.parse(e.data);
+        //console.log("external data", msg);
+        sendMidiEvent(msg);
+
+    })
+    socket.onclose = () => {
+        //document.querySelector<HTMLDivElement>("#connection_status")!.innerText = "disconnected";
+        ws = null;
+
+        if (reconnect) scheduleReconnect();
     }
+    socket.onerror = (e) => {
+        console.error("ws error", e);
+        socket.close();
+    }
+}
+
+function setupSocketSync(socket: WebSocket) {
+    socket.addEventListener("message", (e) => {
+        //const msg = JSON.parse(e.data);
+        //console.log("external data", msg);
+        process_external(e.data);
+
+    })
     socket.onclose = () => {
         //document.querySelector<HTMLDivElement>("#connection_status")!.innerText = "disconnected";
         ws = null;
@@ -33,7 +57,7 @@ function setupSocketSync(socket: WebSocket) {
 
 //type WebSocketHandler = (((ws: WebSocket) => void) | ((ws: WebSocket) => Promise<void>))
 
-export async function connect(uri: string = wsUri): Promise<WebSocket> {
+export async function connect(uri: string = wsUri, handler = setupSocketSync): Promise<WebSocket> {
     //if (ws) close_socket();
     if (ws) return ws;
     if (connecting) return connecting;
@@ -45,15 +69,8 @@ export async function connect(uri: string = wsUri): Promise<WebSocket> {
             ws = socket;
             connecting = null;
             backoff = 250;
-
-            /*document.querySelector<HTMLDivElement>("#connection_status")!
-                .innerText = "connected";*/
-            //(handler ?? setupSocketSync)(socket);
-            setupSocketSync(socket);
+            handler(socket);
             resolve(socket);
-
-            //setupSocket(socket);
-
         };
 
         socket.onerror = (e) => {

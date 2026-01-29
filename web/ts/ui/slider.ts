@@ -114,6 +114,9 @@ export const CCSliderScript = (id: string, options: CCSliderProperties, o: HTMLD
         process_internal(
             new CCEvent(options.channel, v, options.cc),
         );
+
+        // also update ui directly
+        update_value(v);
     };
 
     const update = (e: PointerEvent) => {

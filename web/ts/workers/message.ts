@@ -1,5 +1,5 @@
 import type { MidiEvent } from "../events";
-import { wsUri } from "../websocket";
+import { wsUri } from "./websocket";
 
 export enum WorkerMessageType {
     Connect = "connect",
@@ -33,11 +33,6 @@ interface SurfaceMidiEvent {
     type: WorkerMessageType.MidiFrontendInput
     data: MidiEvent
 }
-//interface WorkerMessageData {}
-
-
-//export type ConnectedWorkerMessage = WorkerMessage<{}>;
-//export type HeartbeatWorkerMessage = WorkerMessage<{}>;
 
 // Send message back to the frontend
 function sendMessage(m: WorkerMessage) {
@@ -49,6 +44,8 @@ function sendMessageInput(worker: Worker, m: WorkerMessage) {
         const msg = JSON.stringify(m)
     worker.postMessage(msg);
 }
+
+/// MARK: - shorthands for message passing
 
 export function sendConnected() {
     sendMessage({
@@ -69,6 +66,12 @@ export function connectSocketMessage(worker: Worker, uri = wsUri) {
     });
 }
 
+export function sendMidiEvent(data: MidiEvent) {
+    sendMessage({
+        type: WorkerMessageType.MidiFrontendInput,
+        data
+    })
+}
 export function sendFrontendMidiEvent(worker: Worker, data: MidiEvent) {
     sendMessageInput(worker, {
         type: WorkerMessageType.MidiFrontendInput,

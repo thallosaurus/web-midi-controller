@@ -1,7 +1,7 @@
 import { CCEvent, MidiEvent, NoteEvent } from "./events.ts";
-import { send } from "./websocket.ts";
+import { send } from "./workers/websocket.ts";
 import { sendFrontendMidiEvent } from "./workers/message.ts";
-import { FrontendSocketEvent } from "./workers/ws_worker.ts";
+import { FrontendSocketEvent } from "./workers/main.ts";
 
 type CCWidget = Map<string, CCCallback>;//Array<CCCallback>;
 type CCChannel = Map<number, CCWidget>;
@@ -111,10 +111,10 @@ export const midi_update_on_bus = (channel: number, note: number, velocity: numb
 };
 
 /// Gets called, when the websocket client gets a message from another peer
-export const process_external = (msg: string) => {
+export const process_external = (data: MidiEvent) => {
     //bus.dispatchEvent(ev);
-    const data = JSON.parse(msg);
-    //console.log(data);
+    //const data = JSON.parse(msg);
+    console.log(data);
     switch (data.event_name) {
         case "ccupdate":
             {
