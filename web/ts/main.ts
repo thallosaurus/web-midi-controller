@@ -15,8 +15,6 @@ const init_ui = () => {
   console.log("init dialogs")
   init_dialogs();
 
-  document.requestFullscreen({ navigationUI: 'hide' })
-
   // fix on smart devices
   if (!import.meta.env.DEV) {
 
