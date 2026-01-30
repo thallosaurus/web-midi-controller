@@ -1,5 +1,7 @@
 :root {
     --bg: black;
     --fg: white;
-    --error: red
+    --error: red;
+    --ui-layer-one: #111;
+    --ui-layer-two: #222;
 }

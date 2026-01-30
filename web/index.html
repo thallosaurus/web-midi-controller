@@ -42,7 +42,14 @@
     <main id="disconnect-fallback" class="disconnect-fallback">
       <div class="container">
 
-        <button type="button" class="primary">Connect</button>
+        <div class="connect_local">
+
+          <h1>Connect</h1>
+          <p>Connect with your Computer and control your musical soft- and hardware.</p>
+          <button id="connect_button" type="button" class="primary">Connect</button>
+        </div>
+
+        <button type="button" data-dialog-trigger="advanced_connect">More options...</button>
       </div>
     </main>
     <footer class="iphone-only">
@@ -61,6 +68,9 @@
       </button>
 
     </main>
+  </dialog>
+  <dialog id="advanced_connect">
+    <h1>Advanced</h1>
   </dialog>
   <dialog id="menu">
     <!-- "Reset all" Button -->

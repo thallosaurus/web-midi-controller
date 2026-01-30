@@ -1,5 +1,5 @@
 import type { MidiEvent } from "../events.ts";
-import { sendMidiEvent } from "./message.ts";
+import { sendDisconnected, sendMidiEvent } from "./message.ts";
 
 export const wsUri = "ws://" + location.hostname + ":8888/ws";
 
@@ -24,6 +24,10 @@ function setupSocket(socket: WebSocket): WebSocket {
         //console.log("external data", msg);
         sendMidiEvent(msg);
     });
+
+    socket.addEventListener("error", (e) => {
+        sendDisconnected(new Error("websocket connection suddenly dropped"))
+    })
 
     return socket
 }

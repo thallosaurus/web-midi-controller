@@ -16,7 +16,7 @@ body,
   grid-area: header;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  background-color: #111;
+  background-color: var(--ui-layer-one);
   border-bottom: .1em solid #222;
   padding: .5em 0;
   position: sticky;
@@ -143,6 +143,10 @@ body,
   #overlay_name {
     display: none !important;
   }
+
+  #disconnect-fallback .container {
+    width: 100% !important;
+  }
 }
 
 .iphone-only {
@@ -171,7 +175,7 @@ body,
 
 .menu-disconnected-label {
   display: none;
-  color: red;
+  color: var(--error);
 }
 
 .menu-connected-label {

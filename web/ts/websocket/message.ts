@@ -53,6 +53,7 @@ export interface ConnectedMessage {
 
 interface DisconnectedMessage {
     type: WorkerMessageType.Disconnected
+    error?: string
 }
 
 interface SurfaceMidiEvent {
@@ -110,7 +111,7 @@ export function process_worker_message(msg: WorkerMessage) {
 
         case WorkerMessageType.Disconnect:
             disconnect().then(e => {
-                sendDisconnected();
+                sendDisconnected(new Error("user disconnected"));
             });
             break;
     }
@@ -134,9 +135,10 @@ export function sendConnected(overlay_path: string) {
     })
 }
 
-export function sendDisconnected() {
+export function sendDisconnected(error: Error) {
     sendMessage({
-        type: WorkerMessageType.Disconnected
+        type: WorkerMessageType.Disconnected,
+        error: error.message
     })
 }
 

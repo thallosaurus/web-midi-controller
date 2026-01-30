@@ -31,6 +31,7 @@ export async function initWebsocketWorker(): Promise<[Worker, ConnectedMessage]>
 
                 case WorkerMessageType.Disconnected:
                     wsWorker = null;
+                    console.log("initWebsocketWorker", "disconnected")
                     rej()
                     break;
             }
