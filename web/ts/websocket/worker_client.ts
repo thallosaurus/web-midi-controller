@@ -6,6 +6,7 @@ import { MidiEvent } from "../events.ts";
 
 // should run in another thread
 export let wsWorker: Worker | null = null;
+export let lastError: Error | null;
 export async function initWebsocketWorker(): Promise<[Worker, ConnectedMessage]> {
     if (wsWorker !== null) throw new Error("the websocket thread is already running")
 
@@ -27,6 +28,7 @@ export async function initWebsocketWorker(): Promise<[Worker, ConnectedMessage]>
                 case WorkerMessageType.ConnectError:
                     console.log("main", msg);
                     rej(msg.error)
+                    lastError = msg.error;
                     break;
 
                 case WorkerMessageType.Disconnected:

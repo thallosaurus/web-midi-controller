@@ -15,12 +15,17 @@ const init_ui = () => {
   console.log("init dialogs")
   init_dialogs();
 
-  // fix on smart devices
-  window.oncontextmenu = function (e) {
+  document.requestFullscreen({ navigationUI: 'hide' })
 
-    if (e.pointerType === "touch") {
+  // fix on smart devices
+  if (!import.meta.env.DEV) {
+
+    window.oncontextmenu = function (e) {
+
+      //if (e.pointerType === "touch") {
 
       return false;
+      //}
     }
   }
 };
