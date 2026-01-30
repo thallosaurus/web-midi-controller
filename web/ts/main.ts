@@ -3,7 +3,7 @@ import "./style.css";
 import "./ui/css/colors.css";
 
 import { init_dialogs } from './ui/dialogs.ts'
-import { init_debug, initWebsocketWorkerWithOverlaySelection } from "./utils.ts";
+import { init_debug, initWebsocketWorkerWithOverlaySelection } from "./common/utils.ts";
 
 const AUTO_CONNECT_LOCAL = false;
 

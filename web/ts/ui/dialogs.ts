@@ -1,4 +1,4 @@
-import { initWebsocketWorkerWithOverlaySelection } from "../utils";
+import { initWebsocketWorkerWithOverlaySelection } from "../common/utils";
 import "./css/dialogs.css";
 
 export const close_dialog = (id: string) => {

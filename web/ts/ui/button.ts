@@ -1,4 +1,4 @@
-import { vibrate } from "../utils.ts";
+import { vibrate } from "../common/utils.ts";
 import "./css/button.css";
 import {
     process_internal,

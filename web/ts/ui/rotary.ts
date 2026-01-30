@@ -3,7 +3,7 @@ import { process_internal, register_cc_widget, unregister_cc_widget } from "../e
 import { CCEvent } from "../events";
 import type { WidgetState } from "./overlay";
 import "./css/rotary.css";
-import { vibrate } from "../utils";
+import { vibrate } from "../common/utils";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;

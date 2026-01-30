@@ -72,7 +72,7 @@ function sendMessageInput(worker: Worker, m: WorkerMessage) {
     worker.postMessage(msg);
 }
 
-export function process_worker_message(msg: WorkerMessage) {
+export function process_worker_input(msg: WorkerMessage) {
         switch (msg.type) {
         case WorkerMessageType.Connect:
             {

@@ -1,4 +1,4 @@
-import { vibrate } from "../utils.ts";
+import { vibrate } from "../common/utils.ts";
 import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus.ts";
 import "./css/slider.css";
 import { CCEvent } from "../events.ts";

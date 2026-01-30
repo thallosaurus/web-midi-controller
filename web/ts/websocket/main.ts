@@ -1,4 +1,4 @@
-import { process_worker_message, type WorkerMessage } from "./message.ts";
+import { process_worker_input, type WorkerMessage } from "./message.ts";
 //import websocketWorkerUrl from './?worker&url';
 import type { MidiEvent } from "../events.ts";
 
@@ -6,7 +6,7 @@ import type { MidiEvent } from "../events.ts";
 onmessage = (m) => {
     const msg: WorkerMessage = JSON.parse(m.data);
     //console.log("worker got a message", msg);
-    process_worker_message(msg);
+    process_worker_input(msg);
 }
 
 type WorkerEventHandler = (msg: MidiEvent) => void;

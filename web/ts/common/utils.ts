@@ -1,9 +1,9 @@
-import type { Overlay } from "../bindings/Overlay";
-import { process_external } from "./event_bus";
-import { close_dialog } from "./ui/dialogs";
-import { change_overlay, clear_loaded_overlays, load_overlays_from_array, LoadedOverlay, setup_tabs } from "./ui/overlay";
-import { wsWorker, DisconnectSocketEvent, ConnectSocketEvent, initWebsocketWorker } from "./websocket/worker_client";
-import { WorkerMessageType, type ConnectedMessage, type WorkerMessage } from "./websocket/message";
+import type { Overlay } from "../../bindings/Overlay";
+import { process_external } from "./../event_bus";
+import { close_dialog } from "./../ui/dialogs";
+import { change_overlay, clear_loaded_overlays, load_overlays_from_array, LoadedOverlay, setup_tabs } from "../ui/overlay";
+import { wsWorker, DisconnectSocketEvent, ConnectSocketEvent, initWebsocketWorker } from "../websocket/worker_client";
+import { WorkerMessageType, type ConnectedMessage, type WorkerMessage } from "../websocket/message";
 
 export function vibrate() {
   if (navigator.vibrate) {
@@ -27,6 +27,7 @@ function pseudoUUID(): string {
   });
 }
 
+// UI Shit
 export function init_debug() {
   if (import.meta.env.DEV) {
     console.log("running in development server");

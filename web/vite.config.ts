@@ -14,7 +14,9 @@ export default defineConfig({
   })],
   target: ["es5", "chrome81"],
   build: {
-    modulePreload: false,
+    modulePreload: {
+      polyfill: false
+    },
     minify: false,
     rollupOptions: {
       input: {

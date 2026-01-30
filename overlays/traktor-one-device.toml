@@ -4,6 +4,7 @@ id = "traktor_performance"
 [[cells]]
 type = "vert-mixer"
 
+# DECK A
 [[cells.controls]]
 type = "grid-mixer"
 id = "deck_a"
@@ -110,6 +111,7 @@ note = 2
 label = "Sync"
 mode = "trigger"
 
+# VOLUME SLIDER
 [[cells]]
 type = "horiz-mixer"
 id = "levels"
@@ -128,6 +130,7 @@ cc = 1
 mode = "relative"
 label = "Test"
 
+# DECK B
 [[cells]]
 type = "grid-mixer"
 id = "deck_b"

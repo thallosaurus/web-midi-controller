@@ -7,7 +7,7 @@ import { type Overlay } from '../../bindings/Overlay.ts';
 import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "../../bindings/Widget.ts";
 import { RotaryScript, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
 import { render_overlay, render_widget } from "./render.ts";
-import { uuid } from "../utils.ts";
+import { uuid } from "../common/utils.ts";
 import { JogwheelScript, type JogState } from "./jogwheel.ts";
 
 let current_overlay_id = -1;
