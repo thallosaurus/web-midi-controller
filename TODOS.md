@@ -9,6 +9,7 @@ todo widgets:
 - Shift
 - Fix WebUI Version
 - iOS CSS Fixes (iPhone/iPad)
+- Prettier Rust Logging with tracing (we already got that)
 
 laters:
 - Haptic Touch via WebKit App

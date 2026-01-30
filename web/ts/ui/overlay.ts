@@ -19,7 +19,7 @@ export function get_current_overlay_id() {
     return overlays.length
 }
 
-export const overlayUri = "http://" + location.hostname + ":8888/overlays";
+//export const overlayUri = "http://" + location.hostname + ":8888/overlays";
 
 /**
  * loads overlays into the system by calling the parse function sequencially. useful for loading from json data
@@ -40,24 +40,24 @@ export function load_overlays_from_array(ol: Array<Overlay>): LoadedOverlay[] {
 export function clear_loaded_overlays() {
     unload_overlay(current_overlay_id);
     overlays = []
+    current_overlay_id = -1
 }
 
 /**
- * Searches an overlay in the registry and shows it on the screen. Gets called by the EventEmitter
+ * Shows a loaded overlay on the screen. Gets called by the EventEmitter
  * @param id 
  */
-function load_overlay(id: number) {
-    const new_overlay = overlays[id];
-    if (new_overlay) {
-        const overlays_parent = document.querySelector<HTMLDivElement>(
-            "main#overlays",
-        )!;
-        overlays_parent.appendChild(new_overlay.html);
-        //const dom_overlay = document.querySelector<HTMLDivElement>("main#overlay #" + new_overlay.overlay.id)!;
+function load_overlay(new_overlay: LoadedOverlay) {
 
-        console.log(new_overlay);
-        new_overlay.load()
-    }
+    const overlays_parent = document.querySelector<HTMLDivElement>(
+        "main#overlays",
+    )!;
+    overlays_parent.appendChild(new_overlay.html);
+    //const dom_overlay = document.querySelector<HTMLDivElement>("main#overlay #" + new_overlay.overlay.id)!;
+
+    console.log(new_overlay);
+    new_overlay.load()
+
 }
 
 /**
@@ -73,7 +73,18 @@ function unload_overlay(id: number) {
                 "main#overlays",
             )!;
             o.unload();
+            console.log(o);
             overlays_parent.removeChild(o.html);
+
+            const overlay_name = document.querySelector<HTMLDivElement>(
+                "#overlay_name",
+            )!;
+            overlay_name.innerText = "no overlay loaded";
+
+            //const unpress_overlays = () => {
+            for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
+                r.classList.remove("shown");
+            }
         }
     } else {
         throw new Error("couldn't unload overlay" + id);
@@ -104,10 +115,21 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
     unload_overlay(current_overlay_id);
 
     const e = ev as ChangeOverlayEvent;
-    console.log(e.id);
-    current_overlay_id = e.id;
+    //console.log(e.id);
 
-    load_overlay(e.id);
+    const new_overlay = overlays[e.id];
+    if (new_overlay) {
+        load_overlay(new_overlay);
+        current_overlay_id = e.id;
+        const o_name_elem = document.querySelector<HTMLDivElement>("#overlay_name")!;
+        o_name_elem.innerText = new_overlay.overlay.name;
+
+        for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch'][data-overlay-index='" + e.id + "']")!) {
+            r.classList.add("shown");
+        }
+    } else {
+        throw new Error("overlay with id " + e.id + " not found")
+    }
 
 });
 
@@ -128,8 +150,6 @@ export class LoadedWidget {
         this.state = {
             handlers: {}
         };
-        //this.state = s
-        //this.abort = new AbortController();
 
         this.id = uuid();
         this.html.dataset.id = this.id;
@@ -202,11 +222,6 @@ export class LoadedOverlay {
     }
 }
 
-const unpress_overlays = () => {
-    for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
-        r.classList.remove("shown");
-    }
-}
 const hide_all_overlays = () => {
     overlays.map((v) => {
         if (!v.html.classList.contains("hide")) {
@@ -271,9 +286,9 @@ export const VertMixer = (container: HTMLDivElement, options: VerticalMixerPrope
 export const setup_tabs = (ols: LoadedOverlay[], parent: HTMLDivElement, cb: (index: number) => void) => {
     //parent.classList.add("tab_parent");
 
+    console.log(ols)
     for (let i = 0; i < ols.length; i++) {
         const t = document.createElement("li");
-        console.log(ols[i])
 
         t.dataset.role = "overlay_switch";
         t.dataset.overlayIndex = String(i);

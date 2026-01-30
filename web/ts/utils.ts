@@ -1,5 +1,9 @@
-import { init_with_worker } from "./main";
-import { wsWorker, DisconnectSocketEvent, ConnectSocketEvent } from "./websocket/main";
+import type { Overlay } from "../bindings/Overlay";
+import { process_external } from "./event_bus";
+import { close_dialog } from "./ui/dialogs";
+import { change_overlay, clear_loaded_overlays, load_overlays_from_array, LoadedOverlay, setup_tabs } from "./ui/overlay";
+import { wsWorker, DisconnectSocketEvent, ConnectSocketEvent, initWebsocketWorker } from "./websocket/main";
+import { WorkerMessageType, type ConnectedMessage, type WorkerMessage } from "./websocket/message";
 
 export function vibrate() {
   if (navigator.vibrate) {
@@ -45,10 +49,78 @@ export function init_debug() {
       menu_disconnected_label.addEventListener("click", (e) => {
         //ConnectSocketEvent();
         //debugger
-        init_with_worker().then(e => {
+        /*init_with_worker().then(e => {
+          })*/
+        initWebsocketWorkerWithOverlaySelection().then(() => {
           console.log("debug reconnect successful", e);
-        })
+        });
       })
     });
   }
+}
+
+export function initWebsocketWorkerWithOverlaySelection() {
+  return init_with_worker().then(connectionInfo => {
+    return fetchOverlaysAndRegister(connectionInfo.overlay_path)
+  })
+    .then(loadedOverlays => {
+      setup_overlay_selector(loadedOverlays);
+      change_overlay(0);
+      //console.log(e);
+    })
+}
+
+async function fetchOverlaysAndRegister(uri: string) {
+  const o = await fetch(uri);
+  const ol: Array<Overlay> = await o.json();
+  return await load_overlays_from_array(ol);
+}
+
+function setup_overlay_selector(ol: LoadedOverlay[]) {
+  // setup overlay chooser
+  const overlay_selector = document.querySelector<HTMLDivElement>(
+    "#overlay_selector",
+  )!;
+  setup_tabs(ol, overlay_selector, (i) => {
+    console.log("setting tab ", i)
+    change_overlay(i);
+    close_dialog("overlay_menu")
+  });
+  //change_overlay(0);*/
+}
+
+/**
+ * Function that loads the state and socket management in the background
+ * @returns 
+ */
+export const init_with_worker = async (): Promise<ConnectedMessage> => {
+  // setup connection 
+  const app_elem = document.querySelector<HTMLDivElement>("#app")!
+  const [worker, conn_msg] = await initWebsocketWorker();
+  app_elem.classList.remove("disconnected");
+
+  worker.addEventListener("message", ev => {
+    const msg: WorkerMessage = JSON.parse(ev.data);
+    console.log("worker message in main thread", msg);
+    switch (msg.type) {
+      case WorkerMessageType.MidiFrontendInput:
+        process_external(msg.data);
+        break;
+      case WorkerMessageType.Disconnected:
+        app_elem.classList.add("disconnected");
+        clear_loaded_overlays();
+        clear_overlay_selector();
+        break;
+    }
+  });
+
+  return conn_msg;
+  //let status = document.querySelector<HTMLDivElement>("#connection_status")!;
+}
+
+function clear_overlay_selector() {
+  const overlay_selector = document.querySelector<HTMLDivElement>(
+    "#overlay_selector",
+  )!;
+  overlay_selector.innerHTML = "";
 }

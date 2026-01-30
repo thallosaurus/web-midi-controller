@@ -1,4 +1,3 @@
-import { process_external } from "../event_bus.ts";
 import type { MidiEvent } from "../events.ts";
 import { sendMidiEvent } from "./message.ts";
 
