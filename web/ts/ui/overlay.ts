@@ -214,7 +214,7 @@ export class LoadedOverlay {
                     CCButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
-                    CCSliderScript(o.id, o.option, o.html, o.state as CCSliderState);
+                    CCSliderScript(o.option, o.html, o.state as CCSliderState);
                     break;
                 case "notebutton":
                     NoteButtonScript(o.option, o.html, o.state as ButtonState);

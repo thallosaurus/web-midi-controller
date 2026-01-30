@@ -1,9 +1,10 @@
 import type { Overlay } from "../../bindings/Overlay";
-import { process_external } from "./../event_bus";
+//import { process_external } from "./../event_bus";
 import { close_dialog } from "./../ui/dialogs";
 import { change_overlay, clear_loaded_overlays, load_overlays_from_array, LoadedOverlay, setup_tabs } from "../ui/overlay";
-import { wsWorker, DisconnectSocketEvent, ConnectSocketEvent, initWebsocketWorker } from "../websocket/worker_client";
+import {  DisconnectSocketEvent, ConnectSocketEvent, initWebsocketWorker } from "../websocket/worker_client";
 import { WorkerMessageType, type ConnectedMessage, type WorkerMessage } from "../websocket/message";
+import { process_external_compat } from "../event_bus";
 
 export function vibrate() {
   if (navigator.vibrate) {
@@ -33,14 +34,14 @@ export function init_debug() {
     console.log("running in development server");
 
     console.log("activating development listeners");
-    window.addEventListener("error", e => {
+    /*window.addEventListener("error", e => {
       //alert("error:" + e.message + e.filename + e.lineno);
       console.error("error:" + e.message + e.filename + e.lineno);
     });
     window.addEventListener("unhandledrejection", e => {
       //alert("promise error:" + e.reason);
       console.error("promise error:" + e.reason);
-    });
+    });*/
 
     // add debug connection toggles
     document.querySelectorAll<HTMLDivElement>(".menu-connected-label").forEach(menu_connected_label => {
@@ -127,7 +128,8 @@ export const init_with_worker = async (): Promise<[Worker, ConnectedMessage]> =>
     console.log("worker message in main thread", msg);
     switch (msg.type) {
       case WorkerMessageType.MidiFrontendInput:
-        process_external(msg.data);
+        // process data here that was sent through the websocket
+        process_external_compat(msg.data);
         break;
       /*case WorkerMessageType.Disconnected:
         app_elem.classList.add("disconnected");

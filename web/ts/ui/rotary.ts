@@ -1,14 +1,16 @@
 import type { RotarySliderProperties } from "../../bindings/Widget";
-import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus";
+import { process_internal } from "../event_bus";
 import { CCEvent } from "../events";
 import type { WidgetState } from "./overlay";
 import "./css/rotary.css";
 import { vibrate } from "../common/utils";
+import { registerCCWidget, unregisterCCWidget } from "../event_bus/event_bus_client";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
 
 export interface RotaryState extends WidgetState {
+    id: string | null
     value: number
     lastX: number
     active: boolean
@@ -38,7 +40,10 @@ export const UnloadRotaryScript = (id: string, s: RotarySliderProperties, o: HTM
     o.removeEventListener("pointermove", state.handlers.pointermove);
     o.removeEventListener("pointerup", state.handlers.pointerup);
     o.removeEventListener("pointercancel", state.handlers.pointercancel);
-    unregister_cc_widget(id, s.channel, s.cc);
+    //unregister_cc_widget(id, s.channel, s.cc);
+    unregisterCCWidget(state.id!, s.channel, s.cc).then(() => {
+        state.id = null
+    })
 }
 
 export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
@@ -110,7 +115,8 @@ export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivEl
         }
     }
 
-    register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
+    //register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
+    registerCCWidget(s.channel, s.cc, s.default_value ?? 0, update_value)
     
     state.handlers.pointerdown = touch_start;
     state.handlers.pointermove = touch_move;

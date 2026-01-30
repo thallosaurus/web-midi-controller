@@ -1,7 +1,8 @@
 import { CCEvent, MidiEvent, NoteEvent } from "./events.ts";
-import { send } from "./websocket/websocket.ts";
 import { sendFrontendMidiEvent } from "./websocket/message.ts";
 import { FrontendSocketEvent } from "./websocket/worker_client.ts";
+import { ebWorker } from "./event_bus/event_bus_client.ts";
+import { sendUpdateCCValue, sendUpdateNoteValue } from "./event_bus/event_bus_client.ts";
 
 type CCWidget = Map<string, CCCallback>;//Array<CCCallback>;
 type CCChannel = Map<number, CCWidget>;
@@ -17,6 +18,9 @@ export abstract class EventBusReceiver {
     
 }
 
+/**
+ * @deprecated
+ */
 const init_backend_maps = () => {
     for (let ch = 0; ch < 16; ch++) {
         const cc_channel = new Map<number, Map<string, CCCallback>>();//Array<CCCallback>>();
@@ -30,6 +34,14 @@ const init_backend_maps = () => {
 }
 
 // Register a CC Widget on the bus
+/**
+ * @deprecated
+ * @param id
+ * @param init 
+ * @param channel 
+ * @param cc 
+ * @param cb 
+ */
 export const register_cc_widget = (id: string, init: number, channel: number, cc: number, cb: CCCallback) => {
     const channel_map = cc_map.get(channel)!;
     if (!channel_map.has(cc)) {
@@ -44,6 +56,13 @@ export const register_cc_widget = (id: string, init: number, channel: number, cc
     cb(init);
 };
 
+/**
+ * @deprecated
+ * @param id 
+ * @param channel 
+ * @param cc 
+ * @returns 
+ */
 export const unregister_cc_widget = (id: string, channel: number, cc: number) => {
     const ccch = cc_map.get(channel)!;
     
@@ -57,6 +76,13 @@ export const unregister_cc_widget = (id: string, channel: number, cc: number) =>
 }
 
 // Update all widgets that are bound to the cc number
+/**
+ * @deprecated
+ * @param channel 
+ * @param cc 
+ * @param value 
+ * @returns 
+ */
 export const cc_update_on_bus = (channel: number, cc: number, value: number) => {
     const ch = cc_map.get(channel)!;
 
@@ -71,6 +97,13 @@ export const cc_update_on_bus = (channel: number, cc: number, value: number) => 
 };
 
 // Register a midi widget on the bus
+/**
+ * @deprecated
+ * @param id 
+ * @param channel 
+ * @param note 
+ * @param cb 
+ */
 export const register_midi_widget = (id: string, channel: number, note: number, cb: NoteCallback) => {
     const ch = note_map.get(channel)!;
     //debugger;
@@ -97,6 +130,13 @@ export const unregister_midi_widget = (id: string, channel: number, note: number
 }
 
 // Update all widgets bound to the midi number
+/**
+ * @deprecated
+ * @param channel 
+ * @param note 
+ * @param velocity 
+ * @returns 
+ */
 export const midi_update_on_bus = (channel: number, note: number, velocity: number) => {
     const ch = note_map.get(channel)!;
 
@@ -115,7 +155,11 @@ export const midi_update_on_bus = (channel: number, note: number, velocity: numb
 };
 
 /// Gets called, when the websocket client gets a message from another peer
-export const process_external = (data: MidiEvent) => {
+/**
+ * @deprecated
+ * @param data 
+ */
+export const process_external_compat = (data: MidiEvent) => {
     //bus.dispatchEvent(ev);
     //const data = JSON.parse(msg);
     console.log(data);
@@ -147,14 +191,40 @@ export const process_external = (data: MidiEvent) => {
 
 /// Should be called when an widget gets modified to update the state
 // and send it to the server which broadcasts it around
+/**
+ * @deprecated
+ * @param ev 
+ * @returns 
+ */
 export const process_internal = (ev: MidiEvent) => {
 
     //send(JSON.stringify(ev));
-    FrontendSocketEvent(ev);
-    bus.dispatchEvent(ev);
+    if (import.meta.env.VITE_USE_WORKER_EVENT_BUS) {
+        console.log("worker event bus stub")
+            //sendFrontendMidiEvent(ebWorker!, ev);
+            if (ev.event_name == "ccupdate") {
+                const cc_ev = ev as CCEvent;
+                sendUpdateCCValue(ebWorker!, cc_ev.midi_channel, cc_ev.cc, cc_ev.value);
+                return
+            } else if (ev.event_name == "noteupdate") {
+                const note_ev = ev as NoteEvent;
+                sendUpdateNoteValue(ebWorker!, note_ev.midi_channel, note_ev.note, note_ev.velocity, note_ev.on)
+                return;
+            }
+    } else {
+        FrontendSocketEvent(ev);
+        bus.dispatchEvent(ev);
+    }
 };
 
+/**
+ * @deprecated
+ */
 export const bus = new EventTarget();
+
+/**
+ * @deprecated
+ */
 export const init_event_bus = () => {
     init_backend_maps();
 

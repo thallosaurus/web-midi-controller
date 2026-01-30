@@ -1,17 +1,9 @@
 import { vibrate } from "../common/utils.ts";
 import "./css/button.css";
-import {
-    process_internal,
-//    register_cc_widget,
-    register_midi_widget,
-//    unregister_cc_widget,
-//    unregister_midi_widget,
-} from "../event_bus.ts";
-import { CCEvent, NoteEvent } from "../events.ts";
 import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
 import type { WidgetState } from "./overlay.ts";
 
-import { registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget } from '../event_bus/event_bus_client.ts';
+import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, ebWorker } from '../event_bus/event_bus_client.ts';
 
 export interface ButtonState extends WidgetState {
     id: string | null
@@ -84,10 +76,13 @@ export const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, s
 
     // Update State on the Bus
     const update_bus_value = (v: number) => {
-        process_internal(new CCEvent(options.channel, v, options.cc));
+        //process_internal(new CCEvent(options.channel, v, options.cc));
         
-        // also update ui directly
-        update_value(v);
+        
+        if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
+            // also update ui directly
+            update_value(v);
+        }
     };
 
     // called, when the touch begins
@@ -199,12 +194,17 @@ export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElemen
     };
 
     const update_bus_value = (v: number) => {
-        process_internal(
+        /*process_internal(
             new NoteEvent(options.channel, options.note, v > 0, v),
-        );
+        );*/
+
+        sendUpdateNoteValue(ebWorker, options.channel, options.note, v, v > 0);
 
         // also update ui directly
-        update_value(v);
+        if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
+            console.warn("self updating note button")
+            update_value(v);
+        }
     };
 
     const touch_update = () => {
