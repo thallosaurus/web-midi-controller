@@ -16,38 +16,75 @@
 </head>
 
 <body>
-  <div id="app">
+  <div id="app" class="disconnected">
     <header>
       <div class="title">
-        <button type="button" data-dialog-trigger="overlay_menu">
+        <button type="button" data-dialog-trigger="menu">
           <img src="/menu.svg">
         </button>
-        <span class="name">MIDI Control v%VITE_VERSION%</span>
+        <span class="name">MIDI Control <span id="app_version">
+            v%VITE_VERSION%
+          </span>
+        </span>
       </div>
+      <div id="overlay_name" data-role="overlay_name">no overlay loaded</div>
       <div id="menu_container">
-        <!-- <button>Menu</button> -->
+        <span class="menu-connected-label">connected</span>
+        <span class="menu-disconnected-label">disconnected</span>
+        <button style="display: none" type="button" data-dialog-trigger="menu">Menu</button>
       </div>
 
     </header>
-    <main id="overlays"></main>
-    <footer>
-      <h2>Connection Status: <span id="connection_status">connecting...</span></h2>
+    <main id="overlays" class="online"></main>
+    <main id="overlays_fallback" class="online">
+      <span>No overlay loaded</span>
+    </main>
+    <main id="disconnect-fallback" class="disconnect-fallback">
+      <div class="container">
+        
+        <div class="connect_local">
+          
+          <h1>Connect</h1>
+          <p>Connect with your Computer and control your musical soft- and hardware.</p>
+          <button id="connect_button" type="button" class="primary">Connect</button>
+        </div>
+        
+        <button type="button" data-dialog-trigger="advanced_connect">More options...</button>
+      </div>
+    </main>
+    <footer class="iphone-only online">
+      <div id="overlay_name_footer" data-role="overlay_name">no overlay loaded</div>
     </footer>
   </div>
-  <dialog id="overlay_menu">
-    <main>
-
-      <h1>Select overlay</h1>
-      <ul id="overlay_selector">
-
-      </ul>
-      <button class="shown" id="close" data-dialog-close="overlay_menu">
-        Close
-      </button>
-
-    </main>
+    <dialog id="menu">
+      <main>
+        <div class="menu-container">
+          <ul class="submenu">
+            <li>
+              <h2>Overlays</h2>
+              <ul id="overlay_selector"></ul>
+            </li>
+          </ul>
+        </div>
+        
+      </main>
+        <div class="iphone-only">
+          
+          <span class="menu-connected-label">connected</span>
+          <span class="menu-disconnected-label">disconnected</span>
+        </div>
+        <button class="shown" id="close" data-dialog-close="menu">
+          Close
+        </button>
+        
+        
+    </dialog>
+  <dialog id="advanced_connect">
+    <h1>Advanced</h1>
+    <button data-dialog-close="advanced_connect">Close</button>
   </dialog>
-  <dialog id="menu">
+  <dialog id="some_menu">
+    <!-- "Reset all" Button -->
     <header>
       <h1>hello</h1>
     </header>
@@ -55,7 +92,7 @@
       <h1>main</h1>
     </main>
     <footer>
-      <button data-role="close" data-target="menu">Close</button>
+      <button data-dialog-close="some_menu">Close</button>
     </footer>
   </dialog>
   <script type="module" src="/ts/main.ts"></script>

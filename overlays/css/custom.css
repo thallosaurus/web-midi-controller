@@ -7,3 +7,13 @@
 #traktor_performance #levels {
     width: 50%;
 }
+
+#note-midi-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#note-midi-grid > * {
+    width: 100vh;
+}

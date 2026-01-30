@@ -1,20 +1,51 @@
-
-
-.overlay.hide {
-  display: none !important;
-}
-
-.tab_parent {
+#disconnect-fallback {
   display: flex;
-  justify-content: end;
+  justify-content: center;
+  align-items: center;
 }
 
-.tab_parent a {
-  display: block;
-  font-size: 1em;
-  color: black;
-  background-color: white;
-  padding: .5em .5em;
-  align-self: center;
-  font-size: 1.2em;
+#disconnect-fallback .container p {}
+
+#disconnect-fallback .container {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+#disconnect-fallback .container button.primary {
+  background-color: var(--fg);
+  color: var(--bg);
+  font-weight: bold;
+}
+
+#disconnect-fallback .container button {
+  background-color: var(--ui-layer-two);
+  color: var(--fg);
+  display: block !important;
+  border: none;
+  padding: 1em 0;
+  width: 100%;
+  font-family: monospace;
+}
+
+#disconnect-fallback .container .connect_local {
+  padding: 1em 0;
+  border-bottom: 2px solid var(--ui-layer-one);
+}
+
+#overlay_name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+footer #overlay_name_footer {
+  display: flex;
+  padding: 0 4em;
+}
+
+footer #overlay_name_footer {
+  justify-content: center;
+  align-items: center;
 }

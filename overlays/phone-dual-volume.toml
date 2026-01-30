@@ -1,0 +1,21 @@
+name = "Phone Dual Volume"
+id = "phone-dual-volume"
+
+[[cells]]
+type = "horiz-mixer"
+
+[[cells.controls]]
+type = "ccslider"
+channel = 1
+cc = 0
+default_value = 127
+mode = "snapback"
+label = "Volume 1"
+
+[[cells.controls]]
+type = "ccslider"
+channel = 1
+cc = 1
+default_value = 127
+mode = "snapback"
+label = "Volume 1"

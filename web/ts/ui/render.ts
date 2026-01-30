@@ -6,27 +6,23 @@ import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget, type Wid
 import { Rotary } from "./rotary";
 import { CCSlider } from "./slider";
 
-/*interface RenderLifecycle {
-    load(): void;
-    unload(): void;
-}*/
-
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables
-export const render_overlay = (overlay: Overlay, element?: HTMLDivElement): LoadedOverlay => {
-    const e = element ?? document.createElement("div") as HTMLDivElement;
+export const render_overlay = (overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay => {
+    const e = render_options.element ?? document.createElement("div") as HTMLDivElement;
     let children: Array<LoadedWidget> = [];
     
     if (overlay.id) e.id = overlay.id;
     
     for (const ol of overlay.cells) {
-        let w = render_widget(ol, children, overlay);
+        let w = render_widget(ol, children);
         e.append(w.html);
         children.push(w);
     }
-    return new LoadedOverlay(overlay, e, children);
+    return new LoadedOverlay(render_options.id ?? -1, overlay, e, children);
 }
 
-export const render_widget = (cell: Widget, children: Array<LoadedWidget>, parentOverlay: Overlay, element?: HTMLDivElement): LoadedWidget => {
+// Creates the widget Markup
+export const render_widget = (cell: Widget, children: Array<LoadedWidget>, element?: HTMLDivElement): LoadedWidget => {
     let e = element ?? document.createElement("div") as HTMLDivElement;
     e.classList.add(cell.type, "widget");
     

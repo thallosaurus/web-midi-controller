@@ -1,34 +1,30 @@
-body, #app {
+body,
+#app {
   margin: 0;
-  color: white;
-  background-color: black;
+  color: var(--fg);
+  background-color: var(--bg);
   font-family: monospace;
   width: 100vw;
   height: 100vh;
 
   display: flex;
   flex-direction: column;
+  overflow: none;
 }
 
-#sliders {
-  display: flex;
-  flex-direction: row;
-}
-
-#buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-
-}
-
-#app > header {
+#app>header {
   grid-area: header;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-bottom: .5em solid grey;
+  background-color: var(--ui-layer-one);
+  border-bottom: .1em solid #222;
+  padding: .5em 0;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
 }
 
-#app > main {
+#app>main {
   padding: 1em 0;
   grid-area: main;
   align-self: stretch;
@@ -37,74 +33,46 @@ body, #app {
   margin: 0 1em;
 }
 
-#app > footer {
-  border-top: .5em solid grey;
+#app>footer {
+  /*border-top: .5em solid grey;*/
+  display: none;
   grid-area: footer;
 }
 
 .bar-fixed-small {
   width: 100px;
 }
+
 .bar-fixed-middle {
   width: 200px;
 }
+
 .bar-fixed-large {
   width: 300px;
 }
+
+#menu_container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: .5em;
+}
+
 #menu_container button {
-  width: 100%;
   height: 100%;
   background-color: transparent;
-  color:white;
+  color: var(--fg);
   font-family: monospace;
   font-size: 1.5em;
   border: none;
 }
 
-dialog[open] {
-  position: absolute;
-  top:0;
-  bottom:0;
-  left:0;
-  right:0;
-  background-color: rgba(0,0,0,.8);
-  color: white;
-
-/*   display: grid;
-  grid-template-areas:
-    "dialog_header"
-    "dialog_content"
-    "dialog_actions"; */
-}
-
-dialog > header {
-  grid-area: dialog_header;
-  display:inline;
-}
-
-dialog > main {
-  grid-area: dialog_content;
+/*#menu_container button {
+  width: 100%;
   height: 100%;
-  grid-row: 2 / 3;
-}
-
-dialog > footer {
-  grid-area: dialog_actions;
-  display:inline;
-}
-
-dialog > footer button {
-  
-}
-
-
-
-/*.vert-mixer.cell {
-  display: flex;
-  flex-direction: column;
-}
-.horiz-mixer.cell {
-  display: flex;
+  background-color: transparent;
+  background-color: transparent;
+  font-family: monospace;
 }*/
 
 .title {
@@ -119,56 +87,102 @@ dialog > footer button {
   color: white;
 }
 
+.title .name #app_version {
+  font-size: .5em;
+  justify-self: center;
+  vertical-align: middle;
+}
+
 .title .name {
   font-size: 2em;
   vertical-align: super;
 }
 
-dialog#overlay_menu main .cancel {
-
+#app.disconnected .online {
+  display: none;
 }
 
-dialog#overlay_menu main {
-  display: flex;
-  flex-direction: column;
+#app:not(.disconnected) .disconnect-fallback {
+  display: none !important;
 }
 
-dialog#overlay_menu {
-  position: fixed;
-  left: 0;
-  margin: 0;
-  height: 90vh
-}
-
-dialog ul#overlay_selector {
-  margin-block-start: 0;
-  margin-block-end: 0;
-  list-style-type: none;
-  padding-inline-start: 0;
-  text-align: center;
-  overflow-y:auto;
-}
-dialog#overlay_menu button.shown,
-dialog ul#overlay_selector li.shown {
-  background-color: white;
-  color: black;
-  font-weight: bold;
-}
-dialog ul#overlay_selector li {
-  list-style-type: none;
+.disconnect-fallback {
   display: block;
-  width: calc(100% - 2em);
-  padding: 1em;
 }
 
-dialog#overlay_menu button {
-  display: block;
-  width: 100%;
-  padding: 1em;
-  background-color: white;
-  color: black;
-  font-weight: bold;
-  border: none;
-  font-family: monospace;
-  margin-top: auto;
+
+.overlay-fallback {
+  display: none;
+}
+
+/* iPhone specifics */
+
+@media (min-device-width:320px) and (max-device-width:768px) {
+
+  #app>header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #app>header>#menu_controller {
+    display: none !important;
+  }
+
+  /*#app #menu_container .menu-connected-label {
+    display: none !important;
+  }
+  #app #menu_container .menu-disconnected-label {
+    display: none !important;
+  }*/
+  #menu_container>span {
+    display: none !important;
+  }
+  .iphone-only {
+    display: unset !important;
+  }
+  #overlay_name {
+    display: none !important;
+  }
+
+  #disconnect-fallback .container {
+    width: 100% !important;
+  }
+
+  dialog#menu {
+    width: 100vw;
+  }
+}
+
+.iphone-only {
+  display: none;
+}
+
+#app #menu_container>.menu-connected-label {
+  display: inline;
+}
+
+#app.disconnected #menu_container>.menu-connected-label {
+  display: none;
+}
+
+#app #menu_container>.menu-disconnected-label {
+  display: none;
+}
+
+#app.disconnected #menu_container>.menu-disconnected-label {
+  display: inline;
+}
+
+#menu_container>span {
+  padding: 0 1em;
+}
+
+.menu-disconnected-label {
+  display: none;
+  color: var(--error);
+}
+
+.menu-connected-label {
+  display: inline;
+  color: greenyellow;
 }

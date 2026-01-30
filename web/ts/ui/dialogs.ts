@@ -1,6 +1,8 @@
-import "./ui/css/dialogs.css";
+import { initWebsocketWorkerWithOverlaySelection } from "../utils";
+import "./css/dialogs.css";
 
 export const close_dialog = (id: string) => {
+  console.log(id);
   const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
   console.log(dialog);
   dialog.close("close");
@@ -31,10 +33,10 @@ export const init_dialogs = () => {
     })
   })
 
-    /*document.querySelector<HTMLButtonElement>(
-        "dialog footer button[data-role='close']",
-    )!.addEventListener("click", (_ev: MouseEvent) => {
-        const target = (_ev.target! as HTMLButtonElement).dataset.target;
-        close_dialog(target!);
-    });*/
+  const connect_button = document.querySelector<HTMLDivElement>("#disconnect-fallback .container button.primary")!
+      connect_button.addEventListener("click", (e) => {
+        initWebsocketWorkerWithOverlaySelection().then(() => {
+          console.log("reconnect successful", e);
+        });
+      });
 }

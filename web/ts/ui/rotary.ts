@@ -3,6 +3,7 @@ import { process_internal, register_cc_widget, unregister_cc_widget } from "../e
 import { CCEvent } from "../events";
 import type { WidgetState } from "./overlay";
 import "./css/rotary.css";
+import { vibrate } from "../utils";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
@@ -20,8 +21,12 @@ export const Rotary = (container: HTMLDivElement, _options: RotarySliderProperti
     const dial = document.createElement("div");
     dial.classList.add("dial");
 
+    const label = document.createElement("div");
+    label.classList.add("label")
+
     widget.appendChild(dial);
     container.appendChild(widget);
+    container.appendChild(label);
     return container;
 }
 
@@ -48,11 +53,13 @@ export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivEl
     let active = false;*/
 
     const dial = o.querySelector<HTMLDivElement>(".rotary .widget .dial")!;
+    const label = o.querySelector<HTMLDivElement>(".label")!;
     //console.log(dial);
 
     const set_element_properties = () => {
         const angle = MIN_ANGLE + (state.value/127) * (MAX_ANGLE - MIN_ANGLE);
         dial.style.setProperty("--rotation", String(angle)+"deg");
+        label.innerText = s.label ?? ("CC" + s.cc + ":\n" + state.value)
     }
 
     const update_value = (e: number) => {
@@ -73,6 +80,7 @@ export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivEl
         //debugger;
         //console.log(el);
         el.setPointerCapture(e.pointerId);
+        vibrate();
         //lastX = e.clientY;
         state.lastX = e.clientX;
         state.active = true;

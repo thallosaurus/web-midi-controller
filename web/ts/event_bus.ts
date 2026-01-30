@@ -1,5 +1,7 @@
 import { CCEvent, MidiEvent, NoteEvent } from "./events.ts";
-import { send } from "./websocket.ts";
+import { send } from "./websocket/websocket.ts";
+import { sendFrontendMidiEvent } from "./websocket/message.ts";
+import { FrontendSocketEvent } from "./websocket/worker_client.ts";
 
 type CCWidget = Map<string, CCCallback>;//Array<CCCallback>;
 type CCChannel = Map<number, CCWidget>;
@@ -10,6 +12,10 @@ type NoteCallback = (value: number) => void;
 
 const cc_map = new Map<number, CCChannel>();
 const note_map = new Map<number, NoteChannel>();
+
+export abstract class EventBusReceiver {
+    
+}
 
 const init_backend_maps = () => {
     for (let ch = 0; ch < 16; ch++) {
@@ -109,10 +115,10 @@ export const midi_update_on_bus = (channel: number, note: number, velocity: numb
 };
 
 /// Gets called, when the websocket client gets a message from another peer
-export const process_external = (msg: string) => {
+export const process_external = (data: MidiEvent) => {
     //bus.dispatchEvent(ev);
-    const data = JSON.parse(msg);
-    //console.log(data);
+    //const data = JSON.parse(msg);
+    console.log(data);
     switch (data.event_name) {
         case "ccupdate":
             {
@@ -142,8 +148,9 @@ export const process_external = (msg: string) => {
 /// Should be called when an widget gets modified to update the state
 // and send it to the server which broadcasts it around
 export const process_internal = (ev: MidiEvent) => {
-    //update_on_bus(cc, value)
-    send(JSON.stringify(ev));
+
+    //send(JSON.stringify(ev));
+    FrontendSocketEvent(ev);
     bus.dispatchEvent(ev);
 };
 

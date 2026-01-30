@@ -1,4 +1,119 @@
-[data-dialog-trigger] > * {
+[data-dialog-trigger]>* {
   touch-action: none;
   pointer-events: none;
+}
+
+dialog[open] {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--ui-layer-one);
+  color: white;
+
+  /*   display: grid;
+  grid-template-areas:
+  "dialog_header"
+  "dialog_content"
+  "dialog_actions"; */
+}
+
+dialog>header {
+  grid-area: dialog_header;
+  display: inline;
+}
+
+dialog>main {
+  grid-area: dialog_content;
+  height: 100%;
+  grid-row: 2 / 3;
+}
+
+dialog>footer {
+  grid-area: dialog_actions;
+  display: inline;
+}
+
+dialog>footer button {}
+
+
+dialog#menu main .cancel {}
+
+dialog#menu main {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog#menu {
+  position: fixed;
+  left: 0;
+  margin: 0;
+  height: calc(100% - 4em);
+  border: 0;
+}
+
+dialog ul#overlay_selector:empty::after {
+  content: "no overlays available"
+}
+
+dialog ul#overlay_selector {
+  margin-block-start: 0;
+  margin-block-end: 0;
+  list-style-type: none;
+  padding-inline-start: 0;
+  text-align: center;
+  overflow-y: auto;
+}
+
+dialog#menu button.shown,
+dialog ul#overlay_selector li.shown {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+}
+
+dialog ul#overlay_selector li {
+  list-style-type: none;
+  display: block;
+  width: calc(100% - 2em);
+  padding: 1em;
+}
+
+dialog#menu button {
+  display: block;
+  width: 100%;
+  padding: 1em;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  border: none;
+  font-family: monospace;
+  margin-top: auto;
+}
+
+dialog .menu-container {
+  width: 100%;
+  height: 100%;
+  color: var(--fg);
+  background-color: var(--ui-layer-one);
+}
+
+.menu-container .submenu {
+  list-style-type: none;
+  margin-block-start: 0;
+  padding-inline-start: 0;
+}
+
+.menu-container .submenu li {}
+
+.menu-container .submenu li h2 {
+  padding: 0 .5em;
+}
+
+.menu-container .submenu ul {
+  list-style-type: none;
+  margin-block-start: 0;
+  background-color: var(--ui-layer-two);
+  padding: 1em 0;
 }

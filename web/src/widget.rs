@@ -160,7 +160,7 @@ pub(super) struct CCSliderProperties {
     label: Option<String>,
 
     mode: SliderMode,
-    //default_value: Option<u8>,
+
     vertical: Option<bool>,
 
 }

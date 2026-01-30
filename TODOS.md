@@ -4,3 +4,9 @@ todo widgets:
 - XY Pad
 - Shift Area/Button
 - step sequencer
+- Ableton User Mapping
+- Shift
+- Prettier Rust Logging with tracing (we already got that)
+
+laters:
+- Haptic Touch via WebKit App
