@@ -6,18 +6,18 @@ import { init_dialogs } from './ui/dialogs.ts'
 import { init_debug, initWebsocketWorkerWithOverlaySelection } from "./utils.ts";
 
 const init_ui = () => {
-  if (import.meta.env.DEV) {
-    console.log("running in development server");
-  }
-
+  console.log("init ui")
   init_debug();
+  console.log("init event bus")
   init_event_bus();
+  console.log("init dialogs")
   init_dialogs();
 };
 
 self.addEventListener("DOMContentLoaded", () => {
   try {
     init_ui();
+    console.log("finished ui init")
     initWebsocketWorkerWithOverlaySelection();
   } catch (e) {
     alert(e);

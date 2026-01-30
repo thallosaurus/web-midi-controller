@@ -43,6 +43,14 @@ export function clear_loaded_overlays() {
     current_overlay_id = -1
 }
 
+function set_overlay_label_html(label: string) {
+    document.querySelectorAll<HTMLDivElement>(
+        "[data-role='overlay_name']",
+    )!.forEach(e => {
+        e.innerText = label;
+    });
+}
+
 /**
  * Shows a loaded overlay on the screen. Gets called by the EventEmitter
  * @param id 
@@ -76,10 +84,9 @@ function unload_overlay(id: number) {
             console.log(o);
             overlays_parent.removeChild(o.html);
 
-            const overlay_name = document.querySelector<HTMLDivElement>(
-                "#overlay_name",
-            )!;
-            overlay_name.innerText = "no overlay loaded";
+            set_overlay_label_html(
+                "no overlay loaded"
+            );
 
             //const unpress_overlays = () => {
             for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']")!) {
@@ -121,8 +128,7 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
     if (new_overlay) {
         load_overlay(new_overlay);
         current_overlay_id = e.id;
-        const o_name_elem = document.querySelector<HTMLDivElement>("#overlay_name")!;
-        o_name_elem.innerText = new_overlay.overlay.name;
+        set_overlay_label_html(new_overlay.overlay.name);
 
         for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch'][data-overlay-index='" + e.id + "']")!) {
             r.classList.add("shown");

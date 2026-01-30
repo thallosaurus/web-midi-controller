@@ -14,8 +14,13 @@ export default defineConfig({
   })],
   target: ["es5", "chrome81"],
   build: {
-    minify: true,
+    modulePreload: false,
+    minify: false,
     rollupOptions: {
+      input: {
+        main: "index.html",
+        worker: "ts/websocket/main.ts"
+      },
       output: {
         entryFileNames: `assets/[name].js`,
         chunkFileNames: `assets/[name].js`,

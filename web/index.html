@@ -23,15 +23,15 @@
           <img src="/menu.svg">
         </button>
         <span class="name">MIDI Control <span id="app_version">
-          v%VITE_VERSION%
+            v%VITE_VERSION%
+          </span>
         </span>
-      </span>
       </div>
-      <div id="overlay_name">no overlay loaded</div>
+      <div id="overlay_name" data-role="overlay_name">no overlay loaded</div>
       <div id="menu_container">
         <span class="menu-connected-label">connected</span>
         <span class="menu-disconnected-label">disconnected</span>
-        <button type="button" data-dialog-trigger="menu">Menu</button>
+        <button style="display: none" type="button" data-dialog-trigger="menu">Menu</button>
       </div>
 
     </header>
@@ -45,7 +45,9 @@
         <button type="button" class="primary">Connect</button>
       </div>
     </main>
-    <footer></footer>
+    <footer class="iphone-only">
+      <div id="overlay_name_footer" data-role="overlay_name">no overlay loaded</div>
+    </footer>
   </div>
   <dialog id="overlay_menu">
     <main>

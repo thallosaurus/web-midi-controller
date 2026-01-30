@@ -1,7 +1,7 @@
 import { CCEvent, MidiEvent, NoteEvent } from "./events.ts";
 import { send } from "./websocket/websocket.ts";
 import { sendFrontendMidiEvent } from "./websocket/message.ts";
-import { FrontendSocketEvent } from "./websocket/main.ts";
+import { FrontendSocketEvent } from "./websocket/worker_client.ts";
 
 type CCWidget = Map<string, CCCallback>;//Array<CCCallback>;
 type CCChannel = Map<number, CCWidget>;
