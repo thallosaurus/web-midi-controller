@@ -1,5 +1,5 @@
 import { uuid } from "../common/utils";
-import { EventBusProducerMessage, EventBusProducerMessageType, sendRegisterCCWidget, sendRegisterNoteWidget, sendUnregisterCCWidget } from "./message";
+import { EventBusProducerMessage, EventBusProducerMessageType, sendInitBus, sendRegisterCCWidget, sendRegisterNoteWidget, sendUnregisterCCWidget, sendUnregisterNoteWidget } from "./message";
 
 type EventBusCallback = (value: number) => void;
 
@@ -12,25 +12,44 @@ export function initEventBusWorker() {
     ebWorker = new Worker(new URL("./main.js", import.meta.url), { type: "module" });
     ebWorker.addEventListener("message", (ev) => {
         const msg: EventBusProducerMessage = JSON.parse(ev.data);
-        console.log(msg);
         switch (msg.type) {
             case EventBusProducerMessageType.CCUpdate:
                 {
+                    console.log("cc update", msg);
                     const cb = callbacks.get(msg.id)!;
                     cb(msg.value)
                 }
                 break;
-            case EventBusProducerMessageType.NoteUpdate:
-                {
+                case EventBusProducerMessageType.NoteUpdate:
+                    {
+                    console.log("note update", msg);
                     const cb = callbacks.get(msg.id)!;
                     cb(msg.value);
                 }
                 break;
         }
     })
+
+    const p = new Promise<void>((res, rej) => {
+
+        const fn = (ev: any) => {
+            const msg: EventBusProducerMessage = JSON.parse(ev.data);
+            switch (ev.type) {
+                case EventBusProducerMessageType.EventBusInitCallback:
+                    ebWorker?.removeEventListener("message", fn);
+                    res();
+                    break;
+            }
+        }
+        ebWorker?.addEventListener("message", fn);
+    });
+
+    sendInitBus(ebWorker!);
+
+    return p;
 }
 
-function registerCCWidget(channel: number, cc: number, init: number, cb: EventBusCallback): Promise<string> {
+export function registerCCWidget(channel: number, cc: number, init: number, cb: EventBusCallback): Promise<string> {
     if (!ebWorker) throw new Error("no event bus running");
     const id = uuid();
 
@@ -47,7 +66,8 @@ function registerCCWidget(channel: number, cc: number, init: number, cb: EventBu
         sendRegisterCCWidget(ebWorker!, id, channel, cc, init)
     });
 }
-function unregisterCCWidget(id: string, channel: number, cc: number): Promise<void> {
+
+export function unregisterCCWidget(id: string, channel: number, cc: number): Promise<void> {
     if (!ebWorker) throw new Error("no event bus running");
 
     return new Promise((res, rej) => {
@@ -64,7 +84,7 @@ function unregisterCCWidget(id: string, channel: number, cc: number): Promise<vo
     });
 }
 
-function registerNoteWidget(channel: number, note: number, cb: EventBusCallback): Promise<string> {
+export function registerNoteWidget(channel: number, note: number, cb: EventBusCallback): Promise<string> {
     if (!ebWorker) throw new Error("no event bus running");
     const id = uuid();
 
@@ -82,7 +102,7 @@ function registerNoteWidget(channel: number, note: number, cb: EventBusCallback)
     });
 }
 
-function unregisterNoteWidget(id: string, channel: number, note: number): Promise<void> {
+export function unregisterNoteWidget(id: string, channel: number, note: number): Promise<void> {
     if (!ebWorker) throw new Error("no event bus running");
 
     return new Promise((res, rej) => {
@@ -95,6 +115,7 @@ function unregisterNoteWidget(id: string, channel: number, note: number): Promis
             }
         }
         ebWorker?.addEventListener("message", fn)
-        //sendUnregisterNoteWidget(ebWorker!, id, channel, cc)
+        sendUnregisterNoteWidget(ebWorker!, id, channel, note)
     });
 }
+

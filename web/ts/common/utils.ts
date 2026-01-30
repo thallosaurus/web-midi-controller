@@ -34,10 +34,12 @@ export function init_debug() {
 
     console.log("activating development listeners");
     window.addEventListener("error", e => {
-      alert("error:" + e.message + e.filename + e.lineno);
+      //alert("error:" + e.message + e.filename + e.lineno);
+      console.error("error:" + e.message + e.filename + e.lineno);
     });
     window.addEventListener("unhandledrejection", e => {
-      alert("promise error:" + e.reason);
+      //alert("promise error:" + e.reason);
+      console.error("promise error:" + e.reason);
     });
 
     // add debug connection toggles

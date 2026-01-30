@@ -80,7 +80,7 @@ export async function disconnect(): Promise<CloseEvent> {
 
 export function send(update: string) {
     if (ws && ws.readyState == WebSocket.OPEN) {
-        console.debug("worker > server", update);
+        //console.debug("worker > server", update);
         ws.send(update);
     } else {
         // put in queue?

@@ -187,7 +187,7 @@ export class LoadedOverlay {
                     UnloadRotaryScript(o.id, o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
-                    UnloadCCButtonScript(o.id, o.option, o.html, o.state as ButtonState);
+                    UnloadCCButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
                     UnloadCCSliderScript(o.id, o.option, o.html, o.state as CCSliderState);
@@ -211,13 +211,13 @@ export class LoadedOverlay {
                     RotaryScript(o.id, o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
-                    CCButtonScript(o.id, o.option, o.html, o.state as ButtonState);
+                    CCButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
                     CCSliderScript(o.id, o.option, o.html, o.state as CCSliderState);
                     break;
                 case "notebutton":
-                    NoteButtonScript(o.id, o.option, o.html, o.state as ButtonState);
+                    NoteButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "jogwheel":
                     JogwheelScript(o.id, o.option, o.html, o.state as JogState);

@@ -1,5 +1,6 @@
-import { EventBusConsumerMessage, EventBusConsumerMessageType, EventBusProducerMessage, sendInitCCWidget, sendInitNoteWidget, sendUnregisterCCCallback, sendUnregisterNoteCallback, sendUpdateCCWidget, sendUpdateNoteWidget } from "./message";
+import { EventBusConsumerMessage, EventBusConsumerMessageType, EventBusProducerMessage, sendEventBusInitCallback, sendInitCCWidget, sendInitNoteWidget, sendUnregisterCCCallback, sendUnregisterNoteCallback, sendUpdateCCWidget, sendUpdateNoteWidget } from "./message";
 
+let started = false;
 type WidgetId = string;
 type CCWidget = WidgetId[];//Array<CCCallback>;
 type CCChannel = Map<number, CCWidget>;
@@ -10,23 +11,51 @@ type NoteWidget = WidgetId[];//Array<NoteCallback>;
 type NoteChannel = Map<number, NoteWidget>;
 const note_map = new Map<number, NoteChannel>();
 
-onmessage = (m) => {
-    const parsed: EventBusConsumerMessage = JSON.parse(m.data);
-    console.log("event bus message", parsed)
 
-    process_consumer_message(parsed)
+
+// Messages for the event bus
+onmessage = (m) => {
+    //console.log("event bus message", m.data)
+    const msg: EventBusConsumerMessage = m.data;
+    switch (msg.type) {
+        case EventBusConsumerMessageType.InitBus:
+            try {
+
+                initBus(msg.midi_channels)
+                sendEventBusInitCallback();
+            } catch (e) {
+                console.error("error while initint event bus", e)
+            }
+            break;
+
+        default:
+            if (!started) throw new Error("event bus is not started")
+            process_consumer_message(m.data)
+            break
+    }
 }
 
+function initBus(channel_count: number) {
+    if (started) throw new Error("event bus is already started");
 
+    for (let ch = 0; ch < channel_count; ch++) {
+        const cc_channel = new Map<number, [WidgetId]>();//Array<CCCallback>>();
+        cc_map.set(ch + 1, cc_channel);   //index + 1 for convenience
+    }
 
-/*function process_producer_message(msg: EventBusProducerMessage) {
-    
-}*/
+    for (let ch = 0; ch < channel_count; ch++) {
+        const note_channel = new Map<number, [WidgetId]>();//Array<NoteCallback>>();
+        note_map.set(ch + 1, note_channel);   //index + 1 for convenience
+    }
+
+    started = true;
+}
 
 function process_consumer_message(msg: EventBusConsumerMessage) {
+    console.log("event bus consumer", "processing consumer message", msg);
     switch (msg.type) {
         case EventBusConsumerMessageType.RegisterCCWidget:
-            return register_cc_widget(msg.id, msg.init_value ?? 0, msg.channel, msg.cc)
+            return register_cc_widget(msg.id, msg.value ?? 0, msg.channel, msg.cc)
         case EventBusConsumerMessageType.UnregisterCCWidget:
             return unregister_cc_widget(msg.id, msg.channel, msg.cc);
         case EventBusConsumerMessageType.RegisterNoteWidget:
@@ -69,7 +98,7 @@ export const unregister_cc_widget = (id: string, channel: number, cc: number) =>
     const index = ccmap.findIndex((v, i) => {
         return v == id
     })
-    
+
     // send unregister message
     sendUnregisterCCCallback(id)
 
@@ -98,7 +127,6 @@ export const cc_update_on_bus = (channel: number, cc: number, value: number) => 
 // Register a midi widget on the bus
 export const register_note_widget = (id: string, channel: number, note: number) => {
     const ch = note_map.get(channel)!;
-    //debugger;
 
     if (!ch.has(note)) {
         ch.set(note, []);
