@@ -1,6 +1,10 @@
 // MARK: - Consumer
-export function dispatchWorkerEvent(msg: EventBusProducerMessage) {
+function dispatchWorkerEvent(msg: EventBusProducerMessage) {
     self.postMessage(JSON.stringify(msg));
+}
+
+function sendEventToWorker(worker: Worker, msg: EventBusConsumerMessage) {
+    worker.postMessage(msg)
 }
 
 export enum EventBusConsumerMessageType {
@@ -13,33 +17,70 @@ export enum EventBusConsumerMessageType {
 export type EventBusConsumerMessage =
     | RegisterCCWidget
     | UnregisterCCWidget
-    //| InitCCWidget
-    //| CCUpdate
     | RegisterNoteWidget
     | UnregisterNoteWidget
-    //| NoteUpdate;
 
 interface RegisterCCWidget {
     type: EventBusConsumerMessageType.RegisterCCWidget,
     id: string,
     channel: number,
     cc: number,
-    init_value?: number
+    value?: number
+}
+
+export function sendRegisterCCWidget(worker: Worker, id: string, channel: number, cc: number, value?: number) {
+    sendEventToWorker(worker, {
+        type: EventBusConsumerMessageType.RegisterCCWidget,
+        id,
+        channel,
+        cc,
+        value
+    })
 }
 
 interface UnregisterCCWidget {
     type: EventBusConsumerMessageType.UnregisterCCWidget,
-    id: string, channel: number, cc: number
+    id: string,
+    channel: number,
+    cc: number
+}
+
+export function sendUnregisterCCWidget(worker: Worker, id: string, channel: number, cc: number) {
+    sendEventToWorker(worker, {
+        type: EventBusConsumerMessageType.RegisterCCWidget,
+        id,
+        channel,
+        cc,
+    })
 }
 
 interface RegisterNoteWidget {
     type: EventBusConsumerMessageType.RegisterNoteWidget,
-    id: string, channel: number, note: number
+    id: string,
+    channel: number, note: number
+}
+
+export function sendRegisterNoteWidget(worker: Worker, id: string, channel: number, note: number) {
+    sendEventToWorker(worker, {
+        type: EventBusConsumerMessageType.RegisterNoteWidget,
+        id,
+        channel,
+        note
+    })
 }
 
 interface UnregisterNoteWidget {
     type: EventBusConsumerMessageType.UnregisterNoteWidget,
     id: string, channel: number, note: number
+}
+
+export function sendUnregisterNoteWidget(worker: Worker, id: string, channel: number, note: number) {
+    sendEventToWorker(worker, {
+        type: EventBusConsumerMessageType.UnregisterNoteWidget,
+        id,
+        channel,
+        note
+    })
 }
 
 
@@ -54,7 +95,7 @@ export enum EventBusProducerMessageType {
     UnregisterNoteCallback = "unregister_note_callback"
 }
 
-export type EventBusProducerMessage = 
+export type EventBusProducerMessage =
     | CCUpdate
     | NoteUpdate
     | RegisterCCCallback
@@ -147,7 +188,7 @@ export function sendUpdateNoteWidget(id: string, channel: number, note: number, 
 }
 
 interface UnregisterNoteCallback {
-    type: EventBusProducerMessageType.UnregisterCCCallback
+    type: EventBusProducerMessageType.UnregisterNoteCallback
     id: string
 }
 
