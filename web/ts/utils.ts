@@ -104,7 +104,7 @@ function setup_overlay_selector(ol: LoadedOverlay[]) {
   setup_tabs(ol, overlay_selector, (i) => {
     console.log("setting tab ", i)
     change_overlay(i);
-    close_dialog("overlay_menu")
+    close_dialog("menu")
   });
   //change_overlay(0);*/
 }

@@ -14,6 +14,15 @@ const init_ui = () => {
   init_event_bus();
   console.log("init dialogs")
   init_dialogs();
+
+  // fix on smart devices
+  window.oncontextmenu = function (e) {
+
+    if (e.pointerType === "touch") {
+
+      return false;
+    }
+  }
 };
 
 self.addEventListener("DOMContentLoaded", () => {

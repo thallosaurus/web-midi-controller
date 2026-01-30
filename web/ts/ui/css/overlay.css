@@ -4,9 +4,7 @@
   align-items: center;
 }
 
-#disconnect-fallback .container p {
-
-}
+#disconnect-fallback .container p {}
 
 #disconnect-fallback .container {
   width: 50%;
@@ -14,12 +12,15 @@
   flex-direction: column;
   gap: 1em;
 }
+
 #disconnect-fallback .container button.primary {
   background-color: var(--fg);
   color: var(--bg);
+  font-weight: bold;
 }
+
 #disconnect-fallback .container button {
-  background-color: var(--ui-layer-two);;
+  background-color: var(--ui-layer-two);
   color: var(--fg);
   display: block !important;
   border: none;

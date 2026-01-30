@@ -1,62 +1,65 @@
-name = "Traktor TOML"
+name = "One-device Traktor 2.0"
 id = "traktor_performance"
 
 [[cells]]
+type = "vert-mixer"
+
+[[cells.controls]]
 type = "grid-mixer"
 id = "deck_a"
 w = 4
-h = 8
+h = 2
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 16
 label = "1/4 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 15
 label = "1/2 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 14
 label = "1 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 13
 label = "2 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 12
 label = "4 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 11
 label = "8 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 10
 label = "16 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 9
@@ -64,37 +67,43 @@ label = "32 Loop"
 mode = "trigger"
 
 [[cells.controls]]
-type = "notebutton"
+type = "horiz-mixer"
+
+[[cells.controls.controls]]
+type = "rotary"
 channel = 1
-note = 17
-label = "Kill Bass"
-mode = "trigger"
+default_value = 64
+cc = 17
+label = "Bass"
+mode = "snapback"
 
-[[cells.controls]]
-type = "notebutton"
+[[cells.controls.controls]]
+type = "rotary"
 channel = 1
-note = 16
-label = "Kill Mid"
-mode = "trigger"
+cc = 16
+default_value = 64
+label = "Mid"
+mode = "snapback"
 
-[[cells.controls]]
-type = "notebutton"
+[[cells.controls.controls]]
+type = "rotary"
 channel = 1
-note = 15
-label = "Kill Hi"
-mode = "trigger"
+cc = 15
+default_value = 64
+label = "Hi"
+mode = "snapback"
 
 [[cells.controls]]
-type = "empty"
+type = "horiz-mixer"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 1
 label = "Play/Pause"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.controls.controls]]
 type = "notebutton"
 channel = 1
 note = 2
