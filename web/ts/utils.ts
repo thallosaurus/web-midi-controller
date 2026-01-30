@@ -139,8 +139,15 @@ export const init_with_worker = async (): Promise<[Worker, ConnectedMessage]> =>
 }
 
 const clear_overlay_selector = () => {
-  const overlay_selector = document.querySelector<HTMLDivElement>(
-    "#overlay_selector",
+  const overlay_selector = document.querySelector<HTMLUListElement>(
+    "ul#overlay_selector",
   )!;
-  overlay_selector.innerHTML = "";
+
+  const childs = overlay_selector.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch']");
+
+  console.log(overlay_selector);
+
+  childs.forEach(e => {
+    overlay_selector.removeChild(e);
+  })
 }

@@ -147,6 +147,10 @@ body,
   #disconnect-fallback .container {
     width: 100% !important;
   }
+
+  dialog#menu {
+    width: 100vw;
+  }
 }
 
 .iphone-only {

@@ -19,7 +19,7 @@
   <div id="app" class="disconnected">
     <header>
       <div class="title">
-        <button type="button" data-dialog-trigger="overlay_menu">
+        <button type="button" data-dialog-trigger="menu">
           <img src="/menu.svg">
         </button>
         <span class="name">MIDI Control <span id="app_version">
@@ -52,18 +52,22 @@
         <button type="button" data-dialog-trigger="advanced_connect">More options...</button>
       </div>
     </main>
-    <footer class="iphone-only">
+    <footer class="iphone-only online">
       <div id="overlay_name_footer" data-role="overlay_name">no overlay loaded</div>
     </footer>
   </div>
-  <dialog id="overlay_menu">
+  <dialog id="menu">
     <main>
+      <div class="menu-container">
+        <ul class="submenu">
+          <li>
+            <h2>Overlays</h2>
+            <ul id="overlay_selector"></ul>
+          </li>
+        </ul>
+      </div>
 
-      <h1>Select overlay</h1>
-      <ul id="overlay_selector">
-
-      </ul>
-      <button class="shown" id="close" data-dialog-close="overlay_menu">
+      <button class="shown" id="close" data-dialog-close="menu">
         Close
       </button>
 
@@ -72,7 +76,7 @@
   <dialog id="advanced_connect">
     <h1>Advanced</h1>
   </dialog>
-  <dialog id="menu">
+  <dialog id="some_menu">
     <!-- "Reset all" Button -->
     <header>
       <h1>hello</h1>
@@ -81,7 +85,7 @@
       <h1>main</h1>
     </main>
     <footer>
-      <button data-dialog-close="menu">Close</button>
+      <button data-dialog-close="some_menu">Close</button>
     </footer>
   </dialog>
   <script type="module" src="/ts/main.ts"></script>

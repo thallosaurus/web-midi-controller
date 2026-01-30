@@ -9,7 +9,6 @@ import { RotaryScript, UnloadRotaryScript, type RotaryState } from "./rotary.ts"
 import { render_overlay, render_widget } from "./render.ts";
 import { uuid } from "../utils.ts";
 import { JogwheelScript, type JogState } from "./jogwheel.ts";
-import { close_dialog } from "./dialogs.ts";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
@@ -39,8 +38,8 @@ export function load_overlays_from_array(ol: Array<Overlay>): LoadedOverlay[] {
  */
 export function clear_loaded_overlays() {
     unload_overlay(current_overlay_id);
-    overlays = []
     current_overlay_id = -1
+    overlays = []
 }
 
 function set_overlay_label_html(label: string) {
