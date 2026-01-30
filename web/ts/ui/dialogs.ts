@@ -2,6 +2,7 @@ import { initWebsocketWorkerWithOverlaySelection } from "../utils";
 import "./css/dialogs.css";
 
 export const close_dialog = (id: string) => {
+  console.log(id);
   const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
   console.log(dialog);
   dialog.close("close");

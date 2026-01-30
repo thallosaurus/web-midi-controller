@@ -5,6 +5,8 @@ import "./ui/css/colors.css";
 import { init_dialogs } from './ui/dialogs.ts'
 import { init_debug, initWebsocketWorkerWithOverlaySelection } from "./utils.ts";
 
+const AUTO_CONNECT_LOCAL = false;
+
 const init_ui = () => {
   console.log("init ui")
   init_debug();
@@ -18,7 +20,7 @@ self.addEventListener("DOMContentLoaded", () => {
   try {
     init_ui();
     console.log("finished ui init")
-    initWebsocketWorkerWithOverlaySelection();
+    if (AUTO_CONNECT_LOCAL) initWebsocketWorkerWithOverlaySelection();
   } catch (e) {
     alert(e);
   }

@@ -49,7 +49,7 @@ dialog#menu {
   position: fixed;
   left: 0;
   margin: 0;
-  height: 100vh;
+  height: calc(100% - 4em);
   border: 0;
 }
 
