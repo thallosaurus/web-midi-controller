@@ -135,22 +135,6 @@ function DefaultWorkerHandler(handlers: AppWorkerHandler) {
             break;
         }
         break;
-      case WorkerMessageType.MidiExternalInput:
-
-        if (msg.data.event_name == "ccupdate") {
-          const cc_ev = msg.data as CCEvent;
-          console.log("external cc update")
-          sendUpdateCCValue(cc_ev.midi_channel, cc_ev.cc, cc_ev.value);
-          return
-        } else if (msg.data.event_name == "noteupdate" && msg) {
-          const note_ev = msg.data as NoteEvent;
-          console.log("external note update")
-
-          // got a message. we now need to send it to the eventbus so that it doesnt send it back
-          //sendUpdateNoteValue(note_ev.midi_channel, note_ev.note, note_ev.velocity, note_ev.velocity > 0, true)
-          return;
-        }
-        break;
     }
   });
 }
