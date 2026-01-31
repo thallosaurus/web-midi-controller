@@ -7,7 +7,7 @@ import { CCSlider } from "@widgets/slider";
 import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
 
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables
-export const render_overlay = (overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay => {
+export function render_overlay(overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay {
     const e = render_options.element ?? document.createElement("div") as HTMLDivElement;
     let children: Array<LoadedWidget> = [];
 
@@ -22,7 +22,7 @@ export const render_overlay = (overlay: Overlay, render_options: { element?: HTM
 }
 
 // Creates the widget Markup
-export const render_widget = (cell: Widget, children: Array<LoadedWidget>, element?: HTMLDivElement): LoadedWidget => {
+export function render_widget(cell: Widget, children: Array<LoadedWidget>, element?: HTMLDivElement): LoadedWidget {
     let e = element ?? document.createElement("div") as HTMLDivElement;
     e.classList.add(cell.type, "widget");
 

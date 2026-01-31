@@ -7,6 +7,8 @@ todo widgets:
 - Ableton User Mapping
 - Shift
 - Prettier Rust Logging with tracing (we already got that)
+- tests
 
 laters:
 - Haptic Touch via WebKit App
+- offline "daw" mode with funDSP

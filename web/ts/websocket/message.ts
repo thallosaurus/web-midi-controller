@@ -1,6 +1,37 @@
 import type { MidiEvent } from "../common/events";
 import { connect, disconnect, send, wsUri } from "./websocket";
 
+export function process_worker_input(msg: WorkerMessage) {
+        switch (msg.type) {
+        case WorkerMessageType.Connect:
+            {
+                let n = msg as ConnectSocketMessage;
+                connect(n.uri).then(s => {
+                    // connection established
+                    sendDefaultConnected();
+                    
+                }).catch(e => {
+                    // there was an error
+                    //console.error(e);
+                    sendWorkerError(e);
+                });
+            }
+            break;
+
+        case WorkerMessageType.MidiFrontendInput:
+            console.log("data for the backend", msg.data)
+            const d = JSON.stringify(msg.data)
+            send(d);
+            break;
+
+        case WorkerMessageType.Disconnect:
+            disconnect().then(e => {
+                sendDisconnected(new Error("user disconnected"));
+            });
+            break;
+    }
+}
+
 export enum WorkerMessageType {
     Connect = "connect",
     Disconnect = "disconnect",
@@ -77,37 +108,6 @@ function sendMessageInput(worker: Worker, m: WorkerMessage) {
     //console.log(m);
     const msg = JSON.stringify(m)
     worker.postMessage(msg);
-}
-
-export function process_worker_input(msg: WorkerMessage) {
-        switch (msg.type) {
-        case WorkerMessageType.Connect:
-            {
-                let n = msg as ConnectSocketMessage;
-                connect(n.uri).then(s => {
-                    // connection established
-                    sendDefaultConnected();
-                    
-                }).catch(e => {
-                    // there was an error
-                    //console.error(e);
-                    sendWorkerError(e);
-                });
-            }
-            break;
-
-        case WorkerMessageType.MidiFrontendInput:
-            console.log("data for the backend", msg.data)
-            const d = JSON.stringify(msg.data)
-            send(d);
-            break;
-
-        case WorkerMessageType.Disconnect:
-            disconnect().then(e => {
-                sendDisconnected(new Error("user disconnected"));
-            });
-            break;
-    }
 }
 
 /// MARK: - shorthands for message passing
