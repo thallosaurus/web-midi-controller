@@ -26,7 +26,7 @@ export class UiDialog {
   }
 
   static initDialogTriggers() {
-    document.querySelectorAll<HTMLElement>("[data-dialog-trigger]").forEach(el => {
+    document.querySelectorAll<HTMLElement>("[data-dialog-trigger]:not(.disabled)").forEach(el => {
       const id = el.dataset.dialogTrigger;
 
       if (!id || !this.dialogs.has(id!)) throw new Error("dialog with id " + " not found");

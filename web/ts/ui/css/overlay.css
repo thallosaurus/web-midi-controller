@@ -19,6 +19,9 @@
   font-weight: bold;
 }
 
+#disconnect-fallback .container button.disabled {
+  display: none !important;
+}
 #disconnect-fallback .container button {
   background-color: var(--ui-layer-two);
   color: var(--fg);
