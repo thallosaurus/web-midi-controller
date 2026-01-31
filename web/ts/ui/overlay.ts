@@ -5,12 +5,13 @@ import { type Overlay } from "@bindings/Overlay.ts";
 import { uuid } from "@common/utils.ts";
 
 // widget imports
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";
-import { CCSliderLifecycle, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
-import { ButtonState, CCButtonLifecycle, NoteButtonLifecycle, UnloadCCButtonScript, UnloadNoteButtonScript } from "@widgets/button.ts";
-import { JogwheelLifecycle, type JogState } from "@widgets/jogwheel";
+import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";
+//import { CCSliderLifecycle, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
+//import { ButtonState, CCButtonLifecycle, NoteButtonLifecycle } from "@widgets/button.ts";
+//import { JogwheelLifecycle, type JogState } from "@widgets/jogwheel";
 import { render_overlay, render_widget } from "./render";
-import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
+import { WidgetLifecycle, WidgetProperties, WidgetState } from "./lifecycle";
+//import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
@@ -138,70 +139,6 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
 
 });
 
-export interface WidgetState {
-    handlers: WidgetStateHandlers
-}
-
-export interface WidgetStateHandlers {
-    [key: string]: (e: PointerEvent) => void
-}
-
-// defined all allowed widgets for type definitions
-export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties;
-
-export abstract class WidgetLifecycle<O extends WidgetProperties, S extends WidgetState> {
-    // appends stuff to the widget before the widget itself
-    constructor() { }
-    abstract load(options: O, html: HTMLDivElement, state: S): void
-    abstract unload(options: O, html: HTMLDivElement, state: WidgetState): void;
-
-    // Intantiates the correct object
-    static fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> {
-        switch (o.option.type) {
-            case "rotary":
-                {
-                    const s = new RotaryLifecycle();
-                    s.load(o.option, o.html, o.state as RotaryState);
-                    return s;
-                }
-                //RotaryScript(o.option, o.html, o.state as RotaryState);
-            case "ccbutton":
-                {
-
-                    //                    CCButtonScript(o.option, o.html, o.state as ButtonState);
-                    const s = new CCButtonLifecycle();
-                    s.load(o.option, o.html, o.state as ButtonState);
-                    return s;
-                }
-
-            case "ccslider":
-                {
-                    const s = new CCSliderLifecycle();
-                    s.load(o.option, o.html, o.state as CCSliderState);
-                    return s;
-                }
-            //                CCSliderScript(o.option, o.html, o.state as CCSliderState);
-            //                break;
-            case "notebutton":
-                //NoteButtonScript(o.option, o.html, o.state as ButtonState);
-                {
-                    const s = new NoteButtonLifecycle();
-                    s.load(o.option, o.html, o.state as ButtonState);
-                    return s;
-                }
-            case "jogwheel":
-                {
-                    const s = new JogwheelLifecycle();
-                    s.load(o.option, o.html, o.state as JogState);
-                    return s;
-                    //JogwheelScript(o.option, o.html, o.state as JogState);
-                }
-
-        }
-
-        throw new Error("cant load lifecycle for " + o.option.type);
-    }
-}
 export class LoadedWidget {
     option: Widget
     html: HTMLDivElement
@@ -244,7 +181,8 @@ export class LoadedOverlay {
 
             //o.state.abort.abort();
             o.lifecycle!.unload(o.option as WidgetProperties, o.html, o.state);
-            switch (o.option.type) {
+            o.lifecycle = null
+            /*switch (o.option.type) {
 
 
                 case "rotary":
@@ -259,7 +197,7 @@ export class LoadedOverlay {
                 case "notebutton":
                     UnloadNoteButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
-            }
+            }*/
         }
 
     }

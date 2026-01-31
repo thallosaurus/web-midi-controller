@@ -1,7 +1,7 @@
 import { vibrate } from "@common/ui_utils";
 import "./css/button.css";
-import { CCSliderProperties, Widget, type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
-import { WidgetLifecycle, type WidgetState } from "@core/overlay";
+import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
+import { WidgetLifecycle, type WidgetState } from "@core/lifecycle";
 
 import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, sendUpdateCCValue } from "@eventbus/client";
 

@@ -1,9 +1,9 @@
-import { WidgetLifecycle, type WidgetState } from "@core/overlay";
+import { WidgetLifecycle, type WidgetState } from "@core/lifecycle";
 import { vibrate } from "@common/ui_utils";
 
 import type { RotarySliderProperties } from "@bindings/Widget";
 import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client.ts";
-import "@widgets/css/rotary.css";
+import "./css/rotary.css";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;

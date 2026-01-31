@@ -1,6 +1,6 @@
 import { JogDirection, sendUpdateJogValue } from "@eventbus/client.ts"
 import type { JogwheelProperties } from "@bindings/Widget"
-import { WidgetLifecycle, type WidgetState } from "@core/overlay"
+import { WidgetLifecycle, type WidgetState } from "@core/lifecycle"
 import "./css/jogwheel.css"
 
 export interface JogState extends WidgetState {

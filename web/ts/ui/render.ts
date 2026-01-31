@@ -1,10 +1,60 @@
+// defined all allowed widgets for type definitions
+export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties;
+
 import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, VerticalMixerProperties, Widget } from "@bindings/Widget";
-import { CCButton, NoteButton } from "@widgets/button";
+import { ButtonState, CCButton, CCButtonLifecycle, NoteButton, NoteButtonLifecycle } from "@widgets/button";
 import type { Overlay } from "@bindings/Overlay";
-import { Jogwheel } from "@widgets/jogwheel";
-import { Rotary } from "@widgets/rotary";
-import { CCSlider } from "@widgets/slider";
+import { JogState, Jogwheel, JogwheelLifecycle } from "@widgets/jogwheel";
+import { Rotary, RotaryLifecycle, RotaryState } from "@widgets/rotary";
+import { CCSlider, CCSliderLifecycle, CCSliderState } from "@widgets/slider";
 import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
+import { WidgetLifecycle, WidgetState } from "./lifecycle";
+
+function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> {
+        switch (o.option.type) {
+            case "rotary":
+                {
+                    const s = new RotaryLifecycle();
+                    s.load(o.option, o.html, o.state as unknown as RotaryState);
+                    return s;
+                }
+                //RotaryScript(o.option, o.html, o.state as RotaryState);
+            case "ccbutton":
+                {
+
+                    //                    CCButtonScript(o.option, o.html, o.state as ButtonState);
+                    const s = new CCButtonLifecycle();
+                    s.load(o.option, o.html, o.state as ButtonState);
+                    return s;
+                }
+
+            case "ccslider":
+                {
+                    const s = new CCSliderLifecycle();
+                    s.load(o.option, o.html, o.state as CCSliderState);
+                    return s;
+                }
+            //                CCSliderScript(o.option, o.html, o.state as CCSliderState);
+            //                break;
+            case "notebutton":
+                //NoteButtonScript(o.option, o.html, o.state as ButtonState);
+                {
+                    const s = new NoteButtonLifecycle();
+                    s.load(o.option, o.html, o.state as ButtonState);
+                    return s;
+                }
+            case "jogwheel":
+                {
+                    const s = new JogwheelLifecycle();
+                    s.load(o.option, o.html, o.state as JogState);
+                    return s;
+                    //JogwheelScript(o.option, o.html, o.state as JogState);
+                }
+
+        }
+
+        throw new Error("cant load lifecycle for " + o.option.type);
+    }
 
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables
 export function render_overlay(overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay {
