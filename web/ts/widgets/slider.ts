@@ -1,6 +1,6 @@
 import { vibrate } from "@common/ui_utils";
 import type { CCSliderProperties } from "@bindings/Widget";
-import type { WidgetState } from "@core/overlay";
+import { WidgetLifecycle, type WidgetState } from "@core/overlay";
 import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client";
 import "./css/slider.css";
 
@@ -15,6 +15,14 @@ export interface CCSliderState extends WidgetState {
     baseX: number
 }
 
+export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSliderState> {
+    load(options: CCSliderProperties, html: HTMLDivElement, state: CCSliderState): void {
+        throw new Error("Method not implemented.");
+    }
+    unload(options: CCSliderProperties, html: HTMLDivElement, state: CCSliderState): void {
+        throw new Error("Method not implemented.");
+    }
+}
 // Renders the slider markup
 export const CCSlider = (container: HTMLDivElement, options: CCSliderProperties) => {
     const fill = document.createElement("div");

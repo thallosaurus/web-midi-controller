@@ -1,4 +1,4 @@
-import type { WidgetState } from "@core/overlay";
+import { WidgetLifecycle, type WidgetState } from "@core/overlay";
 import { vibrate } from "@common/ui_utils";
 
 import type { RotarySliderProperties } from "@bindings/Widget";
@@ -13,6 +13,16 @@ export interface RotaryState extends WidgetState {
     value: number
     lastX: number
     active: boolean
+}
+
+export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, RotaryState> {
+    load(options: RotarySliderProperties, html: HTMLDivElement, state: RotaryState): void {
+        RotaryScript(options, html, state)
+    }
+    unload(options: RotarySliderProperties, html: HTMLDivElement, state: RotaryState): void {
+        UnloadRotaryScript(options, html, state);
+    }
+
 }
 
 export const Rotary = (container: HTMLDivElement, _options: RotarySliderProperties): HTMLDivElement => {

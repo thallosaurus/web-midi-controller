@@ -1,14 +1,37 @@
 import { vibrate } from "@common/ui_utils";
 import "./css/button.css";
-import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
-import type { WidgetState } from "@core/overlay";
+import { CCSliderProperties, Widget, type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
+import { WidgetLifecycle, type WidgetState } from "@core/overlay";
 
 import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, sendUpdateCCValue } from "@eventbus/client";
 
+
+/**
+ * Holds the handlers the UI calls when an event occurs
+ */
 export interface ButtonState extends WidgetState {
     id: string | null
     latch_on: boolean,
     active_pointer: number | null,
+}
+
+export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, ButtonState> {
+    load(options: NoteButtonProperties, html: HTMLDivElement, state: ButtonState): void {
+        NoteButtonScript(options, html, state)
+    }
+    unload(options: NoteButtonProperties, html: HTMLDivElement, state: ButtonState): void {
+        UnloadNoteButtonScript(options, html, state)
+    }
+}
+
+export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, ButtonState> {
+    load(options: CCButtonProperties, html: HTMLDivElement, state: ButtonState): void {
+        CCButtonScript(options, html, state)
+    }
+    unload(options: CCButtonProperties, html: HTMLDivElement, state: ButtonState): void {
+        UnloadCCButtonScript(options, html, state)
+    }
+
 }
 
 export const UnloadNoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
@@ -40,6 +63,7 @@ export const UnloadCCButtonScript = (options: CCButtonProperties, o: HTMLDivElem
 }
 
 /// Function that mounts the Button as a child of the specified Div Element
+// TODO Move this to constructor?
 export const CCButton = (container: HTMLDivElement, options: CCButtonProperties): HTMLDivElement => {
     const button = document.createElement("div");
     button.classList.add("target");
@@ -48,7 +72,7 @@ export const CCButton = (container: HTMLDivElement, options: CCButtonProperties)
     return container;
 }
 
-export const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     state.latch_on = false;
     state.active_pointer = null;
 
@@ -149,7 +173,7 @@ export const NoteButton = (container: HTMLDivElement, options: NoteButtonPropert
     return container;
 }
 
-export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     // velocity
     state.latch_on = false;
     //let value = 0;
