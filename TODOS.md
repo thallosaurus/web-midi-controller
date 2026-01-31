@@ -8,6 +8,9 @@ todo widgets:
 - Shift
 - Prettier Rust Logging with tracing (we already got that)
 - tests
+- Scan for host on connect page
+
+- Distler-friendly installation guide
 
 laters:
 - Haptic Touch via WebKit App
