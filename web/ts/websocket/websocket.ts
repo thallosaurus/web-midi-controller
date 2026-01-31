@@ -21,7 +21,7 @@ function setupSocket(socket: WebSocket): WebSocket {
     // Listen for incoming websocket messages from the backend
     socket.addEventListener("message", (e) => {
         const msg: MidiEvent = JSON.parse(e.data);
-        //console.log("external data", msg);
+        console.log("external data", msg);
         sendMidiEvent(msg);
     });
 

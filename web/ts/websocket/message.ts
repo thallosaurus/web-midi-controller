@@ -147,16 +147,17 @@ export function disconnectSocketMessage(worker: Worker) {
     });
 }
 /**
- * Send Midi Events to the caller
+ * Use this function to send midi messages from the websocket to the parent thread
  * @param data 
  */
-export function sendMidiEvent(ws: Worker, data: MidiEvent) {
-    sendMessageInput(ws, {
-        type: WorkerMessageType.MidiExternalInput,
+export function sendMidiEvent(data: MidiEvent) {
+    sendMessage({
+        type: WorkerMessageType.MidiFrontendInput,
         data
     })
 }
 /***
+ * Sane as sendMidiEvent, but from the main thread - dont get them mixed up
  * @param worker 
  * @param data 
  */

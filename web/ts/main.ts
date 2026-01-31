@@ -65,6 +65,8 @@ async function init() {
   bus.addEventListener("message", (ev) => {
     const m: EventBusProducerMessage = JSON.parse(ev.data);
 
+    console.log("fuck", m);
+
     // responsible for sending updates back to the server
     switch (m.type) {
       case EventBusProducerMessageType.NoteUpdate:
@@ -73,7 +75,7 @@ async function init() {
         break;
       case EventBusProducerMessageType.CCUpdate:
         console.log("bus update cc value on main", m);
-        sendMidiEvent(ws, new CCEvent(m.channel, m.value, m.cc));
+        sendFrontendMidiEvent(ws, new CCEvent(m.channel, m.value, m.cc));
         break;
     }
   })
