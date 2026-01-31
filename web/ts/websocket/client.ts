@@ -7,7 +7,9 @@ export let wsWorker: Worker | null = null;
 export let lastError: Error | null;
 export function initWebsocketWorker(): Worker {
     //if (wsWorker !== null) throw new Error("the websocket thread is already running")
-    return new Worker(new URL("./worker.js", import.meta.url), { type: 'module' })
+    let w = new Worker(new URL("./worker.js", import.meta.url), { type: 'module' })
+    ConnectWebsocketWorkerWithHandler(w);
+    return w
 }
 
 // we need to call it somewhere
@@ -59,9 +61,9 @@ export function DisconnectSocketEvent() {
     }
 }
 
-export function ConnectSocketEvent() {
+export function ConnectSocketEvent(ws: Worker) {
     if (wsWorker != null) {
-        connectSocketMessage(wsWorker);
+        connectSocketMessage(ws);
     } else {
         throw new Error("wsWorker was null");
     }
