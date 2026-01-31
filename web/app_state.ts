@@ -42,26 +42,22 @@ export class App {
         this.initBackend().then((handlers) => {
             this.handlers = handlers
             console.log("were handlers set?", handlers);
-            
+
             App.defaultWorkerHandler(this.handlers);
             this.initUi(this.handlers);
             this.initWebsocketUIChanges(this.handlers)
             debug("init done", this);
+
+            if (import.meta.env.VITE_AUTO_CONNECT_LOCAL == "true") {
+                connectSocketMessage(this.handlers.socket!, wsUri);
+            }
         });
     }
-    connectToServer() {
+    /*connectToServer(h: AppWorkerHandler) {
         ConnectWebsocketWorkerWithHandler(this.handlers.socket!)
-        .then (conn_msg => {
 
-            return fetch(conn_msg.overlay_path)
-        })
-            .then(ol => ol.json())
-            .then(ol => load_overlays_from_array(ol))
-            .then((ol) => {
-                setup_overlay_selector(ol);
-                change_overlay(0)
-            })
-    }
+        connectSocketMessage(h.socket!, wsUri);
+    }*/
     async initBackend(): Promise<AppWorkerHandler> {
         let socket = initWebsocketWorker();
         let eventbus = await initEventBusWorker();
@@ -126,15 +122,19 @@ export class App {
                     this.app_elem.classList.add("disconnected");
                     clear_loaded_overlays();
                     clear_overlay_selector();
-                    // maybe?
-                    //h.socket!.removeEventListener("message", fn);
                     break;
 
                 case SocketWorkerResponse.Connected:
                     this.app_elem.classList.remove("disconnected");
-                    break;
 
-                // TODO Connect case for reconnects?
+                    fetch(msg.overlay_path)
+                        .then(ol => ol.json())
+                        .then(ol => load_overlays_from_array(ol))
+                        .then((ol) => {
+                            setup_overlay_selector(ol);
+                            change_overlay(0)
+                        })
+                    break;
             }
         }
         h.socket!.addEventListener("message", fn);
@@ -142,9 +142,8 @@ export class App {
         this.initSocketConnectionTrigger(h)
     }
 
-    initUi(h: AppWorkerHandler) {
+    initUi(_: AppWorkerHandler) {
         //init_dialogs();
-        //this.initWebsocketUIChanges(h)
         UiDialog.initDialogs();
         UiDialog.initDialogTriggers();
     }
@@ -153,16 +152,8 @@ export class App {
 
         const connect_button = document.querySelector<HTMLDivElement>("#disconnect-fallback .container button.primary")!
         connect_button.addEventListener("click", (e) => {
-            //ConnectSocketEvent()
-            /*initWebsocketWorkerWithOverlaySelection().then(() => {
-              console.log("reconnect successful", e);
-            });*/
-            //            alert("not implemented yet")
-            //ConnectSocketEvent(h.socket!)
             console.log("sending connect to socket message from button")
             connectSocketMessage(h.socket!, wsUri);
-        }, {
-            capture: true
         });
     }
 }

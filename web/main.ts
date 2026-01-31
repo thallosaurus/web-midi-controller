@@ -3,41 +3,15 @@ import "./style.css";
 import "./colors.css";
 
 import { App } from './app_state.ts'
-import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
-import { change_overlay, load_overlays_from_array } from "./ts/ui/overlay.ts";
-import { ConnectWebsocketWorkerWithHandler, initWebsocketWorker } from "@websocket/client.ts";
-/* 
-const init_ui = () => {
+import { connectSocketMessage } from "@websocket/client.ts";
+import { wsUri } from "@websocket/websocket.ts";
 
-
-  // fix on smart devices
-  if (!import.meta.env.DEV) {
-
-    window.oncontextmenu = function (e) {
-
-      //if (e.pointerType === "touch") {
-
-      return false;
-      //}
-    }
-  }
-}; */
+let app: App | null = null;
 
 self.addEventListener("DOMContentLoaded", () => {
   //try {
-    //init_ui();
-    new App();
+    app = new App();
     console.log("finished ui init")
-    /*initEventBusWorker().then(e => {
-      console.log("event bus started")
-    });*/
-
-    if (import.meta.env.VITE_AUTO_CONNECT_LOCAL == "true") {
-
-      /*init().then(e => {
-        console.log("finished backend init")
-      });*/
-    }
 
   /*} catch (e) {
     alert(e);

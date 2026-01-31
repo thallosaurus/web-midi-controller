@@ -57,7 +57,6 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
 
             switch (msg.type) {
                 case SocketWorkerResponse.Connected:
-                    debugger;
                     log("worker connection successful", msg)
                     //wsWorker = worker;
                     worker.removeEventListener("message", fn);
