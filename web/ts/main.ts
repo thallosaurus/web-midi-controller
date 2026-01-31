@@ -5,7 +5,7 @@ import "./ui/css/colors.css";
 import { init_dialogs } from './ui/dialogs.ts'
 import { init_debug, initWebsocketUI, setup_overlay_selector } from "./common/ui_utils.ts";
 import { type EventBusConsumerMessage, EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./event_bus/client.ts";
-import { connectSocketMessage, sendFrontendMidiEvent, WorkerMessage, WorkerMessageType } from "./websocket/message.ts";
+import { connectSocketMessage, sendFrontendMidiEvent, sendMidiEvent, WorkerMessage, WorkerMessageType } from "./websocket/message.ts";
 import { ConnectSocketEvent, ConnectWebsocketWorkerWithHandler, FrontendSocketEvent, initWebsocketWorker } from "./websocket/client.ts";
 import { CCEvent, MidiEvent, NoteEvent } from "./common/events.ts";
 import { Overlay } from "../bindings/Overlay.ts";
@@ -73,7 +73,7 @@ async function init() {
         break;
       case EventBusProducerMessageType.CCUpdate:
         console.log("bus update cc value on main", m);
-        sendFrontendMidiEvent(ws, new CCEvent(m.channel, m.value, m.cc));
+        sendMidiEvent(ws, new CCEvent(m.channel, m.value, m.cc));
         break;
     }
   })

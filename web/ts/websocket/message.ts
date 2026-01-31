@@ -150,8 +150,8 @@ export function disconnectSocketMessage(worker: Worker) {
  * Send Midi Events to the caller
  * @param data 
  */
-export function sendMidiEvent(data: MidiEvent) {
-    sendMessage({
+export function sendMidiEvent(ws: Worker, data: MidiEvent) {
+    sendMessageInput(ws, {
         type: WorkerMessageType.MidiExternalInput,
         data
     })
@@ -160,9 +160,9 @@ export function sendMidiEvent(data: MidiEvent) {
  * @param worker 
  * @param data 
  */
-export function sendFrontendMidiEvent(data: MidiEvent) {
+export function sendFrontendMidiEvent(ws: Worker, data: MidiEvent) {
     console.debug("websocket client", "sendFrontendMidiEvent", data)
-    sendMessage({
+    sendMessageInput(ws, {
         type: WorkerMessageType.MidiFrontendInput,
         data
     })
