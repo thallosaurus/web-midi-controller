@@ -9,6 +9,10 @@
 }
 
 #note-midi-grid {
+    gap: 5px;
+}
+
+#note-midi-grid {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16,4 +20,13 @@
 
 #note-midi-grid > * {
     width: 100vh;
+}
+
+.overlays #note-midi-grid {
+    margin: 0;
+}
+
+#note-midi-grid .grid-mixer > .notebutton .target {
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
 }

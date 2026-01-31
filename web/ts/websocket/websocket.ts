@@ -1,5 +1,5 @@
-import type { MidiEvent } from "../events.ts";
-import { sendDisconnected, sendMidiEvent } from "./message.ts";
+import { MidiEvent } from "../common/events.ts";
+import { sendDisconnected, sendFrontendMidiEvent, sendMidiEvent } from "./message.ts";
 
 export const wsUri = "ws://" + location.hostname + ":8888/ws";
 
@@ -18,11 +18,20 @@ function scheduleReconnect() {
 
 function setupSocket(socket: WebSocket): WebSocket {
 
-    // Listen for incoming websocket messages
+    // Listen for incoming websocket messages from the backend
     socket.addEventListener("message", (e) => {
         const msg: MidiEvent = JSON.parse(e.data);
-        //console.log("external data", msg);
-        sendMidiEvent(msg);
+        switch (msg.event_name) {
+            case "noteupdate":
+                console.log("external noteupdate data", msg);
+                sendMidiEvent(msg);
+                break
+            case "ccupdate":
+                console.log("external ccupdate data", msg);
+                sendMidiEvent(msg);
+            break;
+
+        }
     });
 
     socket.addEventListener("error", (e) => {
@@ -31,8 +40,6 @@ function setupSocket(socket: WebSocket): WebSocket {
 
     return socket
 }
-
-//type WebSocketHandler = (((ws: WebSocket) => void) | ((ws: WebSocket) => Promise<void>))
 
 export async function connect(uri: string = wsUri, handler = setupSocket): Promise<WebSocket> {
     //if (ws) close_socket();
@@ -80,7 +87,7 @@ export async function disconnect(): Promise<CloseEvent> {
 
 export function send(update: string) {
     if (ws && ws.readyState == WebSocket.OPEN) {
-        console.debug("worker > server", update);
+        //console.debug("worker > server", update);
         ws.send(update);
     } else {
         // put in queue?

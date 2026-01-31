@@ -7,7 +7,7 @@ import { type Overlay } from '../../bindings/Overlay.ts';
 import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "../../bindings/Widget.ts";
 import { RotaryScript, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
 import { render_overlay, render_widget } from "./render.ts";
-import { uuid } from "../utils.ts";
+import { uuid } from "../common/utils.ts";
 import { JogwheelScript, type JogState } from "./jogwheel.ts";
 
 let current_overlay_id = -1;
@@ -187,7 +187,7 @@ export class LoadedOverlay {
                     UnloadRotaryScript(o.id, o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
-                    UnloadCCButtonScript(o.id, o.option, o.html, o.state as ButtonState);
+                    UnloadCCButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
                     UnloadCCSliderScript(o.id, o.option, o.html, o.state as CCSliderState);
@@ -211,13 +211,13 @@ export class LoadedOverlay {
                     RotaryScript(o.id, o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
-                    CCButtonScript(o.id, o.option, o.html, o.state as ButtonState);
+                    CCButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
-                    CCSliderScript(o.id, o.option, o.html, o.state as CCSliderState);
+                    CCSliderScript(o.option, o.html, o.state as CCSliderState);
                     break;
                 case "notebutton":
-                    NoteButtonScript(o.id, o.option, o.html, o.state as ButtonState);
+                    NoteButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "jogwheel":
                     JogwheelScript(o.id, o.option, o.html, o.state as JogState);

@@ -10,6 +10,8 @@ body,
   display: flex;
   flex-direction: column;
   overflow: none;
+
+  touch-action: manipulation;
 }
 
 #app>header {

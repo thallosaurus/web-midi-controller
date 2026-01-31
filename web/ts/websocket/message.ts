@@ -1,4 +1,4 @@
-import type { MidiEvent } from "../events";
+import type { MidiEvent } from "../common/events";
 import { connect, disconnect, send, wsUri } from "./websocket";
 
 export enum WorkerMessageType {
@@ -6,9 +6,9 @@ export enum WorkerMessageType {
     Disconnect = "disconnect",
     Connected = "connected",
     Disconnected = "disconnected",
-    DataTest = "data",
     ConnectError = "connect_error",
     MidiFrontendInput = "midi_frontend_input",
+    MidiExternalInput = "midi_external_input",
     WorkerError = "worker_error"
 }
 
@@ -19,6 +19,7 @@ export type WorkerMessage =
     | ConnectedMessage
     | DisconnectedMessage
     | WorkerErrorMessage
+    | MidiExternalInput
     | SurfaceMidiEvent;
 
 /**
@@ -61,6 +62,11 @@ interface SurfaceMidiEvent {
     data: MidiEvent
 }
 
+interface MidiExternalInput {
+    type: WorkerMessageType.MidiExternalInput
+    data: MidiEvent
+}
+
 // Send message back to the frontend
 function sendMessage(m: WorkerMessage) {
     const msg = JSON.stringify(m)
@@ -68,11 +74,12 @@ function sendMessage(m: WorkerMessage) {
 }
 
 function sendMessageInput(worker: Worker, m: WorkerMessage) {
+    //console.log(m);
     const msg = JSON.stringify(m)
     worker.postMessage(msg);
 }
 
-export function process_worker_message(msg: WorkerMessage) {
+export function process_worker_input(msg: WorkerMessage) {
         switch (msg.type) {
         case WorkerMessageType.Connect:
             {
@@ -86,27 +93,13 @@ export function process_worker_message(msg: WorkerMessage) {
                     //console.error(e);
                     sendWorkerError(e);
                 });
-
-                // connect to websocket
-                //connect(wsUri, (socket) => {
-                    // Setup Websocket async with Handler for backend events
-                    //setupSocketAsync(socket);
-
-
-
-                /*}).then(e => {
-                    sendConnected();
-                    //self.postMessage("connected from worker");
-                }).catch(e => {
-                    sendDisconnected();
-                })*/
-
             }
             break;
 
         case WorkerMessageType.MidiFrontendInput:
-            //console.log("data for the frontend")
-            send(JSON.stringify(msg.data));
+            console.log("data for the backend", msg.data)
+            const d = JSON.stringify(msg.data)
+            send(d);
             break;
 
         case WorkerMessageType.Disconnect:
@@ -155,7 +148,7 @@ export function disconnectSocketMessage(worker: Worker) {
     });
 }
 /**
- * Send Midi Events to the caller
+ * Use this function to send midi messages from the websocket to the parent thread
  * @param data 
  */
 export function sendMidiEvent(data: MidiEvent) {
@@ -164,8 +157,14 @@ export function sendMidiEvent(data: MidiEvent) {
         data
     })
 }
-export function sendFrontendMidiEvent(worker: Worker, data: MidiEvent) {
-    sendMessageInput(worker, {
+/***
+ * Sane as sendMidiEvent, but from the main thread - dont get them mixed up
+ * @param worker 
+ * @param data 
+ */
+export function sendFrontendMidiEvent(ws: Worker, data: MidiEvent) {
+    console.debug("websocket client", "sendFrontendMidiEvent", data)
+    sendMessageInput(ws, {
         type: WorkerMessageType.MidiFrontendInput,
         data
     })

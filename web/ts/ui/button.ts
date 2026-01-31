@@ -1,17 +1,12 @@
-import { vibrate } from "../utils.ts";
+import { vibrate } from "../common/utils.ts";
 import "./css/button.css";
-import {
-    process_internal,
-    register_cc_widget,
-    register_midi_widget,
-    unregister_cc_widget,
-    unregister_midi_widget,
-} from "../event_bus.ts";
-import { CCEvent, NoteEvent } from "../events.ts";
 import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
 import type { WidgetState } from "./overlay.ts";
 
+import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, sendUpdateCCValue } from '../event_bus/client.ts';
+
 export interface ButtonState extends WidgetState {
+    id: string | null
     latch_on: boolean,
     active_pointer: number | null
 }
@@ -24,10 +19,13 @@ export const UnloadNoteButtonScript = (id: string, options: NoteButtonProperties
         button.removeEventListener("pointerup", state.handlers.pointerup)
         button.removeEventListener("pointercancel", state.handlers.pointercancel)
     }
-    unregister_midi_widget(id, options.channel, options.note);
+    //unregister_midi_widget(id, options.channel, options.note);
+    unregisterNoteWidget(state.id!, options.channel, options.note).then(id => {
+        state.id
+    })
 }
 
-export const UnloadCCButtonScript = (id: string, options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+export const UnloadCCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     if (options.mode != "readonly") {
 
         const button = o.querySelector<HTMLDivElement>(".target")!;
@@ -35,7 +33,10 @@ export const UnloadCCButtonScript = (id: string, options: CCButtonProperties, o:
         button.removeEventListener("pointerup", state.handlers.pointerup)
         button.removeEventListener("pointercancel", state.handlers.pointercancel)
     }
-    unregister_cc_widget(id, options.channel, options.cc)
+    //unregister_cc_widget(id, options.channel, options.cc)
+    unregisterCCWidget(state.id!, options.channel, options.cc).then(id => {
+        state.id = null
+    })
 }
 
 /// Function that mounts the Button as a child of the specified Div Element
@@ -47,7 +48,7 @@ export const CCButton = (container: HTMLDivElement, options: CCButtonProperties)
     return container;
 }
 
-export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+export const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     state.latch_on = false;
     state.active_pointer = null;
 
@@ -75,10 +76,13 @@ export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLD
 
     // Update State on the Bus
     const update_bus_value = (v: number) => {
-        process_internal(new CCEvent(options.channel, v, options.cc));
+        //process_internal(new CCEvent(options.channel, v, options.cc));
         
-        // also update ui directly
-        update_value(v);
+        sendUpdateCCValue(options.channel, options.cc, state.latch_on ? (options.value ?? 127) : (options.value_off ?? 0));
+        /*if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
+            // also update ui directly
+            update_value(v);
+        }*/
     };
 
     // called, when the touch begins
@@ -121,7 +125,10 @@ export const CCButtonScript = (id: string, options: CCButtonProperties, o: HTMLD
         }
     };
 
-    register_cc_widget(id, options.value_off ?? 0, options.channel, options.cc, update_value);
+    //register_cc_widget(id, options.value_off ?? 0, options.channel, options.cc, update_value);
+    registerCCWidget(options.channel, options.cc, options.value_off ?? 0, update_value).then(id => {
+        state.id = id
+    });
 
     if (options.mode != "readonly") {
         state.handlers.pointerdown = touch_start;
@@ -142,7 +149,7 @@ export const NoteButton = (container: HTMLDivElement, options: NoteButtonPropert
     return container;
 }
 
-export const NoteButtonScript = (id: string, options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     // velocity
     state.latch_on = false;
     //let value = 0;
@@ -187,17 +194,22 @@ export const NoteButtonScript = (id: string, options: NoteButtonProperties, o: H
     };
 
     const update_bus_value = (v: number) => {
-        process_internal(
+        /*process_internal(
             new NoteEvent(options.channel, options.note, v > 0, v),
-        );
+        );*/
+
+        sendUpdateNoteValue(options.channel, options.note, v, v > 0, false);
 
         // also update ui directly
-        update_value(v);
+        if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
+            console.warn("self updating note button")
+            update_value(v);
+        }
     };
 
     const touch_update = () => {
         //update_bus_value(127);
-        console.log(state.latch_on);
+        //console.log(state.latch_on);
         update_bus_value(state.latch_on ? 127 : 0);
     };
 
@@ -214,7 +226,10 @@ export const NoteButtonScript = (id: string, options: NoteButtonProperties, o: H
         }
     };
 
-    register_midi_widget(id, options.channel, options.note, update_value);
+    //register_midi_widget(id, options.channel, options.note, update_value);
+    registerNoteWidget(options.channel, options.note, update_value).then(id => {
+        state.id = id;
+    });
 
     if (options.mode != "readonly") {
 

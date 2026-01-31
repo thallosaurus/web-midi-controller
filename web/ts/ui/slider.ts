@@ -1,13 +1,13 @@
-import { vibrate } from "../utils.ts";
-import { process_internal, register_cc_widget, unregister_cc_widget } from "../event_bus.ts";
+import { vibrate } from "../common/utils.ts";
 import "./css/slider.css";
-import { CCEvent } from "../events.ts";
 import type { CCSliderProperties } from "../../bindings/Widget.ts";
 import type { WidgetState } from "./overlay.ts";
+import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "../event_bus/client.ts";
 
 const MAX_LEVEL = 127;
 
 export interface CCSliderState extends WidgetState {
+    id: string | null,
     value: number,
     active_pointer: number | null,
     baseValue: number,
@@ -40,10 +40,11 @@ export const UnloadCCSliderScript = (id: string, options: CCSliderProperties, o:
     slider.addEventListener("pointermove", state.handlers.pointermove);
     slider.addEventListener("pointerup", state.handlers.pointerup);
     slider.addEventListener("pointercancel", state.handlers.pointercancel);
-    unregister_cc_widget(id, options.channel, options.cc);
+    //unregister_cc_widget(id, options.channel, options.cc);
+    unregisterCCWidget(state.id!, options.channel, options.cc);
 }
 
-export const CCSliderScript = (id: string, options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
+export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
     state.value = options.default_value ?? 0;
     state.active_pointer = null;
     state.baseValue = 0;
@@ -111,9 +112,7 @@ export const CCSliderScript = (id: string, options: CCSliderProperties, o: HTMLD
     };
 
     const update_bus_value = (v: number) => {
-        process_internal(
-            new CCEvent(options.channel, v, options.cc),
-        );
+        sendUpdateCCValue(options.channel, options.cc, v);
 
         // also update ui directly
         update_value(v);
@@ -191,13 +190,17 @@ export const CCSliderScript = (id: string, options: CCSliderProperties, o: HTMLD
         //if ()
     };
 
-    register_cc_widget(
+    /*register_cc_widget(
         id,
         options.default_value ?? 0,
         options.channel,
         options.cc,
         update_value,
-    );
+    );*/
+
+    registerCCWidget(options.channel, options.cc, options.default_value ?? 0, update_value).then(id => {
+        state.id = id
+    });
 
     /*const slider = document.createElement("div");
     slider.classList.add(
