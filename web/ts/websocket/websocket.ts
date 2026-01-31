@@ -24,7 +24,10 @@ function setupSocket(socket: WebSocket): WebSocket {
         switch (msg.event_name) {
             case "noteupdate":
                 console.log("external noteupdate data", msg);
-                //sendFrontendMidiEvent(msg);
+                sendMidiEvent(msg);
+                break
+            case "ccupdate":
+                console.log("external ccupdate data", msg);
                 sendMidiEvent(msg);
             break;
 
@@ -37,8 +40,6 @@ function setupSocket(socket: WebSocket): WebSocket {
 
     return socket
 }
-
-//type WebSocketHandler = (((ws: WebSocket) => void) | ((ws: WebSocket) => Promise<void>))
 
 export async function connect(uri: string = wsUri, handler = setupSocket): Promise<WebSocket> {
     //if (ws) close_socket();

@@ -22,6 +22,7 @@ export enum EventBusConsumerMessageType {
     UnregisterCCWidget = "unregister_cc_widget",
     RegisterNoteWidget = "register_note_widget",
     UnregisterNoteWidget = "unregister_note_widget",
+    ExternalCCUpdate = "external_cc_update",
     UpdateCCValue = "update_cc_value",
     ExternalNoteUpdate = "external_note_update",
     UpdateNoteValue = "update_note_value"
@@ -35,6 +36,7 @@ export type EventBusConsumerMessage =
     | UnregisterCCWidget
     | UpdateNoteValue
     | ExternalNoteUpdate
+    | ExternalCCUpdate
     | RegisterNoteWidget
     | UnregisterNoteWidget
 
@@ -116,6 +118,23 @@ export function sendUpdateExternalNoteWidget(channel: number, note: number, velo
         note,
         velocity,
         on: velocity > 0,
+    })
+}
+
+interface ExternalCCUpdate {
+    type: EventBusConsumerMessageType.ExternalCCUpdate,
+    //id: string,
+    channel: number,
+    cc: number,
+    value: number
+}
+
+export function sendUpdateExternalCCWidget(channel: number, cc: number, value: number) {
+    sendEventToWorker(ebWorker, {
+        type: EventBusConsumerMessageType.ExternalCCUpdate,
+        channel,
+        cc,
+        value
     })
 }
 

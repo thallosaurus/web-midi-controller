@@ -3,7 +3,7 @@ import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
 import type { WidgetState } from "./overlay.ts";
 
-import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget } from '../event_bus/client.ts';
+import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, sendUpdateCCValue } from '../event_bus/client.ts';
 
 export interface ButtonState extends WidgetState {
     id: string | null
@@ -78,11 +78,11 @@ export const CCButtonScript = (options: CCButtonProperties, o: HTMLDivElement, s
     const update_bus_value = (v: number) => {
         //process_internal(new CCEvent(options.channel, v, options.cc));
         
-        
-        if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
+        sendUpdateCCValue(options.channel, options.cc, state.latch_on ? (options.value ?? 127) : (options.value_off ?? 0));
+        /*if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
             // also update ui directly
             update_value(v);
-        }
+        }*/
     };
 
     // called, when the touch begins

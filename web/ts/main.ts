@@ -4,7 +4,7 @@ import "./ui/css/colors.css";
 
 import { init_dialogs } from './ui/dialogs.ts'
 import { init_debug, initWebsocketUI, setup_overlay_selector } from "./common/ui_utils.ts";
-import { type EventBusConsumerMessage, EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./event_bus/client.ts";
+import { type EventBusConsumerMessage, EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./event_bus/client.ts";
 import { connectSocketMessage, sendFrontendMidiEvent, sendMidiEvent, WorkerMessage, WorkerMessageType } from "./websocket/message.ts";
 import { ConnectSocketEvent, ConnectWebsocketWorkerWithHandler, FrontendSocketEvent, initWebsocketWorker } from "./websocket/client.ts";
 import { CCEvent, MidiEvent, NoteEvent } from "./common/events.ts";
@@ -68,14 +68,14 @@ async function init() {
     // responsible for sending updates back to the server from the event bus
     switch (m.type) {
       case EventBusProducerMessageType.NoteUpdate:
+        //only forward internal midi events
         if (!m.ext) {
           console.log("sending note update to websocket backend", m);
           sendFrontendMidiEvent(ws, new NoteEvent(m.channel, m.note, m.velocity > 0, m.velocity));
-        } else {
-          console.warn("is external", m);
         }
         break;
-      case EventBusProducerMessageType.CCUpdate:
+        case EventBusProducerMessageType.CCUpdate:
+        //only forward internal midi events
         if (!m.ext) {
           console.log("bus update cc value on main", m);
           sendFrontendMidiEvent(ws, new CCEvent(m.channel, m.value, m.cc));
@@ -94,7 +94,7 @@ async function init() {
         switch (msg.data.event_name) {
           case "noteupdate":
             const note_ev = msg.data as NoteEvent;
-            console.log("frontend midi input")
+            console.log("frontend note input")
             sendUpdateExternalNoteWidget(note_ev.midi_channel, note_ev.note, note_ev.velocity);
             //sendMidiEvent(note_ev);
             //sendUpdateNoteValue(note_ev.midi_channel, note_ev.note, note_ev.velocity, note_ev.velocity > 0, false)
@@ -102,6 +102,11 @@ async function init() {
 
             break;
 
+            case "ccupdate":
+              const cc_ev = msg.data as CCEvent;
+              console.log("frontend cc input")
+              sendUpdateExternalCCWidget(cc_ev.midi_channel, cc_ev.cc, cc_ev.value)
+              break;
         }
         break;
       case WorkerMessageType.MidiExternalInput:

@@ -1,5 +1,5 @@
 import { sendEventBusInitCallback, sendInitCCWidget, sendInitNoteWidget, sendUnregisterCCCallback, sendUnregisterNoteCallback, sendUpdateCCWidget, sendUpdateNoteWidget } from "./message";
-import { EventBusConsumerMessage, EventBusConsumerMessageType} from "./client"
+import { EventBusConsumerMessage, EventBusConsumerMessageType } from "./client"
 let started = false;
 type WidgetId = string;
 type CCWidget = WidgetId[];
@@ -72,12 +72,16 @@ function process_consumer_message(msg: EventBusConsumerMessage) {
         case EventBusConsumerMessageType.UpdateCCValue:
             cc_update_on_bus(msg.channel, msg.cc, msg.value, false);
             return true;
+        case EventBusConsumerMessageType.ExternalCCUpdate:
+            cc_update_on_bus(msg.channel, msg.cc, msg.value, true)
+            return true;
         case EventBusConsumerMessageType.UpdateNoteValue:
             note_update_on_bus(msg.channel, msg.note, msg.velocity, false);
             return true;
         case EventBusConsumerMessageType.ExternalNoteUpdate:
             note_update_on_bus(msg.channel, msg.note, msg.velocity, true);
             return true;
+
         default:
             return false;
     }
