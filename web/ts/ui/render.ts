@@ -1,10 +1,10 @@
 import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, VerticalMixerProperties, Widget } from "@bindings/Widget";
-import { CCButton, NoteButton } from "./button";
+import { CCButton, NoteButton } from "../widgets/button";
 import type { Overlay } from "@bindings/Overlay";
-import { Jogwheel } from "./jogwheel";
-import { Rotary } from "./rotary";
-import { CCSlider } from "./slider";
-import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "@/overlay";
+import { Jogwheel } from "@widgets/jogwheel.ts";
+import { Rotary } from "../widgets/rotary";
+import { CCSlider } from "../widgets/slider";
+import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
 
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables
 export const render_overlay = (overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay => {

@@ -1,15 +1,15 @@
 //import { init_event_bus } from "./event_bus.ts";
 import "./style.css";
-import "./ui/colors.css";
+import "./colors.css";
 
-import { init_dialogs } from './ui/dialogs.ts'
-import { init_debug, initWebsocketUI, setup_overlay_selector } from "./common/ui_utils.ts";
-import { initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./event_bus/client.ts";
-import { connectSocketMessage, sendFrontendMidiEvent, sendMidiEvent, WorkerMessage, WorkerMessageType } from "./websocket/message.ts";
-import { ConnectSocketEvent, ConnectWebsocketWorkerWithHandler, FrontendSocketEvent, initWebsocketWorker } from "@websocket";
-import { CCEvent, MidiEvent, NoteEvent } from "./common/events.ts";
-import { change_overlay, load_overlays_from_array } from "./ui/overlay.ts";
-import { EventBusProducerMessage, EventBusProducerMessageType } from "./event_bus/message.ts";
+import { init_dialogs } from './ts/ui/dialogs.ts'
+import { init_debug, initWebsocketUI, setup_overlay_selector } from "./ts/common/ui_utils.ts";
+import { initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./ts/event_bus/client.ts";
+import { connectSocketMessage, sendFrontendMidiEvent, sendMidiEvent, WorkerMessage, WorkerMessageType } from "./ts/websocket/message.ts";
+import { CCEvent, MidiEvent, NoteEvent } from "./ts/common/events.ts";
+import { change_overlay, load_overlays_from_array } from "./ts/ui/overlay.ts";
+import { EventBusProducerMessage, EventBusProducerMessageType } from "./ts/event_bus/message.ts";
+import { ConnectSocketEvent, ConnectWebsocketWorkerWithHandler, FrontendSocketEvent, initWebsocketWorker } from "@websocket/client.ts";
 
 const init_ui = () => {
   console.log("init ui")

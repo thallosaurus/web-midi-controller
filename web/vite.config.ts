@@ -13,7 +13,17 @@ process.env.VITE_SELF_UPDATE_WIDGETS = String(false);
 process.env.VITE_AUTO_CONNECT_LOCAL = String(true);
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  //plugins: [tsconfigPaths()],
+  resolve: {
+    alias: {
+      '@core': path.resolve(__dirname, 'ts/ui'),
+      '@common': path.resolve(__dirname, 'ts/common'),
+      '@widgets': path.resolve(__dirname, 'ts/widgets'),
+      '@eventbus': path.resolve(__dirname, 'ts/event_bus'),
+      '@websocket': path.resolve(__dirname, 'ts/websocket'),
+      '@bindings': path.resolve(__dirname, 'bindings'),
+    }
+  },
   worker: {
     format: "es",
   },

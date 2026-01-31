@@ -5,8 +5,9 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./ts/ui/*"],
+      "@core/*": ["./ts/ui/*"],
       "@common/*": ["./ts/common/*"],
       "@websocket/*": ["./ts/websocket/*"],
       "@eventbus/*": ["./ts/event_bus/*"],
@@ -29,5 +30,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "ts/ui", "ts/event_bus.ts", "ts/common/events.ts", "ts/main.ts", "ts/vite-env.d.ts", "ts/websocket/websocket.ts"]
+  "include": ["src", "ts/ui", "ts/event_bus.ts", "ts/common/events.ts", "main.ts", "ts/vite-env.d.ts", "ts/websocket/websocket.ts"]
 }

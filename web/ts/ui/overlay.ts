@@ -9,7 +9,7 @@ import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerPrope
 import { CCSliderScript, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
 import { CCButtonScript, NoteButtonScript, UnloadCCButtonScript, UnloadNoteButtonScript, type ButtonState } from "@widgets/button.ts";
 import { JogwheelScript, type JogState } from "@widgets/jogwheel";
-import { render_overlay, render_widget } from "@widgets/render.ts";
+import { render_overlay, render_widget } from "./render.ts";
 import { RotaryScript, UnloadRotaryScript, type RotaryState } from "@widgets/rotary.ts";
 
 let current_overlay_id = -1;
