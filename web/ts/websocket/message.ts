@@ -160,8 +160,9 @@ export function sendMidiEvent(data: MidiEvent) {
  * @param worker 
  * @param data 
  */
-export function sendFrontendMidiEvent(worker: Worker, data: MidiEvent) {
-    sendMessageInput(worker, {
+export function sendFrontendMidiEvent(data: MidiEvent) {
+    console.debug("websocket client", "sendFrontendMidiEvent", data)
+    sendMessage({
         type: WorkerMessageType.MidiFrontendInput,
         data
     })
