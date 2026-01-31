@@ -88,14 +88,14 @@ interface UpdateNoteValue {
     channel: number, note: number, velocity: number, on: boolean, external: boolean
 }
 
-export function sendUpdateNoteValue(channel: number, note: number, velocity: number, on: boolean) {
+export function sendUpdateNoteValue(channel: number, note: number, velocity: number, on: boolean, external: boolean) {
     sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.UpdateNoteValue,
         channel,
         note,
         velocity,
         on,
-        external: false
+        external
     })
 }
 

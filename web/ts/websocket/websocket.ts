@@ -1,5 +1,5 @@
-import type { MidiEvent } from "../common/events.ts";
-import { sendDisconnected, sendMidiEvent } from "./message.ts";
+import { MidiEvent } from "../common/events.ts";
+import { sendDisconnected, sendFrontendMidiEvent, sendMidiEvent } from "./message.ts";
 
 export const wsUri = "ws://" + location.hostname + ":8888/ws";
 
@@ -21,8 +21,14 @@ function setupSocket(socket: WebSocket): WebSocket {
     // Listen for incoming websocket messages from the backend
     socket.addEventListener("message", (e) => {
         const msg: MidiEvent = JSON.parse(e.data);
-        console.log("external data", msg);
-        sendMidiEvent(msg);
+        switch (msg.event_name) {
+            case "noteupdate":
+                console.log("external noteupdate data", msg);
+                //sendFrontendMidiEvent(msg);
+                sendMidiEvent(msg);
+            break;
+
+        }
     });
 
     socket.addEventListener("error", (e) => {

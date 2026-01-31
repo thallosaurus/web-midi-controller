@@ -72,16 +72,18 @@ interface CCUpdate {
     id: string,
     value: number,
     cc: number
-    channel: number
+    channel: number,
+    ext: boolean
 }
 
-export function sendUpdateCCWidget(id: string, channel: number, cc: number, value: number) {
+export function sendUpdateCCWidget(id: string, channel: number, cc: number, value: number, ext: boolean) {
     dispatchWorkerEvent({
         type: EventBusProducerMessageType.CCUpdate,
         id,
         value,
         cc,
-        channel
+        channel,
+        ext
     })
 }
 

@@ -74,7 +74,7 @@ function sendMessage(m: WorkerMessage) {
 }
 
 function sendMessageInput(worker: Worker, m: WorkerMessage) {
-    console.log(m);
+    //console.log(m);
     const msg = JSON.stringify(m)
     worker.postMessage(msg);
 }
@@ -97,8 +97,9 @@ export function process_worker_input(msg: WorkerMessage) {
             break;
 
         case WorkerMessageType.MidiFrontendInput:
-            console.log("data for the backend")
-            send(JSON.stringify(msg.data));
+            console.log("data for the backend", msg.data)
+            const d = JSON.stringify(msg.data)
+            send(d);
             break;
 
         case WorkerMessageType.Disconnect:

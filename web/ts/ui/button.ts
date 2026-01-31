@@ -198,7 +198,7 @@ export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElemen
             new NoteEvent(options.channel, options.note, v > 0, v),
         );*/
 
-        sendUpdateNoteValue(options.channel, options.note, v, v > 0);
+        sendUpdateNoteValue(options.channel, options.note, v, v > 0, false);
 
         // also update ui directly
         if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
@@ -209,7 +209,7 @@ export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElemen
 
     const touch_update = () => {
         //update_bus_value(127);
-        console.log(state.latch_on);
+        //console.log(state.latch_on);
         update_bus_value(state.latch_on ? 127 : 0);
     };
 

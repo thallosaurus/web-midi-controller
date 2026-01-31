@@ -65,17 +65,21 @@ async function init() {
   bus.addEventListener("message", (ev) => {
     const m: EventBusProducerMessage = JSON.parse(ev.data);
 
-    console.log("fuck", m);
-
-    // responsible for sending updates back to the server
+    // responsible for sending updates back to the server from the event bus
     switch (m.type) {
       case EventBusProducerMessageType.NoteUpdate:
-        console.log("sending note update to backend", m);
-        sendFrontendMidiEvent(ws, new NoteEvent(m.channel, m.note, m.velocity > 0, m.velocity));
+        if (!m.ext) {
+          console.log("sending note update to websocket backend", m);
+          sendFrontendMidiEvent(ws, new NoteEvent(m.channel, m.note, m.velocity > 0, m.velocity));
+        } else {
+          console.warn("is external", m);
+        }
         break;
       case EventBusProducerMessageType.CCUpdate:
-        console.log("bus update cc value on main", m);
-        sendFrontendMidiEvent(ws, new CCEvent(m.channel, m.value, m.cc));
+        if (!m.ext) {
+          console.log("bus update cc value on main", m);
+          sendFrontendMidiEvent(ws, new CCEvent(m.channel, m.value, m.cc));
+        }
         break;
     }
   })
@@ -86,19 +90,33 @@ async function init() {
     switch (msg.type) {
 
       // THIS WORKS
+      case WorkerMessageType.MidiFrontendInput:
+        switch (msg.data.event_name) {
+          case "noteupdate":
+            const note_ev = msg.data as NoteEvent;
+            console.log("frontend midi input")
+            sendUpdateExternalNoteWidget(note_ev.midi_channel, note_ev.note, note_ev.velocity);
+            //sendMidiEvent(note_ev);
+            //sendUpdateNoteValue(note_ev.midi_channel, note_ev.note, note_ev.velocity, note_ev.velocity > 0, false)
+            //sendFrontendMidiEvent(ws, )
+
+            break;
+
+        }
+        break;
       case WorkerMessageType.MidiExternalInput:
 
-        if (msg.data.type == "ccupdate") {
+        if (msg.data.event_name == "ccupdate") {
           const cc_ev = msg.data as CCEvent;
-          console.log("frontend external cc update")
+          console.log("external cc update")
           sendUpdateCCValue(cc_ev.midi_channel, cc_ev.cc, cc_ev.value);
           return
         } else if (msg.data.event_name == "noteupdate" && msg) {
           const note_ev = msg.data as NoteEvent;
-          console.log("frontend external note update")
+          console.log("external note update")
 
           // got a message. we now need to send it to the eventbus so that it doesnt send it back
-          sendUpdateNoteValue(note_ev.midi_channel, note_ev.note, note_ev.velocity, note_ev.velocity > 0)
+          //sendUpdateNoteValue(note_ev.midi_channel, note_ev.note, note_ev.velocity, note_ev.velocity > 0, true)
           return;
         }
         break;

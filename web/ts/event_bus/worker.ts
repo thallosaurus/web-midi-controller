@@ -70,14 +70,14 @@ function process_consumer_message(msg: EventBusConsumerMessage) {
             unregister_note_widget(msg.id, msg.channel, msg.note)
             return true;
         case EventBusConsumerMessageType.UpdateCCValue:
-            cc_update_on_bus(msg.channel, msg.cc, msg.value);
+            cc_update_on_bus(msg.channel, msg.cc, msg.value, false);
             return true;
         case EventBusConsumerMessageType.UpdateNoteValue:
             note_update_on_bus(msg.channel, msg.note, msg.velocity, false);
             return true;
         case EventBusConsumerMessageType.ExternalNoteUpdate:
             note_update_on_bus(msg.channel, msg.note, msg.velocity, true);
-            break;
+            return true;
         default:
             return false;
     }
@@ -122,14 +122,15 @@ const unregister_cc_widget = (id: string, channel: number, cc: number) => {
 }
 
 // Update all widgets that are bound to the cc number
-const cc_update_on_bus = (channel: number, cc: number, value: number) => {
+// TODO: make ext non optional
+const cc_update_on_bus = (channel: number, cc: number, value: number, ext: boolean) => {
     const ch = cc_map.get(channel)!;
 
     if (!ch.has(cc)) return;
 
     for (const id of ch.get(cc)!) {
         // send update
-        sendUpdateCCWidget(id, channel, cc, value);
+        sendUpdateCCWidget(id, channel, cc, value, ext);
     }
 }
 
