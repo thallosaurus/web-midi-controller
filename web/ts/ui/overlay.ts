@@ -6,11 +6,12 @@ import { uuid } from "@common/utils.ts";
 
 // widget imports
 import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";
-import { CCSliderScript, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
-import { CCButtonScript, NoteButtonScript, UnloadCCButtonScript, UnloadNoteButtonScript, type ButtonState } from "@widgets/button.ts";
-import { JogwheelScript, type JogState } from "@widgets/jogwheel";
-import { render_overlay, render_widget } from "./render";
-import { RotaryScript, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
+//import { CCSliderLifecycle, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
+//import { ButtonState, CCButtonLifecycle, NoteButtonLifecycle } from "@widgets/button.ts";
+//import { JogwheelLifecycle, type JogState } from "@widgets/jogwheel";
+import { render_overlay, render_widget, WidgetProperties } from "./render";
+import { WidgetLifecycle, WidgetState } from "./lifecycle";
+//import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
@@ -19,8 +20,6 @@ let overlays: Array<LoadedOverlay> = [];
 export function get_current_overlay_id() {
     return overlays.length
 }
-
-//export const overlayUri = "http://" + location.hostname + ":8888/overlays";
 
 /**
  * loads overlays into the system by calling the parse function sequencially. useful for loading from json data
@@ -140,10 +139,6 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
 
 });
 
-export interface WidgetState {
-    handlers: {[key: string]: (e: PointerEvent) => void}
-}
-
 export class LoadedWidget {
     option: Widget
     html: HTMLDivElement
@@ -151,7 +146,9 @@ export class LoadedWidget {
     state: WidgetState
     id: string
 
-    constructor(option: Widget, html: HTMLDivElement) {
+    lifecycle: WidgetLifecycle<WidgetProperties, WidgetState> | null = null
+
+    constructor(option: Widget, html: HTMLDivElement, lifecycle?: WidgetLifecycle<WidgetProperties, WidgetState>) {
         this.option = option;
         this.html = html;
         this.state = {
@@ -160,6 +157,10 @@ export class LoadedWidget {
 
         this.id = uuid();
         this.html.dataset.id = this.id;
+
+        if (lifecycle) {
+            this.lifecycle = lifecycle;
+        }
     }
 }
 
@@ -183,20 +184,10 @@ export class LoadedOverlay {
         for (const o of this.childs) {
 
             //o.state.abort.abort();
-            switch (o.option.type) {
-                case "rotary":
-                    UnloadRotaryScript(o.option, o.html, o.state as RotaryState);
-                    break;
-                case "ccbutton":
-                    UnloadCCButtonScript(o.option, o.html, o.state as ButtonState);
-                    break;
-                case "ccslider":
-                    UnloadCCSliderScript(o.option, o.html, o.state as CCSliderState);
-                    break;
-                case "notebutton":
-                    UnloadNoteButtonScript(o.option, o.html, o.state as ButtonState);
-                    break;
+            if (o.lifecycle) {
+                o.lifecycle.unload(o.option as WidgetProperties, o.html, o.state);
             }
+            o.lifecycle = null
         }
 
     }
@@ -205,24 +196,9 @@ export class LoadedOverlay {
         console.log("loading overlay id " + this.overlay.id)
 
         for (const o of this.childs) {
-            switch (o.option.type) {
-                case "rotary":
-                    RotaryScript(o.option, o.html, o.state as RotaryState);
-                    break;
-                case "ccbutton":
-                    CCButtonScript(o.option, o.html, o.state as ButtonState);
-                    break;
-                case "ccslider":
-                    CCSliderScript(o.option, o.html, o.state as CCSliderState);
-                    break;
-                case "notebutton":
-                    NoteButtonScript(o.option, o.html, o.state as ButtonState);
-                    break;
-                case "jogwheel":
-                    JogwheelScript(o.option, o.html, o.state as JogState);
-                    break;
-            }
+            o.lifecycle?.load(o.option as unknown as any, o.html, o.state);
         }
+
     }
 }
 

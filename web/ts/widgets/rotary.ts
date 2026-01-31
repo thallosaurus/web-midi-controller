@@ -1,9 +1,9 @@
-import type { WidgetState } from "@core/overlay";
+import { WidgetLifecycle, type WidgetState } from "@core/lifecycle";
 import { vibrate } from "@common/ui_utils";
 
 import type { RotarySliderProperties } from "@bindings/Widget";
 import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client.ts";
-import "@widgets/css/rotary.css";
+import "./css/rotary.css";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
@@ -13,6 +13,20 @@ export interface RotaryState extends WidgetState {
     value: number
     lastX: number
     active: boolean
+}
+
+export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, RotaryState> {
+    constructor(container: HTMLDivElement, options: RotarySliderProperties) {
+        super();
+        Rotary(container, options)
+    }
+    load(options: RotarySliderProperties, html: HTMLDivElement, state: RotaryState): void {
+        RotaryScript(options, html, state)
+    }
+    unload(options: RotarySliderProperties, html: HTMLDivElement, state: RotaryState): void {
+        UnloadRotaryScript(options, html, state);
+    }
+
 }
 
 export const Rotary = (container: HTMLDivElement, _options: RotarySliderProperties): HTMLDivElement => {
@@ -112,7 +126,7 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state
     }
 
     //register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
-    registerCCWidget(s.channel, s.cc, s.default_value ?? 0, update_value)
+    registerCCWidget(s.channel, s.cc, s.value ?? 0, update_value)
     
     state.handlers.pointerdown = touch_start;
     state.handlers.pointermove = touch_move;

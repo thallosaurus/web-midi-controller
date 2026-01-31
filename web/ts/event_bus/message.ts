@@ -40,12 +40,14 @@ interface RegisterCCCallback {
     id: string,
     value: number,
     cc: number
-    channel: number
+    channel: number,
+    ext: boolean
 }
 
 export function sendInitCCWidget(id: string, channel: number, cc: number, value: number) {
     dispatchWorkerEvent({
         type: EventBusProducerMessageType.RegisterCCCallback,
+        ext: true,
         id,
         value,
         cc,
@@ -90,15 +92,18 @@ interface RegisterNoteCallback {
     id: string,
     channel: number,
     note: number,
-    value?: number
+    //value: number,
+    velocity: number,
+    ext: boolean
 }
 
-export function sendInitNoteWidget(id: string, channel: number, note: number, value?: number) {
+export function sendInitNoteWidget(id: string, channel: number, note: number, velocity: number) {
     dispatchWorkerEvent({
         type: EventBusProducerMessageType.RegisterNoteCallback,
+        ext: true,
         id,
         note,
-        value,
+        velocity,
         channel
     })
 }

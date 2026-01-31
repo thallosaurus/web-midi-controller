@@ -1,5 +1,6 @@
 import { log } from "@common/logger";
 import "./css/dialogs.css";
+import "./css/overlay_menu.css"
 
 export class UiDialog {
   static dialogs = new Map<string, UiDialog>();
@@ -26,7 +27,7 @@ export class UiDialog {
   }
 
   static initDialogTriggers() {
-    document.querySelectorAll<HTMLElement>("[data-dialog-trigger]").forEach(el => {
+    document.querySelectorAll<HTMLElement>("[data-dialog-trigger]:not(.disabled)").forEach(el => {
       const id = el.dataset.dialogTrigger;
 
       if (!id || !this.dialogs.has(id!)) throw new Error("dialog with id " + " not found");

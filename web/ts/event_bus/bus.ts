@@ -150,7 +150,7 @@ const register_note_widget = (id: string, channel: number, note: number) => {
     const n = ch.get(note)!;
     n.push(id);
 
-    sendInitNoteWidget(id, channel, note)
+    sendInitNoteWidget(id, channel, note, 0)
 };
 
 const unregister_note_widget = (id: string, channel: number, note: number) => {

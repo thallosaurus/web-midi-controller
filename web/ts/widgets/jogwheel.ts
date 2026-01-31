@@ -1,12 +1,26 @@
 import { JogDirection, sendUpdateJogValue } from "@eventbus/client.ts"
 import type { JogwheelProperties } from "@bindings/Widget"
-import type { WidgetState } from "@core/overlay"
+import { WidgetLifecycle, type WidgetState } from "@core/lifecycle"
 import "./css/jogwheel.css"
 
 export interface JogState extends WidgetState {
     active: boolean
     lastX: number
     lastTime: number
+}
+
+export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogState> {
+    constructor(container: HTMLDivElement, options: JogwheelProperties) {
+        super();
+        Jogwheel(container, options)
+    }
+    load(options: JogwheelProperties, html: HTMLDivElement, state: JogState): void {
+        JogwheelScript(options, html, state);
+    }
+    unload(options: JogwheelProperties, html: HTMLDivElement, state: JogState): void {
+        UnloadJogwheelScript(options, html, state);
+    }
+
 }
 
 export const Jogwheel = (container: HTMLDivElement, _options: JogwheelProperties): HTMLDivElement => {
@@ -84,7 +98,7 @@ export const JogwheelScript = (s: JogwheelProperties, o: HTMLDivElement, state: 
     o.addEventListener("pointercancel", state.handlers.pointercancel);
 }
 
-export const UnloadJogwheelScript = (id: string, s: JogwheelProperties, o: HTMLDivElement, state: JogState) => {
+export const UnloadJogwheelScript = (s: JogwheelProperties, o: HTMLDivElement, state: JogState) => {
     o.removeEventListener("pointerdown", state.handlers.pointerdown);
     o.removeEventListener("pointermove", state.handlers.pointermove);
     o.removeEventListener("pointerup", state.handlers.pointerup);
