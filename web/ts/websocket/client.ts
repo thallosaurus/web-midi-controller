@@ -41,7 +41,7 @@ export let lastError: Error | null;
 export function initWebsocketWorker(): Worker {
     //if (wsWorker !== null) throw new Error("the websocket thread is already running")
     let w = new Worker(new URL("./worker.js", import.meta.url), { type: 'module' })
-    ConnectWebsocketWorkerWithHandler(w);
+    //ConnectWebsocketWorkerWithHandler(w);
     return w
 }
 
@@ -57,28 +57,32 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
 
             switch (msg.type) {
                 case SocketWorkerResponse.Connected:
+                    debugger;
                     log("worker connection successful", msg)
                     //wsWorker = worker;
+                    worker.removeEventListener("message", fn);
                     res(msg);
                     break;
 
                 case SocketWorkerResponse.ConnectError:
                     log("connect error", msg);
+                    worker.removeEventListener("message", fn);
                     rej(msg.error)
                     break;
 
                 case SocketWorkerResponse.Disconnected:
                     //wsWorker = null;
                     log("disconnected")
+                    worker.removeEventListener("message", fn);
                     rej("server disconnected while connecting - no reason idk")
                     break;
             }
-            worker.removeEventListener("message", fn);
 
         }
         worker.addEventListener("message", fn);
 
         // send this from the ui to connect the given socket to the uri
+        //autoconnect?
         //connectSocketMessage(worker, wsUri);
     })
 }

@@ -28,7 +28,7 @@ export function setup_overlay_selector(ol: LoadedOverlay[]) {
  * @deprecated
  * @param worker 
  */
-export function initWebsocketUI(worker: Worker) {
+/*export function initWebsocketUI(worker: Worker) {
   const app_elem = document.querySelector<HTMLDivElement>("#app")!;
   app_elem.classList.add("disconnected");
   
@@ -47,7 +47,7 @@ export function initWebsocketUI(worker: Worker) {
     }
   }
   worker.addEventListener("message", fn);
-}
+}*/
 
 // UI Shit
 export function init_debug() {

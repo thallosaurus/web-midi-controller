@@ -27,7 +27,6 @@ function output(level: LogLevel, ...msg: any) {
             break;
         case LogLevel.Log:
             console.log(tag, ...msg);
-            //debugger;
             break;
     }
 }

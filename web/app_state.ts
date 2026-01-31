@@ -1,5 +1,5 @@
 import { UiDialog } from './ts/ui/dialogs.ts'
-import { init_debug, initWebsocketUI, setup_overlay_selector } from "./ts/common/ui_utils.ts";
+import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
 import { initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./ts/event_bus/client.ts";
 import { SocketWorkerResponse, SocketWorkerResponseType } from "./ts/websocket/message.ts";
 import { sendFrontendMidiEvent } from "./ts/websocket/client.ts";
@@ -41,14 +41,26 @@ export class App {
         setup_logger("frontend");
         this.initBackend().then((handlers) => {
             this.handlers = handlers
-            debug("were handlers set?", this);
-              const conn_msg = ConnectWebsocketWorkerWithHandler(handlers.socket!); //.then(([worker, connectionInfo])
-
+            console.log("were handlers set?", handlers);
+            
             App.defaultWorkerHandler(this.handlers);
             this.initUi(this.handlers);
             this.initWebsocketUIChanges(this.handlers)
             debug("init done", this);
         });
+    }
+    connectToServer() {
+        ConnectWebsocketWorkerWithHandler(this.handlers.socket!)
+        .then (conn_msg => {
+
+            return fetch(conn_msg.overlay_path)
+        })
+            .then(ol => ol.json())
+            .then(ol => load_overlays_from_array(ol))
+            .then((ol) => {
+                setup_overlay_selector(ol);
+                change_overlay(0)
+            })
     }
     async initBackend(): Promise<AppWorkerHandler> {
         let socket = initWebsocketWorker();
@@ -115,7 +127,11 @@ export class App {
                     clear_loaded_overlays();
                     clear_overlay_selector();
                     // maybe?
-                    h.socket!.removeEventListener("message", fn);
+                    //h.socket!.removeEventListener("message", fn);
+                    break;
+
+                case SocketWorkerResponse.Connected:
+                    this.app_elem.classList.remove("disconnected");
                     break;
 
                 // TODO Connect case for reconnects?
@@ -128,7 +144,7 @@ export class App {
 
     initUi(h: AppWorkerHandler) {
         //init_dialogs();
-        this.initWebsocketUIChanges(h)
+        //this.initWebsocketUIChanges(h)
         UiDialog.initDialogs();
         UiDialog.initDialogTriggers();
     }
@@ -143,15 +159,12 @@ export class App {
             });*/
             //            alert("not implemented yet")
             //ConnectSocketEvent(h.socket!)
+            console.log("sending connect to socket message from button")
             connectSocketMessage(h.socket!, wsUri);
+        }, {
+            capture: true
         });
     }
-}
-
-async function create_worker_threads() {
-    const bus = await initEventBusWorker();
-    const ws = initWebsocketWorker();
-    //app_elem.classList.remove("disconnected");
 }
 
 const clear_overlay_selector = () => {
