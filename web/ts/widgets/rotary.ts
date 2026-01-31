@@ -126,7 +126,7 @@ export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state
     }
 
     //register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
-    registerCCWidget(s.channel, s.cc, s.default_value ?? 0, update_value)
+    registerCCWidget(s.channel, s.cc, s.value ?? 0, update_value)
     
     state.handlers.pointerdown = touch_start;
     state.handlers.pointermove = touch_move;

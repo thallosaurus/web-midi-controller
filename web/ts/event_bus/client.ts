@@ -9,7 +9,7 @@ interface EventBusProperties {
 
 
 function sendEventToWorker(worker: Worker | null, msg: EventBusConsumerMessage) {
-    if (!worker) throw new Error ("cant send on a null event bus")
+    if (!worker) throw new Error("cant send on a null event bus")
     worker.postMessage(msg)
 }
 
@@ -208,30 +208,44 @@ type EventBusCallback = (value: number) => void;
 
 const callbacks = new Map<string, EventBusCallback>();
 
+function EventBusDistributeUpdatesToMatrix(ebWorker: Worker) {
+    ebWorker.addEventListener("message", (ev) => {
+        const msg: EventBusProducerMessage = JSON.parse(ev.data);
+        switch (msg.type) {
+            //            case EventBusProducerMessageType.RegisterCCCallback:
+            //                console.log("register cc callback")
+            case EventBusProducerMessageType.CCUpdate:
+                {
+                    //console.log("event bus", "cc update", msg);
+                    //const cb = callbacks.get(msg.id)!;
+                    //cb(msg.value)
+                    //EventBusDistributeUpdatesToMatrix(msg.id, msg.value);
+                    const cb = callbacks.get(msg.id)!;
+                    cb(msg.value)
+                }
+                break;
+            //                    case EventBusProducerMessageType.RegisterNoteCallback:  // fallthrough
+            //                console.log("register note callback")
+            case EventBusProducerMessageType.NoteUpdate:
+                {
+                    //console.log("event bus", "note update", msg);
+                    //const cb = callbacks.get(msg.id)!;
+                    //cb(msg.velocity);
+                    //EventBusDistributeUpdatesToMatrix(msg.id, msg.velocity);
+                    const cb = callbacks.get(msg.id)!;
+                    cb(msg.velocity)
+                }
+                break;
+        }
+    })
+}
+
 let ebWorker: Worker | null = null
 export function initEventBusWorker(): Promise<Worker> {
     if (ebWorker !== null) throw new Error("the event bus is already running");
 
     ebWorker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
-    ebWorker.addEventListener("message", (ev) => {
-        const msg: EventBusProducerMessage = JSON.parse(ev.data);
-        switch (msg.type) {
-            case EventBusProducerMessageType.CCUpdate:
-                {
-                    //console.log("event bus", "cc update", msg);
-                    const cb = callbacks.get(msg.id)!;
-                    cb(msg.value)
-                }
-                break;
-                case EventBusProducerMessageType.NoteUpdate:
-                    {
-                    //console.log("event bus", "note update", msg);
-                    const cb = callbacks.get(msg.id)!;
-                    cb(msg.velocity);
-                }
-                break;
-        }
-    })
+
 
     const p = new Promise<Worker>((res, rej) => {
 
@@ -242,9 +256,13 @@ export function initEventBusWorker(): Promise<Worker> {
                     ebWorker?.removeEventListener("message", fn);
                     res(ebWorker!);
                     break;
+                }
             }
-        }
-        ebWorker?.addEventListener("message", fn);
+            ebWorker?.addEventListener("message", fn);
+        });
+        
+        p.then(worker => {
+        EventBusDistributeUpdatesToMatrix(worker);
     });
 
     sendInitBus();

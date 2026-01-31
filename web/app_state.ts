@@ -1,6 +1,6 @@
 import { UiDialog } from './ts/ui/dialogs.ts'
 import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
-import { initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./ts/event_bus/client.ts";
+import { EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./ts/event_bus/client.ts";
 import { SocketWorkerResponse, SocketWorkerResponseType } from "./ts/websocket/message.ts";
 import { sendFrontendMidiEvent } from "./ts/websocket/client.ts";
 import { CCEvent, MidiEvent, NoteEvent } from "./ts/common/events.ts";
@@ -70,6 +70,8 @@ export class App {
 
             // responsible for sending updates back to the server from the event bus
             switch (m.type) {
+                //case EventBusProducerMessageType.RegisterNoteCallback:
+
                 case EventBusProducerMessageType.NoteUpdate:
                     //only forward internal midi events
                     if (!m.ext) {
@@ -77,6 +79,7 @@ export class App {
                         sendFrontendMidiEvent(h.socket!, new NoteEvent(m.channel, m.note, m.velocity > 0, m.velocity));
                     }
                     break;
+                //case EventBusProducerMessageType.RegisterCCCallback:
                 case EventBusProducerMessageType.CCUpdate:
                     //only forward internal midi events
                     if (!m.ext) {

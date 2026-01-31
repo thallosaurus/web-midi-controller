@@ -50,7 +50,6 @@ export async function connect(uri: string = wsUri, handler = setupSocket): Promi
     await new Promise((resolve, reject) => {
 
         const fn_open = (e: any) => {
-            console.log(e);
             socket.removeEventListener("open", fn_open);
             resolve(socket);
         }
