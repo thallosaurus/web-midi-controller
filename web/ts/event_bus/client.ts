@@ -218,14 +218,14 @@ export function initEventBusWorker(): Promise<Worker> {
         switch (msg.type) {
             case EventBusProducerMessageType.CCUpdate:
                 {
-                    console.log("event bus", "cc update", msg);
+                    //console.log("event bus", "cc update", msg);
                     const cb = callbacks.get(msg.id)!;
                     cb(msg.value)
                 }
                 break;
                 case EventBusProducerMessageType.NoteUpdate:
                     {
-                    console.log("event bus", "note update", msg);
+                    //console.log("event bus", "note update", msg);
                     const cb = callbacks.get(msg.id)!;
                     cb(msg.velocity);
                 }

@@ -16,6 +16,10 @@ export interface ButtonState extends WidgetState {
 }
 
 export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, ButtonState> {
+    constructor(container: HTMLDivElement, options: NoteButtonProperties) {
+        super();
+        NoteButton(container, options);
+    }
     load(options: NoteButtonProperties, html: HTMLDivElement, state: ButtonState): void {
         NoteButtonScript(options, html, state)
     }
@@ -25,6 +29,10 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
 }
 
 export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, ButtonState> {
+    constructor(container: HTMLDivElement, options: CCButtonProperties) {
+        super();
+        CCButton(container, options);
+    }
     load(options: CCButtonProperties, html: HTMLDivElement, state: ButtonState): void {
         CCButtonScript(options, html, state)
     }

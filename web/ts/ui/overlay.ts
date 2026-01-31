@@ -9,8 +9,8 @@ import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerPrope
 //import { CCSliderLifecycle, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
 //import { ButtonState, CCButtonLifecycle, NoteButtonLifecycle } from "@widgets/button.ts";
 //import { JogwheelLifecycle, type JogState } from "@widgets/jogwheel";
-import { render_overlay, render_widget } from "./render";
-import { WidgetLifecycle, WidgetProperties, WidgetState } from "./lifecycle";
+import { render_overlay, render_widget, WidgetProperties } from "./render";
+import { WidgetLifecycle, WidgetState } from "./lifecycle";
 //import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 
 let current_overlay_id = -1;
@@ -148,7 +148,7 @@ export class LoadedWidget {
 
     lifecycle: WidgetLifecycle<WidgetProperties, WidgetState> | null = null
 
-    constructor(option: Widget, html: HTMLDivElement) {
+    constructor(option: Widget, html: HTMLDivElement, lifecycle?: WidgetLifecycle<WidgetProperties, WidgetState>) {
         this.option = option;
         this.html = html;
         this.state = {
@@ -157,6 +157,10 @@ export class LoadedWidget {
 
         this.id = uuid();
         this.html.dataset.id = this.id;
+
+        if (lifecycle) {
+            this.lifecycle = lifecycle;
+        }
     }
 }
 
@@ -180,24 +184,10 @@ export class LoadedOverlay {
         for (const o of this.childs) {
 
             //o.state.abort.abort();
-            o.lifecycle!.unload(o.option as WidgetProperties, o.html, o.state);
+            if (o.lifecycle) {
+                o.lifecycle.unload(o.option as WidgetProperties, o.html, o.state);
+            }
             o.lifecycle = null
-            /*switch (o.option.type) {
-
-
-                case "rotary":
-                    UnloadRotaryScript(o.option, o.html, o.state as RotaryState);
-                    break;
-                case "ccbutton":
-                    UnloadCCButtonScript(o.option, o.html, o.state as ButtonState);
-                    break;
-                case "ccslider":
-                    UnloadCCSliderScript(o.option, o.html, o.state as CCSliderState);
-                    break;
-                case "notebutton":
-                    UnloadNoteButtonScript(o.option, o.html, o.state as ButtonState);
-                    break;
-            }*/
         }
 
     }
@@ -206,7 +196,7 @@ export class LoadedOverlay {
         console.log("loading overlay id " + this.overlay.id)
 
         for (const o of this.childs) {
-            o.lifecycle = WidgetLifecycle.fromWidget(o);
+            o.lifecycle?.load(o.option as unknown as any, o.html, o.state);
         }
 
     }

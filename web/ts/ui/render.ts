@@ -10,7 +10,7 @@ import { CCSlider, CCSliderLifecycle, CCSliderState } from "@widgets/slider";
 import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
 import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
-function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> {
+/*export function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> | null{
         switch (o.option.type) {
             case "rotary":
                 {
@@ -50,13 +50,11 @@ function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetSt
                     return s;
                     //JogwheelScript(o.option, o.html, o.state as JogState);
                 }
-
         }
+        return null
+    }*/
 
-        throw new Error("cant load lifecycle for " + o.option.type);
-    }
-
-// Converts the given Overlay to a LoadedOverlay which contains runtime variables
+// Converts the given Overlay to a LoadedOverlay which contains runtime variables and renders it into the given element
 export function render_overlay(overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay {
     const e = render_options.element ?? document.createElement("div") as HTMLDivElement;
     let children: Array<LoadedWidget> = [];
@@ -81,21 +79,24 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
             {
                 const w = cell as CCButtonProperties;
                 //if (w.id) e.id = cell.id;
-                CCButton(e, w);
+                //CCButton(e, w);
+                return new LoadedWidget(cell, e, new CCButtonLifecycle(e, w))
             }
             break;
 
         case "rotary":
             {
                 const w = cell as RotarySliderProperties;
-                Rotary(e, w);
+                //Rotary(e, w);
+                return new LoadedWidget(cell, e, new RotaryLifecycle(e, w))
             }
             break;
 
         case "ccslider":
             {
                 const w = cell as CCSliderProperties;
-                CCSlider(e, w);
+                //CCSlider(e, w);
+                return new LoadedWidget(cell, e, new CCSliderLifecycle(e, w))
             }
             break;
 
@@ -110,6 +111,7 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
             {
                 const w = cell as VerticalMixerProperties;
                 VertMixer(e, w, children);
+                return new LoadedWidget(cell, e);
             }
             break;
 
@@ -117,20 +119,23 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
             {
                 const w = cell as HorizontalMixerProperties;
                 HorizMixer(e, w, children);
+                return new LoadedWidget(cell, e);
             }
             break;
 
         case "notebutton":
             {
                 const w = cell as NoteButtonProperties;
-                NoteButton(e, w);
+                //NoteButton(e, w);
+                return new LoadedWidget(cell, e, new NoteButtonLifecycle(e, w))
             }
             break;
 
         case "jogwheel":
             {
                 const w = cell as JogwheelProperties;
-                Jogwheel(e, w);
+                return new LoadedWidget(cell, e, new JogwheelLifecycle(e, w));
+                //Jogwheel(e, w);
             }
             break;
     }

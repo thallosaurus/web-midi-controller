@@ -10,6 +10,10 @@ export interface JogState extends WidgetState {
 }
 
 export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogState> {
+    constructor(container: HTMLDivElement, options: JogwheelProperties) {
+        super();
+        Jogwheel(container, options)
+    }
     load(options: JogwheelProperties, html: HTMLDivElement, state: JogState): void {
         JogwheelScript(options, html, state);
     }

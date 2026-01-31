@@ -16,6 +16,10 @@ export interface RotaryState extends WidgetState {
 }
 
 export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, RotaryState> {
+    constructor(container: HTMLDivElement, options: RotarySliderProperties) {
+        super();
+        Rotary(container, options)
+    }
     load(options: RotarySliderProperties, html: HTMLDivElement, state: RotaryState): void {
         RotaryScript(options, html, state)
     }

@@ -16,11 +16,15 @@ export interface CCSliderState extends WidgetState {
 }
 
 export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSliderState> {
+    constructor(container: HTMLDivElement, options: CCSliderProperties) {
+        super();
+        CCSlider(container, options);
+    }
     load(options: CCSliderProperties, html: HTMLDivElement, state: CCSliderState): void {
-        throw new Error("Method not implemented.");
+        CCSliderScript(options, html, state);
     }
     unload(options: CCSliderProperties, html: HTMLDivElement, state: CCSliderState): void {
-        throw new Error("Method not implemented.");
+        UnloadCCSliderScript(options, html, state);
     }
 }
 // Renders the slider markup
