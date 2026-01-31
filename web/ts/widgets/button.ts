@@ -9,7 +9,6 @@ export interface ButtonState extends WidgetState {
     id: string | null
     latch_on: boolean,
     active_pointer: number | null,
-    
 }
 
 export const UnloadNoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {

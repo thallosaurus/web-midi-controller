@@ -141,7 +141,45 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
 });
 
 export interface WidgetState {
-    handlers: {[key: string]: (e: PointerEvent) => void}
+    handlers: { [key: string]: (e: PointerEvent) => void }
+}
+
+
+
+export abstract class WidgetLifecycle {
+    // appends stuff to the widget before the widget itself
+    constructor() { }
+    load(options: Widget, html: HTMLDivElement, state: WidgetState) {
+
+    }
+    unload() {
+
+    }
+    static fromWidget(o: LoadedWidget): WidgetLifecycle {
+        switch (o.option.type) {
+            case "rotary":
+                RotaryScript(o.option, o.html, o.state as RotaryState);
+                break;
+            case "ccbutton":
+                CCButtonScript(o.option, o.html, o.state as ButtonState);
+                break;
+            case "ccslider":
+                CCSliderScript(o.option, o.html, o.state as CCSliderState);
+                break;
+            case "notebutton":
+                NoteButtonScript(o.option, o.html, o.state as ButtonState);
+                break;
+            case "jogwheel":
+                JogwheelScript(o.option, o.html, o.state as JogState);
+                break;
+        }
+
+        return new DummyWidgetLifecycle();
+    }
+}
+
+class DummyWidgetLifecycle extends WidgetLifecycle {
+    
 }
 
 export class LoadedWidget {
@@ -150,6 +188,8 @@ export class LoadedWidget {
 
     state: WidgetState
     id: string
+
+    lifecycle: WidgetLifecycle | null = null
 
     constructor(option: Widget, html: HTMLDivElement) {
         this.option = option;
@@ -183,7 +223,9 @@ export class LoadedOverlay {
         for (const o of this.childs) {
 
             //o.state.abort.abort();
+            o.lifecycle!.unload();
             switch (o.option.type) {
+
                 case "rotary":
                     UnloadRotaryScript(o.option, o.html, o.state as RotaryState);
                     break;
@@ -205,24 +247,9 @@ export class LoadedOverlay {
         console.log("loading overlay id " + this.overlay.id)
 
         for (const o of this.childs) {
-            switch (o.option.type) {
-                case "rotary":
-                    RotaryScript(o.option, o.html, o.state as RotaryState);
-                    break;
-                case "ccbutton":
-                    CCButtonScript(o.option, o.html, o.state as ButtonState);
-                    break;
-                case "ccslider":
-                    CCSliderScript(o.option, o.html, o.state as CCSliderState);
-                    break;
-                case "notebutton":
-                    NoteButtonScript(o.option, o.html, o.state as ButtonState);
-                    break;
-                case "jogwheel":
-                    JogwheelScript(o.option, o.html, o.state as JogState);
-                    break;
-            }
+            o.lifecycle = WidgetLifecycle.fromWidget(o);
         }
+
     }
 }
 
