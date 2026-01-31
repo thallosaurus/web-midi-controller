@@ -3,9 +3,9 @@ import "./style.css";
 import "./colors.css";
 
 import { App } from './app_state.ts'
-import { initWebsocketUI, setup_overlay_selector } from "./ts/common/ui_utils.ts";
+import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
 import { change_overlay, load_overlays_from_array } from "./ts/ui/overlay.ts";
-import { ConnectSocketEvent, ConnectWebsocketWorkerWithHandler, FrontendSocketEvent, initWebsocketWorker } from "@websocket/client.ts";
+import { ConnectWebsocketWorkerWithHandler, initWebsocketWorker } from "@websocket/client.ts";
 
 const init_ui = () => {
 
@@ -24,7 +24,7 @@ const init_ui = () => {
 };
 
 self.addEventListener("DOMContentLoaded", () => {
-  try {
+  //try {
     //init_ui();
     new App();
     console.log("finished ui init")
@@ -39,9 +39,9 @@ self.addEventListener("DOMContentLoaded", () => {
       });*/
     }
 
-  } catch (e) {
+  /*} catch (e) {
     alert(e);
-  }
+  }*/
 });
 
 async function init() {
@@ -59,7 +59,7 @@ async function init() {
     eventbus: bus
   });*/
 
-  initWebsocketUI(ws);
+  //initWebsocketUI(ws);
 
   // connect to the websocket
   const conn_msg = await ConnectWebsocketWorkerWithHandler(ws); //.then(([worker, connectionInfo])

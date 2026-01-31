@@ -27,6 +27,7 @@ function output(level: LogLevel, ...msg: any) {
             break;
         case LogLevel.Log:
             console.log(tag, ...msg);
+            //debugger;
             break;
     }
 }
@@ -34,21 +35,21 @@ export function debug(...msg: unknown[]) {
 
     output(LogLevel.Debug, ...msg)
 };
-export function warn(msg: any) {
+export function warn(...msg: unknown[]) {
 
     output(LogLevel.Warn, ...msg)
 };
-export function error(msg: any) {
+export function error(...msg: unknown[]) {
 
     output(LogLevel.Error, ...msg)
 };
-export function info(msg: any) {
+export function info(...msg: unknown[]) {
 
     output(LogLevel.Info, ...msg)
 };
-export function log(msg: any) {
+export function log(...msg: unknown[]) {
 
-    output(LogLevel.Info, ...msg)
+    output(LogLevel.Log, ...msg)
 };
 //export  warn = { return Logger._logger.debug };
 //export const error = Logger._logger.debug;

@@ -1,9 +1,42 @@
 //import { connect, disconnect, send, wsUri } from "./websocket.ts";
-import { disconnectSocketMessage, sendFrontendMidiEvent, type ConnectedMessage, type WorkerMessage, WorkerMessageType, connectSocketMessage } from "./message";
+import { type ConnectedMessage, SocketWorkerResponse, SocketWorkerResponseType } from "./message";
 import { MidiEvent } from "../common/events.ts";
+import { log } from "@common/logger.ts";
+import { wsUri } from "./websocket.ts";
+
+export enum SocketWorkerRequestType {
+    Connect = "connect",
+    Disconnect = "disconnect",
+    MidiFrontendInput = "midi_frontend_input",
+}
+
+export type SocketWorkerRequest =
+| ConnectSocketMessage
+| DisconnectSocketMessage
+| SurfaceMidiEvent
+
+interface SurfaceMidiEvent {
+    type: SocketWorkerRequestType.MidiFrontendInput
+    data: MidiEvent
+}
+/**
+ * Send this from the frontend if you want to connect
+ */
+export interface ConnectSocketMessage {
+    type: SocketWorkerRequestType.Connect,
+    uri: string
+}
+
+/**
+ * Send this from the frontend if you want to disconnect
+ */
+interface DisconnectSocketMessage {
+    type: SocketWorkerRequestType.Disconnect
+}
+
 
 // should run in another thread
-export let wsWorker: Worker | null = null;
+//export let wsWorker: Worker | null = null;
 export let lastError: Error | null;
 export function initWebsocketWorker(): Worker {
     //if (wsWorker !== null) throw new Error("the websocket thread is already running")
@@ -17,53 +50,75 @@ export function initWebsocketWorker(): Worker {
 export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
     return new Promise<ConnectedMessage>((res, rej) => {
 
-        worker.addEventListener("message", (ev) => {
-            const msg: WorkerMessage = JSON.parse(ev.data);
+        const fn = (e: any) => {
+
+            const msg: SocketWorkerResponseType = JSON.parse(e.data);
             //console.log("worker message", msg);
 
             switch (msg.type) {
-                case WorkerMessageType.Connected:
-                    console.log("main -", "worker connection successful", msg)
-                    wsWorker = worker;
+                case SocketWorkerResponse.Connected:
+                    log("worker connection successful", msg)
+                    //wsWorker = worker;
                     res(msg);
                     break;
 
-                case WorkerMessageType.ConnectError:
-                    console.log("main", msg);
+                case SocketWorkerResponse.ConnectError:
+                    log("connect error", msg);
                     rej(msg.error)
-                    lastError = msg.error;
                     break;
 
-                case WorkerMessageType.Disconnected:
-                    wsWorker = null;
-                    console.log("initWebsocketWorker", "disconnected")
+                case SocketWorkerResponse.Disconnected:
+                    //wsWorker = null;
+                    log("disconnected")
                     rej("server disconnected while connecting - no reason idk")
                     break;
             }
-        });
-        connectSocketMessage(worker);
+            worker.removeEventListener("message", fn);
+
+        }
+        worker.addEventListener("message", fn);
+
+        // send this from the ui to connect the given socket to the uri
+        //connectSocketMessage(worker, wsUri);
     })
 }
 
-export function FrontendSocketEvent(ev: MidiEvent) {
-    if (wsWorker != null) {
-        sendFrontendMidiEvent(wsWorker, ev);
-    } else {
-        throw new Error("wsWorker was null");
-    }
+export function sendMessageInput(worker: Worker, m: SocketWorkerRequest) {
+    //console.log(m);
+    const msg = JSON.stringify(m)
+    worker.postMessage(msg);
 }
 
-export function DisconnectSocketEvent() {
-    if (wsWorker != null) {
-        disconnectSocketMessage(wsWorker);
-    } else {
-        throw new Error("wsWorker was null");
-    }
+export function connectSocketMessage(worker: Worker, uri: string) {
+    sendMessageInput(worker, {
+        type: SocketWorkerRequestType.Connect,
+        uri
+    });
 }
 
-export function ConnectSocketEvent(ws: Worker) {
-    if (wsWorker != null) {
-        connectSocketMessage(ws);
+export function disconnectSocketMessage(worker: Worker) {
+    sendMessageInput(worker, {
+        type: SocketWorkerRequestType.Disconnect
+    });
+}
+
+/***
+ * Sane as sendMidiEvent, but from the main thread - dont get them mixed up
+ * @param worker 
+ * @param data 
+ */
+export function sendFrontendMidiEvent(ws: Worker, data: MidiEvent) {
+    console.debug("websocket client", "sendFrontendMidiEvent", data)
+    sendMessageInput(ws, {
+        type: SocketWorkerRequestType.MidiFrontendInput,
+        data
+    })
+}
+
+//send this from the ui to connect the giveb socket to the uri
+export function _ConnectSocketEvent(ws: Worker, uri: string) {
+    if (ws != null) {
+        connectSocketMessage(ws, uri);
     } else {
         throw new Error("wsWorker was null");
     }

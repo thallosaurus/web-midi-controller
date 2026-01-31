@@ -1,8 +1,8 @@
 import { Overlay } from "../../bindings/Overlay";
 import { change_overlay, clear_loaded_overlays, load_overlays_from_array, LoadedOverlay, setup_tabs } from "../ui/overlay";
-import { WorkerMessage, WorkerMessageType } from "../websocket/message";
-import { DisconnectSocketEvent } from "../websocket/client";
-import { close_dialog } from "../ui/dialogs";
+import { SocketWorkerResponse, SocketWorkerResponseType } from "../websocket/message";
+import { disconnectSocketMessage } from "../websocket/client";
+//import { close_dialog } from "../ui/dialogs";
 
 export function vibrate() {
   if (navigator.vibrate) {
@@ -18,13 +18,14 @@ export function setup_overlay_selector(ol: LoadedOverlay[]) {
   setup_tabs(ol, overlay_selector, (i) => {
     console.log("setting tab ", i)
     change_overlay(i);
-    close_dialog("menu")
+    //close_dialog("menu")
   });
   //change_overlay(0);*/
 }
 
 /**
  * setup the given WebSocket Worker for the Application
+ * @deprecated
  * @param worker 
  */
 export function initWebsocketUI(worker: Worker) {
@@ -32,9 +33,9 @@ export function initWebsocketUI(worker: Worker) {
   app_elem.classList.add("disconnected");
   
   const fn = (ev: MessageEvent<any>) => {
-    const msg: WorkerMessage = JSON.parse(ev.data);
+    const msg: SocketWorkerResponseType = JSON.parse(ev.data);
     switch (msg.type) {
-      case WorkerMessageType.Disconnected:
+      case SocketWorkerResponse.Disconnected:
         app_elem.classList.add("disconnected");
         clear_loaded_overlays();
         clear_overlay_selector();
@@ -66,7 +67,7 @@ export function init_debug() {
     // add debug connection toggles
     document.querySelectorAll<HTMLDivElement>(".menu-connected-label").forEach(menu_connected_label => {
       menu_connected_label.addEventListener("click", (e) => {
-        DisconnectSocketEvent();
+        //disconnectSocketMessage();
       })
     });
 
@@ -85,7 +86,9 @@ export function init_debug() {
   }
 }
 
-
+/**
+ * @deprecated
+ */
 const clear_overlay_selector = () => {
   const overlay_selector = document.querySelector<HTMLUListElement>(
     "ul#overlay_selector",
