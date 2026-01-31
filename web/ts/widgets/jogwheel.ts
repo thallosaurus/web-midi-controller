@@ -1,7 +1,7 @@
-import type { JogwheelProperties } from "../../bindings/Widget"
-import type { WidgetState } from "./overlay"
+import { JogDirection, sendUpdateJogValue } from "@eventbus/client.ts"
+import type { JogwheelProperties } from "@bindings/Widget"
+import type { WidgetState } from "@core/overlay"
 import "./css/jogwheel.css"
-import { JogDirection, sendUpdateJogValue } from "../event_bus/client.ts"
 
 export interface JogState extends WidgetState {
     active: boolean
@@ -17,7 +17,7 @@ export const Jogwheel = (container: HTMLDivElement, _options: JogwheelProperties
     return container;
 }
 
-export const JogwheelScript = (id: string, s: JogwheelProperties, o: HTMLDivElement, state: JogState) => {
+export const JogwheelScript = (s: JogwheelProperties, o: HTMLDivElement, state: JogState) => {
     const touch_start = (e: PointerEvent) => {
         const el = e.currentTarget as HTMLElement;
         el.setPointerCapture(e.pointerId);

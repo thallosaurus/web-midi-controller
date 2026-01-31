@@ -1,4 +1,3 @@
-
 // MARK: - Producer
 function dispatchWorkerEvent(msg: EventBusProducerMessage) {
     self.postMessage(JSON.stringify(msg));
@@ -15,7 +14,6 @@ export enum EventBusProducerMessageType {
     RegisterNoteCallback = "register_note_callback",
     UnregisterCCCallback = "unregister_cc_callback",
     UnregisterNoteCallback = "unregister_note_callback",
-
 }
 
 export type EventBusProducerMessage =

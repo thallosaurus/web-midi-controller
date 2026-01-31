@@ -1,14 +1,16 @@
-import { CCButtonScript, NoteButtonScript, UnloadCCButtonScript, UnloadNoteButtonScript, type ButtonState } from "./button.ts";
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
-import { CCSliderScript, UnloadCCSliderScript, type CCSliderState } from "./slider.ts";
-import { type Overlay } from '../../bindings/Overlay.ts';
-import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "../../bindings/Widget.ts";
-import { RotaryScript, UnloadRotaryScript, type RotaryState } from "./rotary.ts";
-import { render_overlay, render_widget } from "./render.ts";
-import { uuid } from "../common/utils.ts";
-import { JogwheelScript, type JogState } from "./jogwheel.ts";
+import { type Overlay } from "@bindings/Overlay.ts";
+import { uuid } from "@common/utils.ts";
+
+// widget imports
+import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";
+import { CCSliderScript, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
+import { CCButtonScript, NoteButtonScript, UnloadCCButtonScript, UnloadNoteButtonScript, type ButtonState } from "@widgets/button.ts";
+import { JogwheelScript, type JogState } from "@widgets/jogwheel";
+import { render_overlay, render_widget } from "./render";
+import { RotaryScript, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
@@ -139,7 +141,7 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
 });
 
 export interface WidgetState {
-    handlers: any
+    handlers: {[key: string]: (e: PointerEvent) => void}
 }
 
 export class LoadedWidget {
@@ -179,21 +181,20 @@ export class LoadedOverlay {
     unload() {
         console.log("unloading overlay id " + this.overlay.id)
         for (const o of this.childs) {
-            //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
 
             //o.state.abort.abort();
             switch (o.option.type) {
                 case "rotary":
-                    UnloadRotaryScript(o.id, o.option, o.html, o.state as RotaryState);
+                    UnloadRotaryScript(o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
                     UnloadCCButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "ccslider":
-                    UnloadCCSliderScript(o.id, o.option, o.html, o.state as CCSliderState);
+                    UnloadCCSliderScript(o.option, o.html, o.state as CCSliderState);
                     break;
                 case "notebutton":
-                    UnloadNoteButtonScript(o.id, o.option, o.html, o.state as ButtonState);
+                    UnloadNoteButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
             }
         }
@@ -204,11 +205,9 @@ export class LoadedOverlay {
         console.log("loading overlay id " + this.overlay.id)
 
         for (const o of this.childs) {
-            //const elem = this.html.querySelector<HTMLDivElement>("[data-id='" + o.id + "']")
-
             switch (o.option.type) {
                 case "rotary":
-                    RotaryScript(o.id, o.option, o.html, o.state as RotaryState);
+                    RotaryScript(o.option, o.html, o.state as RotaryState);
                     break;
                 case "ccbutton":
                     CCButtonScript(o.option, o.html, o.state as ButtonState);
@@ -220,20 +219,12 @@ export class LoadedOverlay {
                     NoteButtonScript(o.option, o.html, o.state as ButtonState);
                     break;
                 case "jogwheel":
-                    JogwheelScript(o.id, o.option, o.html, o.state as JogState);
+                    JogwheelScript(o.option, o.html, o.state as JogState);
                     break;
             }
         }
     }
 }
-
-const hide_all_overlays = () => {
-    overlays.map((v) => {
-        if (!v.html.classList.contains("hide")) {
-            //v.html.classList.add("hide");
-        }
-    });
-};
 
 class ChangeOverlayEvent extends Event {
     id: number;
@@ -289,8 +280,6 @@ export const VertMixer = (container: HTMLDivElement, options: VerticalMixerPrope
 }
 
 export const setup_tabs = (ols: LoadedOverlay[], parent: HTMLDivElement, cb: (index: number) => void) => {
-    //parent.classList.add("tab_parent");
-
     console.log(ols)
     for (let i = 0; i < ols.length; i++) {
         const t = document.createElement("li");

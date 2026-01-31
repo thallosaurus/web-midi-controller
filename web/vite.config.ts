@@ -2,43 +2,31 @@ import { defineConfig } from "vite";
 import path from 'path'
 import fs from 'node:fs'
 
+import tsconfigPaths from 'vite-tsconfig-paths';
+
 //import legacy from "@vitejs/plugin-legacy";
 
 const ver = JSON.parse(fs.readFileSync("package.json", "utf-8"));
 process.env.VITE_VERSION = ver.version;
-process.env.VITE_USE_WORKER_EVENT_BUS = true;
-process.env.VITE_SELF_UPDATE_WIDGETS = false;
-process.env.VITE_AUTO_CONNECT_LOCAL = true;
+process.env.VITE_USE_WORKER_EVENT_BUS = String(true);
+process.env.VITE_SELF_UPDATE_WIDGETS = String(false);
+process.env.VITE_AUTO_CONNECT_LOCAL = String(false);
 
 export default defineConfig({
-  /*plugins: [legacy({
-    targets: ["Android >= 4.4"],
-    additionalLegacyPolyfills: ["regenerator-runtime/runtime"],
-    modernPolyfills: false,
-  })],*/
-  worker: {
-    format: "es",
-    /*rollupOptions: {
-      /*input: {
-        worker: "ts/websocket/main.ts",
-        event_bus: "ts/event_bus/main.ts"
-      },
-      output: {
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`,
-      },
-    }*/
-  },
+  //plugins: [tsconfigPaths()],
   resolve: {
     alias: {
-      '@websocket': path.resolve(__dirname,'./ts/websocket/worker'),
-      '@websocket-client': path.resolve(__dirname,'./ts/websocket/client'),
-      '@eventbus': path.resolve(__dirname,'./ts/event_bus/worker'),
-      '@eventbus-client': path.resolve(__dirname,'./ts/event_bus/client'),
+      '@core': path.resolve(__dirname, 'ts/ui'),
+      '@common': path.resolve(__dirname, 'ts/common'),
+      '@widgets': path.resolve(__dirname, 'ts/widgets'),
+      '@eventbus': path.resolve(__dirname, 'ts/event_bus'),
+      '@websocket': path.resolve(__dirname, 'ts/websocket'),
+      '@bindings': path.resolve(__dirname, 'bindings'),
     }
   },
-  //target: ["chrome81"],
+  worker: {
+    format: "es",
+  },
   build: {
     modulePreload: false,
     rollupOptions: {
@@ -47,20 +35,4 @@ export default defineConfig({
       }
     }
   }
-  /*build: {
-    modulePreload: false,
-    minify: false,
-    rollupOptions: {
-      input: {
-        main: "index.html",
-        worker: "ts/websocket/main.ts",
-        event_bus: "ts/event_bus/event_bus_client.ts"
-      },
-      output: {
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`,
-      },
-    },
-  },*/
 });

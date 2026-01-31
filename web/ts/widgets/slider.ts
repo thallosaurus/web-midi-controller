@@ -1,8 +1,8 @@
-import { vibrate } from "../common/utils.ts";
+import { vibrate } from "@common/ui_utils";
+import type { CCSliderProperties } from "@bindings/Widget";
+import type { WidgetState } from "@core/overlay";
+import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client";
 import "./css/slider.css";
-import type { CCSliderProperties } from "../../bindings/Widget.ts";
-import type { WidgetState } from "./overlay.ts";
-import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "../event_bus/client.ts";
 
 const MAX_LEVEL = 127;
 
@@ -34,7 +34,7 @@ export const CCSlider = (container: HTMLDivElement, options: CCSliderProperties)
     return container;
 }
 
-export const UnloadCCSliderScript = (id: string, options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
+export const UnloadCCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, state: CCSliderState) => {
     const slider = o.querySelector<HTMLDivElement>(".slider")!;
     slider.addEventListener("pointerdown", state.handlers.pointerdown);
     slider.addEventListener("pointermove", state.handlers.pointermove);
