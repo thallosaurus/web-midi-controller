@@ -1,8 +1,8 @@
-import { vibrate } from "../common/utils.ts";
+import { vibrate } from "../../common/ui_utils.ts";
+import type { CCSliderProperties } from "@bindings/Widget.ts";
+import type { WidgetState } from "../overlay.ts";
+import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus";
 import "./css/slider.css";
-import type { CCSliderProperties } from "../../bindings/Widget.ts";
-import type { WidgetState } from "./overlay.ts";
-import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "../event_bus/client.ts";
 
 const MAX_LEVEL = 127;
 

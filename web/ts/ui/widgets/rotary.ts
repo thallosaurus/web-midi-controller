@@ -1,8 +1,9 @@
-import type { RotarySliderProperties } from "../../bindings/Widget";
-import type { WidgetState } from "./overlay";
-import "./css/rotary.css";
-import { vibrate } from "../common/utils";
-import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "../event_bus/client.ts";
+import type { WidgetState } from "../overlay.ts";
+import { vibrate } from "../../common/ui_utils";
+
+import type { RotarySliderProperties } from "@bindings/Widget";
+import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus";
+import "@widgets/css/rotary.css";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
@@ -44,16 +45,12 @@ export const UnloadRotaryScript = (id: string, s: RotarySliderProperties, o: HTM
     })
 }
 
-export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
+export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
     const sensitivity = 0.5;    // px -> value
 
     state.value = 0;
     state.lastX = 0;
     state.active = false;
-
-/*    let value = 0;
-    let lastX = 0;
-    let active = false;*/
 
     const dial = o.querySelector<HTMLDivElement>(".rotary .widget .dial")!;
     const label = o.querySelector<HTMLDivElement>(".label")!;

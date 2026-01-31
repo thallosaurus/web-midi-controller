@@ -1,6 +1,4 @@
-//import { initWebsocketWorkerWithOverlaySelection } from "../common/ui_utils";
-import { ConnectSocketEvent } from "../websocket/client";
-import "./css/dialogs.css";
+import "./dialogs.css";
 
 export const close_dialog = (id: string) => {
   console.log(id);
@@ -40,5 +38,8 @@ export const init_dialogs = () => {
         /*initWebsocketWorkerWithOverlaySelection().then(() => {
           console.log("reconnect successful", e);
         });*/
+        alert("not implemented yet")
+
+        // construct new app state and enable it
       });
 }
