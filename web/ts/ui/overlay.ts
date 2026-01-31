@@ -1,16 +1,16 @@
-import "./overlay.css";
-import "./grid.css";
-import "./layout.css";
+import "./css/overlay.css";
+import "./css/grid.css";
+import "./css/layout.css";
 import { type Overlay } from "@bindings/Overlay.ts";
-import { uuid } from "../common/utils.ts";
+import { uuid } from "@common/utils.ts";
 
 // widget imports
 import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";
 import { CCSliderScript, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
 import { CCButtonScript, NoteButtonScript, UnloadCCButtonScript, UnloadNoteButtonScript, type ButtonState } from "@widgets/button.ts";
 import { JogwheelScript, type JogState } from "@widgets/jogwheel";
-import { render_overlay, render_widget } from "./render.ts";
-import { RotaryScript, UnloadRotaryScript, type RotaryState } from "@widgets/rotary.ts";
+import { render_overlay, render_widget } from "./render";
+import { RotaryScript, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 
 let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();

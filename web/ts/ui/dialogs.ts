@@ -1,4 +1,4 @@
-import "./dialogs.css";
+import "./css/dialogs.css";
 
 export const close_dialog = (id: string) => {
   console.log(id);
