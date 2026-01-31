@@ -79,11 +79,9 @@ async function init() {
       setup_overlay_selector(ol);
       change_overlay(0)
     })
-  app_elem.classList.remove("disconnected");
 
-  //    const o = await fetch(conn_msg.overlay_path);
-  //    const ol: [Overlay] = await o.json();
-  //    return await load_overlays_from_array(ol);
+    // set frontend to connected
+  app_elem.classList.remove("disconnected");
 }
 
 interface AppWorkerHandler {

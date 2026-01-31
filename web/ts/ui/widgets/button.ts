@@ -1,6 +1,6 @@
 import { vibrate } from "../../common/ui_utils.ts";
 import "./css/button.css";
-import { type CCButtonProperties, type NoteButtonProperties } from '../../../bindings/Widget.ts';
+import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget.ts';
 import type { WidgetState } from "../overlay.ts";
 
 import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, sendUpdateCCValue } from '../../event_bus/client.ts';
