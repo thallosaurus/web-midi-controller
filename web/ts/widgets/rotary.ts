@@ -1,8 +1,8 @@
-import type { WidgetState } from "../overlay.ts";
-import { vibrate } from "../../common/ui_utils";
+import type { WidgetState } from "@/overlay.ts";
+import { vibrate } from "@common/ui_utils";
 
 import type { RotarySliderProperties } from "@bindings/Widget";
-import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus";
+import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client";
 import "@widgets/css/rotary.css";
 
 const MIN_ANGLE = -135;
@@ -32,7 +32,7 @@ export const Rotary = (container: HTMLDivElement, _options: RotarySliderProperti
 }
 
 // Called, when the rotary gets displayed on the screen
-export const UnloadRotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
+export const UnloadRotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
     console.log("unloading rotary")
 
     o.removeEventListener("pointerdown", state.handlers.pointerdown);

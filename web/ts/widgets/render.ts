@@ -4,7 +4,7 @@ import type { Overlay } from "@bindings/Overlay";
 import { Jogwheel } from "./jogwheel";
 import { Rotary } from "./rotary";
 import { CCSlider } from "./slider";
-import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "../overlay";
+import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "@/overlay";
 
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables
 export const render_overlay = (overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay => {

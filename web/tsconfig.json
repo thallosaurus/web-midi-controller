@@ -6,12 +6,12 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "paths": {
-      //"@": ["./ts"],
-      "@websocket": ["./ts/websocket/client"],
-      //'@websocket-client': path.resolve(__dirname,'./ts/websocket/client'),
-      "@eventbus": ["./ts/event_bus/client"],
-      "@bindings/*": ["./bindings/*"],
-      "@widgets/*": ["./ts/ui/widgets/*"]
+      "@/*": ["./ts/ui/*"],
+      "@common/*": ["./ts/common/*"],
+      "@websocket/*": ["./ts/websocket/*"],
+      "@eventbus/*": ["./ts/event_bus/*"],
+      "@widgets/*": ["./ts/widgets/*"],
+      "@bindings/*": ["./bindings/*"]
     },
 
     /* Bundler mode */

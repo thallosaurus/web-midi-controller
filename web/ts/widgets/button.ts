@@ -1,17 +1,18 @@
-import { vibrate } from "../../common/ui_utils.ts";
+import { vibrate } from "@common/ui_utils";
 import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget.ts';
-import type { WidgetState } from "../overlay.ts";
+import type { WidgetState } from "@/overlay.ts";
 
-import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, sendUpdateCCValue } from '../../event_bus/client.ts';
+import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, sendUpdateCCValue } from "@eventbus/client";
 
 export interface ButtonState extends WidgetState {
     id: string | null
     latch_on: boolean,
-    active_pointer: number | null
+    active_pointer: number | null,
+    
 }
 
-export const UnloadNoteButtonScript = (id: string, options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
+export const UnloadNoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElement, state: ButtonState) => {
     if (options.mode != "readonly") {
 
         const button = o.querySelector<HTMLDivElement>(".target")!;
