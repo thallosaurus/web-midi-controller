@@ -21,5 +21,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "ts/ui", "ts/event_bus.ts", "ts/events.ts", "ts/main.ts", "ts/vite-env.d.ts", "ts/websocket/websocket.ts"]
+  "include": ["src", "ts/ui", "ts/event_bus.ts", "ts/common/events.ts", "ts/main.ts", "ts/vite-env.d.ts", "ts/websocket/websocket.ts"]
 }

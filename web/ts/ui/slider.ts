@@ -1,10 +1,8 @@
 import { vibrate } from "../common/utils.ts";
-import { process_internal } from "../event_bus.ts";
 import "./css/slider.css";
-import { CCEvent } from "../events.ts";
 import type { CCSliderProperties } from "../../bindings/Widget.ts";
 import type { WidgetState } from "./overlay.ts";
-import { registerCCWidget, unregisterCCWidget } from "../event_bus/client.ts";
+import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "../event_bus/client.ts";
 
 const MAX_LEVEL = 127;
 
@@ -114,9 +112,7 @@ export const CCSliderScript = (options: CCSliderProperties, o: HTMLDivElement, s
     };
 
     const update_bus_value = (v: number) => {
-        process_internal(
-            new CCEvent(options.channel, v, options.cc),
-        );
+        sendUpdateCCValue(options.channel, options.cc, v);
 
         // also update ui directly
         update_value(v);

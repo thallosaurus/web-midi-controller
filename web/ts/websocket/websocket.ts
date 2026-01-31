@@ -1,4 +1,4 @@
-import type { MidiEvent } from "../events.ts";
+import type { MidiEvent } from "../common/events.ts";
 import { sendDisconnected, sendMidiEvent } from "./message.ts";
 
 export const wsUri = "ws://" + location.hostname + ":8888/ws";

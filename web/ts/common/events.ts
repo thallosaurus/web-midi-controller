@@ -1,6 +1,3 @@
-/**
- * @deprecated
- */
 export abstract class MidiEvent extends Event {
     midi_channel: number;
     event_name: string;
@@ -13,9 +10,6 @@ export abstract class MidiEvent extends Event {
     abstract parse(s: string): MidiEvent;
 }
 
-/**
- * @deprecated
- */
 export class NoteEvent extends MidiEvent {
     override parse(s: string): MidiEvent {
         return JSON.parse(s) as NoteEvent;
@@ -36,9 +30,6 @@ export class NoteEvent extends MidiEvent {
     }
 }
 
-/**
- * @deprecated
- */
 export class CCEvent extends MidiEvent {
     override parse(s: string): MidiEvent {
         return JSON.parse(s) as CCEvent;
@@ -52,11 +43,17 @@ export class CCEvent extends MidiEvent {
     }
 }
 
+/**
+ * @deprecated
+ */
 export enum JogDirection {
     Forward = 65,
     Backward = 63
 }
 
+/**
+ * @deprecated
+ */
 export class JogEvent extends CCEvent {
     constructor(midi_channel:number, cc: number, direction: JogDirection) {
         super(midi_channel, direction, cc)

@@ -1,4 +1,4 @@
-import type { MidiEvent } from "../events";
+import type { MidiEvent } from "../common/events";
 import { connect, disconnect, send, wsUri } from "./websocket";
 
 export enum WorkerMessageType {
@@ -6,9 +6,9 @@ export enum WorkerMessageType {
     Disconnect = "disconnect",
     Connected = "connected",
     Disconnected = "disconnected",
-    DataTest = "data",
     ConnectError = "connect_error",
     MidiFrontendInput = "midi_frontend_input",
+    MidiExternalInput = "midi_external_input",
     WorkerError = "worker_error"
 }
 
@@ -19,6 +19,7 @@ export type WorkerMessage =
     | ConnectedMessage
     | DisconnectedMessage
     | WorkerErrorMessage
+    | MidiExternalInput
     | SurfaceMidiEvent;
 
 /**
@@ -61,6 +62,11 @@ interface SurfaceMidiEvent {
     data: MidiEvent
 }
 
+interface MidiExternalInput {
+    type: WorkerMessageType.MidiExternalInput
+    data: MidiEvent
+}
+
 // Send message back to the frontend
 function sendMessage(m: WorkerMessage) {
     const msg = JSON.stringify(m)
@@ -68,6 +74,7 @@ function sendMessage(m: WorkerMessage) {
 }
 
 function sendMessageInput(worker: Worker, m: WorkerMessage) {
+    console.log(m);
     const msg = JSON.stringify(m)
     worker.postMessage(msg);
 }
@@ -86,26 +93,11 @@ export function process_worker_input(msg: WorkerMessage) {
                     //console.error(e);
                     sendWorkerError(e);
                 });
-
-                // connect to websocket
-                //connect(wsUri, (socket) => {
-                    // Setup Websocket async with Handler for backend events
-                    //setupSocketAsync(socket);
-
-
-
-                /*}).then(e => {
-                    sendConnected();
-                    //self.postMessage("connected from worker");
-                }).catch(e => {
-                    sendDisconnected();
-                })*/
-
             }
             break;
 
         case WorkerMessageType.MidiFrontendInput:
-            //console.log("data for the frontend")
+            console.log("data for the backend")
             send(JSON.stringify(msg.data));
             break;
 
@@ -160,10 +152,14 @@ export function disconnectSocketMessage(worker: Worker) {
  */
 export function sendMidiEvent(data: MidiEvent) {
     sendMessage({
-        type: WorkerMessageType.MidiFrontendInput,
+        type: WorkerMessageType.MidiExternalInput,
         data
     })
 }
+/***
+ * @param worker 
+ * @param data 
+ */
 export function sendFrontendMidiEvent(worker: Worker, data: MidiEvent) {
     sendMessageInput(worker, {
         type: WorkerMessageType.MidiFrontendInput,

@@ -1,16 +1,19 @@
 //import { connect, disconnect, send, wsUri } from "./websocket.ts";
 import { disconnectSocketMessage, sendFrontendMidiEvent, type ConnectedMessage, type WorkerMessage, WorkerMessageType, connectSocketMessage } from "./message";
-import { MidiEvent } from "../events.ts";
+import { MidiEvent } from "../common/events.ts";
 
 // should run in another thread
 export let wsWorker: Worker | null = null;
 export let lastError: Error | null;
-export async function initWebsocketWorker(): Promise<[Worker, ConnectedMessage]> {
-    if (wsWorker !== null) throw new Error("the websocket thread is already running")
+export function initWebsocketWorker(): Worker {
+    //if (wsWorker !== null) throw new Error("the websocket thread is already running")
+    return new Worker(new URL("./worker.js", import.meta.url), { type: 'module' })
+}
 
-    let w = await new Promise<[Worker, ConnectedMessage]>((res, rej) => {
+// we need to call it somewhere
 
-        let worker = new Worker(new URL("./worker.js", import.meta.url), { type: 'module' })
+export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
+    return new Promise<ConnectedMessage>((res, rej) => {
 
         worker.addEventListener("message", (ev) => {
             const msg: WorkerMessage = JSON.parse(ev.data);
@@ -20,7 +23,7 @@ export async function initWebsocketWorker(): Promise<[Worker, ConnectedMessage]>
                 case WorkerMessageType.Connected:
                     console.log("main -", "worker connection successful", msg)
                     wsWorker = worker;
-                    res([worker, msg]);
+                    res(msg);
                     break;
 
                 case WorkerMessageType.ConnectError:
@@ -32,15 +35,12 @@ export async function initWebsocketWorker(): Promise<[Worker, ConnectedMessage]>
                 case WorkerMessageType.Disconnected:
                     wsWorker = null;
                     console.log("initWebsocketWorker", "disconnected")
-                    rej()
+                    rej("server disconnected while connecting - no reason idk")
                     break;
             }
         });
         connectSocketMessage(worker);
-    });
-
-    //send message to the worker so it connects to the given URI
-    return w;
+    })
 }
 
 export function FrontendSocketEvent(ev: MidiEvent) {

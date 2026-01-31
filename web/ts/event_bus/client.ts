@@ -13,6 +13,9 @@ function sendEventToWorker(worker: Worker | null, msg: EventBusConsumerMessage) 
     worker.postMessage(msg)
 }
 
+/** 
+ * Messages that go IN to the Event Bus
+ */
 export enum EventBusConsumerMessageType {
     InitBus = "init_bus",
     RegisterCCWidget = "register_cc_widget",
@@ -20,6 +23,7 @@ export enum EventBusConsumerMessageType {
     RegisterNoteWidget = "register_note_widget",
     UnregisterNoteWidget = "unregister_note_widget",
     UpdateCCValue = "update_cc_value",
+    ExternalNoteUpdate = "external_note_update",
     UpdateNoteValue = "update_note_value"
 }
 
@@ -30,6 +34,7 @@ export type EventBusConsumerMessage =
     | RegisterCCWidget
     | UnregisterCCWidget
     | UpdateNoteValue
+    | ExternalNoteUpdate
     | RegisterNoteWidget
     | UnregisterNoteWidget
 
@@ -80,7 +85,7 @@ export function sendUnregisterCCWidget(id: string, channel: number, cc: number) 
 
 interface UpdateNoteValue {
     type: EventBusConsumerMessageType.UpdateNoteValue,
-    channel: number, note: number, velocity: number, on: boolean
+    channel: number, note: number, velocity: number, on: boolean, external: boolean
 }
 
 export function sendUpdateNoteValue(channel: number, note: number, velocity: number, on: boolean) {
@@ -89,7 +94,28 @@ export function sendUpdateNoteValue(channel: number, note: number, velocity: num
         channel,
         note,
         velocity,
-        on
+        on,
+        external: false
+    })
+}
+
+
+interface ExternalNoteUpdate {
+    type: EventBusConsumerMessageType.ExternalNoteUpdate,
+    //id: string,
+    channel: number,
+    note: number,
+    velocity: number
+    on: boolean
+}
+
+export function sendUpdateExternalNoteWidget(channel: number, note: number, velocity: number) {
+    sendEventToWorker(ebWorker, {
+        type: EventBusConsumerMessageType.ExternalNoteUpdate,
+        channel,
+        note,
+        velocity,
+        on: velocity > 0,
     })
 }
 
@@ -173,16 +199,16 @@ export function initEventBusWorker(): Promise<Worker> {
         switch (msg.type) {
             case EventBusProducerMessageType.CCUpdate:
                 {
-                    console.log("cc update", msg);
+                    console.log("event bus", "cc update", msg);
                     const cb = callbacks.get(msg.id)!;
                     cb(msg.value)
                 }
                 break;
                 case EventBusProducerMessageType.NoteUpdate:
                     {
-                    console.log("note update", msg);
+                    console.log("event bus", "note update", msg);
                     const cb = callbacks.get(msg.id)!;
-                    cb(msg.value);
+                    cb(msg.velocity);
                 }
                 break;
         }

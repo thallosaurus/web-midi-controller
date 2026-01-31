@@ -1,8 +1,7 @@
 import type { JogwheelProperties } from "../../bindings/Widget"
 import type { WidgetState } from "./overlay"
 import "./css/jogwheel.css"
-import { process_internal } from "../event_bus.ts"
-import { JogDirection, JogEvent } from "../events"
+import { JogDirection, sendUpdateJogValue } from "../event_bus/client.ts"
 
 export interface JogState extends WidgetState {
     active: boolean
@@ -60,9 +59,11 @@ export const JogwheelScript = (id: string, s: JogwheelProperties, o: HTMLDivElem
             console.log("fast", v);
         }*/
         if (v > 0) {
-            process_internal(new JogEvent(s.channel, s.cc, JogDirection.Forward))
+            //process_internal(new JogEvent(s.channel, s.cc, JogDirection.Forward))
+            sendUpdateJogValue(s.channel, s.cc, JogDirection.Forward)
         } else {
-            process_internal(new JogEvent(s.channel, s.cc, JogDirection.Backward))
+            //process_internal(new JogEvent(s.channel, s.cc, JogDirection.Backward))
+            sendUpdateJogValue(s.channel, s.cc, JogDirection.Backward)
         }
     };
 

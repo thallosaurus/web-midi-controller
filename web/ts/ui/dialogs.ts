@@ -1,4 +1,5 @@
-import { initWebsocketWorkerWithOverlaySelection } from "../common/ui_utils";
+//import { initWebsocketWorkerWithOverlaySelection } from "../common/ui_utils";
+import { ConnectSocketEvent } from "../websocket/client";
 import "./css/dialogs.css";
 
 export const close_dialog = (id: string) => {
@@ -35,8 +36,9 @@ export const init_dialogs = () => {
 
   const connect_button = document.querySelector<HTMLDivElement>("#disconnect-fallback .container button.primary")!
       connect_button.addEventListener("click", (e) => {
-        initWebsocketWorkerWithOverlaySelection().then(() => {
+        //ConnectSocketEvent()
+        /*initWebsocketWorkerWithOverlaySelection().then(() => {
           console.log("reconnect successful", e);
-        });
+        });*/
       });
 }

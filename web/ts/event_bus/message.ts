@@ -3,6 +3,10 @@
 function dispatchWorkerEvent(msg: EventBusProducerMessage) {
     self.postMessage(JSON.stringify(msg));
 }
+
+/**
+ * Messages that go OUT from the Event Bus
+ */
 export enum EventBusProducerMessageType {
     EventBusInitCallback = "init_bus_callback",
     CCUpdate = "cc_update",
@@ -10,7 +14,8 @@ export enum EventBusProducerMessageType {
     RegisterCCCallback = "register_cc_callback",
     RegisterNoteCallback = "register_note_callback",
     UnregisterCCCallback = "unregister_cc_callback",
-    UnregisterNoteCallback = "unregister_note_callback"
+    UnregisterNoteCallback = "unregister_note_callback",
+
 }
 
 export type EventBusProducerMessage =
@@ -103,16 +108,18 @@ interface NoteUpdate {
     id: string,
     channel: number,
     note: number,
-    value: number
+    velocity: number,
+    ext: boolean
 }
 
-export function sendUpdateNoteWidget(id: string, channel: number, note: number, value: number) {
+export function sendUpdateNoteWidget(id: string, channel: number, note: number, velocity: number, ext: boolean) {
     dispatchWorkerEvent({
         type: EventBusProducerMessageType.NoteUpdate,
         id,
         note,
-        value,
-        channel
+        velocity,
+        channel,
+        ext
     })
 }
 

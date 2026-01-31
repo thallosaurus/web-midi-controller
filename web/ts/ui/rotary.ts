@@ -1,10 +1,8 @@
 import type { RotarySliderProperties } from "../../bindings/Widget";
-import { process_internal } from "../event_bus.ts";
-import { CCEvent } from "../events";
 import type { WidgetState } from "./overlay";
 import "./css/rotary.css";
 import { vibrate } from "../common/utils";
-import { registerCCWidget, unregisterCCWidget } from "../event_bus/client.ts";
+import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "../event_bus/client.ts";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
@@ -74,9 +72,10 @@ export const RotaryScript = (id: string, s: RotarySliderProperties, o: HTMLDivEl
     }
 
     const update_bus_value = (v: number) => {
-        process_internal(
+        /*process_internal(
             new CCEvent(s.channel, v, s.cc),
-        );
+        );*/
+        sendUpdateCCValue(s.channel, s.cc, v)
     };
 
     const touch_start = (e: PointerEvent) => {

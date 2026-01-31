@@ -26,6 +26,8 @@ onmessage = (m) => {
             }
             break;
 
+
+
         default:
             if (!started) throw new Error("event bus is not started")
             if (!process_consumer_message(msg)) {
@@ -71,8 +73,11 @@ function process_consumer_message(msg: EventBusConsumerMessage) {
             cc_update_on_bus(msg.channel, msg.cc, msg.value);
             return true;
         case EventBusConsumerMessageType.UpdateNoteValue:
-            note_update_on_bus(msg.channel, msg.note, msg.velocity);
+            note_update_on_bus(msg.channel, msg.note, msg.velocity, false);
             return true;
+        case EventBusConsumerMessageType.ExternalNoteUpdate:
+            note_update_on_bus(msg.channel, msg.note, msg.velocity, true);
+            break;
         default:
             return false;
     }
@@ -162,7 +167,7 @@ const unregister_note_widget = (id: string, channel: number, note: number) => {
 }
 
 // Update all widgets bound to the midi number
-const note_update_on_bus = (channel: number, note: number, velocity: number) => {
+const note_update_on_bus = (channel: number, note: number, velocity: number, ext: boolean) => {
     const ch = note_map.get(channel)!;
 
     if (!ch.has(note)) return;
@@ -170,6 +175,6 @@ const note_update_on_bus = (channel: number, note: number, velocity: number) => 
     for (const id of ch.get(note)!) {
         //send update
         //cb(velocity)
-        sendUpdateNoteWidget(id, channel, note, velocity)
+        sendUpdateNoteWidget(id, channel, note, velocity, ext)
     }
 };
