@@ -3,8 +3,8 @@ import "./style.css";
 import "./ui/css/colors.css";
 
 import { init_dialogs } from './ui/dialogs.ts'
-import { init_debug, initWebsocketWorkerWithOverlaySelection } from "./common/utils.ts";
-import { EventBusConsumerMessage, initEventBusWorker } from "./event_bus/event_bus_client.ts";
+import { init_debug, initWebsocketWorkerWithOverlaySelection } from "./common/ui_utils.ts";
+import { type EventBusConsumerMessage, initEventBusWorker } from "./event_bus/client.ts";
 
 const init_ui = () => {
   console.log("init ui")

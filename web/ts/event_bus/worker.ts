@@ -1,5 +1,5 @@
 import { sendEventBusInitCallback, sendInitCCWidget, sendInitNoteWidget, sendUnregisterCCCallback, sendUnregisterNoteCallback, sendUpdateCCWidget, sendUpdateNoteWidget } from "./message";
-import { EventBusConsumerMessage, EventBusConsumerMessageType} from "./event_bus_client"
+import { EventBusConsumerMessage, EventBusConsumerMessageType} from "./client"
 let started = false;
 type WidgetId = string;
 type CCWidget = WidgetId[];

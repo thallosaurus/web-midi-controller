@@ -1,10 +1,10 @@
 import type { RotarySliderProperties } from "../../bindings/Widget";
-import { process_internal } from "../event_bus";
+import { process_internal } from "../event_bus.ts";
 import { CCEvent } from "../events";
 import type { WidgetState } from "./overlay";
 import "./css/rotary.css";
 import { vibrate } from "../common/utils";
-import { registerCCWidget, unregisterCCWidget } from "../event_bus/event_bus_client";
+import { registerCCWidget, unregisterCCWidget } from "../event_bus/client.ts";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;

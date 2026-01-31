@@ -3,7 +3,7 @@ import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
 import type { WidgetState } from "./overlay.ts";
 
-import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget, ebWorker } from '../event_bus/event_bus_client.ts';
+import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, registerCCWidget, unregisterCCWidget } from '../event_bus/client.ts';
 
 export interface ButtonState extends WidgetState {
     id: string | null
@@ -198,7 +198,7 @@ export const NoteButtonScript = (options: NoteButtonProperties, o: HTMLDivElemen
             new NoteEvent(options.channel, options.note, v > 0, v),
         );*/
 
-        sendUpdateNoteValue(ebWorker, options.channel, options.note, v, v > 0);
+        sendUpdateNoteValue(options.channel, options.note, v, v > 0);
 
         // also update ui directly
         if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {

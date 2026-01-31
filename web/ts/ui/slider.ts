@@ -4,7 +4,7 @@ import "./css/slider.css";
 import { CCEvent } from "../events.ts";
 import type { CCSliderProperties } from "../../bindings/Widget.ts";
 import type { WidgetState } from "./overlay.ts";
-import { registerCCWidget, unregisterCCWidget } from "../event_bus/event_bus_client.ts";
+import { registerCCWidget, unregisterCCWidget } from "../event_bus/client.ts";
 
 const MAX_LEVEL = 127;
 

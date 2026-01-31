@@ -1,8 +1,8 @@
 import { CCEvent, MidiEvent, NoteEvent } from "./events.ts";
-import { sendFrontendMidiEvent } from "./websocket/message.ts";
-import { FrontendSocketEvent } from "./websocket/worker_client.ts";
-import { ebWorker } from "./event_bus/event_bus_client.ts";
-import { sendUpdateCCValue, sendUpdateNoteValue } from "./event_bus/event_bus_client.ts";
+//import { sendFrontendMidiEvent } from "./websocket/message.ts";
+import { FrontendSocketEvent } from "./websocket/client.ts";
+//import { sendUpdateCCValue, sendUpdateNoteValue } from "./event_bus/client/event_bus_client.ts";
+import { sendUpdateCCValue, sendUpdateNoteValue } from './event_bus/client';
 
 type CCWidget = Map<string, CCCallback>;//Array<CCCallback>;
 type CCChannel = Map<number, CCWidget>;
@@ -204,11 +204,11 @@ export const process_internal = (ev: MidiEvent) => {
             //sendFrontendMidiEvent(ebWorker!, ev);
             if (ev.event_name == "ccupdate") {
                 const cc_ev = ev as CCEvent;
-                sendUpdateCCValue(ebWorker!, cc_ev.midi_channel, cc_ev.cc, cc_ev.value);
+                sendUpdateCCValue(cc_ev.midi_channel, cc_ev.cc, cc_ev.value);
                 return
             } else if (ev.event_name == "noteupdate") {
                 const note_ev = ev as NoteEvent;
-                sendUpdateNoteValue(ebWorker!, note_ev.midi_channel, note_ev.note, note_ev.velocity, note_ev.on)
+                sendUpdateNoteValue(note_ev.midi_channel, note_ev.note, note_ev.velocity, note_ev.on)
                 return;
             }
     } else {

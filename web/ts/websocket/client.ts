@@ -1,7 +1,5 @@
 //import { connect, disconnect, send, wsUri } from "./websocket.ts";
-import { disconnectSocketMessage, sendFrontendMidiEvent, type ConnectedMessage, type WorkerMessage } from "./message.ts";
-//import websocketWorkerUrl from './?worker&url';
-import { WorkerMessageType, connectSocketMessage } from './message.ts';
+import { disconnectSocketMessage, sendFrontendMidiEvent, type ConnectedMessage, type WorkerMessage, WorkerMessageType, connectSocketMessage } from "./message";
 import { MidiEvent } from "../events.ts";
 
 // should run in another thread
@@ -12,7 +10,7 @@ export async function initWebsocketWorker(): Promise<[Worker, ConnectedMessage]>
 
     let w = await new Promise<[Worker, ConnectedMessage]>((res, rej) => {
 
-        let worker = new Worker(new URL("./main.js", import.meta.url), { type: 'module' })
+        let worker = new Worker(new URL("./worker.js", import.meta.url), { type: 'module' })
 
         worker.addEventListener("message", (ev) => {
             const msg: WorkerMessage = JSON.parse(ev.data);

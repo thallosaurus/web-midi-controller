@@ -37,8 +37,8 @@ interface InitBus extends EventBusProperties {
     type: EventBusConsumerMessageType.InitBus,
 }
 
-export function sendInitBus(worker: Worker | null, midi_channels = 16) {
-    sendEventToWorker(worker, {
+export function sendInitBus(midi_channels = 16) {
+    sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.InitBus,
         midi_channels
     })
@@ -52,8 +52,8 @@ interface RegisterCCWidget {
     value: number
 }
 
-export function sendRegisterCCWidget(worker: Worker | null, id: string, channel: number, cc: number, value: number) {
-    sendEventToWorker(worker, {
+export function sendRegisterCCWidget(id: string, channel: number, cc: number, value: number) {
+    sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.RegisterCCWidget,
         id,
         channel,
@@ -69,8 +69,8 @@ interface UnregisterCCWidget {
     cc: number
 }
 
-export function sendUnregisterCCWidget(worker: Worker | null, id: string, channel: number, cc: number) {
-    sendEventToWorker(worker, {
+export function sendUnregisterCCWidget(id: string, channel: number, cc: number) {
+    sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.UnregisterCCWidget,
         id,
         channel,
@@ -83,8 +83,8 @@ interface UpdateNoteValue {
     channel: number, note: number, velocity: number, on: boolean
 }
 
-export function sendUpdateNoteValue(worker: Worker | null, channel: number, note: number, velocity: number, on: boolean) {
-    sendEventToWorker(worker, {
+export function sendUpdateNoteValue(channel: number, note: number, velocity: number, on: boolean) {
+    sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.UpdateNoteValue,
         channel,
         note,
@@ -99,8 +99,8 @@ interface RegisterNoteWidget {
     channel: number, note: number
 }
 
-export function sendRegisterNoteWidget(worker: Worker | null, id: string, channel: number, note: number) {
-    sendEventToWorker(worker, {
+export function sendRegisterNoteWidget(id: string, channel: number, note: number) {
+    sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.RegisterNoteWidget,
         id,
         channel,
@@ -115,8 +115,8 @@ interface UnregisterNoteWidget {
     note: number
 }
 
-export function sendUnregisterNoteWidget(worker: Worker | null, id: string, channel: number, note: number) {
-    sendEventToWorker(worker, {
+export function sendUnregisterNoteWidget(id: string, channel: number, note: number) {
+    sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.UnregisterNoteWidget,
         id,
         channel,
@@ -131,8 +131,8 @@ interface UpdateCCValue {
     value: number
 }
 
-export function sendUpdateCCValue(worker: Worker | null, channel: number, cc: number, value: number) {
-    sendEventToWorker(worker, {
+export function sendUpdateCCValue(channel: number, cc: number, value: number) {
+    sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.UpdateCCValue,
         cc,
         channel,
@@ -149,8 +149,8 @@ interface UpdateJogValue extends UpdateCCValue {
     value: JogDirection
 }
 
-export function sendUpdateJogValue(worker: Worker | null, channel: number, cc: number, value: JogDirection) {
-    sendEventToWorker(worker, {
+export function sendUpdateJogValue(channel: number, cc: number, value: JogDirection) {
+    sendEventToWorker(ebWorker, {
         type: EventBusConsumerMessageType.UpdateCCValue,
         cc,
         channel,
@@ -163,11 +163,11 @@ type EventBusCallback = (value: number) => void;
 
 const callbacks = new Map<string, EventBusCallback>();
 
-export let ebWorker: Worker | null = null
+let ebWorker: Worker | null = null
 export function initEventBusWorker(): Promise<Worker> {
     if (ebWorker !== null) throw new Error("the event bus is already running");
 
-    ebWorker = new Worker(new URL("./main.js", import.meta.url), { type: "module" });
+    ebWorker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
     ebWorker.addEventListener("message", (ev) => {
         const msg: EventBusProducerMessage = JSON.parse(ev.data);
         switch (msg.type) {
@@ -202,7 +202,7 @@ export function initEventBusWorker(): Promise<Worker> {
         ebWorker?.addEventListener("message", fn);
     });
 
-    sendInitBus(ebWorker!);
+    sendInitBus();
 
     return p;
 }
@@ -221,7 +221,7 @@ export function registerCCWidget(channel: number, cc: number, init: number, cb: 
             }
         }
         ebWorker?.addEventListener("message", fn)
-        sendRegisterCCWidget(ebWorker!, id, channel, cc, init)
+        sendRegisterCCWidget(id, channel, cc, init)
     });
 }
 
@@ -238,7 +238,7 @@ export function unregisterCCWidget(id: string, channel: number, cc: number): Pro
             }
         }
         ebWorker?.addEventListener("message", fn)
-        sendUnregisterCCWidget(ebWorker!, id, channel, cc)
+        sendUnregisterCCWidget(id, channel, cc)
     });
 }
 
@@ -256,7 +256,7 @@ export function registerNoteWidget(channel: number, note: number, cb: EventBusCa
             }
         }
         ebWorker?.addEventListener("message", fn)
-        sendRegisterNoteWidget(ebWorker!, id, channel, note);
+        sendRegisterNoteWidget(id, channel, note);
     });
 }
 
@@ -273,7 +273,7 @@ export function unregisterNoteWidget(id: string, channel: number, note: number):
             }
         }
         ebWorker?.addEventListener("message", fn)
-        sendUnregisterNoteWidget(ebWorker!, id, channel, note)
+        sendUnregisterNoteWidget(id, channel, note)
     });
 }
 
