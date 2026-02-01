@@ -102,7 +102,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
 
         //register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
         //registerCCWidget(options.channel, options.cc, options.value ?? 0, this.updateValue)
-        registerCCConsumer(this.prop, this);
+        registerCCConsumer(this.prop.channel, this.prop.cc, null, this);
 
         this.handlers.pointerdown = touch_start;
         this.handlers.pointermove = touch_move;
@@ -121,7 +121,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
         html.removeEventListener("pointerup", this.handlers.pointerup);
         html.removeEventListener("pointercancel", this.handlers.pointercancel);
         //unregister_cc_widget(id, s.channel, s.cc);
-        unregisterCCConsumer(this.prop, this);
+        unregisterCCConsumer(this.prop.channel, this.prop.cc, this);
         /*        unregisterCCWidget(this.consumerId!, options.channel, options.cc).then(() => {
                     this.consumerId = null
                 })*/

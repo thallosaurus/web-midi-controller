@@ -86,7 +86,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
             this.sendUpdate(this.state.latch_on ? 127 : 0)
         };
 
-        registerNoteConsumer(this.prop, this)
+        registerNoteConsumer(this.prop.channel, this.prop.note, this)
             .then(id => {
                 this.consumerId = id;
             });
@@ -218,7 +218,7 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             this.consumerId = id
         });*/
 
-        registerCCConsumer(this.prop, this).then(id => {
+        registerCCConsumer(this.prop.channel, this.prop.cc, null, this).then(id => {
             this.consumerId = id
         })
 
@@ -242,7 +242,7 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             html.removeEventListener("pointercancel", this.handlers.pointercancel)
         }*/
         //unregister_cc_widget(id, options.channel, options.cc)
-        unregisterCCConsumer(this.prop, this);
+        unregisterCCConsumer(this.prop.channel, this.prop.cc, this);
         /*        unregisterCCWidget(state.id!, options.channel, options.cc).then(id => {
                     state.id = null
                 })*/

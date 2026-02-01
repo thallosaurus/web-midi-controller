@@ -207,7 +207,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
             );*/
 
             
-        registerCCConsumer(options, this);
+        registerCCConsumer(this.prop.channel, this.prop.cc, null, this);
 
         
         this.slider.addEventListener("pointerdown", this.handlers.pointerdown);

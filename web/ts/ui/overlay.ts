@@ -182,8 +182,6 @@ export class LoadedOverlay {
                 o.lifecycle.unload(o.option as WidgetProperties, o.html);
 
                 Object.entries(o.lifecycle.handlers).forEach(([k, h]) => {
-                    console.log(k, h);
-
                     if (k == "pointerdown") {
                         o.html.removeEventListener("pointerdown", h)
                     }
@@ -206,115 +204,110 @@ export class LoadedOverlay {
         }
     }
 
+    load() {
+        console.log("loading overlay id " + this.overlay.id)
 
+        for (const o of this.childs) {
+            if (o.lifecycle) {
 
-
-            load() {
-                console.log("loading overlay id " + this.overlay.id)
-
-                for (const o of this.childs) {
-                    if (o.lifecycle) {
-
-                        const should_listen = o.lifecycle.load(o.option as unknown as any, o.html);
-                        // TODO correct this
-                        Object.entries(o.lifecycle.handlers).forEach(([k, h]) => {
-                            console.log(k, h);
-
-                            if (k == "pointerdown") {
-                                o.html.addEventListener("pointerdown", h)
-                            }
-
-                            if (k == "pointermove") {
-                                o.html.addEventListener("pointermove", h);
-                            }
-
-                            if (k == "pointerup") {
-                                o.html.addEventListener("pointerup", h);
-                            }
-
-                            if (k == "pointercancel") {
-
-                                o.html.addEventListener("pointercancel", h);
-                            }
-                        })
+                const should_listen = o.lifecycle.load(o.option as unknown as any, o.html);
+                // TODO correct this
+                Object.entries(o.lifecycle.handlers).forEach(([k, h]) => {
+                    if (k == "pointerdown") {
+                        o.html.addEventListener("pointerdown", h)
                     }
-                }
 
+                    if (k == "pointermove") {
+                        o.html.addEventListener("pointermove", h);
+                    }
+
+                    if (k == "pointerup") {
+                        o.html.addEventListener("pointerup", h);
+                    }
+
+                    if (k == "pointercancel") {
+
+                        o.html.addEventListener("pointercancel", h);
+                    }
+                })
             }
         }
 
-        class ChangeOverlayEvent extends Event {
-            id: number;
-            constructor(new_id: number) {
-                super("change");
-                this.id = new_id;
-            }
-        }
+    }
+}
 
-        export const change_overlay = (overlayId: number) => {
-            overlay_emitter.dispatchEvent(new ChangeOverlayEvent(overlayId));
-        };
+class ChangeOverlayEvent extends Event {
+    id: number;
+    constructor(new_id: number) {
+        super("change");
+        this.id = new_id;
+    }
+}
 
-        export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) => {
-            //const grid = document.createElement("div");
-            if (options.id) container.id = options.id;
+export const change_overlay = (overlayId: number) => {
+    overlay_emitter.dispatchEvent(new ChangeOverlayEvent(overlayId));
+};
 
-            container.style.setProperty("--cols", String(options.w));
-            container.style.setProperty("--rows", String(options.h));
+export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) => {
+    //const grid = document.createElement("div");
+    if (options.id) container.id = options.id;
 
-            for (const child of options.controls) {
-                let ww = render_widget(child, children);
-                container.appendChild(ww.html);
-                children.push(ww);
-            }
+    container.style.setProperty("--cols", String(options.w));
+    container.style.setProperty("--rows", String(options.h));
 
-            //container.appendChild(grid);
-            return container;
-        }
+    for (const child of options.controls) {
+        let ww = render_widget(child, children);
+        container.appendChild(ww.html);
+        children.push(ww);
+    }
 
-        export const HorizMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
-            if (options.id) container.id = options.id;
+    //container.appendChild(grid);
+    return container;
+}
 
-            for (const child of options.controls) {
-                const ww = render_widget(child, children);
-                container.appendChild(ww.html);
-                children.push(ww);
-            }
+export const HorizMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
+    if (options.id) container.id = options.id;
 
-            return container;
-        }
+    for (const child of options.controls) {
+        const ww = render_widget(child, children);
+        container.appendChild(ww.html);
+        children.push(ww);
+    }
 
-        export const VertMixer = (container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>) => {
-            if (options.id) container.id = options.id;
+    return container;
+}
 
-            for (const child of options.controls) {
-                const ww = render_widget(child, children);
-                container.appendChild(ww.html);
-                children.push(ww);
-            }
+export const VertMixer = (container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>) => {
+    if (options.id) container.id = options.id;
 
-            return container;
-        }
+    for (const child of options.controls) {
+        const ww = render_widget(child, children);
+        container.appendChild(ww.html);
+        children.push(ww);
+    }
 
-        export const setup_tabs = (ols: LoadedOverlay[], parent: HTMLDivElement, cb: (index: number) => void) => {
-            console.log(ols)
-            for (let i = 0; i < ols.length; i++) {
-                const t = document.createElement("li");
+    return container;
+}
 
-                t.dataset.role = "overlay_switch";
-                t.dataset.overlayIndex = String(i);
-                //t.
-                t.innerText = String(ols[i].overlay.name);
+export const setup_tabs = (ols: LoadedOverlay[], parent: HTMLDivElement, cb: (index: number) => void) => {
+    console.log(ols)
+    for (let i = 0; i < ols.length; i++) {
+        const t = document.createElement("li");
 
-                t.addEventListener("click", () => {
-                    //change_overlay(i);
+        t.dataset.role = "overlay_switch";
+        t.dataset.overlayIndex = String(i);
+        //t.
+        t.innerText = String(ols[i].overlay.name);
 
-                    cb(i);
-                });
-                parent.appendChild(t);
-            }
-        };
+        t.addEventListener("click", () => {
+            //change_overlay(i);
 
-        export const setup_chooser = (options: Array<any>, cb: (v: any) => void) => {
-            options.map(cb);
-        };
+            cb(i);
+        });
+        parent.appendChild(t);
+    }
+};
+
+export const setup_chooser = (options: Array<any>, cb: (v: any) => void) => {
+    options.map(cb);
+};

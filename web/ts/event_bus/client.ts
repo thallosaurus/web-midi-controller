@@ -1,4 +1,4 @@
-import { ButtonProperties, CCProperties, MidiProperties, NoteButtonProperties } from "@bindings/Widget";
+import { ButtonProperties, CCProperties, MidiProperties, NoteButtonProperties, XYPadProperties } from "@bindings/Widget";
 import { uuid } from "../common/utils";
 import { EventBusProducerMessage, EventBusProducerMessageType } from "./message";
 
@@ -291,8 +291,8 @@ export function initEventBusWorker(): Promise<Worker> {
     return p;
 }
 
-export function registerCCConsumer(options: CCProperties & MidiProperties, consumer: EventBusConsumer): Promise<string> {
-    return registerCCWidgetOnBus(options.channel, options.cc, options.default_value ?? 0, consumer.updateValue.bind(consumer))
+export function registerCCConsumer(channel: number, cc: number, default_value: number | null, consumer: EventBusConsumer): Promise<string> {
+    return registerCCWidgetOnBus(channel, cc, default_value ?? 0, consumer.updateValue.bind(consumer))
     /*.then(id => {
         //state.id = id
         consumer.consumerId = id;
@@ -317,9 +317,9 @@ function registerCCWidgetOnBus(channel: number, cc: number, init: number, cb: Ev
     });
 }
 
-export function unregisterCCConsumer(options: CCProperties & MidiProperties, consumer: EventBusConsumer): Promise<void> {
+export function unregisterCCConsumer(channel: number, cc: number, consumer: EventBusConsumer): Promise<void> {
     if (!consumer.consumerId) throw new Error("consumer has no Id")
-    return unregisterCCWidget(consumer.consumerId, options.channel, options.cc);
+    return unregisterCCWidget(consumer.consumerId, channel, cc);
 }
 
 export function unregisterCCWidget(id: string, channel: number, cc: number): Promise<void> {
@@ -339,8 +339,8 @@ export function unregisterCCWidget(id: string, channel: number, cc: number): Pro
     });
 }
 
-export function registerNoteConsumer(options: NoteButtonProperties & MidiProperties, consumer: EventBusConsumer): Promise<string> {
-    return registerNoteWidgetOnBus(options.channel, options.note, consumer.updateValue.bind(consumer))
+export function registerNoteConsumer(channel: number, note: number, consumer: EventBusConsumer): Promise<string> {
+    return registerNoteWidgetOnBus(channel, note, consumer.updateValue.bind(consumer))
 }
 export function registerNoteWidgetOnBus(channel: number, note: number, cb: EventBusCallback): Promise<string> {
     if (!ebWorker) throw new Error("no event bus running");
@@ -377,3 +377,7 @@ export function unregisterNoteWidget(id: string, channel: number, note: number):
     });
 }
 
+export function unregisterNoteConsumer(channel: number, note: number, consumer: EventBusConsumer): Promise<void> {
+    if (!consumer.consumerId) throw new Error("consumer has no Id")
+    return unregisterNoteWidget(consumer.consumerId, channel, note);
+}
