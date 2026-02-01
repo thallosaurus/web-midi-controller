@@ -11,6 +11,7 @@ import { connectSocketMessage, ConnectWebsocketWorkerWithHandler, initWebsocketW
 import { debug, setup_logger } from '@common/logger'
 import { AppEvents } from './app_events.ts'
 import { wsUri } from '@websocket/websocket.ts';
+import { hasFeature, resolveFeatures } from '@common/utils.ts';
 
 //const init_ui = () => {
 
@@ -39,26 +40,34 @@ export class App {
      */
     constructor(private app_elem = document.querySelector<HTMLDivElement>("#app")!) {
         setup_logger("frontend");
-        this.initBackend().then((handlers) => {
-            this.handlers = handlers
-            console.log("were handlers set?", handlers);
+        const f = resolveFeatures();
 
-            App.defaultWorkerHandler(this.handlers);
-            this.initUi(this.handlers);
-            this.initWebsocketUIChanges(this.handlers)
-            debug("init done", this);
+        if (hasFeature(f, "default")) {
+            this.initDefaultBackend().then((handlers) => {
+                this.handlers = handlers
+                console.log("were handlers set?", handlers);
 
-            if (import.meta.env.VITE_AUTO_CONNECT_LOCAL == "true") {
-                connectSocketMessage(this.handlers.socket!, wsUri);
-            }
-        });
+
+                App.defaultWorkerHandler(this.handlers);
+                this.initWebsocketUIChanges(this.handlers)
+            });
+        } else {
+            alert("file frontend not implemented yet")
+        }
+
+        this.initUi(this.handlers);
+        debug("init done", this);
+
+        if (import.meta.env.VITE_AUTO_CONNECT_LOCAL == "true") {
+            connectSocketMessage(this.handlers.socket!, wsUri);
+        }
     }
     /*connectToServer(h: AppWorkerHandler) {
         ConnectWebsocketWorkerWithHandler(this.handlers.socket!)
 
         connectSocketMessage(h.socket!, wsUri);
     }*/
-    async initBackend(): Promise<AppWorkerHandler> {
+    async initDefaultBackend(): Promise<AppWorkerHandler> {
         let socket = initWebsocketWorker();
         let eventbus = await initEventBusWorker();
 

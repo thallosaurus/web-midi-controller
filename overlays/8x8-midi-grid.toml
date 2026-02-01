@@ -9,6 +9,12 @@ h = 8
 [[cells.controls]]
 type = "notebutton"
 channel = 1
+note = 0
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
 note = 1
 mode = "trigger"
 
@@ -40,60 +46,6 @@ mode = "trigger"
 type = "notebutton"
 channel = 1
 note = 6
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 7
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 8
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 9
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 10
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 11
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 12
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 13
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 14
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 15
 mode = "trigger"
 
 [[cells.controls]]
@@ -147,49 +99,7 @@ mode = "trigger"
 [[cells.controls]]
 type = "notebutton"
 channel = 1
-note = 24
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 25
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 26
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 27
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 28
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 29
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 30
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 31
+note = 16
 mode = "trigger"
 
 [[cells.controls]]
@@ -243,54 +153,6 @@ mode = "trigger"
 [[cells.controls]]
 type = "notebutton"
 channel = 1
-note = 40
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 41
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 42
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 43
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 44
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 45
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 46
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 47
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
 note = 48
 mode = "trigger"
 
@@ -339,53 +201,191 @@ mode = "trigger"
 [[cells.controls]]
 type = "notebutton"
 channel = 1
-note = 56
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 57
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 58
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 59
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 60
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 61
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 62
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
-note = 63
-mode = "trigger"
-
-[[cells.controls]]
-type = "notebutton"
-channel = 1
 note = 64
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 65
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 66
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 67
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 68
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 69
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 70
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 71
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 80
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 81
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 82
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 83
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 84
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 85
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 86
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 87
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 96
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 97
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 98
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 99
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 100
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 101
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 102
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 103
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 112
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 113
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 114
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 115
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 116
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 117
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 118
+mode = "trigger"
+
+[[cells.controls]]
+type = "notebutton"
+channel = 1
+note = 119
 mode = "trigger"

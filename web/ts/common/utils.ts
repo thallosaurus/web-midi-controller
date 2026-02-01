@@ -13,3 +13,29 @@ function pseudoUUID(): string {
     return v.toString(16);
   });
 }
+
+export type Feature = "default" | "file";
+export type FeatureSet = Set<Feature>;
+
+export const hasFeature = (fs: FeatureSet, f: Feature) => {
+  if (fs.size == 0 && f == "default") return true;
+  fs.has(f);
+}
+
+export function resolveFeatures(): FeatureSet {
+  const params = new URLSearchParams(location.search);
+
+  const raw = params.get("features");
+  const features = new Set<Feature>;
+
+  if (!raw) return features;
+
+  for (const f of raw.split(",")) {
+    features.add(f.trim() as Feature);
+  }
+
+  if (features.size == 0) {
+    features.add("default")
+  }
+  return features;
+}
