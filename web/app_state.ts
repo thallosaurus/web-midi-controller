@@ -10,8 +10,7 @@ import { connectSocketMessage, ConnectWebsocketWorkerWithHandler, initWebsocketW
 
 import { debug, setup_logger } from '@common/logger'
 import { AppEvents } from './app_events.ts'
-import { wsUri } from '@websocket/websocket.ts';
-import { hasFeature, resolveFeatures } from '@common/utils.ts';
+import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts';
 
 //const init_ui = () => {
 
@@ -50,6 +49,12 @@ export class App {
 
                 App.defaultWorkerHandler(this.handlers);
                 this.initWebsocketUIChanges(this.handlers)
+                let autoconnectHost = getHostFromQuery();
+
+                if (autoconnectHost) {
+                    //autoconnect
+                    connectSocketMessage(handlers.socket!, autoconnectHost);
+                }
             });
         } else {
             alert("file frontend not implemented yet")
@@ -57,10 +62,6 @@ export class App {
 
         this.initUi(this.handlers);
         debug("init done", this);
-
-        if (import.meta.env.VITE_AUTO_CONNECT_LOCAL == "true") {
-            connectSocketMessage(this.handlers.socket!, wsUri);
-        }
     }
     /*connectToServer(h: AppWorkerHandler) {
         ConnectWebsocketWorkerWithHandler(this.handlers.socket!)
@@ -126,6 +127,16 @@ export class App {
 
     }
 
+    fetchOverlays(path: string) {
+        fetch(path)
+            .then(ol => ol.json())
+            .then(ol => load_overlays_from_array(ol))
+            .then((ol) => {
+                setup_overlay_selector(ol);
+                change_overlay(0)
+            })
+    }
+
     private initWebsocketUIChanges(h: AppWorkerHandler) {
         const fn = (ev: MessageEvent<any>) => {
             const msg: SocketWorkerResponseType = JSON.parse(ev.data);
@@ -139,13 +150,7 @@ export class App {
                 case SocketWorkerResponse.Connected:
                     this.app_elem.classList.remove("disconnected");
 
-                    fetch(msg.overlay_path)
-                        .then(ol => ol.json())
-                        .then(ol => load_overlays_from_array(ol))
-                        .then((ol) => {
-                            setup_overlay_selector(ol);
-                            change_overlay(0)
-                        })
+                    this.fetchOverlays(msg.overlay_path);
                     break;
             }
         }
@@ -165,7 +170,7 @@ export class App {
         const connect_button = document.querySelector<HTMLDivElement>("#disconnect-fallback .container button.primary")!
         connect_button.addEventListener("click", (e) => {
             console.log("sending connect to socket message from button")
-            connectSocketMessage(h.socket!, wsUri);
+            connectSocketMessage(h.socket!, location.hostname);
         });
     }
 }

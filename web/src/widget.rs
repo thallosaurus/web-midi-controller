@@ -1,6 +1,27 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+/// MARK: - typescript definitions
+/// dont use
+#[derive(TS, Serialize, Deserialize)]
+#[ts(export, export_to = "Overlay.ts")]
+#[serde(tag = "type")]
+#[deprecated]
+pub(super) enum AllowedWidgetProperties {
+        #[serde(rename = "notebutton")]
+        NoteButton,
+        #[serde(rename = "ccslider")]
+        CCSlider,
+        #[serde(rename = "ccbutton")]
+        CCButton,
+        #[serde(rename = "rotary")]
+        RotarySlider,
+        #[serde(rename = "jogwheel")]
+        Jogwheel,
+        #[serde(rename = "xypads")]
+    XYPad,
+}
+
 /// MARK: - Shared
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
@@ -82,6 +103,9 @@ pub(super) enum Widget {
     /// An input that sends out relative CC values (3Fh/41h)
     #[serde(rename = "jogwheel")]
     Jogwheel(JogwheelProperties),
+    
+    #[serde(rename = "xypad")]
+    XYPad(XYPadProperties),
 
     /// An empty cell useful as a grid placeholder
     #[serde(rename = "empty")]
@@ -246,4 +270,21 @@ enum ButtonMode {
 
     #[serde(rename = "readonly")]
     ReadOnly
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct XYPadProperties {
+    #[serde(flatten)]
+    base: BaseProperties,
+
+    #[serde(flatten)]
+    midi: MidiProperties,
+
+    x: CCProperties,
+    y: CCProperties,
+
+    label: Option<String>,
+
+    //mode: RotaryMode,
 }

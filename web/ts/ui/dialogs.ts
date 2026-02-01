@@ -4,14 +4,7 @@ import "./css/overlay_menu.css"
 
 export class UiDialog {
   static dialogs = new Map<string, UiDialog>();
-  constructor(private dialog: HTMLDialogElement) {
-    //const d = document.querySelector<HTMLDialogElement>("dialog#" + id);
-    /*     if (d) {
-      this.#dialog = d
-      } else {
-        throw new Error("Dialog not found")
-    } */
-  }
+  constructor(private dialog: HTMLDialogElement) {}
   open() {
     this.dialog.showModal();
   }

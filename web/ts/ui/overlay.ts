@@ -1,16 +1,13 @@
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
-import { type Overlay } from "@bindings/Overlay.ts";
+import { AllowedWidgetProperties, type Overlay } from "@bindings/Overlay.ts";
 import { uuid } from "@common/utils.ts";
 
 // widget imports
 import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";
-//import { CCSliderLifecycle, UnloadCCSliderScript, type CCSliderState } from "@widgets/slider";
-//import { ButtonState, CCButtonLifecycle, NoteButtonLifecycle } from "@widgets/button.ts";
-//import { JogwheelLifecycle, type JogState } from "@widgets/jogwheel";
 import { render_overlay, render_widget, WidgetProperties } from "./render";
-import { WidgetLifecycle, WidgetState } from "./lifecycle";
+import { WidgetLifecycle, WidgetStateHandlers } from "./lifecycle";
 //import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 
 let current_overlay_id = -1;
@@ -143,17 +140,14 @@ export class LoadedWidget {
     option: Widget
     html: HTMLDivElement
 
-    state: WidgetState
+    //state: WidgetState
     id: string
 
-    lifecycle: WidgetLifecycle<WidgetProperties, WidgetState> | null = null
+    lifecycle: WidgetLifecycle<WidgetProperties, any> | null = null
 
-    constructor(option: Widget, html: HTMLDivElement, lifecycle?: WidgetLifecycle<WidgetProperties, WidgetState>) {
+    constructor(option: Widget, html: HTMLDivElement, lifecycle?: WidgetLifecycle<WidgetProperties, any>) {
         this.option = option;
         this.html = html;
-        this.state = {
-            handlers: {}
-        };
 
         this.id = uuid();
         this.html.dataset.id = this.id;
@@ -185,7 +179,7 @@ export class LoadedOverlay {
 
             //o.state.abort.abort();
             if (o.lifecycle) {
-                o.lifecycle.unload(o.option as WidgetProperties, o.html, o.state);
+                o.lifecycle.unload(o.option as WidgetProperties, o.html);
             }
             o.lifecycle = null
         }
@@ -196,7 +190,19 @@ export class LoadedOverlay {
         console.log("loading overlay id " + this.overlay.id)
 
         for (const o of this.childs) {
-            o.lifecycle?.load(o.option as unknown as any, o.html, o.state);
+            if (o.lifecycle) {
+
+                let h: WidgetStateHandlers = o.lifecycle.load(o.option as unknown as any, o.html);
+                console.log(Object.keys(h.handlers))
+                // TODO correct this
+                Object.entries(h.handlers).forEach(([k, h]) => {
+                    console.log(k, h);
+                    /*h.slider.addEventListener("pointerdown", state.handlers.pointerdown);
+                    slider.addEventListener("pointermove", state.handlers.pointermove);
+                    slider.addEventListener("pointerup", state.handlers.pointerup);
+                    slider.addEventListener("pointercancel", state.handlers.pointercancel);*/
+                })
+            }
         }
 
     }

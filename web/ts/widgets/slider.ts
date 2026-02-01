@@ -1,13 +1,13 @@
 import { vibrate } from "@common/ui_utils";
 import type { CCSliderProperties } from "@bindings/Widget";
-import { WidgetLifecycle, type WidgetState } from "@core/lifecycle";
-import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client";
+import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
+import { EventBusConsumer, registerCCConsumer, registerCCWidgetOnBus, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client";
 import "./css/slider.css";
 
 const MAX_LEVEL = 127;
 
-export interface CCSliderState extends WidgetState {
-    id: string | null,
+export interface CCSliderState {
+    //id: string | null,
     value: number,
     active_pointer: number | null,
     baseValue: number,
@@ -15,96 +15,129 @@ export interface CCSliderState extends WidgetState {
     baseX: number
 }
 
-export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSliderState> {
+export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSliderState> implements EventBusConsumer {
+    /**
+     * The Properties as read from the file
+     */
+    prop: CCSliderProperties;
+    /**
+     * the state of the widget
+     */
+    state: CCSliderState;
+
+    handlers: WidgetStateHandlers = {};/* = {
+        pointerdown: start;
+        pointermove: move;
+        pointerup: end;
+        pointercancel: end;
+    };*/
+
+    resetButton: HTMLButtonElement
+    fill: HTMLDivElement
+    slider: HTMLDivElement
+
+    /**
+     * The id assigned by the event bus
+     */
+    consumerId: string | null = null;
+
     constructor(container: HTMLDivElement, options: CCSliderProperties) {
         super();
-        const fill = document.createElement("div");
-        fill.classList.add("fill", options.mode);
+        this.state = {
+            value: options.default_value ?? 0,
+            active_pointer: null,
+            baseValue: 0,
+            baseX: 0,
+            baseY: 0,
+            //handlers: {}
+        };
 
-        const reset_button = document.createElement("button");
+        this.prop = options
 
-        const slider = document.createElement("div");
-        slider.classList.add(
+        /*this.state.value = options.default_value ?? 0;
+        this.state.active_pointer = null;
+        this.state.baseValue = 0;
+        this.state.baseY = 0;
+        this.state.baseX = 0;*/
+        this.fill = document.createElement("div");
+        this.fill.classList.add("fill", options.mode);
+
+        this.resetButton = document.createElement("button");
+
+        this.slider = document.createElement("div");
+        this.slider.classList.add(
             "slider",
             options.vertical ? "vertical" : "horizontal",
         );
-        slider.appendChild(fill);
+        this.slider.appendChild(this.fill);
 
-        container.appendChild(slider);
-        container.appendChild(reset_button);
+        container.appendChild(this.slider);
+        container.appendChild(this.resetButton);
     }
-    load(options: CCSliderProperties, html: HTMLDivElement, state: CCSliderState): void {
-        state.value = options.default_value ?? 0;
-        state.active_pointer = null;
-        state.baseValue = 0;
-        state.baseY = 0;
-        state.baseX = 0;
 
+    updateValue(v: number): void {
+        const fill = document.createElement("div");
+        this.state.value = v;
+        if (this.prop.vertical) {
+            fill.style.width = (this.state.value / MAX_LEVEL) * 100 + "%";
+        } else {
+            fill.style.height = (this.state.value / MAX_LEVEL) * 100 + "%";
+        }
+        //set_reset_label();
+        this.setResetLabel();
+    }
+
+    setResetLabel() {
+
+        this.resetButton.innerText = (this.prop.label ?? "CC" + this.prop.cc) + ":\n" +
+            this.state.value;
+
+    }
+    load(options: CCSliderProperties, html: HTMLDivElement): WidgetStateHandlers {
         const fill = html.querySelector<HTMLDivElement>("div.fill")!;
-        const reset_button = html.querySelector<HTMLDivElement>("button")!;
         const slider = html.querySelector<HTMLDivElement>(".slider")!;
 
-        reset_button.addEventListener("click", () => {
+        this.resetButton.addEventListener("click", () => {
             reset();
         });
 
-        const set_reset_label = () => {
-            reset_button.innerText = (options.label ?? "CC" + options.cc) + ":\n" +
-                state.value;
-        };
-        set_reset_label();
+        this.setResetLabel();
 
         const start = (e: PointerEvent) => {
             e.preventDefault();
             vibrate();
             const el = e.currentTarget as HTMLElement;
 
-            state.active_pointer = e.pointerId;
+            this.state.active_pointer = e.pointerId;
             el.setPointerCapture(e.pointerId);
 
-            state.baseValue = state.value;
-            state.baseY = e.clientY;
-            state.baseX = e.clientX;
+            this.state.baseValue = this.state.value;
+            this.state.baseY = e.clientY;
+            this.state.baseX = e.clientX;
 
             update(e);
         };
 
         const move = (e: PointerEvent) => {
-            if (e.pointerId !== state.active_pointer) return;
+            if (e.pointerId !== this.state.active_pointer) return;
             update(e);
         };
 
         const end = (e: PointerEvent) => {
-            if (e.pointerId !== state.active_pointer) return;
+            if (e.pointerId !== this.state.active_pointer) return;
 
             const el = e.target as HTMLElement;
             el.releasePointerCapture(e.pointerId);
-            state.active_pointer = null;
+            this.state.active_pointer = null;
 
             if (options.mode == "snapback") {
                 reset();
             }
         };
 
-        const update_value = (v: number) => {
-            state.value = v;
-            if (options.vertical) {
-                fill.style.width = (state.value / MAX_LEVEL) * 100 + "%";
-            } else {
-                fill.style.height = (state.value / MAX_LEVEL) * 100 + "%";
-            }
-            set_reset_label();
-        };
-
         const reset = () => {
-            update_bus_value(options.default_value ?? 0);
-        };
-
-        const update_bus_value = (v: number) => {
-            sendUpdateCCValue(options.channel, options.cc, v);
-
-            // also update ui directly
-            update_value(v);
+            this.updateValue(options.default_value ?? 0);
+            //update_bus_value(options.default_value ?? 0);
         };
 
         const update = (e: PointerEvent) => {
@@ -139,11 +172,11 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
                                 ),
                             );
                         }
-                        if (v != state.value) {
+                        if (v != this.state.value) {
                             //update_value(v);
                             console.log(rect);
                             console.log(v);
-                            update_bus_value(v);
+                            this.sendValue(v);
                         }
                     }
                     break;
@@ -152,25 +185,25 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
                     {
                         let v;
                         if (!options.vertical) {
-                            const n = state.baseY - e.clientY;
+                            const n = this.state.baseY - e.clientY;
                             const sensitivity = MAX_LEVEL / (rect.height);
-                            const next = state.baseValue + n * sensitivity;
+                            const next = this.state.baseValue + n * sensitivity;
                             //(options.vertical ? (rect.width) : (rect.height));
                             v = Math.floor(
                                 Math.max(0, Math.min(MAX_LEVEL, next)),
                             );
                         } else {
-                            const delta = e.clientX - state.baseX;
+                            const delta = e.clientX - this.state.baseX;
                             const sensitivity = MAX_LEVEL / rect.width;
-                            const next = state.baseValue + delta * sensitivity;
+                            const next = this.state.baseValue + delta * sensitivity;
 
                             v = Math.floor(
                                 Math.max(0, Math.min(MAX_LEVEL, next)),
                             );
                         }
 
-                        if (v != state.value) {
-                            update_bus_value(v);
+                        if (v != this.state.value) {
+                            this.sendValue(v);
                         }
                     }
 
@@ -178,38 +211,44 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
             }
             //if ()
         };
+        this.handlers.pointerdown = start;
+        this.handlers.pointermove = move;
+        this.handlers.pointerup = end;
+        this.handlers.pointercancel = end;
 
-        /*register_cc_widget(
-            id,
-            options.default_value ?? 0,
-            options.channel,
-            options.cc,
-            update_value,
-        );*/
-
-        registerCCWidget(options.channel, options.cc, options.default_value ?? 0, update_value).then(id => {
-            state.id = id
-        });
-
+        /*registerCCWidgetOnBus(options.channel, options.cc, options.default_value ?? 0, update_value).then(id => {
+            //state.id = id
+            this.consumerId = id;
+        });*/
+        
         /*const slider = document.createElement("div");
         slider.classList.add(
             "slider",
             options.vertical ? "vertical" : "horizontal",
-        );*/
-        state.handlers.pointerdown = start;
-        state.handlers.pointermove = move;
-        state.handlers.pointerup = end;
-        state.handlers.pointercancel = end;
+            );*/
+
+            
+        registerCCConsumer(options, this);
+
+        return this.handlers;
+        /*
         slider.addEventListener("pointerdown", state.handlers.pointerdown);
         slider.addEventListener("pointermove", state.handlers.pointermove);
         slider.addEventListener("pointerup", state.handlers.pointerup);
-        slider.addEventListener("pointercancel", state.handlers.pointercancel);
+        slider.addEventListener("pointercancel", state.handlers.pointercancel);*/
     }
-    unload(options: CCSliderProperties, html: HTMLDivElement, state: CCSliderState): void {
+    unload(options: CCSliderProperties, html: HTMLDivElement): void {
         const slider = html.querySelector<HTMLDivElement>(".slider")!;
-        slider.addEventListener("pointerdown", state.handlers.pointerdown);
-        slider.addEventListener("pointermove", state.handlers.pointermove);
-        slider.addEventListener("pointerup", state.handlers.pointerup);
-        slider.addEventListener("pointercancel", state.handlers.pointercancel);
+        slider.addEventListener("pointerdown", this.handlers.pointerdown);
+        slider.addEventListener("pointermove", this.handlers.pointermove);
+        slider.addEventListener("pointerup", this.handlers.pointerup);
+        slider.addEventListener("pointercancel", this.handlers.pointercancel);
+    }
+
+    sendValue(v: number) {
+        sendUpdateCCValue(this.prop.channel, this.prop.cc, v);
+
+        // update ui - TODO gate behind feature gate
+        this.updateValue(v);
     }
 }

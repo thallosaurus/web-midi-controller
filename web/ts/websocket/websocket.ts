@@ -1,7 +1,8 @@
 import { MidiEvent } from "../common/events.ts";
 import { sendDisconnected, sendMidiEvent } from "./message.ts";
 
-export const wsUri = "ws://" + location.hostname + ":8888/ws";
+//export const wsUri = "ws://" + location.hostname + ":8888/ws";
+const PORT = 8888;
 
 let ws: WebSocket | null = null;
 //let connecting: Promise<WebSocket> | null = null;
@@ -41,12 +42,12 @@ function setupSocket(socket: WebSocket): WebSocket {
     return socket
 }
 
-export async function connect(uri: string = wsUri, handler = setupSocket): Promise<WebSocket> {
+export async function connect(host: string, handler = setupSocket): Promise<WebSocket> {
     //if (ws) close_socket();
     if (ws) return ws;
     //if (connecting) return connecting;
 
-    const socket = new WebSocket(uri);
+    const socket = new WebSocket("ws://" + host + ":" + PORT + "/ws");
     await new Promise((resolve, reject) => {
 
         const fn_open = (e: any) => {

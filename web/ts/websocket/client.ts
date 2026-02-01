@@ -2,7 +2,6 @@
 import { type ConnectedMessage, SocketWorkerResponse, SocketWorkerResponseType } from "./message";
 import { MidiEvent } from "../common/events.ts";
 import { log } from "@common/logger.ts";
-import { wsUri } from "./websocket.ts";
 
 export enum SocketWorkerRequestType {
     Connect = "connect",
