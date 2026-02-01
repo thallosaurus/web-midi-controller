@@ -3,6 +3,7 @@ todo widgets:
 - note button latch?
 - XY Pad
 - Shift Area/Button
+- midi clock
 - step sequencer
 - documentation (kinda?)
 - Ableton User Mapping
