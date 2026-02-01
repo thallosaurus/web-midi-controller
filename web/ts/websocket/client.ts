@@ -11,9 +11,9 @@ export enum SocketWorkerRequestType {
 }
 
 export type SocketWorkerRequest =
-| ConnectSocketMessage
-| DisconnectSocketMessage
-| SurfaceMidiEvent
+    | ConnectSocketMessage
+    | DisconnectSocketMessage
+    | SurfaceMidiEvent
 
 interface SurfaceMidiEvent {
     type: SocketWorkerRequestType.MidiFrontendInput
@@ -47,8 +47,9 @@ export function initWebsocketWorker(): Worker {
 
 // we need to call it somewhere
 
+let connected: ConnectedMessage | null = null
 export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
-    return new Promise<ConnectedMessage>((res, rej) => {
+    if (!connected) return new Promise<ConnectedMessage>((res, rej) => {
 
         const fn = (e: any) => {
 
@@ -60,12 +61,14 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
                     log("worker connection successful", msg)
                     //wsWorker = worker;
                     worker.removeEventListener("message", fn);
+                    connected = msg;
                     res(msg);
                     break;
 
                 case SocketWorkerResponse.ConnectError:
                     log("connect error", msg);
                     worker.removeEventListener("message", fn);
+                    connected = null;
                     rej(msg.error)
                     break;
 
@@ -73,6 +76,7 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
                     //wsWorker = null;
                     log("disconnected")
                     worker.removeEventListener("message", fn);
+                    connected = null;
                     rej("server disconnected while connecting - no reason idk")
                     break;
             }
