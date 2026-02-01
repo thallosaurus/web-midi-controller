@@ -10,19 +10,14 @@ export interface JogState {
 }
 
 export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogState> implements EventBusConsumer {
-    state: JogState
-    prop: JogwheelProperties
     handlers: WidgetStateHandlers = {}
     
     constructor(container: HTMLDivElement, options: JogwheelProperties) {
-        super();
-        this.prop = options;
-
-        this.state = {
+        super({
             active: false,
             lastX: 0,
             lastTime: 0
-        }
+        }, options);
 
         let jog = document.createElement("div");
         jog.classList.add("jog-target");

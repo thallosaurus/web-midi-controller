@@ -16,20 +16,17 @@ export interface ButtonState {
 }
 
 export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, ButtonState> implements EventBusConsumer {
-    state: ButtonState;
-    prop: NoteButtonProperties;
     handlers: WidgetStateHandlers = {};
     consumerId: string | null = null;
 
     target: HTMLDivElement
 
     constructor(container: HTMLDivElement, options: NoteButtonProperties) {
-        super();
-        this.prop = options;
-        this.state = {
+        super({
             latch_on: false,
             active_pointer: null
-        }
+        }, options);
+
         this.target = document.createElement("div");
         this.target.classList.add("target");
         container.appendChild(this.target);
@@ -156,23 +153,18 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
 }
 
 export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, ButtonState> implements EventBusConsumer {
-    state: ButtonState;
-    prop: CCButtonProperties;
-    handlers: WidgetStateHandlers = {};
     button: HTMLDivElement;
 
     constructor(container: HTMLDivElement, options: CCButtonProperties) {
-        super();
-        this.prop = options;
+        super({
+            latch_on: false,
+            active_pointer: null,
+        }, options);
 
         //CCButton(container, options);
         this.button = document.createElement("div");
         this.button.classList.add("target");
         container.appendChild(this.button);
-        this.state = {
-            latch_on: false,
-            active_pointer: null,
-        }
 
         //return container;
     }
@@ -250,7 +242,9 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             this.consumerId = id
         });*/
 
-        registerCCConsumer(this.prop, this)
+        registerCCConsumer(this.prop, this).then(id => {
+            this.consumerId = id
+        })
 
         if (options.mode != "readonly") {
             this.handlers.pointerdown = touch_start;
@@ -261,14 +255,14 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
         this.setLabel();
     }
     unload(options: CCButtonProperties, html: HTMLDivElement): void {
-        if (options.mode != "readonly") {
+        /*if (options.mode != "readonly") {
 
             // TODO Check if the correct target is handled here
             //const button = html.querySelector<HTMLDivElement>(".target")!;
             html.removeEventListener("pointerdown", this.handlers.pointerdown)
             html.removeEventListener("pointerup", this.handlers.pointerup)
             html.removeEventListener("pointercancel", this.handlers.pointercancel)
-        }
+        }*/
         //unregister_cc_widget(id, options.channel, options.cc)
         unregisterCCConsumer(this.prop, this);
         /*        unregisterCCWidget(state.id!, options.channel, options.cc).then(id => {

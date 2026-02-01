@@ -185,20 +185,20 @@ export class LoadedOverlay {
                     console.log(k, h);
 
                     if (k == "pointerdown") {
-                        o.html.addEventListener("pointerdown", h)
+                        o.html.removeEventListener("pointerdown", h)
                     }
 
                     if (k == "pointermove") {
-                        o.html.addEventListener("pointermove", h);
+                        o.html.removeEventListener("pointermove", h);
                     }
 
                     if (k == "pointerup") {
-                        o.html.addEventListener("pointerup", h);
+                        o.html.removeEventListener("pointerup", h);
                     }
 
                     if (k == "pointercancel") {
 
-                        o.html.addEventListener("pointercancel", h);
+                        o.html.removeEventListener("pointercancel", h);
                     }
                 });
                 o.lifecycle = null

@@ -16,21 +16,6 @@ export interface CCSliderState {
 }
 
 export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSliderState> implements EventBusConsumer {
-    /**
-     * The Properties as read from the file
-     */
-    prop: CCSliderProperties;
-    /**
-     * the state of the widget
-     */
-    state: CCSliderState;
-
-    handlers: WidgetStateHandlers = {};/* = {
-        pointerdown: start;
-        pointermove: move;
-        pointerup: end;
-        pointercancel: end;
-    };*/
 
     resetButton: HTMLButtonElement
     fill: HTMLDivElement
@@ -42,17 +27,14 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
     consumerId: string | null = null;
 
     constructor(container: HTMLDivElement, options: CCSliderProperties) {
-        super();
-        this.state = {
+        super({
             value: options.default_value ?? 0,
             active_pointer: null,
             baseValue: 0,
             baseX: 0,
             baseY: 0,
             //handlers: {}
-        };
-
-        this.prop = options
+        }, options);
 
         /*this.state.value = options.default_value ?? 0;
         this.state.active_pointer = null;

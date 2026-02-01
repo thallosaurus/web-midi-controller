@@ -16,23 +16,16 @@ export interface RotaryState {
 }
 
 export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, RotaryState> implements EventBusConsumer {
-    state: RotaryState;
-    prop: RotarySliderProperties;
-    handlers: WidgetStateHandlers = {};
-
     widget: HTMLDivElement
     dial: HTMLDivElement
     label: HTMLDivElement
 
     constructor(container: HTMLDivElement, options: RotarySliderProperties) {
-        super();
-        this.state = {
+        super({
             value: 0,
             lastX: 0,
             active: false
-        }
-
-        this.prop = options;
+        }, options);
 
         this.widget = document.createElement("div");
         this.widget.classList.add("widget");
@@ -71,12 +64,6 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
 
         //console.log(dial);
 
-        const update_bus_value = (v: number) => {
-            /*process_internal(
-                new CCEvent(s.channel, v, s.cc),
-            );*/
-        };
-
         const touch_start = (e: PointerEvent) => {
             const el = e.target as HTMLElement;
             //alert("touch");
@@ -99,7 +86,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
             const new_value = Math.floor(Math.max(0, Math.min(127, this.state.value + (dy * sensitivity))));
 
             if (new_value != this.state.value) {
-                update_bus_value(new_value);
+                this.sendValue(new_value);
             }
         }
 
@@ -109,7 +96,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
             el.releasePointerCapture(e.pointerId);
 
             if (options.mode == "snapback") {
-                update_bus_value(options.default_value ?? 0)
+                this.sendValue(options.default_value ?? 0)
             }
         }
 
