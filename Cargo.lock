@@ -715,7 +715,7 @@ checksum = "f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273"
 
 [[package]]
 name = "midi-controller"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "axum",
  "axum-extra",
@@ -1563,7 +1563,7 @@ dependencies = [
 
 [[package]]
 name = "web"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "serde",
  "serde_json",
