@@ -3,7 +3,7 @@ import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 
-import { sendUpdateNoteValue, registerNoteWidget, unregisterNoteWidget, sendUpdateCCValue, EventBusConsumer, registerCCConsumer, unregisterCCConsumer } from "@eventbus/client";
+import { sendUpdateNoteValue, unregisterNoteWidget, sendUpdateCCValue, EventBusConsumer, registerCCConsumer, unregisterCCConsumer, registerNoteConsumer } from "@eventbus/client";
 
 
 /**
@@ -39,6 +39,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
         throw new Error("Method not implemented.");
     }
     updateValue(n: number): void {
+        console.log(this);
         this.state.latch_on = n > 0;
         this.setLabel();
         if (this.state.latch_on) {
@@ -52,7 +53,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
     setLabel() {
         this.target.innerText = (this.prop.label ?? "NOTE " + this.prop.note) + ":\n" + (this.state.latch_on ? "On" : "Off")
     }
-    load(options: NoteButtonProperties, html: HTMLDivElement): WidgetStateHandlers {
+    load(options: NoteButtonProperties, html: HTMLDivElement) {
         const touch_start = (e: PointerEvent) => {
             e.preventDefault();
             vibrate();
@@ -107,9 +108,12 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
         */
 
         //register_midi_widget(id, options.channel, options.note, update_value);
-        registerNoteWidget(options.channel, options.note, this.updateValue).then(id => {
+        //registerNoteWidget(options.channel, options.note, this.updateValue)
+        registerNoteConsumer(this.prop, this)
+        .then(id => {
             this.consumerId = id;
         });
+
 
         //registerCCConsumer(this.prop, this);
 
@@ -119,13 +123,11 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
             this.handlers.pointerup = touch_end;
             this.handlers.pointercancel = touch_end;
             //button.addEventListener("pointermove", move);
-            html.addEventListener("pointerdown", this.handlers.pointerdown);
+            /*html.addEventListener("pointerdown", this.handlers.pointerdown);
             html.addEventListener("pointerup", this.handlers.pointerup);
-            html.addEventListener("pointercancel", this.handlers.pointercancel);
+            html.addEventListener("pointercancel", this.handlers.pointercancel);*/
         }
         this.setLabel();
-
-        return this.handlers;
     }
     unload(options: NoteButtonProperties, html: HTMLDivElement): void {
         if (options.mode != "readonly") {
@@ -162,7 +164,7 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
     constructor(container: HTMLDivElement, options: CCButtonProperties) {
         super();
         this.prop = options;
-        
+
         //CCButton(container, options);
         this.button = document.createElement("div");
         this.button.classList.add("target");
@@ -176,29 +178,21 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
     }
     consumerId: string | null = null;
     updateValue(v: number): void {
-        throw new Error("Method not implemented.");
+        this.state.latch_on = v > 0;
+        this.setLabel();
+        if (this.state.latch_on) {
+            //latch_on = true;
+            this.button.classList.add("press");
+        } else {
+            //latch_on = false;
+            this.button.classList.remove("press");
+        }
     }
     setLabel() {
-            this.button.innerText = (this.prop.label ?? "CC" + this.prop.cc) + ":\n" +
-                (this.state.latch_on ? this.prop.value : this.prop.value_off);
+        this.button.innerText = (this.prop.label ?? "CC" + this.prop.cc) + ":\n" +
+            (this.state.latch_on ? this.prop.value : this.prop.value_off);
     }
-    load(options: CCButtonProperties, html: HTMLDivElement): WidgetStateHandlers {
-
-        // Update UI only
-        const update_value = (v: number) => {
-            //value = v;
-            this.state.latch_on = v > 0;
-            this.setLabel();
-            if (this.state.latch_on) {
-                //latch_on = true;
-                this.button.classList.add("press");
-            } else {
-                //latch_on = false;
-                this.button.classList.remove("press");
-            }
-            //midi_messages.di
-        };
-
+    load(options: CCButtonProperties, html: HTMLDivElement) {
         // Update State on the Bus
         /*const update_bus_value = (v: number) => {
             //process_internal(new CCEvent(options.channel, v, options.cc));
@@ -263,13 +257,8 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             this.handlers.pointerup = touch_end;
             this.handlers.pointercancel = touch_end;
             //button.addEventListener("pointermove", move);
-            html.addEventListener("pointerdown", this.handlers.pointerdown);
-            html.addEventListener("pointerup", this.handlers.pointerup);
-            html.addEventListener("pointercancel", this.handlers.pointercancel);
         }
         this.setLabel();
-
-        return this.handlers;
     }
     unload(options: CCButtonProperties, html: HTMLDivElement): void {
         if (options.mode != "readonly") {
@@ -282,9 +271,9 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
         }
         //unregister_cc_widget(id, options.channel, options.cc)
         unregisterCCConsumer(this.prop, this);
-/*        unregisterCCWidget(state.id!, options.channel, options.cc).then(id => {
-            state.id = null
-        })*/
+        /*        unregisterCCWidget(state.id!, options.channel, options.cc).then(id => {
+                    state.id = null
+                })*/
     }
 
     sendValue(v: number): void {

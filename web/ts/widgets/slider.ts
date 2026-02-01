@@ -1,7 +1,7 @@
 import { vibrate } from "@common/ui_utils";
 import type { CCSliderProperties } from "@bindings/Widget";
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
-import { EventBusConsumer, registerCCConsumer, registerCCWidgetOnBus, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client";
+import { EventBusConsumer, registerCCConsumer, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client";
 import "./css/slider.css";
 
 const MAX_LEVEL = 127;
@@ -76,12 +76,12 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
     }
 
     updateValue(v: number): void {
-        const fill = document.createElement("div");
+        //const fill = document.createElement("div");
         this.state.value = v;
         if (this.prop.vertical) {
-            fill.style.width = (this.state.value / MAX_LEVEL) * 100 + "%";
+            this.fill.style.width = (this.state.value / MAX_LEVEL) * 100 + "%";
         } else {
-            fill.style.height = (this.state.value / MAX_LEVEL) * 100 + "%";
+            this.fill.style.height = (this.state.value / MAX_LEVEL) * 100 + "%";
         }
         //set_reset_label();
         this.setResetLabel();
@@ -93,10 +93,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
             this.state.value;
 
     }
-    load(options: CCSliderProperties, html: HTMLDivElement): WidgetStateHandlers {
-        const fill = html.querySelector<HTMLDivElement>("div.fill")!;
-        const slider = html.querySelector<HTMLDivElement>(".slider")!;
-
+    load(options: CCSliderProperties, html: HTMLDivElement) {
         this.resetButton.addEventListener("click", () => {
             reset();
         });
@@ -230,7 +227,6 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
             
         registerCCConsumer(options, this);
 
-        return this.handlers;
         /*
         slider.addEventListener("pointerdown", state.handlers.pointerdown);
         slider.addEventListener("pointermove", state.handlers.pointermove);

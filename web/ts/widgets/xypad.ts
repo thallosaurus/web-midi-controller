@@ -3,11 +3,16 @@ import type { CCSliderProperties, XYPadProperties } from "@bindings/Widget";
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 import { EventBusConsumer } from "@eventbus/client";
 
-export interface XYPadState {
-
+class XYAxis implements EventBusConsumer{
+    value: number = 0
 }
 
-export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState> implements EventBusConsumer{
+export interface XYPadState {
+    x: XYAxis,
+    y: XYAxis
+}
+
+export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState> {
     state: XYPadState;
     prop: XYPadProperties;
     handlers: WidgetStateHandlers = {};

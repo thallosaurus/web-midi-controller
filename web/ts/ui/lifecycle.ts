@@ -19,7 +19,7 @@ export abstract class WidgetLifecycle<O extends WidgetProperties, S> {
     abstract prop: O
     abstract handlers: WidgetStateHandlers
     constructor() { }
-    abstract load(options: O, html: HTMLDivElement): WidgetStateHandlers
+    abstract load(options: O, html: HTMLDivElement): void;
     abstract unload(options: O, html: HTMLDivElement): void;
 
     /*registerCCWidget(widget: CCWidgetConsumer) {

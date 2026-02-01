@@ -63,7 +63,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
         sendUpdateCCValue(this.prop.channel, this.prop.cc, v)
     }
 
-    load(options: RotarySliderProperties, html: HTMLDivElement): WidgetStateHandlers {
+    load(options: RotarySliderProperties, html: HTMLDivElement) {
         const sensitivity = 0.5;    // px -> value
 
 
@@ -121,14 +121,9 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
         this.handlers.pointermove = touch_move;
         this.handlers.pointerup = touch_stop;
         this.handlers.pointercancel = touch_stop;
-        //pointerdown
-        html.addEventListener("pointerdown", this.handlers.pointerdown);
-        html.addEventListener("pointermove", this.handlers.pointermove);
-        html.addEventListener("pointerup", this.handlers.pointerup);
-        html.addEventListener("pointercancel", this.handlers.pointercancel);
+        //pointerdow
         this.setElementProperties();
 
-        return this.handlers
     }
     unload(options: RotarySliderProperties, html: HTMLDivElement): void {
         console.log("unloading rotary")

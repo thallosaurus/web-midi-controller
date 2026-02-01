@@ -1,4 +1,4 @@
-import { CCProperties, MidiProperties } from "@bindings/Widget";
+import { ButtonProperties, CCProperties, MidiProperties, NoteButtonProperties } from "@bindings/Widget";
 import { uuid } from "../common/utils";
 import { EventBusProducerMessage, EventBusProducerMessageType } from "./message";
 
@@ -292,14 +292,14 @@ export function initEventBusWorker(): Promise<Worker> {
 }
 
 export function registerCCConsumer(options: CCProperties & MidiProperties, consumer: EventBusConsumer): Promise<string> {
-    return registerCCWidgetOnBus(options.channel, options.cc, options.default_value ?? 0, consumer.updateValue)
+    return registerCCWidgetOnBus(options.channel, options.cc, options.default_value ?? 0, consumer.updateValue.bind(consumer))
     /*.then(id => {
         //state.id = id
         consumer.consumerId = id;
     });*/
 }
 
-export function registerCCWidgetOnBus(channel: number, cc: number, init: number, cb: EventBusCallback): Promise<string> {
+function registerCCWidgetOnBus(channel: number, cc: number, init: number, cb: EventBusCallback): Promise<string> {
     if (!ebWorker) throw new Error("no event bus running");
     const id = uuid();
 
@@ -339,7 +339,10 @@ export function unregisterCCWidget(id: string, channel: number, cc: number): Pro
     });
 }
 
-export function registerNoteWidget(channel: number, note: number, cb: EventBusCallback): Promise<string> {
+export function registerNoteConsumer(options: NoteButtonProperties & MidiProperties, consumer: EventBusConsumer): Promise<string> {
+    return registerNoteWidgetOnBus(options.channel, options.note, consumer.updateValue.bind(consumer))
+}
+export function registerNoteWidgetOnBus(channel: number, note: number, cb: EventBusCallback): Promise<string> {
     if (!ebWorker) throw new Error("no event bus running");
     const id = uuid();
 

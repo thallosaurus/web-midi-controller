@@ -56,7 +56,7 @@ export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogSt
         }
     }
 
-    load(options: JogwheelProperties, html: HTMLDivElement): WidgetStateHandlers {
+    load(options: JogwheelProperties, html: HTMLDivElement) {
         const touch_start = (e: PointerEvent) => {
             const el = e.currentTarget as HTMLElement;
             el.setPointerCapture(e.pointerId);
@@ -94,13 +94,6 @@ export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogSt
         this.handlers.pointermove = touch_move;
         this.handlers.pointerup = touch_stop;
         this.handlers.pointercancel = touch_stop;
-
-        html.addEventListener("pointerdown", this.handlers.pointerdown);
-        html.addEventListener("pointermove", this.handlers.pointermove);
-        html.addEventListener("pointerup", this.handlers.pointerup);
-        html.addEventListener("pointercancel", this.handlers.pointercancel);
-
-        return this.handlers
     }
 
     unload(options: JogwheelProperties, html: HTMLDivElement): void {
