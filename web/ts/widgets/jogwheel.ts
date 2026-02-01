@@ -89,12 +89,15 @@ export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogSt
         this.handlers.pointermove = touch_move;
         this.handlers.pointerup = touch_stop;
         this.handlers.pointercancel = touch_stop;
+
+        return true
     }
 
-    unload(options: JogwheelProperties, html: HTMLDivElement): void {
+    unload(options: JogwheelProperties, html: HTMLDivElement): boolean {
         html.removeEventListener("pointerdown", this.handlers.pointerdown);
         html.removeEventListener("pointermove", this.handlers.pointermove);
         html.removeEventListener("pointerup", this.handlers.pointerup);
         html.removeEventListener("pointercancel", this.handlers.pointercancel);
+        return false;
     }
 }

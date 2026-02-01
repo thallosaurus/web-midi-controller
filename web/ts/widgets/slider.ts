@@ -209,18 +209,21 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
             
         registerCCConsumer(options, this);
 
-        /*
-        slider.addEventListener("pointerdown", state.handlers.pointerdown);
-        slider.addEventListener("pointermove", state.handlers.pointermove);
-        slider.addEventListener("pointerup", state.handlers.pointerup);
-        slider.addEventListener("pointercancel", state.handlers.pointercancel);*/
+        
+        this.slider.addEventListener("pointerdown", this.handlers.pointerdown);
+        this.slider.addEventListener("pointermove", this.handlers.pointermove);
+        this.slider.addEventListener("pointerup", this.handlers.pointerup);
+        this.slider.addEventListener("pointercancel", this.handlers.pointercancel);
+
+        return false;
     }
-    unload(options: CCSliderProperties, html: HTMLDivElement): void {
+    unload(options: CCSliderProperties, html: HTMLDivElement): boolean {
         const slider = html.querySelector<HTMLDivElement>(".slider")!;
         slider.addEventListener("pointerdown", this.handlers.pointerdown);
         slider.addEventListener("pointermove", this.handlers.pointermove);
         slider.addEventListener("pointerup", this.handlers.pointerup);
         slider.addEventListener("pointercancel", this.handlers.pointercancel);
+        return false;
     }
 
     sendValue(v: number) {

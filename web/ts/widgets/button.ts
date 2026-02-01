@@ -83,62 +83,38 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
         };
 
         const touch_update = () => {
-            //update_bus_value(127);
-            //console.log(state.latch_on);
-            //update_bus_value(this.state.latch_on ? 127 : 0);
             this.sendUpdate(this.state.latch_on ? 127 : 0)
         };
 
-        /*
-        const update_value = (n: number) => {
-            //value = n;
-            this.state.latch_on = n > 0;
-            set_label();
-            if (this.state.latch_on) {
-                //latch_on = true;
-                button.classList.add("press");
-            } else {
-                //latch_on = false;
-                button.classList.remove("press");
-            }
-        };
-        */
-
-        //register_midi_widget(id, options.channel, options.note, update_value);
-        //registerNoteWidget(options.channel, options.note, this.updateValue)
         registerNoteConsumer(this.prop, this)
-        .then(id => {
-            this.consumerId = id;
-        });
-
-
-        //registerCCConsumer(this.prop, this);
+            .then(id => {
+                this.consumerId = id;
+            });
 
         if (options.mode != "readonly") {
 
             this.handlers.pointerdown = touch_start;
             this.handlers.pointerup = touch_end;
             this.handlers.pointercancel = touch_end;
-            //button.addEventListener("pointermove", move);
-            /*html.addEventListener("pointerdown", this.handlers.pointerdown);
-            html.addEventListener("pointerup", this.handlers.pointerup);
-            html.addEventListener("pointercancel", this.handlers.pointercancel);*/
         }
         this.setLabel();
+
+        return true;
     }
-    unload(options: NoteButtonProperties, html: HTMLDivElement): void {
-        if (options.mode != "readonly") {
+    unload(options: NoteButtonProperties, html: HTMLDivElement): boolean {
+        /*if (options.mode != "readonly") {
 
             const button = html.querySelector<HTMLDivElement>(".target")!;
             button.removeEventListener("pointerdown", this.handlers.pointerdown)
             button.removeEventListener("pointerup", this.handlers.pointerup)
             button.removeEventListener("pointercancel", this.handlers.pointercancel)
-        }
+        }*/
         //unregister_midi_widget(id, options.channel, options.note);
         unregisterNoteWidget(this.consumerId!, options.channel, options.note).then(id => {
             //state.id
             this.consumerId = null
-        })
+        });
+        return true;
     }
 
     sendUpdate(v: number) {
@@ -253,8 +229,10 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             //button.addEventListener("pointermove", move);
         }
         this.setLabel();
+
+        return true;
     }
-    unload(options: CCButtonProperties, html: HTMLDivElement): void {
+    unload(options: CCButtonProperties, html: HTMLDivElement): boolean {
         /*if (options.mode != "readonly") {
 
             // TODO Check if the correct target is handled here
@@ -268,6 +246,7 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
         /*        unregisterCCWidget(state.id!, options.channel, options.cc).then(id => {
                     state.id = null
                 })*/
+        return true;
     }
 
     sendValue(v: number): void {

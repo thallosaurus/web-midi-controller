@@ -215,7 +215,7 @@ export class LoadedOverlay {
                 for (const o of this.childs) {
                     if (o.lifecycle) {
 
-                        o.lifecycle.load(o.option as unknown as any, o.html);
+                        const should_listen = o.lifecycle.load(o.option as unknown as any, o.html);
                         // TODO correct this
                         Object.entries(o.lifecycle.handlers).forEach(([k, h]) => {
                             console.log(k, h);

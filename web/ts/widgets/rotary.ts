@@ -111,8 +111,9 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
         //pointerdow
         this.setElementProperties();
 
+        return true;
     }
-    unload(options: RotarySliderProperties, html: HTMLDivElement): void {
+    unload(options: RotarySliderProperties, html: HTMLDivElement): boolean {
         console.log("unloading rotary")
 
         html.removeEventListener("pointerdown", this.handlers.pointerdown);
@@ -121,9 +122,11 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
         html.removeEventListener("pointercancel", this.handlers.pointercancel);
         //unregister_cc_widget(id, s.channel, s.cc);
         unregisterCCConsumer(this.prop, this);
-/*        unregisterCCWidget(this.consumerId!, options.channel, options.cc).then(() => {
-            this.consumerId = null
-        })*/
+        /*        unregisterCCWidget(this.consumerId!, options.channel, options.cc).then(() => {
+                    this.consumerId = null
+                })*/
+
+        return true;
     }
 
 }

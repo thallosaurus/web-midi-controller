@@ -23,8 +23,27 @@ export class WidgetLifecycle<O extends WidgetProperties, S> {
 
         this.state = s
     }
-    load(options: O, html: HTMLDivElement): void {}
-    unload(options: O, html: HTMLDivElement): void {}
+    /**
+     * loads this lifecycle
+     * return true if you want the ui to initialize the touch events for you
+     * @param options 
+     * @param html 
+     * @returns 
+     */
+    load(options: O, html: HTMLDivElement): boolean {
+        return false;
+    }
+
+    /**
+     * unloads this lifecycle
+     * return true if you want the ui to remove the touch events for you
+     * @param options 
+     * @param html 
+     * @returns 
+     */
+    unload(options: O, html: HTMLDivElement): boolean {
+        return false;
+    }
 
     /*registerCCWidget(widget: CCWidgetConsumer) {
         registerCCWidgetOnBus(widget.channel, widget.cc, widget.default_value ?? 0, widget.updateValue).then(id => {
