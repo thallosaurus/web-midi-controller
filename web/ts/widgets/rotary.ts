@@ -125,7 +125,3 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
     }
 
 }
-
-export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
-
-}
