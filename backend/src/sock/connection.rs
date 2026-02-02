@@ -5,7 +5,7 @@ use tokio::sync::mpsc;
 use tracing::{Level, event, span};
 use uuid::Uuid;
 
-use crate::{AppState, socket::AppMessage};
+use crate::state::{AppState, messages::AppMessage};
 
 
 enum NextAction {
@@ -101,7 +101,7 @@ impl WebsocketConnection {
             Message::Binary(bytes) => todo!(),
             Message::Ping(bytes) => todo!(),
             Message::Pong(bytes) => ControlFlow::Continue(NextAction::Nothing),
-            Message::Close(close_frame) =>ControlFlow::Break(()) 
+            Message::Close(close_frame) => ControlFlow::Break(()) 
         }
     }
 

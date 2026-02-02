@@ -10,16 +10,15 @@ use axum::{
 };
 use axum_extra::TypedHeader;
 use dashmap::DashMap;
-use tokio::sync::{Mutex, mpsc};
+use tokio::sync::{Mutex, broadcast, mpsc};
 use tracing::{Level, event, span};
 use uuid::Uuid;
 
-use crate::{AppState, sock::{self, handling::WebsocketConnection}, socket::AppMessage};
+use crate::{sock::connection::WebsocketConnection, state::AppState};
 
-mod handling;
+mod connection;
+pub mod inbox;
 
-pub(crate) type ClientsMapNew = DashMap<Uuid, mpsc::Sender<AppMessage>>;
-pub(crate) type ClientsNew = Arc<ClientsMapNew>;
 
 pub(crate) async fn socket_handler(
     ws: WebSocketUpgrade,
@@ -47,4 +46,3 @@ pub(crate) async fn socket_handler(
     })
     //WebsocketConnection::upgrade();
 }
-

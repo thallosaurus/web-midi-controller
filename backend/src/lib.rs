@@ -12,46 +12,24 @@ use uuid::Uuid;
 use web::overlays::load;
 
 mod midi;
-mod socket;
+//mod socket;
 
 /// New Implementation of websocket
 mod sock;
+pub mod state;
 
 //pub mod widgets;
 
 static ASSETS_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/../web/dist");
 
 use crate::{
-    midi::MidiSystem, sock::{ClientsNew, socket_handler}, socket::{AppMessage, Clients, ws_handler}
+    midi::MidiSystem, sock::{inbox::ClientsNew, socket_handler}, state::{AppState, messages::AppMessage}
 };
 
-#[derive(Clone)]
-pub struct AppState {
-    clients: Clients,
-    clientsnew: ClientsNew,
-    midi_socket_output: Arc<Mutex<mpsc::Sender<AppMessage>>>,
-    midi_socket_input: Arc<Mutex<broadcast::Receiver<AppMessage>>>,
-
-    // holds the program change id associations
-    device_program_ids: Arc<DashMap<u8, Uuid>>,
-}
-
-/// Initializes the channel and the midi system
-pub fn state(name: Option<String>) -> (AppState, MidiSystem) {
-    // output sender
-    let (output_tx, mut output_rx) = mpsc::channel::<AppMessage>(64);
-    let (input_tx, mut input_rx) = broadcast::channel::<AppMessage>(64);
-
-
-    (AppState {
-        clients: Arc::new(DashMap::new()),
-        clientsnew: Arc::new(DashMap::new()),
-        midi_socket_output: Arc::new(Mutex::new(output_tx)),
-        midi_socket_input: Arc::new(Mutex::new(input_rx)),
-        device_program_ids: Arc::new(DashMap::new()),
-    }, 
-    MidiSystem::new(name, output_rx, input_tx).expect("error while initializing midi system"))
-}
+#[deprecated]
+type ClientMap = DashMap<Uuid, mpsc::Sender<AppMessage>>;
+#[deprecated]
+pub(crate) type Clients = Arc<ClientMap>;
 
 pub fn serve_app() -> Router<AppState> {
 
@@ -61,7 +39,7 @@ pub fn serve_app() -> Router<AppState> {
         .fallback_service(service)
         //.route("/", get( async || { include_str!("../web/dist/index.html") }))
         //.nest_service("/assets", service)
-        .route("/ws", any(ws_handler)) //websocket route
+        //.route("/ws", any(ws_handler)) //websocket route
         .route("/wsdev", any(socket_handler))
         .route(
             "/custom.css",

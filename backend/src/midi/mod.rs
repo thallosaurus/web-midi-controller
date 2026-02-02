@@ -11,7 +11,9 @@ use midir::os::unix::VirtualOutput;
 
 use tokio::{sync::{broadcast, mpsc}, task::JoinHandle};
 
-use crate::socket::AppMessage;
+use crate::state::messages::AppMessage;
+
+
 //use std::fmt::Display as DebugDisplay;
 
 pub struct MidiSystem {

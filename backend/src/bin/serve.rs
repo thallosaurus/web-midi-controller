@@ -4,6 +4,7 @@ use axum::{
 use axum_extra::TypedHeader;
 use clap::Parser;
 
+
 use midi_controller::{serve_app, state};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -16,7 +17,7 @@ use tokio::{
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
-    let (appstate, midi_system) = state(args.name);
+    let (appstate, midi_system) = state::state(args.name);
 
     tracing_subscriber::registry()
         .with(
