@@ -14,18 +14,21 @@ use web::overlays::load;
 mod midi;
 mod socket;
 
+/// New Implementation of websocket
+mod sock;
+
 //pub mod widgets;
 
 static ASSETS_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/../web/dist");
 
 use crate::{
-    midi::MidiSystem,
-    socket::{AppMessage, Clients, ws_handler}
+    midi::MidiSystem, sock::{ClientsNew, socket_handler}, socket::{AppMessage, Clients, ws_handler}
 };
 
 #[derive(Clone)]
 pub struct AppState {
     clients: Clients,
+    clientsnew: ClientsNew,
     midi_socket_output: Arc<Mutex<mpsc::Sender<AppMessage>>>,
     midi_socket_input: Arc<Mutex<broadcast::Receiver<AppMessage>>>,
 
@@ -42,6 +45,7 @@ pub fn state(name: Option<String>) -> (AppState, MidiSystem) {
 
     (AppState {
         clients: Arc::new(DashMap::new()),
+        clientsnew: Arc::new(DashMap::new()),
         midi_socket_output: Arc::new(Mutex::new(output_tx)),
         midi_socket_input: Arc::new(Mutex::new(input_rx)),
         device_program_ids: Arc::new(DashMap::new()),
@@ -58,6 +62,7 @@ pub fn serve_app() -> Router<AppState> {
         //.route("/", get( async || { include_str!("../web/dist/index.html") }))
         //.nest_service("/assets", service)
         .route("/ws", any(ws_handler)) //websocket route
+        .route("/wsdev", any(socket_handler))
         .route(
             "/custom.css",
             get(|| async {

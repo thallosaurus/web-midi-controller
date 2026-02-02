@@ -52,11 +52,20 @@ export async function connect(host: string, handler = setupSocket): Promise<WebS
     if (ws) return ws;
     //if (connecting) return connecting;
 
-    const socket = new WebSocket("ws://" + host + ":" + PORT + "/ws");
+    let path = "/ws"
+    if (String(import.meta.env.VITE_USE_DEV_BACKEND) == "true") {
+        path = "/wsdev"
+    }
+
+    const uri = "ws://" + host + ":" + PORT + path;
+
+    const socket = new WebSocket(uri);
+    //const socket = new WebSocket("ws://" + host + ":" + PORT + "/ws");
     await new Promise((resolve, reject) => {
 
         const fn_open = (e: any) => {
             socket.removeEventListener("open", fn_open);
+            console.log("connected", uri);
             resolve(socket);
         }
 
