@@ -1,3 +1,4 @@
+import { ButtonProperties, CCProperties, MidiProperties, NoteButtonProperties, XYPadProperties } from "@bindings/Widget";
 import { uuid } from "../common/utils";
 import { EventBusProducerMessage, EventBusProducerMessageType } from "./message";
 
@@ -6,6 +7,26 @@ interface EventBusProperties {
 }
 
 // MARK: - Consumer/Client
+
+/**
+ * The class a widget or whatever should implement when it wants to listen to the eventbus
+ * usually through a Extension (See CCWidgetConsumer for example)
+ */
+export interface EventBusConsumer {
+    //channel: number,
+
+    consumerId: string | null
+    /**
+     * Gets called by the Event Bus Client as callback
+     */
+    updateValue(v: number): void;
+    
+    /**
+     * Send this to update the value on the event bus
+     * @param v 
+     */
+    sendValue(v: number): void;
+}
 
 
 function sendEventToWorker(worker: Worker | null, msg: EventBusConsumerMessage) {
@@ -256,12 +277,12 @@ export function initEventBusWorker(): Promise<Worker> {
                     ebWorker?.removeEventListener("message", fn);
                     res(ebWorker!);
                     break;
-                }
             }
-            ebWorker?.addEventListener("message", fn);
-        });
-        
-        p.then(worker => {
+        }
+        ebWorker?.addEventListener("message", fn);
+    });
+
+    p.then(worker => {
         EventBusDistributeUpdatesToMatrix(worker);
     });
 
@@ -270,7 +291,15 @@ export function initEventBusWorker(): Promise<Worker> {
     return p;
 }
 
-export function registerCCWidget(channel: number, cc: number, init: number, cb: EventBusCallback): Promise<string> {
+export function registerCCConsumer(channel: number, cc: number, default_value: number | null, consumer: EventBusConsumer): Promise<string> {
+    return registerCCWidgetOnBus(channel, cc, default_value ?? 0, consumer.updateValue.bind(consumer))
+    /*.then(id => {
+        //state.id = id
+        consumer.consumerId = id;
+    });*/
+}
+
+function registerCCWidgetOnBus(channel: number, cc: number, init: number, cb: EventBusCallback): Promise<string> {
     if (!ebWorker) throw new Error("no event bus running");
     const id = uuid();
 
@@ -286,6 +315,11 @@ export function registerCCWidget(channel: number, cc: number, init: number, cb: 
         ebWorker?.addEventListener("message", fn)
         sendRegisterCCWidget(id, channel, cc, init)
     });
+}
+
+export function unregisterCCConsumer(channel: number, cc: number, consumer: EventBusConsumer): Promise<void> {
+    if (!consumer.consumerId) throw new Error("consumer has no Id")
+    return unregisterCCWidget(consumer.consumerId, channel, cc);
 }
 
 export function unregisterCCWidget(id: string, channel: number, cc: number): Promise<void> {
@@ -305,7 +339,10 @@ export function unregisterCCWidget(id: string, channel: number, cc: number): Pro
     });
 }
 
-export function registerNoteWidget(channel: number, note: number, cb: EventBusCallback): Promise<string> {
+export function registerNoteConsumer(channel: number, note: number, consumer: EventBusConsumer): Promise<string> {
+    return registerNoteWidgetOnBus(channel, note, consumer.updateValue.bind(consumer))
+}
+export function registerNoteWidgetOnBus(channel: number, note: number, cb: EventBusCallback): Promise<string> {
     if (!ebWorker) throw new Error("no event bus running");
     const id = uuid();
 
@@ -340,3 +377,7 @@ export function unregisterNoteWidget(id: string, channel: number, note: number):
     });
 }
 
+export function unregisterNoteConsumer(channel: number, note: number, consumer: EventBusConsumer): Promise<void> {
+    if (!consumer.consumerId) throw new Error("consumer has no Id")
+    return unregisterNoteWidget(consumer.consumerId, channel, note);
+}

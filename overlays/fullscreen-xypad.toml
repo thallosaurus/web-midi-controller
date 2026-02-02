@@ -1,0 +1,18 @@
+name = "Fullscreen XY Pad"
+id = "fullscreen-xy-pad"
+program = 0
+
+[[cells]]
+type = "vert-mixer"
+
+[[cells.controls]]
+type = "xypad"
+channel = 2
+label = "XY Pad"
+#note = 60
+
+[cells.controls.x]
+cc = 4
+
+[cells.controls.y]
+cc = 5

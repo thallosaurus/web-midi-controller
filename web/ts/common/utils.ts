@@ -39,3 +39,14 @@ export function resolveFeatures(): FeatureSet {
   }
   return features;
 }
+
+export function getHostFromQuery(): string | null {
+  const params = new URLSearchParams(location.search);
+
+  const raw = params.get("host");
+
+  if (!raw) return null;
+
+  const t = raw.trim();
+  return t == "local" ? location.hostname : t;
+}

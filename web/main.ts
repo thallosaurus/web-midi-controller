@@ -4,7 +4,6 @@ import "./colors.css";
 
 import { App } from './app_state.ts'
 import { connectSocketMessage } from "@websocket/client.ts";
-import { wsUri } from "@websocket/websocket.ts";
 
 let app: App | null = null;
 

@@ -25,3 +25,6 @@ laters:
 to be fixed:
 - dialogs css
 - double tap to zoom on iOS
+
+settings:
+- device id for program changes

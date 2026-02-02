@@ -1,65 +1,68 @@
-import { WidgetLifecycle, type WidgetState } from "@core/lifecycle";
+import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 import { vibrate } from "@common/ui_utils";
 
 import type { RotarySliderProperties } from "@bindings/Widget";
-import { registerCCWidget, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client.ts";
+import { EventBusConsumer, registerCCConsumer, sendUpdateCCValue, unregisterCCConsumer, unregisterCCWidget } from "@eventbus/client.ts";
 import "./css/rotary.css";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
 
-export interface RotaryState extends WidgetState {
-    id: string | null
+export interface RotaryState {
+    //id: string | null
     value: number
     lastX: number
     active: boolean
 }
 
-export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, RotaryState> {
+export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, RotaryState> implements EventBusConsumer {
+    widget: HTMLDivElement
+    dial: HTMLDivElement
+    label: HTMLDivElement
+
     constructor(container: HTMLDivElement, options: RotarySliderProperties) {
-        super();
-        const widget = document.createElement("div");
-        widget.classList.add("widget");
+        super({
+            value: 0,
+            lastX: 0,
+            active: false
+        }, options);
 
-        const dial = document.createElement("div");
-        dial.classList.add("dial");
+        this.widget = document.createElement("div");
+        this.widget.classList.add("widget");
 
-        const label = document.createElement("div");
-        label.classList.add("label")
+        this.dial = document.createElement("div");
+        this.dial.classList.add("dial");
 
-        widget.appendChild(dial);
-        container.appendChild(widget);
-        container.appendChild(label);
+        this.label = document.createElement("div");
+        this.label.classList.add("label")
+
+        this.widget.appendChild(this.dial);
+        container.appendChild(this.widget);
+        container.appendChild(this.label);
     }
-    load(options: RotarySliderProperties, html: HTMLDivElement, state: RotaryState): void {
+    consumerId: string | null = null;
+    updateValue(v: number): void {
+        this.state.value = v;
+        this.setElementProperties()
+        console.log(v);
+    }
+    setElementProperties() {
+        const angle = MIN_ANGLE + (this.state.value / 127) * (MAX_ANGLE - MIN_ANGLE);
+        this.dial.style.setProperty("--rotation", String(angle) + "deg");
+        this.label.innerText = this.prop.label ?? ("CC" + this.prop.cc + ":\n" + this.state.value)
+    }
+
+    sendValue(v: number) {
+        sendUpdateCCValue(this.prop.channel, this.prop.cc, v)
+    }
+
+    load(options: RotarySliderProperties, html: HTMLDivElement) {
         const sensitivity = 0.5;    // px -> value
 
-        state.value = 0;
-        state.lastX = 0;
-        state.active = false;
 
-        const dial = html.querySelector<HTMLDivElement>(".rotary .widget .dial")!;
-        const label = html.querySelector<HTMLDivElement>(".label")!;
+
+
         //console.log(dial);
-
-        const set_element_properties = () => {
-            const angle = MIN_ANGLE + (state.value / 127) * (MAX_ANGLE - MIN_ANGLE);
-            dial.style.setProperty("--rotation", String(angle) + "deg");
-            label.innerText = options.label ?? ("CC" + options.cc + ":\n" + state.value)
-        }
-
-        const update_value = (e: number) => {
-            state.value = e;
-            set_element_properties()
-            console.log(e);
-        }
-
-        const update_bus_value = (v: number) => {
-            /*process_internal(
-                new CCEvent(s.channel, v, s.cc),
-            );*/
-            sendUpdateCCValue(options.channel, options.cc, v)
-        };
 
         const touch_start = (e: PointerEvent) => {
             const el = e.target as HTMLElement;
@@ -69,63 +72,63 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
             el.setPointerCapture(e.pointerId);
             vibrate();
             //lastX = e.clientY;
-            state.lastX = e.clientX;
-            state.active = true;
+            this.state.lastX = e.clientX;
+            this.state.active = true;
         };
 
         const touch_move = (e: PointerEvent) => {
-            if (!state.active) return;
+            if (!this.state.active) return;
 
             //const dy = state.lastX - e.clientX;
-            const dy = e.clientX - state.lastX;
-            state.lastX = e.clientX;
+            const dy = e.clientX - this.state.lastX;
+            this.state.lastX = e.clientX;
 
-            const new_value = Math.floor(Math.max(0, Math.min(127, state.value + (dy * sensitivity))));
+            const new_value = Math.floor(Math.max(0, Math.min(127, this.state.value + (dy * sensitivity))));
 
-            if (new_value != state.value) {
-                update_bus_value(new_value);
+            if (new_value != this.state.value) {
+                this.sendValue(new_value);
             }
         }
 
         const touch_stop = (e: PointerEvent) => {
-            state.active = false;
+            this.state.active = false;
             const el = e.target as HTMLElement;
             el.releasePointerCapture(e.pointerId);
 
             if (options.mode == "snapback") {
-                update_bus_value(options.default_value ?? 0)
+                this.sendValue(options.default_value ?? 0)
             }
         }
 
         //register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
-        registerCCWidget(options.channel, options.cc, options.value ?? 0, update_value)
+        //registerCCWidget(options.channel, options.cc, options.value ?? 0, this.updateValue)
+        registerCCConsumer(this.prop.channel, this.prop.cc, null, this).then(id => {
+            this.consumerId = id;
+        });
 
-        state.handlers.pointerdown = touch_start;
-        state.handlers.pointermove = touch_move;
-        state.handlers.pointerup = touch_stop;
-        state.handlers.pointercancel = touch_stop;
-        //pointerdown
-        html.addEventListener("pointerdown", state.handlers.pointerdown);
-        html.addEventListener("pointermove", state.handlers.pointermove);
-        html.addEventListener("pointerup", state.handlers.pointerup);
-        html.addEventListener("pointercancel", state.handlers.pointercancel);
-        set_element_properties();
+        this.handlers.pointerdown = touch_start;
+        this.handlers.pointermove = touch_move;
+        this.handlers.pointerup = touch_stop;
+        this.handlers.pointercancel = touch_stop;
+        //pointerdow
+        this.setElementProperties();
+
+        return true;
     }
-    unload(options: RotarySliderProperties, html: HTMLDivElement, state: RotaryState): void {
+    unload(options: RotarySliderProperties, html: HTMLDivElement): boolean {
         console.log("unloading rotary")
 
-        html.removeEventListener("pointerdown", state.handlers.pointerdown);
-        html.removeEventListener("pointermove", state.handlers.pointermove);
-        html.removeEventListener("pointerup", state.handlers.pointerup);
-        html.removeEventListener("pointercancel", state.handlers.pointercancel);
+        html.removeEventListener("pointerdown", this.handlers.pointerdown);
+        html.removeEventListener("pointermove", this.handlers.pointermove);
+        html.removeEventListener("pointerup", this.handlers.pointerup);
+        html.removeEventListener("pointercancel", this.handlers.pointercancel);
         //unregister_cc_widget(id, s.channel, s.cc);
-        unregisterCCWidget(state.id!, options.channel, options.cc).then(() => {
-            state.id = null
-        })
+        unregisterCCConsumer(this.prop.channel, this.prop.cc, this);
+        /*        unregisterCCWidget(this.consumerId!, options.channel, options.cc).then(() => {
+                    this.consumerId = null
+                })*/
+
+        return true;
     }
-
-}
-
-export const RotaryScript = (s: RotarySliderProperties, o: HTMLDivElement, state: RotaryState) => {
 
 }

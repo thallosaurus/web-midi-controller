@@ -1,14 +1,15 @@
-// defined all allowed widgets for type definitions
-export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties;
+// defined all allowed widgets for type definitions - add when necessary
+export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties | XYPadProperties;
 
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, VerticalMixerProperties, Widget } from "@bindings/Widget";
-import { ButtonState, CCButton, CCButtonLifecycle, NoteButton, NoteButtonLifecycle } from "@widgets/button";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, VerticalMixerProperties, Widget, XYPadProperties } from "@bindings/Widget";
+import { CCButtonLifecycle, NoteButtonLifecycle } from "@widgets/button";
 import type { Overlay } from "@bindings/Overlay";
-import { JogState, Jogwheel, JogwheelLifecycle } from "@widgets/jogwheel";
-import { Rotary, RotaryLifecycle, RotaryState } from "@widgets/rotary";
-import { CCSlider, CCSliderLifecycle, CCSliderState } from "@widgets/slider";
+import { JogwheelLifecycle } from "@widgets/jogwheel";
+import { XYPadLifecycle } from "@widgets/xypad";
+import { RotaryLifecycle, RotaryState } from "@widgets/rotary";
+import { CCSliderLifecycle, CCSliderState } from "@widgets/slider";
 import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
-import { WidgetLifecycle, WidgetState } from "./lifecycle";
+//import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
 /*export function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> | null{
         switch (o.option.type) {
@@ -82,7 +83,6 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
                 //CCButton(e, w);
                 return new LoadedWidget(cell, e, new CCButtonLifecycle(e, w))
             }
-            break;
 
         case "rotary":
             {
@@ -90,7 +90,6 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
                 //Rotary(e, w);
                 return new LoadedWidget(cell, e, new RotaryLifecycle(e, w))
             }
-            break;
 
         case "ccslider":
             {
@@ -98,14 +97,13 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
                 //CCSlider(e, w);
                 return new LoadedWidget(cell, e, new CCSliderLifecycle(e, w))
             }
-            break;
 
         case "grid-mixer":
             {
                 const w = cell as GridMixerProperties;
                 GridMixer(e, w, children);
+                return new LoadedWidget(cell, e);
             }
-            break;
 
         case "vert-mixer":
             {
@@ -113,7 +111,6 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
                 VertMixer(e, w, children);
                 return new LoadedWidget(cell, e);
             }
-            break;
 
         case "horiz-mixer":
             {
@@ -121,7 +118,6 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
                 HorizMixer(e, w, children);
                 return new LoadedWidget(cell, e);
             }
-            break;
 
         case "notebutton":
             {
@@ -129,7 +125,6 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
                 //NoteButton(e, w);
                 return new LoadedWidget(cell, e, new NoteButtonLifecycle(e, w))
             }
-            break;
 
         case "jogwheel":
             {
@@ -137,7 +132,12 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
                 return new LoadedWidget(cell, e, new JogwheelLifecycle(e, w));
                 //Jogwheel(e, w);
             }
-            break;
+
+        case "xypad":
+            {
+                const w = cell as XYPadProperties;
+                return new LoadedWidget(cell, e, new XYPadLifecycle(e, w));
+            }
     }
     let ww = new LoadedWidget(cell, e);
     //children.push(ww);
