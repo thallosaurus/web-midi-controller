@@ -3,9 +3,7 @@ use std::sync::Arc;
 use axum::{Router, http::HeaderValue, response::IntoResponse, routing::{any, get}};
 use dashmap::DashMap;
 
-use serde_json::Value;
-use tokio::{fs, sync::{Mutex, broadcast, mpsc}};
-use tower_http::services;
+use tokio::{fs, sync::mpsc};
 use include_dir::{Dir, include_dir};
 use tower_serve_static::ServeDir;
 use uuid::Uuid;
@@ -23,7 +21,7 @@ pub mod state;
 static ASSETS_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/../web/dist");
 
 use crate::{
-    midi::MidiSystem, sock::{inbox::ClientsNew, socket_handler}, state::{AppState, messages::AppMessage}
+    sock::socket_handler, state::{AppState, messages::AppMessage}
 };
 
 #[deprecated]

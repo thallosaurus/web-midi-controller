@@ -2,7 +2,7 @@ use std::ops::ControlFlow;
 
 use axum::extract::ws::{Message, WebSocket};
 use tokio::sync::mpsc;
-use tracing::{Level, event, span};
+use tracing::{Level, span};
 use uuid::Uuid;
 
 use crate::state::{AppState, messages::AppMessage};
@@ -54,7 +54,7 @@ impl WebsocketConnection {
                     break;
                 } else {
                     match next_action.continue_value().unwrap() {
-                        NextAction::Broadcast(msg) => {
+                        NextAction::Broadcast(_msg) => {
                             //println!("client with id {conn_id} got msg {:?}", aux);
                         }
                         NextAction::Direct(msg) => {
@@ -79,8 +79,8 @@ impl WebsocketConnection {
     /// also from other peers
     fn process_inbox_message(
         &self,
-        msg: AppMessage,
-        state: &AppState,
+        _msg: AppMessage,
+        _state: &AppState,
     ) -> ControlFlow<(), NextAction> {
         ControlFlow::Continue(NextAction::Nothing)
     }
@@ -89,7 +89,7 @@ impl WebsocketConnection {
     fn process_socket_message(
         &self,
         msg: Message,
-        state: &AppState,
+        _state: &AppState,
     ) -> ControlFlow<(), NextAction> {
         match msg {
             Message::Text(utf8_bytes) => {
@@ -98,10 +98,10 @@ impl WebsocketConnection {
                 println!("got message: {:?}", event);
                 ControlFlow::Continue(NextAction::Broadcast(event))
             },
-            Message::Binary(bytes) => todo!(),
-            Message::Ping(bytes) => todo!(),
-            Message::Pong(bytes) => ControlFlow::Continue(NextAction::Nothing),
-            Message::Close(close_frame) => ControlFlow::Break(()) 
+            Message::Binary(_bytes) => todo!(),
+            Message::Ping(_bytes) => todo!(),
+            Message::Pong(_bytes) => ControlFlow::Continue(NextAction::Nothing),
+            Message::Close(_close_frame) => ControlFlow::Break(()) 
         }
     }
 

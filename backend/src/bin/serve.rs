@@ -1,7 +1,4 @@
-use axum::{
-    Router, extract::{State, WebSocketUpgrade, connect_info::ConnectInfo}, http::{HeaderValue, Method}, response::IntoResponse, routing::{any, get}
-};
-use axum_extra::TypedHeader;
+use axum::http::Method;
 use clap::Parser;
 
 
@@ -9,15 +6,13 @@ use midi_controller::{serve_app, state};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use std::{net::SocketAddr, sync::Arc};
-use tokio::{
-    fs, net::TcpListener, sync::{Mutex, mpsc}
-};
+use std::net::SocketAddr;
+use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
-    let (appstate, midi_system) = state::state(args.name);
+    let (appstate, _midi_system) = state::state(args.name);
 
     tracing_subscriber::registry()
         .with(

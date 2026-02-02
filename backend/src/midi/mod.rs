@@ -1,8 +1,5 @@
 use midir::{MidiIO, MidiInput, MidiInputConnection, MidiOutput};
-use std::{
-    error::Error,
-    fmt::{Display, write},
-};
+use std::fmt::Display;
 
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualInput;
@@ -50,7 +47,7 @@ impl MidiSystem {
         input_tx: broadcast::Sender<AppMessage>,
     ) -> Result<Self, MidiSystemErrors> {
         let output_name = device_name.clone().unwrap_or(String::from("midi control output"));
-        let input_name = device_name.clone().unwrap_or(String::from("midi control input"));
+        let _input_name = device_name.clone().unwrap_or(String::from("midi control input"));
         let midi_in = MidiInput::new("input name").map_err(|e| MidiSystemErrors::InitError(e))?;
         #[cfg(target_os = "windows")]
         let midi_in_conn = {
@@ -122,7 +119,7 @@ impl MidiSystem {
     }*/
 }
 
-fn midi_in_handler(ts: u64, data: &[u8], e: &mut broadcast::Sender<AppMessage>) {
+fn midi_in_handler(_ts: u64, data: &[u8], e: &mut broadcast::Sender<AppMessage>) {
     let msg: AppMessage = Vec::from(data).into();
     //println!("{} midi input: {:?}", ts, msg);s
 

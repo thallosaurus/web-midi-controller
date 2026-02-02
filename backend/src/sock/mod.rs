@@ -1,17 +1,13 @@
-use std::{net::SocketAddr, ops::ControlFlow, sync::Arc};
+use std::net::SocketAddr;
 
 use axum::{
-    body::Bytes,
     extract::{
         ConnectInfo, State, WebSocketUpgrade,
-        ws::{Message, WebSocket},
     },
     response::IntoResponse,
 };
 use axum_extra::TypedHeader;
-use dashmap::DashMap;
-use tokio::sync::{Mutex, broadcast, mpsc};
-use tracing::{Level, event, span};
+use tokio::sync::mpsc;
 use uuid::Uuid;
 
 use crate::{sock::connection::WebsocketConnection, state::AppState};
