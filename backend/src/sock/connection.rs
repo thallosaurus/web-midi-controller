@@ -7,7 +7,6 @@ use uuid::Uuid;
 
 use crate::state::{AppState, messages::AppMessage};
 
-
 enum NextAction {
     /// sends the containing message back to all clients except the sender
     Broadcast(AppMessage),
@@ -53,16 +52,13 @@ impl WebsocketConnection {
                     //event!(Level::INFO, "client disconnected");
                     break;
                 } else {
-                    match next_action.continue_value().unwrap() {
-                        NextAction::Broadcast(_msg) => {
-                            //println!("client with id {conn_id} got msg {:?}", aux);
+                    if let Some(msg) = next_action.continue_value().unwrap() {
+                        if let Err(e) = socket.send(msg.into()).await {
+                            eprintln!("error while pushing update: {e}")
                         }
-                        NextAction::Direct(msg) => {
-                            if let Err(e) = socket.send(msg.into()).await {
-                                eprintln!("error while pushing update: {e}")
-                            }
-                        },
-                        NextAction::Nothing => continue
+                    } else {
+                        // we shouldn't send something back to the frontend, so we just loop back
+                        continue;
                     }
                 }
             }
@@ -81,8 +77,8 @@ impl WebsocketConnection {
         &self,
         _msg: AppMessage,
         _state: &AppState,
-    ) -> ControlFlow<(), NextAction> {
-        ControlFlow::Continue(NextAction::Nothing)
+    ) -> ControlFlow<(), Option<AppMessage>> {
+        ControlFlow::Continue(None)
     }
 
     /// processes messages sent from the frontend
@@ -90,17 +86,17 @@ impl WebsocketConnection {
         &self,
         msg: Message,
         _state: &AppState,
-    ) -> ControlFlow<(), NextAction> {
+    ) -> ControlFlow<(), Option<AppMessage>> {
         match msg {
             Message::Text(utf8_bytes) => {
                 // frontend sent a JSON message likely
                 let event: AppMessage = utf8_bytes.into();
                 println!("got message: {:?}", event);
-                ControlFlow::Continue(NextAction::Broadcast(event))
+                ControlFlow::Continue(Some(event))
             },
             Message::Binary(_bytes) => todo!(),
             Message::Ping(_bytes) => todo!(),
-            Message::Pong(_bytes) => ControlFlow::Continue(NextAction::Nothing),
+            Message::Pong(_bytes) => ControlFlow::Continue(None),
             Message::Close(_close_frame) => ControlFlow::Break(()) 
         }
     }
