@@ -32,6 +32,11 @@ function setupSocket(socket: WebSocket): WebSocket {
                 sendMidiEvent(msg);
                 break;
 
+            case "programchange":
+                console.log("program change", msg);
+                sendMidiEvent(msg);
+                break;
+
         }
     });
 

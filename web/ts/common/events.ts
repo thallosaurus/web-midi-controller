@@ -30,6 +30,17 @@ export class NoteEvent extends MidiEvent {
     }
 }
 
+export class ProgramChangeEvent extends MidiEvent {
+    parse(s: string): MidiEvent {
+        return JSON.parse(s) as ProgramChangeEvent;
+    }
+    value: number;
+    constructor(midi_channel: number, value: number) {
+        super(midi_channel, "programchange");
+        this.value = value;
+    }
+}
+
 export class CCEvent extends MidiEvent {
     override parse(s: string): MidiEvent {
         return JSON.parse(s) as CCEvent;

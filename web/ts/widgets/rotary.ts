@@ -102,7 +102,9 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
 
         //register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
         //registerCCWidget(options.channel, options.cc, options.value ?? 0, this.updateValue)
-        registerCCConsumer(this.prop.channel, this.prop.cc, null, this);
+        registerCCConsumer(this.prop.channel, this.prop.cc, null, this).then(id => {
+            this.consumerId = id;
+        });
 
         this.handlers.pointerdown = touch_start;
         this.handlers.pointermove = touch_move;

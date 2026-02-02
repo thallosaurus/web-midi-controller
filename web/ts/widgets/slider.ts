@@ -1,7 +1,7 @@
 import { vibrate } from "@common/ui_utils";
 import type { CCSliderProperties } from "@bindings/Widget";
-import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
-import { EventBusConsumer, registerCCConsumer, sendUpdateCCValue, unregisterCCWidget } from "@eventbus/client";
+import { WidgetLifecycle } from "@core/lifecycle";
+import { EventBusConsumer, registerCCConsumer, sendUpdateCCValue } from "@eventbus/client";
 import "./css/slider.css";
 
 const MAX_LEVEL = 127;

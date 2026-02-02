@@ -281,6 +281,9 @@ pub(super) struct XYPadProperties {
     #[serde(flatten)]
     midi: MidiProperties,
 
+    note: Option<u8>,
+    velocity: Option<u8>,
+
     x: CCProperties,
     y: CCProperties,
 

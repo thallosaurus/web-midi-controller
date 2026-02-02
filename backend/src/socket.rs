@@ -191,6 +191,11 @@ pub(crate) enum AppMessage {
         note: u8,
         velocity: u8,
     },
+    #[serde(rename = "programchange")]
+    ProgramChange {
+        midi_channel: u8,
+        value: u8
+    },
     Unsupported,
     Dummy,
 }
@@ -236,6 +241,11 @@ impl From<Vec<u8>> for AppMessage {
                     velocity: 0,
                 }
                 //Self::NoteOff(ch, n)
+            }
+            [0xC0..=0xCF, val] => {
+                // Program changes
+                let ch = data[0] - 0xC0;
+                Self::ProgramChange { midi_channel: ch + 1, value: *val }
             }
             [0x90..=0x9F, note, 0] => {
                 let ch = data[0] - 0x90;
@@ -291,6 +301,9 @@ impl From<AppMessage> for Vec<u8> {
             }
             AppMessage::Dummy => todo!(),
             AppMessage::Unsupported => panic!("can't cast unsupported message to bytes"),
+            AppMessage::ProgramChange { midi_channel, value } => {
+                vec![0xC0 + midi_channel, value]
+            },
         }
     }
 }

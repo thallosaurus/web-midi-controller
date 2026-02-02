@@ -3,7 +3,7 @@ import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
 import { EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./ts/event_bus/client.ts";
 import { SocketWorkerResponse, SocketWorkerResponseType } from "./ts/websocket/message.ts";
 import { sendFrontendMidiEvent } from "./ts/websocket/client.ts";
-import { CCEvent, MidiEvent, NoteEvent } from "./ts/common/events.ts";
+import { CCEvent, MidiEvent, NoteEvent, ProgramChangeEvent } from "./ts/common/events.ts";
 import { change_overlay, clear_loaded_overlays, load_overlays_from_array } from "./ts/ui/overlay.ts";
 import { EventBusProducerMessage, EventBusProducerMessageType } from "./ts/event_bus/message.ts";
 import { connectSocketMessage, ConnectWebsocketWorkerWithHandler, initWebsocketWorker } from "@websocket/client.ts";
@@ -119,6 +119,11 @@ export class App {
                             const cc_ev = msg.data as CCEvent;
                             console.log("frontend cc input")
                             sendUpdateExternalCCWidget(cc_ev.midi_channel, cc_ev.cc, cc_ev.value)
+                            break;
+
+                        case "programchange":
+                            const prg = msg.data as ProgramChangeEvent;
+                            change_overlay(prg.value);
                             break;
                     }
                     break;

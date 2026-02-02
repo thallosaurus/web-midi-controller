@@ -9,8 +9,12 @@
 .xypad .target {
     width: calc(100% - 2em);
     height: calc(100% - 2em);
-    background-color: grey;
+    background-color: darkgrey;
     touch-action: none;
+}
+
+.xypad .label {
+    margin: 1em;
 }
 
 .xypad .target .touchhandler {
@@ -30,4 +34,8 @@
         calc(var(--ypos, 0) / 127)
     )
     
+}
+
+.xypad .target.pressed {
+    background-color: grey;
 }
