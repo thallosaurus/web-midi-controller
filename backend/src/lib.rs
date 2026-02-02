@@ -8,6 +8,7 @@ use tokio::{fs, sync::{Mutex, broadcast, mpsc}};
 use tower_http::services;
 use include_dir::{Dir, include_dir};
 use tower_serve_static::ServeDir;
+use uuid::Uuid;
 use web::overlays::load;
 
 mod midi;
@@ -27,6 +28,9 @@ pub struct AppState {
     clients: Clients,
     midi_socket_output: Arc<Mutex<mpsc::Sender<AppMessage>>>,
     midi_socket_input: Arc<Mutex<broadcast::Receiver<AppMessage>>>,
+
+    // holds the program change id associations
+    device_program_ids: Arc<DashMap<u8, Uuid>>,
 }
 
 /// Initializes the channel and the midi system
@@ -40,6 +44,7 @@ pub fn state(name: Option<String>) -> (AppState, MidiSystem) {
         clients: Arc::new(DashMap::new()),
         midi_socket_output: Arc::new(Mutex::new(output_tx)),
         midi_socket_input: Arc::new(Mutex::new(input_rx)),
+        device_program_ids: Arc::new(DashMap::new()),
     }, 
     MidiSystem::new(name, output_rx, input_tx).expect("error while initializing midi system"))
 }

@@ -55,10 +55,14 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) 
 
     let (tx, mut rx) = mpsc::channel::<AppMessage>(32);
 
-    println!("adding {conn_id} to clients map");
-    state.clients.insert(conn_id, tx);
-
     let client_map = Arc::clone(&state.clients);
+    let prg_map = Arc::clone(&state.device_program_ids);
+    println!("adding {conn_id} to clients map");
+    client_map.insert(conn_id, tx);
+
+    let prg_id = state.device_program_ids.len() as u8;
+    prg_map.insert(prg_id, conn_id);
+
     //let in_socket = Arc::clone(&state.midi_socket_input);
     let mut in_socket = {
         let lock = &state.midi_socket_input.lock().await;
@@ -85,9 +89,20 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) 
                             Ok(msg) => {
                                 println!("send to socket: {:?}", msg);
 
-                                if let Err(e) = socket.send(msg.into()).await {
-                                    eprintln!("error while pushing update: {e}")
+                                match msg {
+                                    _ => {
+                                        if let Err(e) = socket.send(msg.into()).await {
+                                            eprintln!("error while pushing update: {e}")
+                                        }
+                                    }
+                                    /*AppMessage::ProgramChange { midi_channel, value } => {
+
+                                        let own_id = prg_map.get(&prg_id);
+                                        direct_message(map, msg, who)
+                                    }*/
                                 }
+
+
                             },
                             Err(e) => {
                                 eprintln!("{}", e)
@@ -111,6 +126,7 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) 
         }
 
         client_map.remove(&conn_id);
+        prg_map.remove(&prg_id);
     });
 }
 
@@ -141,14 +157,44 @@ async fn process_message(
             //let event: AppMessage = serde_json::from_str(&txt.to_string())?
             //.map_err(|e| AppError::InvalidUpdatePacket(e))?;
 
-            println!("{}", txt);
-
             let event = txt.into();
+            println!("{:?}", event);
 
-            broadcast(map, event, vec![who]).await;
+            match event {
+                AppMessage::CCUpdate {
+                    midi_channel: _,
+                    value: _,
+                    cc: _,
+                } => {
+                    broadcast(map, event, vec![who]).await;
+                    {
+                        midi_tx.lock().await.send(event.into()).await.unwrap();
+                    }
+                }
+                AppMessage::NoteUpdate {
+                    midi_channel,
+                    on,
+                    note,
+                    velocity,
+                } => {
+                    broadcast(map, event, vec![who]).await;
+                    {
+                        midi_tx.lock().await.send(event.into()).await.unwrap();
+                    }
+                }
+                //client cant send program change for now
+                AppMessage::ProgramChange {
+                    midi_channel,
+                    value,
+                } => todo!(),
+                AppMessage::Unsupported => todo!(),
+                AppMessage::Dummy => todo!(),
+            }
+
+            /*broadcast(map, event, vec![who]).await;
             {
                 midi_tx.lock().await.send(event.into()).await.unwrap();
-            }
+            }*/
         }
         Message::Pong(bytes) => {
             println!("got pong {:?}", bytes);
@@ -175,6 +221,15 @@ async fn broadcast(map: &Clients, msg: AppMessage, except: Vec<Uuid>) {
     }
 }
 
+async fn direct_message(map: &Clients, msg: AppMessage, who: Uuid) {
+    let client = map.get(&who);
+    if let Some(c) = client {
+        if let Err(e) = c.send(msg).await {
+            println!("direct message error: {:?}", e)
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 #[serde(tag = "event_name")]
 pub(crate) enum AppMessage {
@@ -194,7 +249,7 @@ pub(crate) enum AppMessage {
     #[serde(rename = "programchange")]
     ProgramChange {
         midi_channel: u8,
-        value: u8
+        value: u8,
     },
     Unsupported,
     Dummy,
@@ -245,7 +300,10 @@ impl From<Vec<u8>> for AppMessage {
             [0xC0..=0xCF, val] => {
                 // Program changes
                 let ch = data[0] - 0xC0;
-                Self::ProgramChange { midi_channel: ch + 1, value: *val }
+                Self::ProgramChange {
+                    midi_channel: ch + 1,
+                    value: *val,
+                }
             }
             [0x90..=0x9F, note, 0] => {
                 let ch = data[0] - 0x90;
@@ -301,9 +359,12 @@ impl From<AppMessage> for Vec<u8> {
             }
             AppMessage::Dummy => todo!(),
             AppMessage::Unsupported => panic!("can't cast unsupported message to bytes"),
-            AppMessage::ProgramChange { midi_channel, value } => {
+            AppMessage::ProgramChange {
+                midi_channel,
+                value,
+            } => {
                 vec![0xC0 + midi_channel, value]
-            },
+            }
         }
     }
 }
