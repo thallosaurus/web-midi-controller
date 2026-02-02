@@ -1,0 +1,30 @@
+name = "Fullscreen XY Pad with Note"
+id = "fullscreen-xy-pad"
+program = 0
+
+[[cells]]
+type = "horiz-mixer"
+
+
+
+[[cells.controls]]
+type = "xypad"
+channel = 2
+label = "XY Pad"
+note = 32
+
+[cells.controls.x]
+cc = 4
+
+[cells.controls.y]
+cc = 5
+
+
+[[cells.controls]]
+type = "ccslider"
+id = "vol_slider"
+channel = 1
+cc = 6
+mode = "relative"
+label = "Volume"
+vertical = false

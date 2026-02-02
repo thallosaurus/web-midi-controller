@@ -1,6 +1,6 @@
 import type { MidiEvent } from "../common/events";
 import { ConnectSocketMessage, SocketWorkerRequest, SocketWorkerRequestType } from "./client";
-import { connect, disconnect, send, wsUri } from "./websocket";
+import { connect, disconnect, send } from "./websocket";
 
 /**
  * process messages from the frontend/the calling thread

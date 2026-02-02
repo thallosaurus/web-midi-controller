@@ -31,3 +31,7 @@
     width: calc(100% - 5px);
     height: calc(100% - 5px);
 }
+
+#fullscreen-xy-pad .ccslider {
+    flex-shrink: 12
+}
