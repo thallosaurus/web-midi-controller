@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 #[serde(tag = "event_name")]
-pub(crate) enum AppMessage {
+pub enum AppMessage {
     #[serde(rename = "ccupdate")]
     CCUpdate {
         midi_channel: u8,

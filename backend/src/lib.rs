@@ -24,11 +24,6 @@ use crate::{
     sock::socket_handler, state::{AppState, messages::AppMessage}
 };
 
-#[deprecated]
-type ClientMap = DashMap<Uuid, mpsc::Sender<AppMessage>>;
-#[deprecated]
-pub(crate) type Clients = Arc<ClientMap>;
-
 pub fn serve_app() -> Router<AppState> {
 
     let service = ServeDir::new(&ASSETS_DIR);

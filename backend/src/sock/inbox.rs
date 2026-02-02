@@ -4,33 +4,34 @@ use dashmap::DashMap;
 use tokio::sync::{broadcast, mpsc};
 use uuid::Uuid;
 
-use crate::{sock::WebsocketConnection, state::messages::AppMessage};
+use crate::state::messages::AppMessage;
 
 pub type ClientsMapNew = DashMap<Uuid, mpsc::Sender<AppMessage>>;
 pub type ClientsNew = Arc<ClientsMapNew>;
 
-#[derive(Clone, Copy)]
-enum MessageType<T> {
-    Broadcast { except: Uuid, data: T },
+#[derive(Debug, Clone, Copy)]
+pub enum MessageType<T> {
+    Broadcast { from: Uuid, data: T },
     Direct { recipient: Uuid, data: T }
 }
 
-struct AppMessageBus {
-    clients: Arc<DashMap<Uuid, mpsc::Sender<AppMessage>>>,
-    sender: broadcast::Sender<MessageType<AppMessage>>
+#[derive(Clone)]
+pub struct MessageResponder {
+    clients: ClientsNew,
+    sender: mpsc::Sender<MessageType<AppMessage>>
 }
 
-impl AppMessageBus {
-    fn inbox_task(clients: ClientsNew) -> Self {
-        let (tx, mut rx) = broadcast::channel(32);
+impl MessageResponder {
+    pub fn task() -> Self {
+        let (tx, mut rx) = mpsc::channel(32);
         let clients = Arc::new(DashMap::new());
 
         let clients_inner = clients.clone();
         tokio::spawn(async move {
             // if we got a message on the broadcast channel, emit it to the recipients
-            while let Ok(msg) = rx.recv().await {
+            while let Some(msg) = rx.recv().await {
                 match msg {
-                    MessageType::Broadcast { except, data } => Self::broadcast(&clients_inner, data, vec![except]).await,
+                    MessageType::Broadcast { from, data } => Self::broadcast(&clients_inner, data, vec![from]).await,
                     MessageType::Direct { recipient, data } => Self::direct_message(&clients_inner, data, recipient).await,
                 }
             }
@@ -42,14 +43,31 @@ impl AppMessageBus {
         }
     }
 
-    pub fn subscribe(&mut self) -> broadcast::Receiver<MessageType<AppMessage>> {
-        self.sender.subscribe()
+    /// send message from the AppState
+    pub async fn send_message(&mut self, msg: MessageType<AppMessage>) {
+        if let Err(e) = self.sender.send(msg).await {
+            eprintln!("{e}");
+        }
     }
+
+    pub fn add_client(&mut self, id: Uuid, conn: mpsc::Sender<AppMessage>) {
+        println!("adding client {id}");
+        self.clients.insert(id, conn);
+    }
+    
+    pub fn remove_client(&mut self, id: Uuid) {
+        println!("removing client {id}");
+        self.clients.remove(&id);
+    }
+
+/*     pub fn subscribe(&mut self) -> broadcast::Receiver<MessageType<AppMessage>> {
+        //self.sender.subscribe()
+    }*/
 
     pub async fn broadcast(map: &Arc<DashMap<Uuid, mpsc::Sender<AppMessage>>>, msg: AppMessage, except: Vec<Uuid>) {
         for client in map.iter() {
             if !except.contains(client.key()) {
-                println!("sending message to {:?}", client.key());
+                println!("[broadcast] sending message to {:?}", client.key());
 
                 let mut c = client.value();
                 if let Err(e) = c.send(msg).await {

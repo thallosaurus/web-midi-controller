@@ -4,19 +4,21 @@ use dashmap::DashMap;
 use tokio::sync::{Mutex, broadcast, mpsc};
 use uuid::Uuid;
 
-use crate::{Clients, midi::MidiSystem, sock::inbox::ClientsNew, state::messages::AppMessage};
+use crate::{midi::MidiSystem, sock::inbox::{ClientsNew, MessageResponder, MessageType}, state::messages::AppMessage};
 
 pub mod messages;
 
 #[derive(Clone)]
 pub struct AppState {
-    clients: Clients,
-    pub clientsnew: ClientsNew,
-    midi_socket_output: Arc<Mutex<mpsc::Sender<AppMessage>>>,
-    midi_socket_input: Arc<Mutex<broadcast::Receiver<AppMessage>>>,
+    //clients: Clients,
+    //pub clientsnew: ClientsNew,
+    //midi_socket_output: Arc<Mutex<mpsc::Sender<AppMessage>>>,
+    //midi_socket_input: Arc<Mutex<broadcast::Receiver<AppMessage>>>,
+    pub responder: MessageResponder,
 
     // holds the program change id associations
-    device_program_ids: Arc<DashMap<u8, Uuid>>,
+    //device_program_ids: Arc<DashMap<u8, Uuid>>,
+    system_messages: mpsc::Sender<MessageType<AppMessage>>
 }
 
 /// Initializes the channel and the midi system
@@ -25,13 +27,16 @@ pub fn state(name: Option<String>) -> (AppState, MidiSystem) {
     let (output_tx, output_rx) = mpsc::channel::<AppMessage>(64);
     let (input_tx, input_rx) = broadcast::channel::<AppMessage>(64);
 
+    let (sys_tx, sys_rx) = mpsc::channel(32);
 
     (AppState {
-        clients: Arc::new(DashMap::new()),
-        clientsnew: Arc::new(DashMap::new()),
-        midi_socket_output: Arc::new(Mutex::new(output_tx)),
-        midi_socket_input: Arc::new(Mutex::new(input_rx)),
-        device_program_ids: Arc::new(DashMap::new()),
+        //clients: Arc::new(DashMap::new()),
+        //clientsnew: Arc::new(DashMap::new()),
+        responder: MessageResponder::task(),
+        //midi_socket_output: Arc::new(Mutex::new(output_tx)),
+        //midi_socket_input: Arc::new(Mutex::new(input_rx)),
+        system_messages: sys_tx
+        //device_program_ids: Arc::new(DashMap::new()),
     }, 
     MidiSystem::new(name, output_rx, input_tx).expect("error while initializing midi system"))
 }

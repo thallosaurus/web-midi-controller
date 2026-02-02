@@ -15,6 +15,7 @@ todo widgets:
 - file based loader (better said: dont make loading depend on fetch - could be useful for tauri/electron/native implementation)
 - Scan for host on connect page
 - Distler-friendly installation guide
+- xypad mapping mode
 
 laters:
 - Ableton User Mapping

@@ -5,17 +5,15 @@ use tokio::sync::mpsc;
 use tracing::{Level, span};
 use uuid::Uuid;
 
-use crate::state::{AppState, messages::AppMessage};
+use crate::{
+    sock::inbox::MessageType,
+    state::{AppState, messages::AppMessage},
+};
 
-enum NextAction {
-    /// sends the containing message back to all clients except the sender
-    Broadcast(AppMessage),
-
-    /// Sends the containing message to someone
-    Direct(AppMessage),
-    Nothing,
-    // sends the input to
-    //MidiOutput
+enum FrontendActions {
+    // Updates the frontend with the given data
+    Update(AppMessage),
+    ExternalUpdate(AppMessage),
 }
 
 pub(super) struct WebsocketConnection {
@@ -25,21 +23,23 @@ pub(super) struct WebsocketConnection {
 }
 
 impl WebsocketConnection {
-    pub(super) async fn upgrade(mut socket: WebSocket, mut conn: Self, state: AppState) {
+    pub(super) async fn upgrade(mut socket: WebSocket, mut conn: Self, mut state: AppState) {
         // ping
 
         let span = span!(Level::INFO, "websocket client loop");
         let _enter = span.enter();
 
         if socket
-            .send(axum::extract::ws::Message::Ping(axum::body::Bytes::from_static(&[
-                4, 2, 0,
-            ])))
+            .send(axum::extract::ws::Message::Ping(
+                axum::body::Bytes::from_static(&[4, 2, 0]),
+            ))
             .await
             .is_ok()
         {
             //ping successful
             println!("ping successful");
+
+            // send connection details (connection id, program change id etc)
             loop {
                 //let mut socket_lock = socket.lock().await;
                 let next_action = tokio::select! {
@@ -47,16 +47,39 @@ impl WebsocketConnection {
                     Some(Ok(m)) = socket.recv() => { conn.process_socket_message(m, &state) }
                 };
 
-                // we got a loop break, exit the loop
-                if next_action.is_break() {
-                    //event!(Level::INFO, "client disconnected");
-                    break;
-                } else {
-                    if let Some(msg) = next_action.continue_value().unwrap() {
-                        if let Err(e) = socket.send(msg.into()).await {
-                            eprintln!("error while pushing update: {e}")
+                match next_action {
+                    ControlFlow::Continue(Some(m)) => {
+                        match m {
+                            FrontendActions::Update(app_message) => {
+                                println!(
+                                    "pushing frontend update to client {}: {:?}",
+                                    conn.id, app_message
+                                );
+
+                                if let Err(e) = socket.send(app_message.into()).await {
+                                    eprintln!("error while pushing update: {e}")
+                                }
+
+                                // distribute message to all the other peers
+                                state
+                                    .responder
+                                    .send_message(MessageType::Broadcast {
+                                        from: conn.id,
+                                        data: app_message,
+                                    })
+                                    .await;
+                            }
+                            FrontendActions::ExternalUpdate(app_message) => {
+                                // Only send to the frontend
+                                if let Err(e) = socket.send(app_message.into()).await {
+                                    eprintln!("error while pushing update: {e}")
+                                }
+                            }
                         }
-                    } else {
+                        continue;
+                    }
+                    ControlFlow::Break(_) => break,
+                    _ => {
                         // we shouldn't send something back to the frontend, so we just loop back
                         continue;
                     }
@@ -68,17 +91,18 @@ impl WebsocketConnection {
         }
 
         // connection teardown
-        state.clientsnew.remove(&conn.id);
+        //state.clientsnew.remove(&conn.id);
+        state.responder.remove_client(conn.id);
     }
 
     /// processes messages sent from the internals
     /// also from other peers
     fn process_inbox_message(
         &self,
-        _msg: AppMessage,
+        msg: AppMessage,
         _state: &AppState,
-    ) -> ControlFlow<(), Option<AppMessage>> {
-        ControlFlow::Continue(None)
+    ) -> ControlFlow<(), Option<FrontendActions>> {
+        ControlFlow::Continue(Some(FrontendActions::ExternalUpdate(msg)))
     }
 
     /// processes messages sent from the frontend
@@ -86,18 +110,20 @@ impl WebsocketConnection {
         &self,
         msg: Message,
         _state: &AppState,
-    ) -> ControlFlow<(), Option<AppMessage>> {
+    ) -> ControlFlow<(), Option<FrontendActions>> {
         match msg {
             Message::Text(utf8_bytes) => {
                 // frontend sent a JSON message likely
                 let event: AppMessage = utf8_bytes.into();
-                println!("got message: {:?}", event);
-                ControlFlow::Continue(Some(event))
-            },
+                ControlFlow::Continue(Some(FrontendActions::Update(event)))
+            }
             Message::Binary(_bytes) => todo!(),
             Message::Ping(_bytes) => todo!(),
-            Message::Pong(_bytes) => ControlFlow::Continue(None),
-            Message::Close(_close_frame) => ControlFlow::Break(()) 
+            Message::Pong(bytes) => {
+                println!("got client pong {:?}", bytes);
+                ControlFlow::Continue(None)
+            }
+            Message::Close(_close_frame) => ControlFlow::Break(()),
         }
     }
 
@@ -105,9 +131,9 @@ impl WebsocketConnection {
 
     }*/
 
-    async fn send_message_to_client(mut socket: WebSocket, msg: AppMessage) {
+    /*async fn send_message_to_client(mut socket: WebSocket, msg: AppMessage) {
         if let Err(e) = socket.send(msg.into()).await {
             eprintln!("error while pushing program change: {e}")
         }
-    }
+    }*/
 }
