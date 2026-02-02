@@ -90,16 +90,27 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr, state: AppState) 
                                 println!("send to socket: {:?}", msg);
 
                                 match msg {
+                                    AppMessage::ProgramChange { midi_channel, value } => {
+                                        if let Some(own_id) = prg_map.get(&prg_id) {
+
+                                            
+                                            //println!("{} {:?}", prg_id, own_id.value());
+                                            
+                                            // sloppy but eh
+                                            if *own_id.value() == conn_id {
+                                                if let Err(e) = socket.send(msg.into()).await {
+                                                    eprintln!("error while pushing program change: {e}")
+                                                }
+                                            }
+                                        }
+
+                                        //direct_message(map, msg, who)
+                                    }
                                     _ => {
                                         if let Err(e) = socket.send(msg.into()).await {
                                             eprintln!("error while pushing update: {e}")
                                         }
                                     }
-                                    /*AppMessage::ProgramChange { midi_channel, value } => {
-
-                                        let own_id = prg_map.get(&prg_id);
-                                        direct_message(map, msg, who)
-                                    }*/
                                 }
 
 

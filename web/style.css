@@ -104,6 +104,10 @@ body,
   display: none;
 }
 
+#app:not(.disconnected).online {
+  display: block;
+}
+
 #app:not(.disconnected) .disconnect-fallback {
   display: none !important;
 }
