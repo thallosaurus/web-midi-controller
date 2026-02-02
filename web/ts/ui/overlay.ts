@@ -14,6 +14,9 @@ let current_overlay_id = -1;
 const overlay_emitter = new EventTarget();
 let overlays: Array<LoadedOverlay> = [];
 
+// holds an association of programchange ids and overlay indexes
+const programIds = new Map<number, number>();
+
 export function get_current_overlay_id() {
     return overlays.length
 }
@@ -109,31 +112,55 @@ function parse_overlay(overlay: Overlay) {
 }
 
 const register_overlay = (o: LoadedOverlay) => {
-    overlays.push(o);
+    const l = overlays.push(o);
+
+    if (o.overlay.program !== null) {
+        if (programIds.has(o.overlay.program)) {
+            console.warn("program id " + o.overlay.program + " is already assigned, overwriting")
+        }
+
+        programIds.set(o.overlay.program, l - 1)
+    }
 }
 
 overlay_emitter.addEventListener("change", (ev: Event) => {
     //hide_all_overlays();
     //unpress_overlays();
 
-    unload_overlay(current_overlay_id);
+    console.log(ev);
 
-    const e = ev as ChangeOverlayEvent;
-    //console.log(e.id);
 
-    const new_overlay = overlays[e.id];
-    if (new_overlay) {
-        load_overlay(new_overlay);
-        current_overlay_id = e.id;
-        set_overlay_label_html(new_overlay.overlay.name);
+    
+    if (ev.type == "change_overlay") {
+        const e = ev as ChangeOverlayEvent;
+        //console.log(e.id);
+        
+        const new_overlay = overlays[e.id];
+        unload_overlay(current_overlay_id);
+        if (new_overlay) {
+            load_overlay(new_overlay);
+            current_overlay_id = e.id;
+            set_overlay_label_html(new_overlay.overlay.name);
 
-        for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch'][data-overlay-index='" + e.id + "']")!) {
-            r.classList.add("shown");
+            for (const r of document.querySelectorAll<HTMLLIElement>("[data-role='overlay_switch'][data-overlay-index='" + e.id + "']")!) {
+                r.classList.add("shown");
+            }
+            return
+        } else {
+            throw new Error("overlay with id " + e.id + " not found")
         }
-    } else {
-        throw new Error("overlay with id " + e.id + " not found")
     }
+    
+    if (ev.type == "program_change") {
+        // lookup program change id and change to the overlay
 
+        console.log(programIds);
+        const index = programIds.get((ev as ProgramChangeEvent).value)
+        if (index) {
+            console.log("changing to", index);
+            change_overlay(index)
+        }
+    }
 });
 
 export class LoadedWidget {
@@ -238,15 +265,31 @@ export class LoadedOverlay {
 
 class ChangeOverlayEvent extends Event {
     id: number;
+    type: string;
     constructor(new_id: number) {
         super("change");
+        this.type = "change_overlay"
         this.id = new_id;
+    }
+}
+
+class ProgramChangeEvent extends Event {
+    value: number;
+    type: string;
+    constructor(new_id: number) {
+        super("change");
+        this.type = "program_change"
+        this.value = new_id;
     }
 }
 
 export const change_overlay = (overlayId: number) => {
     overlay_emitter.dispatchEvent(new ChangeOverlayEvent(overlayId));
 };
+
+export const process_program_change = (value: number) => {
+    overlay_emitter.dispatchEvent(new ProgramChangeEvent(value));
+}
 
 export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) => {
     //const grid = document.createElement("div");

@@ -4,7 +4,7 @@ import { EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sen
 import { SocketWorkerResponse, SocketWorkerResponseType } from "./ts/websocket/message.ts";
 import { sendFrontendMidiEvent } from "./ts/websocket/client.ts";
 import { CCEvent, MidiEvent, NoteEvent, ProgramChangeEvent } from "./ts/common/events.ts";
-import { change_overlay, clear_loaded_overlays, load_overlays_from_array } from "./ts/ui/overlay.ts";
+import { change_overlay, clear_loaded_overlays, load_overlays_from_array, process_program_change } from "./ts/ui/overlay.ts";
 import { EventBusProducerMessage, EventBusProducerMessageType } from "./ts/event_bus/message.ts";
 import { connectSocketMessage, ConnectWebsocketWorkerWithHandler, initWebsocketWorker } from "@websocket/client.ts";
 
@@ -123,7 +123,7 @@ export class App {
 
                         case "programchange":
                             const prg = msg.data as ProgramChangeEvent;
-                            change_overlay(prg.value);
+                            process_program_change(prg.value)
                             break;
                     }
                     break;

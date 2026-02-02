@@ -15,6 +15,10 @@ pub struct Overlay {
     /// Overlay Global MIDI Channel
     channel: Option<u8>,
 
+    /// The Program Id the overlay responds to
+    /// Set to None to disable Program Changes
+    program: Option<u8>,
+
     #[serde(flatten)]
     base: BaseProperties,
 

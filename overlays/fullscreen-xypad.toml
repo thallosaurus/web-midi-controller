@@ -1,5 +1,6 @@
 name = "Fullscreen XY Pad"
 id = "fullscreen-xy-pad"
+program = 0
 
 [[cells]]
 type = "vert-mixer"
