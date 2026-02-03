@@ -10,6 +10,9 @@ pub(crate) struct Args {
     ///     The name of the virtual midi port
     #[arg(short, long)]
     pub(crate) name: Option<String>,
+
+    #[arg(long)]
+    pub(crate) list: Option<bool>,
     
     #[arg(short = 'p')]
     pub(crate) address: Option<String>,

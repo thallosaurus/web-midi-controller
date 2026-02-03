@@ -10,6 +10,7 @@ use midir::os::unix::VirtualOutput;
 
 use tokio::sync::mpsc;
 
+use crate::midi::messages::MidiMessage;
 use crate::sock::inbox::{MessageResponder, MessageType, SharedMessageResponder};
 use crate::state::messages::AppMessage;
 
@@ -47,7 +48,7 @@ impl Display for MidiSystemErrors {
     }
 }
 
-type MidiOutputReceiver = mpsc::Receiver<AppMessage>;
+type MidiOutputReceiver = mpsc::Receiver<MidiMessage>;
 
 impl MidiSystem {
     fn init_virtual_input(
@@ -175,7 +176,7 @@ impl MidiSystem {
         //midi_input_tx: mpsc::Sender<AppMessage>,
 
         // the input of the inbox, used to send data from the socket over to midi
-        global_receiver: mpsc::Receiver<AppMessage>, //system_messages: ()
+        global_receiver: mpsc::Receiver<MidiMessage>, //system_messages: ()
     ) -> Result<(), MidiSystemErrors> {
         let output_name = device_name
             .clone()

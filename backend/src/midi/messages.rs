@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-#[derive(Serialize, Deserialize, Debug, TS)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "SocketMessages.ts")]
 pub struct MidiPayload {
     pub channel: u8
 }
 
-#[derive(Serialize, Deserialize, Debug, TS)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "SocketMessages.ts")]
 
 pub struct NotePayload {
@@ -16,14 +16,14 @@ pub struct NotePayload {
     pub velocity: u8
 }
 
-#[derive(Serialize, Deserialize, Debug, TS)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "SocketMessages.ts")]
 pub struct CCPayload {
     pub cc: u8,
     pub value: u8
 }
 
-#[derive(Serialize, Deserialize, Debug, TS)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "SocketMessages.ts")]
 
 pub enum MidiMessage {

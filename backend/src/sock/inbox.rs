@@ -5,7 +5,7 @@ use tokio::sync::{Mutex, mpsc};
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::state::messages::AppMessage;
+use crate::{midi::messages::MidiMessage, state::messages::AppMessage};
 
 pub type ClientsMapNew = DashMap<Uuid, mpsc::Sender<AppMessage>>;
 pub type ClientsNew = Arc<ClientsMapNew>;
@@ -25,7 +25,7 @@ pub struct MessageResponder {
 }
 
 impl MessageResponder {
-    pub fn task(global_tx: mpsc::Sender<AppMessage>) -> Self {
+    pub fn task(global_tx: mpsc::Sender<MidiMessage>) -> Self {
         let (tx, mut rx) = mpsc::channel(32);
         let clients = Arc::new(DashMap::new());
 
@@ -42,7 +42,7 @@ impl MessageResponder {
                                 } else {
                                     Self::broadcast(&clients_inner, data, vec![]).await
                                 }
-                                if let Err(e) = global_tx.send(data).await {
+                                if let Err(e) = global_tx.send(data.into()).await {
                                     tracing::error!("error while sending event to midi system")
                                 }
                             },

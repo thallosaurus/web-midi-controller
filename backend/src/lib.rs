@@ -6,7 +6,7 @@ use include_dir::{Dir, include_dir};
 use tower_serve_static::ServeDir;
 use web::overlays::load;
 
-mod midi;
+pub mod midi;
 //mod socket;
 
 /// New Implementation of websocket
