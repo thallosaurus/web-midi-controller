@@ -124,8 +124,6 @@ export class App {
                 // THIS WORKS
                 case SocketWorkerResponse.MidiFrontendInput:
                     switch (msg.data.type) {
-                        case 'ConnectionInformation':
-                            break;
                         case 'JogEvent':
                             break;
                         case 'CCEvent':
@@ -138,15 +136,6 @@ export class App {
                             console.log("frontend note input")
                             sendUpdateExternalNoteWidget(note_ev.channel, note_ev.note, note_ev.velocity);
                             break;
-
-                            /*
-                        case "ccupdate":
-                            break;
-
-                        case "programchange":
-                            const prg = msg.data as ProgramChangeEvent;
-                            process_program_change(prg.value)
-                            break;*/
                     }
                     break;
             }

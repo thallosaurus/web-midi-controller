@@ -1,4 +1,4 @@
-import { SocketMessageType } from "@backend/SocketMessages";
+import { ServerResponse, ServerRequest } from "../../../backend/bindings/SocketMessages";
 import type { MidiEvent } from "../common/events";
 import { ConnectSocketMessage, SocketWorkerRequest, SocketWorkerRequestType } from "./client";
 import { connect, disconnect, send } from "./websocket";
@@ -80,12 +80,12 @@ interface DisconnectedMessage {
 
 interface SurfaceMidiEvent {
     type: SocketWorkerResponse.MidiFrontendInput
-    data: SocketMessageType
+    data: ServerRequest
 }
 
 interface MidiExternalInput {
     type: SocketWorkerResponse.MidiExternalInput
-    data: SocketMessageType
+    data: ServerResponse
 }
 
 // Send message back to the frontend
@@ -126,7 +126,7 @@ export function sendDisconnected(error: Error) {
  * Use this function to send midi messages from the websocket to the parent thread
  * @param data 
  */
-export function sendMidiEvent(data: SocketMessageType) {
+export function sendMidiEvent(data: ServerRequest) {
     sendMessage({
         type: SocketWorkerResponse.MidiFrontendInput,
         data
