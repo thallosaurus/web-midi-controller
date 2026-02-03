@@ -1,7 +1,7 @@
 // defined all allowed widgets for type definitions - add when necessary
-export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties | XYPadProperties;
+export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties | XYPadProperties | GridMixerProperties | HorizontalMixerProperties | VerticalMixerProperties | ShiftAreaProperties;
 
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, VerticalMixerProperties, Widget, XYPadProperties } from "@bindings/Widget";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, ShiftAreaProperties, VerticalMixerProperties, Widget, XYPadProperties } from "@bindings/Widget";
 import { CCButtonLifecycle, NoteButtonLifecycle } from "@widgets/button";
 import type { Overlay } from "@bindings/Overlay";
 import { JogwheelLifecycle } from "@widgets/jogwheel";
@@ -9,6 +9,7 @@ import { XYPadLifecycle } from "@widgets/xypad";
 import { RotaryLifecycle, RotaryState } from "@widgets/rotary";
 import { CCSliderLifecycle, CCSliderState } from "@widgets/slider";
 import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
+import { FlexBox, GridMixerNew, ShiftArea } from "./layout";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
 /*export function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> | null{
@@ -101,22 +102,22 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
         case "grid-mixer":
             {
                 const w = cell as GridMixerProperties;
-                GridMixer(e, w, children);
-                return new LoadedWidget(cell, e);
+                //GridMixer(e, w, children);
+                return new LoadedWidget(cell, e, new GridMixerNew(e, w, children));
             }
 
         case "vert-mixer":
             {
                 const w = cell as VerticalMixerProperties;
-                VertMixer(e, w, children);
-                return new LoadedWidget(cell, e);
+                //VertMixer(e, w, children);
+                return new LoadedWidget(cell, e, new FlexBox(e, w, children));
             }
 
         case "horiz-mixer":
             {
                 const w = cell as HorizontalMixerProperties;
-                HorizMixer(e, w, children);
-                return new LoadedWidget(cell, e);
+                //HorizMixer(e, w, children);
+                return new LoadedWidget(cell, e, new FlexBox(e, w, children));
             }
 
         case "notebutton":
@@ -137,6 +138,12 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
             {
                 const w = cell as XYPadProperties;
                 return new LoadedWidget(cell, e, new XYPadLifecycle(e, w));
+            }
+
+        case "shift":
+            {
+                const w = cell as ShiftAreaProperties;
+                return new LoadedWidget(cell, e, new ShiftArea(e, w, children));
             }
     }
     let ww = new LoadedWidget(cell, e);

@@ -94,7 +94,7 @@ export class App {
                             channel: m.channel,
                             note: m.note,
                             velocity: m.velocity,
-                            on: m.velocity > 0
+                            //on: m.velocity > 0
                         })
                     }
                     break;
