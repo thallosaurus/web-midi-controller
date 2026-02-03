@@ -13,6 +13,9 @@ pub(crate) struct Args {
     
     #[arg(short = 'p')]
     pub(crate) address: Option<String>,
+
+    #[arg(short = 'v')]
+    pub(crate) use_virtual: Option<bool>,
     
     #[arg(short, long, default_value = "overlays")]
     pub(crate) overlay_path: String

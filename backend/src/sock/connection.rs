@@ -6,7 +6,10 @@ use tracing::{Level, span};
 use uuid::Uuid;
 
 use crate::{
-    sock::{inbox::MessageType, messages::{ServerRequest, ServerResponse}},
+    sock::{
+        inbox::MessageType,
+        messages::{ServerRequest, ServerResponse},
+    },
     state::{AppState, messages::AppMessage},
 };
 
@@ -27,8 +30,10 @@ impl WebsocketConnection {
     pub(super) async fn upgrade(mut socket: WebSocket, mut conn: Self, state: AppState, _id: Uuid) {
         // ping
 
-        let span = span!(Level::INFO, "websocket client loop");
-        let _enter = span.enter();
+        //let span = span!(Level::INFO, "websocket client loop");
+        //let _enter = span.enter();
+
+        tracing::debug!("entered websocket client loop");
 
         if socket
             .send(axum::extract::ws::Message::Ping(
@@ -38,7 +43,7 @@ impl WebsocketConnection {
             .is_ok()
         {
             //ping successful
-            println!("ping successful");
+            tracing::info!("ping successful");
 
             // send connection details (connection id, program change id etc)
             loop {
@@ -52,32 +57,37 @@ impl WebsocketConnection {
                     ControlFlow::Continue(Some(m)) => {
                         match m {
                             FrontendActions::Update(server_response) => {
-                                println!(
+                                tracing::debug!(
                                     "pushing frontend update to client {}: {:?}",
-                                    conn.id, server_response
+                                    conn.id,
+                                    server_response
                                 );
 
-                                let d = serde_json::to_string(&server_response).expect("error while serializing the app message update");
-                                
+                                let d = serde_json::to_string(&server_response)
+                                    .expect("error while serializing the app message update");
+
                                 if let Err(e) = socket.send(d.into()).await {
-                                    eprintln!("error while pushing update: {e}")
+                                    tracing::error!("error while pushing update: {e}")
                                 }
-                                
+
                                 // distribute message to all the other peers
                                 let mut responder = state.responder.lock().await;
                                 responder
-                                .send_message(MessageType::Broadcast {
-                                    from: Some(conn.id),
-                                    data: server_response.into(),
-                                })
-                                .await;
-                            drop(responder)
-                        }
-                        FrontendActions::ExternalUpdate(server_response) => {
-                            // Only send to the frontend
-                            let d = serde_json::to_string(&server_response).expect("error while serializing the app message update");
+                                    .send_message(MessageType::Broadcast {
+                                        from: Some(conn.id),
+                                        data: server_response.into(),
+                                    })
+                                    .await;
+                                drop(responder)
+                            }
+                            FrontendActions::ExternalUpdate(server_response) => {
+                                // Only send to the frontend
+                                let d = serde_json::to_string(&server_response)
+                                    .expect("error while serializing the app message update");
+                                tracing::trace!("serialized external update: {}", d);
+
                                 if let Err(e) = socket.send(server_response.into()).await {
-                                    eprintln!("error while pushing update: {e}")
+                                    tracing::error!("error while pushing external update: {e}")
                                 }
                             }
                         }
@@ -88,7 +98,7 @@ impl WebsocketConnection {
                 }
             }
         } else {
-            eprintln!("error while sending client ping");
+            tracing::error!("error while sending client ping");
             return;
         }
 
@@ -118,23 +128,20 @@ impl WebsocketConnection {
             Message::Text(utf8_bytes) => {
                 // frontend sent a JSON message likely
                 match serde_json::from_slice::<ServerRequest>(utf8_bytes.as_bytes()) {
-                    
-                    Ok(msg) => {
-                        ControlFlow::Continue(Some(FrontendActions::Update(msg.into())))
-                    } 
+                    Ok(msg) => ControlFlow::Continue(Some(FrontendActions::Update(msg.into()))),
                     Err(e) => {
-                        eprintln!("error while parsing message: {}, {}", e, utf8_bytes);
+                        tracing::error!("error while parsing message: {}, {}", e, utf8_bytes);
                         ControlFlow::Continue(None)
-                    },
+                    }
                 }
             }
             Message::Binary(_bytes) => todo!(),
             Message::Ping(bytes) => {
-                println!("got client ping {:?}", bytes);
+                tracing::debug!("got client ping {:?}", bytes);
                 ControlFlow::Continue(None)
-            },
+            }
             Message::Pong(bytes) => {
-                println!("got client pong {:?}", bytes);
+                tracing::debug!("got client pong {:?}", bytes);
                 ControlFlow::Continue(None)
             }
             Message::Close(_close_frame) => ControlFlow::Break(()),

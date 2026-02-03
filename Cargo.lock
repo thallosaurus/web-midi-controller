@@ -733,7 +733,6 @@ dependencies = [
  "tower-http",
  "tower-serve-static",
  "tracing",
- "tracing-subscriber",
  "ts-rs",
  "uuid",
  "web",

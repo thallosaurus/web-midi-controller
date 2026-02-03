@@ -1,28 +1,30 @@
 use std::sync::Arc;
 
 use tokio::sync::{Mutex, mpsc};
+use tracing::{debug_span, info_span, instrument, span};
 
-use crate::{midi::{system::MidiSystem}, sock::inbox::{MessageResponder, SharedMessageResponder}};
+use crate::{
+    midi::system::MidiSystem,
+    sock::inbox::{MessageResponder, SharedMessageResponder},
+};
 
 pub mod messages;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AppState {
     pub responder: SharedMessageResponder,
 }
 
 /// Initializes the channel and the midi system
-pub fn state(name: Option<String>) -> AppState {
-    // output sender
+//#[instrument(name = "state")]
+pub fn state(name: Option<String>, use_virtual: bool) -> AppState {
     let (global_tx, global_rx) = mpsc::channel(32);
-    
+
     let responder = Arc::new(Mutex::new(MessageResponder::task(global_tx)));
 
-    MidiSystem::new(name, responder.clone(), global_rx).expect("error while initializing midi system");
+    MidiSystem::new(name, use_virtual, responder.clone(), global_rx)
+        .expect("error while initializing midi system");
 
-    tracing::info!("initialized midi system");
-    AppState {
-        responder,
-    }
+    tracing::debug!("initialized midi system");
+    AppState { responder }
 }
-
