@@ -29,3 +29,6 @@ to be fixed:
 
 settings:
 - device id for program changes
+
+Bugs:
+- XYPad sometimes sends values over 127 and very weird things

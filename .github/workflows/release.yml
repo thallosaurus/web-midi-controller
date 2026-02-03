@@ -46,15 +46,15 @@ jobs:
 
       - name: Rename Output (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: mv target/release/serve midi-controller-linux
+        run: mv target/release/server midi-controller-linux
 
       - name: Rename Output (MacOS)
         if: matrix.os == 'macos-latest'
-        run: mv target/release/serve midi-controller-macos
+        run: mv target/release/server midi-controller-macos
 
       - name: Rename Output (Windows)
         if: matrix.os == 'windows-latest'
-        run: mv target/release/serve.exe midi-controller-win.exe
+        run: mv target/release/server.exe midi-controller-win.exe
 
       - name: Package WebUI and Vendor Files
         if: matrix.os == 'ubuntu-latest'

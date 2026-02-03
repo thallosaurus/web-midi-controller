@@ -1,19 +1,20 @@
 use axum::http::Method;
 use clap::Parser;
-
-
 use midi_controller::{serve_app, state};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
+use crate::args::Args;
+
+mod args;
 
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
     let appstate = state::state(args.name);
 
+    // tracing for the axum libraries
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
@@ -33,7 +34,7 @@ async fn main() {
             .allow_methods([Method::GET, Method::POST])
             .allow_origin(Any);
 
-    let app = serve_app()
+    let app = serve_app(args.overlay_path)
         .with_state(appstate);
 
         let app = app.layer(cors);
@@ -41,6 +42,7 @@ async fn main() {
     let listener = TcpListener::bind(args.address.unwrap_or(String::from("0.0.0.0:8888")))
         .await
         .unwrap();
+
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
 
     axum::serve(
@@ -49,18 +51,4 @@ async fn main() {
     )
     .await
     .unwrap()
-}
-
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-struct Args {
-    /// If you are on Windows:
-    ///     The name of the device the application tries to open
-    /// If you are anywhere else where supported:
-    ///     The name of the virtual midi port
-    #[arg(short, long)]
-    name: Option<String>,
-
-    #[arg(short = 'p')]
-    address: Option<String>,
 }

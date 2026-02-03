@@ -19,6 +19,8 @@ pub fn state(name: Option<String>) -> AppState {
     let responder = Arc::new(Mutex::new(MessageResponder::task(global_tx)));
 
     MidiSystem::new(name, responder.clone(), global_rx).expect("error while initializing midi system");
+
+    tracing::info!("initialized midi system");
     AppState {
         responder,
     }
