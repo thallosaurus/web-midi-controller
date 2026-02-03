@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use tokio::sync::{broadcast, mpsc};
+use tokio::sync::{Mutex, broadcast, mpsc};
 use uuid::Uuid;
 
 use crate::state::messages::AppMessage;
@@ -11,14 +11,16 @@ pub type ClientsNew = Arc<ClientsMapNew>;
 
 #[derive(Debug, Clone, Copy)]
 pub enum MessageType<T> {
-    Broadcast { from: Uuid, data: T },
+    Broadcast { from: Option<Uuid>, data: T },
     Direct { recipient: Uuid, data: T }
 }
+
+pub type SharedMessageResponder = Arc<Mutex<MessageResponder>>;
 
 #[derive(Clone)]
 pub struct MessageResponder {
     clients: ClientsNew,
-    sender: mpsc::Sender<MessageType<AppMessage>>
+    pub sender: mpsc::Sender<MessageType<AppMessage>>
 }
 
 impl MessageResponder {
@@ -31,7 +33,13 @@ impl MessageResponder {
             // if we got a message on the broadcast channel, emit it to the recipients
             while let Some(msg) = rx.recv().await {
                 match msg {
-                    MessageType::Broadcast { from, data } => Self::broadcast(&clients_inner, data, vec![from]).await,
+                    MessageType::Broadcast { from, data } => {
+                        if let Some(from) = from {
+                            Self::broadcast(&clients_inner, data, vec![from]).await
+                        } else {
+                            Self::broadcast(&clients_inner, data, vec![]).await
+                        }
+                    },
                     MessageType::Direct { recipient, data } => Self::direct_message(&clients_inner, data, recipient).await,
                 }
             }
@@ -48,6 +56,18 @@ impl MessageResponder {
         if let Err(e) = self.sender.send(msg).await {
             eprintln!("{e}");
         }
+    }
+
+    /// sends messages from an asynchronous context. spawns a tokio thread
+    pub fn send_message_sync(responder: &mut SharedMessageResponder, msg: MessageType<AppMessage>) {
+        let r = responder.clone();
+
+        let lock = r.blocking_lock();
+        lock.sender.blocking_send(msg).unwrap();
+        /*tokio::spawn(async move {
+            let mut lock = r.lock().await;
+            lock.send_message(msg).await;
+        });*/
     }
 
     pub fn add_client(&mut self, id: Uuid, conn: mpsc::Sender<AppMessage>) {

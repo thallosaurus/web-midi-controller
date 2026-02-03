@@ -12,7 +12,7 @@ use tokio::net::TcpListener;
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
-    let (appstate, _midi_system) = state::state(args.name);
+    let appstate = state::state(args.name);
 
     tracing_subscriber::registry()
         .with(

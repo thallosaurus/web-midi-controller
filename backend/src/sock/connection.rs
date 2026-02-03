@@ -23,7 +23,7 @@ pub(super) struct WebsocketConnection {
 }
 
 impl WebsocketConnection {
-    pub(super) async fn upgrade(mut socket: WebSocket, mut conn: Self, mut state: AppState) {
+    pub(super) async fn upgrade(mut socket: WebSocket, mut conn: Self, mut state: AppState, id: Uuid) {
         // ping
 
         let span = span!(Level::INFO, "websocket client loop");
@@ -61,13 +61,14 @@ impl WebsocketConnection {
                                 }
 
                                 // distribute message to all the other peers
-                                state
-                                    .responder
+                                let mut responder = state.responder.lock().await;
+                                responder
                                     .send_message(MessageType::Broadcast {
-                                        from: conn.id,
+                                        from: Some(conn.id),
                                         data: app_message,
                                     })
                                     .await;
+                                drop(responder)
                             }
                             FrontendActions::ExternalUpdate(app_message) => {
                                 // Only send to the frontend
@@ -92,7 +93,8 @@ impl WebsocketConnection {
 
         // connection teardown
         //state.clientsnew.remove(&conn.id);
-        state.responder.remove_client(conn.id);
+        let mut responder = state.responder.lock().await;
+        responder.remove_client(conn.id);
     }
 
     /// processes messages sent from the internals

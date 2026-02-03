@@ -26,19 +26,20 @@ pub(crate) async fn socket_handler(
     } else {
         String::from("Unknown browser")
     };
+    let id = Uuid::new_v4();
+    println!("`{user_agent}` at {addr} has Connection Id {id}.");
+    let (tx, inbox) = mpsc::channel(32);
+    // create channels
+    // generate uuid
+    let mut responder = state.responder.lock().await;
 
+    responder.add_client(id, tx);
+    let conn = WebsocketConnection { id, inbox };
+
+    drop(responder);
+    
     ws.on_upgrade(move |socket| {
-        // generate uuid
-        let id = Uuid::new_v4();
-        println!("`{user_agent}` at {addr} has Connection Id {id}.");
-
-        let (tx, inbox) = mpsc::channel(32);
-        // create channels
-        //state.clientsnew.insert(id, tx);
-        state.responder.add_client(id, tx);
-        let conn = WebsocketConnection { id, inbox };
-
-        WebsocketConnection::upgrade(socket, conn, state)
+        WebsocketConnection::upgrade(socket, conn, state, id)
     })
     //WebsocketConnection::upgrade();
 }
