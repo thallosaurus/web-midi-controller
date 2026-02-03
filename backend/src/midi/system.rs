@@ -51,9 +51,9 @@ impl MidiSystem {
 
         #[cfg(target_os = "windows")]
         let midi_in_conn = {
-            let port = select_port_by_name(&midi_in, &input_name.clone());
+            let port = select_port_by_name(&midi_in, &device_name.clone());
             midi_in
-                .connect(&port, &input_name, Self::input_callback, input_tx)
+                .connect(&port, &device_name, Self::input_callback, responder)
                 .expect("error connecting to midi port")
         };
 
