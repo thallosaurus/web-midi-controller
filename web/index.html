@@ -17,87 +17,15 @@
 
 <body>
   <div id="app" class="disconnected">
-    <header>
-      <div class="title">
-        <button type="button" data-dialog-trigger="menu">
-          <img src="/menu.svg">
-        </button>
-        <span class="name">MIDI Control <span id="app_version">
-            v%VITE_VERSION%
-          </span>
-        </span>
-      </div>
-      <div id="overlay_name" data-role="overlay_name">no overlay loaded</div>
-      <div id="menu_container">
-        <span class="menu-connected-label">connected</span>
-        <span class="menu-disconnected-label">disconnected</span>
-        <button style="display: none" type="button" data-dialog-trigger="menu">Menu</button>
-      </div>
-
-    </header>
+    {{> header }}
     <main id="overlays" class="online"></main>
-    <main id="overlays_fallback" class="online">
-      <span>no overlay loaded</span>
-    </main>
-    <main id="disconnect-fallback" class="disconnect-fallback">
-      <div class="container">
-        
-        <div class="connect_local">
-
-          <!--
-
-          <pre>
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⣇⣿⠟⢹⠏⣸⣧⣾⣿⠙⣿⣤⡀⠻⣦⣿⣿⣄⠀⠀⠘⣿⣿⣇⠀⡀⠙⢿⢻⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⣠⣾⠟⣿⡇⣾⣯⡄⠈⣿⣿⣷⣼⣿⣿⣿⣦⣀⠀⣹⣿⣿⡼⣇⠀⢸⡘⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⡟⣿⠟⢹⡄⣿⣿⣿⣿⣿⡀⠘⣿⡈⢿⣿⣿⣟⣿⣿⣿⣟⡻⣿⡇⣿⠀⢸⡇⣿⣿⣿⣿⣿⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⡾⠟⣿⣿⣿⣇⣿⡀⢸⡇⣿⣿⡏⢻⣿⣷⡀⠹⣷⡈⢿⣿⣿⣟⣡⣽⣿⣿⣿⣷⣿⠀⣸⠇⣿⡿⢿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠈⠛⠛⠋⠁⠀⠀⣿⢻⣿⣿⢻⣧⢸⣿⣿⣿⣤⣤⣽⣿⣷⡀⠸⣧⡀⣹⣿⣿⣿⣿⣿⣯⢙⣿⣿⠀⣿⡄⢿⣷⣾⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⢻⣿⣿⣼⣿⡎⣿⣿⣏⣴⣾⣿⣿⣿⣷⣄⠘⣿⣏⠉⣿⣿⣟⣿⣿⣾⣿⡿⣸⣿⠀⢸⣷⡿⢹⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⠟⣿⣿⣿⣿⣽⣿⠟⣻⣿⣿⣿⡇⠛⢿⣷⣾⣿⣿⣿⣿⡅⢀⣀⣼⣿⣷⣿⣿⡄⢸⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⣿⠀⠈⢻⣿⣿⣿⣿⣦⣿⡿⠿⠛⠃⠀⠀⢸⠈⠙⠻⢿⣿⣿⣿⣿⢟⣿⣿⠃⣿⡇⣼⣷⣿⣿⣿⣿⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡇⣿⠀⠀⠘⣿⣿⣿⣿⣿⣆⢤⣶⣾⡿⠀⠀⠈⠁⠀⠀⠀⠈⠀⠈⢀⣾⠟⠁⠀⣿⣧⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣏⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣛⡃⠀⠀⠀⠀⣀⠀⠀⠀⠀⠰⠟⠁⠀⠀⣠⣿⡇⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠹⣿⠀⠀⡼⢻⣿⣟⣿⠉⠙⢧⡀⠈⠁⠀⠀⠰⠿⠉⠉⠀⠀⠀⠀⠀⠀⢀⣼⣿⣽⣇⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⠀⢀⡀⣠⡀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢧⡀⠀⣼⡏⢻⣿⡄⠀⠀⠙⢦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡶⠛⢿⡿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⣰⣿⣿⣿⡿⢿⣛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⠾⠋⠀⠈⢿⣇⠀⠀⠀⠀⠉⠙⠲⢤⣀⡀⠀⣀⣤⡶⠛⠉⠀⠀⢸⣷⣿⠛⣿⣿⣿⣿⣿⣿⣿⠿⠟⠀⠀⠀⠙⠛⠋⢹⢷⠿⠛⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣆⠀⠀⠀⠀⠀⠀⠀⣬⣿⣿⡏⠀⠀⠀⠀⢀⣀⣼⡿⠙⢷⣸⣿⣿⣿⣿⣿⠋⠀⠀⢀⣀⣠⣀⣀⢀⣤⣾⡟⠰⠶⠿⠻⠀⠀⠀⠀⠀⠀⠀⠀⠀
-          </pre>
-            -->
-          
-          <h1>Connect</h1>
-          <p>Connect with your Computer and control your musical soft- and hardware.</p>
-          <button id="connect_button" type="button" class="primary">Connect</button>
-        </div>
-        
-        <button type="button" class="disabled" data-dialog-trigger="advanced_connect">More options...</button>
-      </div>
-    </main>
+    {{> overlays-fallback }}
+    {{> disconnect-fallback }}
     <footer class="iphone-only online">
       <div id="overlay_name_footer" data-role="overlay_name">no overlay loaded</div>
     </footer>
   </div>
-    <dialog id="menu">
-      <main>
-        <div class="menu-container">
-          <ul class="submenu">
-            <li>
-              <h2>Overlays</h2>
-              <ul id="overlay_selector"></ul>
-            </li>
-          </ul>
-        </div>
-        
-      </main>
-
-        <footer>
-
-          <button class="shown" id="close" data-dialog-close="menu">
-            Close
-          </button>
-        </footer>
-        
-        
-    </dialog>
+{{> dialogs/mainmenu }}
   <dialog id="advanced_connect">
     <h1>Advanced</h1>
     <button data-dialog-close="advanced_connect">Close</button>
