@@ -24,7 +24,8 @@ pub struct MidiSystem {
     //input_task: JoinHandle<Result<(), MidiSystemErrors>>, //pub(crate) tx: mpsc::Sender<AppMessage>,
     midi_input: MidiInputConnection<SharedMessageResponder>,
     midi_output: MidiOutputConnection,
-    midi_output_rx: mpsc::Receiver<AppMessage>,
+    //midi_output_rx: mpsc::Receiver<AppMessage>,
+    //midi_input_tx: mpsc::Sender<AppMessage>,
 }
 
 #[derive(Debug)]
@@ -47,6 +48,9 @@ impl Display for MidiSystemErrors {
         }
     }
 }
+
+type MidiInputSender = mpsc::Sender<AppMessage>;
+type MidiOutputReceiver = mpsc::Receiver<AppMessage>;
 
 impl MidiSystem {
     fn init_input(
@@ -99,8 +103,16 @@ impl MidiSystem {
 
     pub(crate) fn new(
         device_name: Option<String>,
-        midi_output_rx: mpsc::Receiver<AppMessage>,
-        responder: SharedMessageResponder
+        responder: SharedMessageResponder,
+
+        // the input receiver of the output
+        //midi_output_rx: mpsc::Receiver<AppMessage>,
+
+        // the output sender of the input
+        //midi_input_tx: mpsc::Sender<AppMessage>,
+
+        // the input of the inbox, used to send data from the socket over to midi
+        global_receiver: mpsc::Receiver<AppMessage>
         //system_messages: ()
     ) -> Result<(), MidiSystemErrors> {
         let output_name = device_name
@@ -120,13 +132,13 @@ impl MidiSystem {
 
             // not passing output_rx, because we need to implement it ourselves
             midi_output: Self::init_output(output_name).expect("error opening midi output"),
-            midi_output_rx, //system_input: output_rx
+ //system_input: output_rx
         };
 
         //let device_name = output_name;
         tokio::spawn(async move {
             let system = system;
-            Self::output_task(system.midi_output_rx, system.midi_output, responder.clone()).await
+            Self::output_task(system.midi_output, global_receiver).await
         });
 
         Ok(())
@@ -144,13 +156,13 @@ impl MidiSystem {
     }
 
     async fn output_task(
-        mut midi_output_rx: mpsc::Receiver<AppMessage>,
         mut midi_output: MidiOutputConnection,
-        responder: SharedMessageResponder
+        mut output_rx: MidiOutputReceiver,
+        //mut global_rx: mpsc::Receiver<AppMessage>,
     ) {
         //start midi here
         loop {
-            if let Some(msg) = midi_output_rx.recv().await {
+            if let Some(msg) = output_rx.recv().await {
                 let m: Vec<u8> = msg.into();
 
                 println!("sending midi message: {:?}", msg);

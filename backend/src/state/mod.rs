@@ -4,7 +4,7 @@ use dashmap::DashMap;
 use tokio::sync::{Mutex, broadcast, mpsc};
 use uuid::Uuid;
 
-use crate::{midi::host::MidiHost, sock::inbox::{ClientsNew, MessageResponder, MessageType, SharedMessageResponder}, state::messages::AppMessage};
+use crate::{midi::{system::MidiSystem}, sock::inbox::{ClientsNew, MessageResponder, MessageType, SharedMessageResponder}, state::messages::AppMessage};
 
 pub mod messages;
 
@@ -16,7 +16,7 @@ pub struct AppState {
     //midi_socket_input: Arc<Mutex<broadcast::Receiver<AppMessage>>>,
     pub responder: SharedMessageResponder,
 
-    pub midi_host: MidiHost,
+    //pub midi_host: MidiHost,
 
     // holds the program change id associations
     //device_program_ids: Arc<DashMap<u8, Uuid>>,
@@ -30,15 +30,17 @@ pub fn state(name: Option<String>) -> AppState {
     //let (input_tx, input_rx) = broadcast::channel::<AppMessage>(64);
 
     //let (sys_tx, sys_rx) = mpsc::channel(32);
-    let responder = Arc::new(Mutex::new(MessageResponder::task()));
+    let (global_tx, global_rx) = mpsc::channel(32);
+    
+    let responder = Arc::new(Mutex::new(MessageResponder::task(global_tx)));
 
-    let midi_host = MidiHost::new(name, responder.clone());
-
+    //MidiHost::new(name,global_rx, responder.clone());
+    MidiSystem::new(name, responder.clone(), global_rx).expect("error while initializing midi system");
     AppState {
         //clients: Arc::new(DashMap::new()),
         //clientsnew: Arc::new(DashMap::new()),
         responder,
-        midi_host,
+//        midi_host,
         //midi_socket_output: Arc::new(Mutex::new(output_tx)),
         //midi_socket_input: Arc::new(Mutex::new(input_rx)),
         //system_messages: sys_tx

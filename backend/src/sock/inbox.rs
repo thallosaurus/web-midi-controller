@@ -24,23 +24,28 @@ pub struct MessageResponder {
 }
 
 impl MessageResponder {
-    pub fn task() -> Self {
+    pub fn task(global_tx: mpsc::Sender<AppMessage>) -> Self {
         let (tx, mut rx) = mpsc::channel(32);
         let clients = Arc::new(DashMap::new());
 
         let clients_inner = clients.clone();
         tokio::spawn(async move {
-            // if we got a message on the broadcast channel, emit it to the recipients
-            while let Some(msg) = rx.recv().await {
-                match msg {
-                    MessageType::Broadcast { from, data } => {
-                        if let Some(from) = from {
-                            Self::broadcast(&clients_inner, data, vec![from]).await
-                        } else {
-                            Self::broadcast(&clients_inner, data, vec![]).await
+            loop {
+                tokio::select! {
+                    Some(msg) = rx.recv() => {
+                        // if we got a message on the broadcast channel, emit it to the recipients
+                        match msg {
+                            MessageType::Broadcast { from, data } => {
+                                if let Some(from) = from {
+                                    Self::broadcast(&clients_inner, data, vec![from]).await
+                                } else {
+                                    Self::broadcast(&clients_inner, data, vec![]).await
+                                }
+                                global_tx.send(data).await;
+                            },
+                            MessageType::Direct { recipient, data } => Self::direct_message(&clients_inner, data, recipient).await,
                         }
-                    },
-                    MessageType::Direct { recipient, data } => Self::direct_message(&clients_inner, data, recipient).await,
+                    }
                 }
             }
         });
