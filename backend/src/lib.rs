@@ -1,12 +1,9 @@
-use std::sync::Arc;
 
 use axum::{Router, http::HeaderValue, response::IntoResponse, routing::{any, get}};
-use dashmap::DashMap;
 
-use tokio::{fs, sync::mpsc};
+use tokio::fs;
 use include_dir::{Dir, include_dir};
 use tower_serve_static::ServeDir;
-use uuid::Uuid;
 use web::overlays::load;
 
 mod midi;
@@ -21,7 +18,7 @@ pub mod state;
 static ASSETS_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/../web/dist");
 
 use crate::{
-    sock::socket_handler, state::{AppState, messages::AppMessage}
+    sock::socket_handler, state::AppState
 };
 
 pub fn serve_app() -> Router<AppState> {
@@ -30,10 +27,7 @@ pub fn serve_app() -> Router<AppState> {
     
     Router::new()
         .fallback_service(service)
-        //.route("/", get( async || { include_str!("../web/dist/index.html") }))
-        //.nest_service("/assets", service)
-        //.route("/ws", any(ws_handler)) //websocket route
-        .route("/wsdev", any(socket_handler))
+        .route("/ws", any(socket_handler))
         .route(
             "/custom.css",
             get(|| async {

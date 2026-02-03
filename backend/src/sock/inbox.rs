@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use tokio::sync::{Mutex, broadcast, mpsc};
+use tokio::sync::{Mutex, mpsc};
 use uuid::Uuid;
 
 use crate::state::messages::AppMessage;
@@ -69,10 +69,6 @@ impl MessageResponder {
 
         let lock = r.blocking_lock();
         lock.sender.blocking_send(msg).unwrap();
-        /*tokio::spawn(async move {
-            let mut lock = r.lock().await;
-            lock.send_message(msg).await;
-        });*/
     }
 
     pub fn add_client(&mut self, id: Uuid, conn: mpsc::Sender<AppMessage>) {
@@ -85,16 +81,12 @@ impl MessageResponder {
         self.clients.remove(&id);
     }
 
-/*     pub fn subscribe(&mut self) -> broadcast::Receiver<MessageType<AppMessage>> {
-        //self.sender.subscribe()
-    }*/
-
     pub async fn broadcast(map: &Arc<DashMap<Uuid, mpsc::Sender<AppMessage>>>, msg: AppMessage, except: Vec<Uuid>) {
         for client in map.iter() {
             if !except.contains(client.key()) {
                 println!("[broadcast] sending message to {:?}", client.key());
 
-                let mut c = client.value();
+                let c = client.value();
                 if let Err(e) = c.send(msg).await {
                     println!("broadcast error: {:?}", e);
                     continue;

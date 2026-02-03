@@ -57,7 +57,7 @@ export async function connect(host: string, handler = setupSocket): Promise<WebS
         path = "/wsdev"
     }
 
-    const uri = "ws://" + host + ":" + PORT + path;
+    const uri = "ws://" + host + ":" + PORT + "/ws";
 
     const socket = new WebSocket(uri);
     //const socket = new WebSocket("ws://" + host + ":" + PORT + "/ws");

@@ -23,7 +23,7 @@ pub(super) struct WebsocketConnection {
 }
 
 impl WebsocketConnection {
-    pub(super) async fn upgrade(mut socket: WebSocket, mut conn: Self, mut state: AppState, id: Uuid) {
+    pub(super) async fn upgrade(mut socket: WebSocket, mut conn: Self, state: AppState, _id: Uuid) {
         // ping
 
         let span = span!(Level::INFO, "websocket client loop");

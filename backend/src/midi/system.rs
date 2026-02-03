@@ -1,18 +1,13 @@
 use midir::MidiOutputConnection;
 use midir::{MidiIO, MidiInput, MidiInputConnection, MidiOutput};
-use tokio::sync::Mutex;
 use std::fmt::Display;
-use std::sync::Arc;
 
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualInput;
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualOutput;
 
-use tokio::{
-    sync::{broadcast, mpsc},
-    task::JoinHandle,
-};
+use tokio::sync::mpsc;
 
 use crate::sock::inbox::{MessageResponder, MessageType, SharedMessageResponder};
 use crate::state::messages::AppMessage;
@@ -20,12 +15,8 @@ use crate::state::messages::AppMessage;
 //use std::fmt::Display as DebugDisplay;
 
 pub struct MidiSystem {
-    //output_task: JoinHandle<Result<(), MidiSystemErrors>>,
-    //input_task: JoinHandle<Result<(), MidiSystemErrors>>, //pub(crate) tx: mpsc::Sender<AppMessage>,
-    midi_input: MidiInputConnection<SharedMessageResponder>,
+    _midi_input: MidiInputConnection<SharedMessageResponder>,
     midi_output: MidiOutputConnection,
-    //midi_output_rx: mpsc::Receiver<AppMessage>,
-    //midi_input_tx: mpsc::Sender<AppMessage>,
 }
 
 #[derive(Debug)]
@@ -49,7 +40,6 @@ impl Display for MidiSystemErrors {
     }
 }
 
-type MidiInputSender = mpsc::Sender<AppMessage>;
 type MidiOutputReceiver = mpsc::Receiver<AppMessage>;
 
 impl MidiSystem {
@@ -63,13 +53,13 @@ impl MidiSystem {
         let midi_in_conn = {
             let port = select_port_by_name(&midi_in, &input_name.clone());
             midi_in
-                .connect(&port, &input_name, Self::input_task, input_tx)
+                .connect(&port, &input_name, Self::input_callback, input_tx)
                 .expect("error connecting to midi port")
         };
 
         #[cfg(not(target_os = "windows"))]
         let midi_in_conn = midi_in
-            .create_virtual(&("virtual input port"), Self::input_task, responder)
+            .create_virtual(&("virtual input port"), Self::input_callback, responder)
             .map_err(|e| MidiSystemErrors::InputConnectError(e))?;
 
         Ok(midi_in_conn)
@@ -127,35 +117,30 @@ impl MidiSystem {
 
         let system = MidiSystem {
             // passing input_tx, because midi input needs to send out (transfer)
-            midi_input: Self::init_input(input_name, responder.clone())
+            _midi_input: Self::init_input(input_name, responder.clone())
                 .expect("error opeing midi input"),
 
             // not passing output_rx, because we need to implement it ourselves
             midi_output: Self::init_output(output_name).expect("error opening midi output"),
- //system_input: output_rx
         };
 
         //let device_name = output_name;
         tokio::spawn(async move {
             let system = system;
-            Self::output_task(system.midi_output, global_receiver).await
+            Self::task(system.midi_output, global_receiver).await
         });
 
         Ok(())
     }
 
-    /*pub(crate) async fn send_update(&self, msg: AppMessage) {
-        self.tx.send(msg).await.expect("failed to send message to midi system")
-    }*/
-
-    fn input_task(ts: u64, data: &[u8], e: &mut SharedMessageResponder) {
+    fn input_callback(ts: u64, data: &[u8], e: &mut SharedMessageResponder) {
         let msg: AppMessage = Vec::from(data).into();
         println!("{} midi input: {:?}", ts, msg);        
         MessageResponder::send_message_sync(e, MessageType::Broadcast { from: None, data: msg });
         //e.blocking_lock().send_message(MessageType::Broadcast { from: None, data: msg });
     }
 
-    async fn output_task(
+    async fn task(
         mut midi_output: MidiOutputConnection,
         mut output_rx: MidiOutputReceiver,
         //mut global_rx: mpsc::Receiver<AppMessage>,
@@ -178,7 +163,7 @@ impl MidiSystem {
     }
 }
 
-//#[cfg(target_os = "windows")]
+#[cfg(target_os = "windows")]
 /// Select MIDI Device by Name
 fn select_port_by_name<T: MidiIO>(midi_io: &T, search: &String) -> T::Port {
     let midi_ports = midi_io.ports();
