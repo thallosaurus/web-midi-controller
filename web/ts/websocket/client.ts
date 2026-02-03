@@ -46,7 +46,7 @@ export function initWebsocketWorker(): Worker {
 
 // we need to call it somewhere
 
-let connected: ConnectedMessage | null = null
+let connected: boolean = false;
 export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
     if (!connected) return new Promise<ConnectedMessage>((res, rej) => {
 
@@ -60,14 +60,14 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
                     log("worker connection successful", msg)
                     //wsWorker = worker;
                     worker.removeEventListener("message", fn);
-                    connected = msg;
+                    connected = true;
                     res(msg);
                     break;
 
                 case SocketWorkerResponse.ConnectError:
                     log("connect error", msg);
                     worker.removeEventListener("message", fn);
-                    connected = null;
+                    connected = false;
                     rej(msg.error)
                     break;
 
@@ -75,7 +75,7 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
                     //wsWorker = null;
                     log("disconnected")
                     worker.removeEventListener("message", fn);
-                    connected = null;
+                    connected = false;
                     rej("server disconnected while connecting - no reason idk")
                     break;
             }

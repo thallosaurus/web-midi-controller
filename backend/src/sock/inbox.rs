@@ -41,7 +41,9 @@ impl MessageResponder {
                                 } else {
                                     Self::broadcast(&clients_inner, data, vec![]).await
                                 }
-                                global_tx.send(data).await;
+                                if let Err(e) = global_tx.send(data).await {
+                                    eprintln!("error while sending event to midi system")
+                                }
                             },
                             MessageType::Direct { recipient, data } => Self::direct_message(&clients_inner, data, recipient).await,
                         }
