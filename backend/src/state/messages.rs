@@ -2,6 +2,7 @@ use axum::extract::ws::{Message, Utf8Bytes};
 use serde::{Deserialize, Serialize};
 
 // TODO: make proper events
+#[deprecated]
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 #[serde(tag = "event_name")]
 pub enum AppMessage {
