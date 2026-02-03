@@ -35,7 +35,7 @@ jobs:
 
       - name: Export Bindings
         #working-directory: ./web
-        run: cargo test -p web
+        run: cargo test --all
 
       - name: Build Web UI
         working-directory: ./web

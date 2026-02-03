@@ -6,15 +6,15 @@ use tracing::{Level, span};
 use uuid::Uuid;
 
 use crate::{
-    sock::{inbox::MessageType, messages::SocketMessageType},
+    sock::{inbox::MessageType, messages::{ServerRequest, ServerResponse}},
     state::{AppState, messages::AppMessage},
 };
 
 /// Enum that describes what the event state machine should do
 enum FrontendActions {
     // Updates the frontend with the given data
-    Update(SocketMessageType),
-    ExternalUpdate(AppMessage),
+    Update(ServerResponse),
+    ExternalUpdate(ServerResponse),
 }
 
 pub(super) struct WebsocketConnection {
@@ -51,42 +51,40 @@ impl WebsocketConnection {
                 match next_action {
                     ControlFlow::Continue(Some(m)) => {
                         match m {
-                            FrontendActions::Update(app_message) => {
+                            FrontendActions::Update(server_response) => {
                                 println!(
                                     "pushing frontend update to client {}: {:?}",
-                                    conn.id, app_message
+                                    conn.id, server_response
                                 );
 
-                                let d = serde_json::to_string(&app_message).expect("error while serializing the app message update");
-
+                                let d = serde_json::to_string(&server_response).expect("error while serializing the app message update");
+                                
                                 if let Err(e) = socket.send(d.into()).await {
                                     eprintln!("error while pushing update: {e}")
                                 }
-
+                                
                                 // distribute message to all the other peers
                                 let mut responder = state.responder.lock().await;
                                 responder
-                                    .send_message(MessageType::Broadcast {
-                                        from: Some(conn.id),
-                                        data: app_message.into(),
-                                    })
-                                    .await;
-                                drop(responder)
-                            }
-                            FrontendActions::ExternalUpdate(app_message) => {
-                                // Only send to the frontend
-                                if let Err(e) = socket.send(app_message.into()).await {
+                                .send_message(MessageType::Broadcast {
+                                    from: Some(conn.id),
+                                    data: server_response.into(),
+                                })
+                                .await;
+                            drop(responder)
+                        }
+                        FrontendActions::ExternalUpdate(server_response) => {
+                            // Only send to the frontend
+                            let d = serde_json::to_string(&server_response).expect("error while serializing the app message update");
+                                if let Err(e) = socket.send(server_response.into()).await {
                                     eprintln!("error while pushing update: {e}")
                                 }
                             }
                         }
                         continue;
                     }
+                    ControlFlow::Continue(None) => continue,
                     ControlFlow::Break(_) => break,
-                    _ => {
-                        // we shouldn't send something back to the frontend, so we just loop back
-                        continue;
-                    }
                 }
             }
         } else {
@@ -107,7 +105,7 @@ impl WebsocketConnection {
         msg: AppMessage,
         _state: &AppState,
     ) -> ControlFlow<(), Option<FrontendActions>> {
-        ControlFlow::Continue(Some(FrontendActions::ExternalUpdate(msg)))
+        ControlFlow::Continue(Some(FrontendActions::ExternalUpdate(msg.into())))
     }
 
     /// processes messages sent from the frontend
@@ -119,16 +117,22 @@ impl WebsocketConnection {
         match msg {
             Message::Text(utf8_bytes) => {
                 // frontend sent a JSON message likely
-                if let Ok(j) = serde_json::from_slice::<SocketMessageType>(utf8_bytes.as_bytes()) {
-
-                    //let event: SocketMessageType = utf8_bytes.into();
-                    ControlFlow::Continue(Some(FrontendActions::Update(j)))
-                } else {
-                    ControlFlow::Break(())
+                match serde_json::from_slice::<ServerRequest>(utf8_bytes.as_bytes()) {
+                    
+                    Ok(msg) => {
+                        ControlFlow::Continue(Some(FrontendActions::Update(msg.into())))
+                    } 
+                    Err(e) => {
+                        eprintln!("error while parsing message: {}, {}", e, utf8_bytes);
+                        ControlFlow::Continue(None)
+                    },
                 }
             }
             Message::Binary(_bytes) => todo!(),
-            Message::Ping(_bytes) => todo!(),
+            Message::Ping(bytes) => {
+                println!("got client ping {:?}", bytes);
+                ControlFlow::Continue(None)
+            },
             Message::Pong(bytes) => {
                 println!("got client pong {:?}", bytes);
                 ControlFlow::Continue(None)
