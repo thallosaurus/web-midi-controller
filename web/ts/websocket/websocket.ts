@@ -1,5 +1,7 @@
 import { MidiEvent } from "../common/events.ts";
 import { sendDisconnected, sendMidiEvent } from "./message.ts";
+//import { SocketMessageType } from '@backend/SocketMessageType';
+import { ServerResponse } from '../../../backend/bindings/SocketMessages.ts';
 
 //export const wsUri = "ws://" + location.hostname + ":8888/ws";
 const PORT = 8888;
@@ -21,9 +23,21 @@ function setupSocket(socket: WebSocket): WebSocket {
 
     // Listen for incoming websocket messages from the backend
     socket.addEventListener("message", (e) => {
-        const msg: MidiEvent = JSON.parse(e.data);
-        switch (msg.event_name) {
-            case "noteupdate":
+        const msg: ServerResponse = JSON.parse(e.data);
+        switch (msg.type) {
+            case "ConnectionInformation":
+                console.log("connection packet", msg);
+                break;
+            case "NoteEvent":
+                sendMidiEvent(msg);
+                break;
+            case "CCEvent":
+                sendMidiEvent(msg);
+                break;
+            case "JogEvent":
+                sendMidiEvent(msg);
+                break;
+/*            case "noteupdate":
                 console.log("external noteupdate data", msg);
                 sendMidiEvent(msg);
                 break
@@ -35,7 +49,7 @@ function setupSocket(socket: WebSocket): WebSocket {
             case "programchange":
                 console.log("program change", msg);
                 sendMidiEvent(msg);
-                break;
+                break;*/
 
         }
     });
@@ -52,11 +66,20 @@ export async function connect(host: string, handler = setupSocket): Promise<WebS
     if (ws) return ws;
     //if (connecting) return connecting;
 
-    const socket = new WebSocket("ws://" + host + ":" + PORT + "/ws");
+    let path = "/ws"
+    if (String(import.meta.env.VITE_USE_DEV_BACKEND) == "true") {
+        path = "/wsdev"
+    }
+
+    const uri = "ws://" + host + ":" + PORT + "/ws";
+
+    const socket = new WebSocket(uri);
+    //const socket = new WebSocket("ws://" + host + ":" + PORT + "/ws");
     await new Promise((resolve, reject) => {
 
         const fn_open = (e: any) => {
             socket.removeEventListener("open", fn_open);
+            console.log("connected", uri);
             resolve(socket);
         }
 

@@ -1,6 +1,6 @@
 name = "Fullscreen XY Pad with Note"
 id = "fullscreen-xy-pad"
-program = 0
+program = 1
 
 [[cells]]
 type = "horiz-mixer"

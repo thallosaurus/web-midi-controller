@@ -12,6 +12,8 @@ import { debug, setup_logger } from '@common/logger'
 import { AppEvents } from './app_events.ts'
 import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts';
 
+import { ServerResponse } from '@backend/SocketMessages.ts';
+
 //const init_ui = () => {
 
 export interface AppWorkerHandler {
@@ -86,7 +88,14 @@ export class App {
                     //only forward internal midi events
                     if (!m.ext) {
                         console.log("sending note update to websocket backend", m);
-                        sendFrontendMidiEvent(h.socket!, new NoteEvent(m.channel, m.note, m.velocity > 0, m.velocity));
+                        //sendFrontendMidiEvent(h.socket!, new NoteEvent(m.channel, m.note, m.velocity > 0, m.velocity));
+                        sendFrontendMidiEvent(h.socket!, {
+                            type: "NoteEvent",
+                            channel: m.channel,
+                            note: m.note,
+                            velocity: m.velocity,
+                            on: m.velocity > 0
+                        })
                     }
                     break;
                 //case EventBusProducerMessageType.RegisterCCCallback:
@@ -94,7 +103,13 @@ export class App {
                     //only forward internal midi events
                     if (!m.ext) {
                         console.log("bus update cc value on main", m);
-                        sendFrontendMidiEvent(h.socket!, new CCEvent(m.channel, m.value, m.cc));
+                        //sendFrontendMidiEvent(h.socket!, new CCEvent(m.channel, m.value, m.cc));
+                        sendFrontendMidiEvent(h.socket!, {
+                            type: "CCEvent",
+                            channel: m.channel,
+                            cc: m.cc,
+                            value: m.value
+                        })
                     }
                     break;
             }
@@ -108,23 +123,30 @@ export class App {
 
                 // THIS WORKS
                 case SocketWorkerResponse.MidiFrontendInput:
-                    switch (msg.data.event_name) {
-                        case "noteupdate":
-                            const note_ev = msg.data as NoteEvent;
+                    switch (msg.data.type) {
+                        case 'ConnectionInformation':
+                            break;
+                        case 'JogEvent':
+                            break;
+                        case 'CCEvent':
+                            const cc_ev = msg.data;
+                            console.log("frontend cc input")
+                            sendUpdateExternalCCWidget(cc_ev.channel, cc_ev.cc, cc_ev.value)
+                            break;
+                        case 'NoteEvent':
+                            const note_ev = msg.data;
                             console.log("frontend note input")
-                            sendUpdateExternalNoteWidget(note_ev.midi_channel, note_ev.note, note_ev.velocity);
+                            sendUpdateExternalNoteWidget(note_ev.channel, note_ev.note, note_ev.velocity);
                             break;
 
+                            /*
                         case "ccupdate":
-                            const cc_ev = msg.data as CCEvent;
-                            console.log("frontend cc input")
-                            sendUpdateExternalCCWidget(cc_ev.midi_channel, cc_ev.cc, cc_ev.value)
                             break;
 
                         case "programchange":
                             const prg = msg.data as ProgramChangeEvent;
                             process_program_change(prg.value)
-                            break;
+                            break;*/
                     }
                     break;
             }

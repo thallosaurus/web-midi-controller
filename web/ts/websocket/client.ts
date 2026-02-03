@@ -2,6 +2,7 @@
 import { type ConnectedMessage, SocketWorkerResponse, SocketWorkerResponseType } from "./message";
 import { MidiEvent } from "../common/events.ts";
 import { log } from "@common/logger.ts";
+import { ServerRequest, ServerResponse } from "@backend/SocketMessages.ts";
 
 export enum SocketWorkerRequestType {
     Connect = "connect",
@@ -16,7 +17,7 @@ export type SocketWorkerRequest =
 
 interface SurfaceMidiEvent {
     type: SocketWorkerRequestType.MidiFrontendInput
-    data: MidiEvent
+    data: ServerRequest
 }
 /**
  * Send this from the frontend if you want to connect
@@ -46,7 +47,7 @@ export function initWebsocketWorker(): Worker {
 
 // we need to call it somewhere
 
-let connected: ConnectedMessage | null = null
+let connected: boolean = false;
 export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
     if (!connected) return new Promise<ConnectedMessage>((res, rej) => {
 
@@ -60,14 +61,14 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
                     log("worker connection successful", msg)
                     //wsWorker = worker;
                     worker.removeEventListener("message", fn);
-                    connected = msg;
+                    connected = true;
                     res(msg);
                     break;
 
                 case SocketWorkerResponse.ConnectError:
                     log("connect error", msg);
                     worker.removeEventListener("message", fn);
-                    connected = null;
+                    connected = false;
                     rej(msg.error)
                     break;
 
@@ -75,7 +76,7 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
                     //wsWorker = null;
                     log("disconnected")
                     worker.removeEventListener("message", fn);
-                    connected = null;
+                    connected = false;
                     rej("server disconnected while connecting - no reason idk")
                     break;
             }
@@ -113,7 +114,7 @@ export function disconnectSocketMessage(worker: Worker) {
  * @param worker 
  * @param data 
  */
-export function sendFrontendMidiEvent(ws: Worker, data: MidiEvent) {
+export function sendFrontendMidiEvent(ws: Worker, data: ServerRequest) {
     console.debug("websocket client", "sendFrontendMidiEvent", data)
     sendMessageInput(ws, {
         type: SocketWorkerRequestType.MidiFrontendInput,
@@ -122,6 +123,11 @@ export function sendFrontendMidiEvent(ws: Worker, data: MidiEvent) {
 }
 
 //send this from the ui to connect the giveb socket to the uri
+/**
+ * @deprecated
+ * @param ws 
+ * @param uri 
+ */
 export function _ConnectSocketEvent(ws: Worker, uri: string) {
     if (ws != null) {
         connectSocketMessage(ws, uri);

@@ -9,6 +9,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 const ver = JSON.parse(fs.readFileSync("package.json", "utf-8"));
 process.env.VITE_VERSION = ver.version;
 process.env.VITE_USE_WORKER_EVENT_BUS = String(true);
+process.env.VITE_USE_DEV_BACKEND = String(true);
 process.env.VITE_SELF_UPDATE_WIDGETS = String(false);
 process.env.VITE_AUTO_CONNECT_LOCAL = String(false);
 
@@ -16,6 +17,7 @@ export default defineConfig({
   //plugins: [tsconfigPaths()],
   resolve: {
     alias: {
+      '@backend': path.resolve(__dirname, '../backend/bindings'),
       '@core': path.resolve(__dirname, 'ts/ui'),
       '@common': path.resolve(__dirname, 'ts/common'),
       '@widgets': path.resolve(__dirname, 'ts/widgets'),
