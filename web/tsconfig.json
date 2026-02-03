@@ -7,12 +7,13 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@backend/*": ["../backend/bindings/*"],
       "@core/*": ["./ts/ui/*"],
       "@common/*": ["./ts/common/*"],
       "@websocket/*": ["./ts/websocket/*"],
       "@eventbus/*": ["./ts/event_bus/*"],
       "@widgets/*": ["./ts/widgets/*"],
-      "@bindings/*": ["./bindings/*"]
+      "@bindings/*": ["./bindings/*"],
     },
 
     /* Bundler mode */

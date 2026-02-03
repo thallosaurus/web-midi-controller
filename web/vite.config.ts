@@ -17,6 +17,7 @@ export default defineConfig({
   //plugins: [tsconfigPaths()],
   resolve: {
     alias: {
+      '@backend': path.resolve(__dirname, '../backend/bindings'),
       '@core': path.resolve(__dirname, 'ts/ui'),
       '@common': path.resolve(__dirname, 'ts/common'),
       '@widgets': path.resolve(__dirname, 'ts/widgets'),

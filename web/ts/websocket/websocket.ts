@@ -1,5 +1,7 @@
 import { MidiEvent } from "../common/events.ts";
 import { sendDisconnected, sendMidiEvent } from "./message.ts";
+//import { SocketMessageType } from '@backend/SocketMessageType';
+import { SocketMessageType } from '../../../backend/bindings/SocketMessages.ts';
 
 //export const wsUri = "ws://" + location.hostname + ":8888/ws";
 const PORT = 8888;

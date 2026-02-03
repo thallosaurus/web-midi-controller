@@ -6,13 +6,14 @@ use tracing::{Level, span};
 use uuid::Uuid;
 
 use crate::{
-    sock::inbox::MessageType,
+    sock::{inbox::MessageType, messages::SocketMessageType},
     state::{AppState, messages::AppMessage},
 };
 
+/// Enum that describes what the event state machine should do
 enum FrontendActions {
     // Updates the frontend with the given data
-    Update(AppMessage),
+    Update(SocketMessageType),
     ExternalUpdate(AppMessage),
 }
 
@@ -56,7 +57,9 @@ impl WebsocketConnection {
                                     conn.id, app_message
                                 );
 
-                                if let Err(e) = socket.send(app_message.into()).await {
+                                let d = serde_json::to_string(&app_message).expect("error while serializing the app message update");
+
+                                if let Err(e) = socket.send(d.into()).await {
                                     eprintln!("error while pushing update: {e}")
                                 }
 
@@ -65,7 +68,7 @@ impl WebsocketConnection {
                                 responder
                                     .send_message(MessageType::Broadcast {
                                         from: Some(conn.id),
-                                        data: app_message,
+                                        data: app_message.into(),
                                     })
                                     .await;
                                 drop(responder)
@@ -116,8 +119,13 @@ impl WebsocketConnection {
         match msg {
             Message::Text(utf8_bytes) => {
                 // frontend sent a JSON message likely
-                let event: AppMessage = utf8_bytes.into();
-                ControlFlow::Continue(Some(FrontendActions::Update(event)))
+                if let Ok(j) = serde_json::from_slice::<SocketMessageType>(utf8_bytes.as_bytes()) {
+
+                    //let event: SocketMessageType = utf8_bytes.into();
+                    ControlFlow::Continue(Some(FrontendActions::Update(j)))
+                } else {
+                    ControlFlow::Break(())
+                }
             }
             Message::Binary(_bytes) => todo!(),
             Message::Ping(_bytes) => todo!(),
