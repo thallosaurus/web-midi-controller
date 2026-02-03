@@ -230,6 +230,6 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
         sendUpdateCCValue(this.prop.channel, this.prop.cc, v);
 
         // update ui - TODO gate behind feature gate
-        //this.updateValue(v);
+        this.updateValue(v);
     }
 }

@@ -8,6 +8,7 @@ use axum::{
 };
 use axum_extra::TypedHeader;
 use tokio::sync::mpsc;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::{sock::connection::WebsocketConnection, state::AppState};
@@ -16,6 +17,7 @@ mod connection;
 pub mod inbox;
 mod messages;
 
+//#[instrument]
 pub(crate) async fn socket_handler(
     ws: WebSocketUpgrade,
     user_agent: Option<TypedHeader<headers::UserAgent>>,
@@ -28,7 +30,7 @@ pub(crate) async fn socket_handler(
         String::from("Unknown browser")
     };
     let id = Uuid::new_v4();
-    println!("`{user_agent}` at {addr} has Connection Id {id}.");
+    tracing::debug!("`{user_agent}` at {addr} has Connection Id {id}.");
     let (tx, inbox) = mpsc::channel(32);
     // create channels
     // generate uuid

@@ -1,6 +1,8 @@
 use axum::extract::ws::{Message, Utf8Bytes};
 use serde::{Deserialize, Serialize};
 
+use crate::midi::messages::{CCPayload, MidiMessage, MidiPayload, NotePayload};
+
 // TODO: make proper events
 #[deprecated]
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
@@ -138,6 +140,22 @@ impl From<AppMessage> for Vec<u8> {
             } => {
                 vec![0xC0 + midi_channel, value]
             }
+        }
+    }
+}
+
+impl From<AppMessage> for MidiMessage {
+    fn from(value: AppMessage) -> Self {
+        match value {
+            AppMessage::CCUpdate { midi_channel, value, cc } => Self::ControlChange { midi: MidiPayload { channel: midi_channel }, cc: CCPayload { cc, value } },
+            AppMessage::NoteUpdate { midi_channel, on, note, velocity } => if on {
+                Self::NoteOn { midi: MidiPayload { channel: midi_channel }, note: NotePayload { note, velocity } }
+            } else {
+                Self::NoteOff { midi: MidiPayload { channel: midi_channel }, note: NotePayload { note, velocity } }
+            },
+            AppMessage::ProgramChange { midi_channel, value } => Self::ProgramChange { midi: MidiPayload { channel: midi_channel }, value },
+            AppMessage::Unsupported => todo!(),
+            AppMessage::Dummy => todo!(),
         }
     }
 }

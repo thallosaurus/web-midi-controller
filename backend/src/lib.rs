@@ -6,7 +6,7 @@ use include_dir::{Dir, include_dir};
 use tower_serve_static::ServeDir;
 use web::overlays::load;
 
-mod midi;
+pub mod midi;
 //mod socket;
 
 /// New Implementation of websocket
@@ -21,7 +21,7 @@ use crate::{
     sock::socket_handler, state::AppState
 };
 
-pub fn serve_app() -> Router<AppState> {
+pub fn serve_app(overlay_path: String) -> Router<AppState> {
 
     let service = ServeDir::new(&ASSETS_DIR);
     
@@ -43,8 +43,8 @@ pub fn serve_app() -> Router<AppState> {
         ) //custom css
         .route(
             "/overlays",
-            get(|| async {
-                let overlays = load("overlays").await;
+            get(|| async move {
+                let overlays = load(&overlay_path).await;
 
                 let o = serde_json::to_string(&overlays).unwrap();
 
