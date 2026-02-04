@@ -15,8 +15,7 @@ mod tests {
     const TRAKTOR_DECK_B: &'static str = include_str!("../../overlays/traktor-deck-b.toml");
     const TRAKTOR_DECK_ONE_DEVICE: &'static str = include_str!("../../overlays/traktor-one-device.toml");
 
-    //const ABLETON_OVERLAY: &'static str = include_str!("../../overlays/ableton-performance.json");
-    const DEMO_OVERLAY: &'static str = include_str!("../../web/public/demo_overlay.json");
+    const ABLETON_OVERLAY: &'static str = include_str!("../../overlays/ableton-performance.toml");
 
     #[tokio::test]
     async fn test_new_cells() {
@@ -101,6 +100,13 @@ mod tests {
     #[tokio::test]
     async fn traktor_deck_one_device() {
         let t: Overlay = toml::from_str(TRAKTOR_DECK_ONE_DEVICE).unwrap();
+        println!("{:#?}", t);
+        assert!(true)
+    }
+
+    #[tokio::test]
+    async fn ableton_overlay() {
+        let t: Overlay = toml::from_str(ABLETON_OVERLAY).unwrap();
         println!("{:#?}", t);
         assert!(true)
     }
