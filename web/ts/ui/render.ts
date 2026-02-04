@@ -9,7 +9,7 @@ import { XYPadLifecycle } from "@widgets/xypad";
 import { RotaryLifecycle, RotaryState } from "@widgets/rotary";
 import { CCSliderLifecycle, CCSliderState } from "@widgets/slider";
 import { LoadedOverlay, LoadedWidget } from "./overlay";
-import { FlexBox, GridMixerNew, ShiftArea } from "./layout";
+import { FlexBox, GridMixerNew, HorizontalBox, ShiftArea, VerticalBox } from "./layout";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
 /*export function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> | null{
@@ -110,14 +110,14 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
             {
                 const w = cell as VerticalMixerProperties;
                 //VertMixer(e, w, children);
-                return new LoadedWidget(cell, e, new FlexBox(e, w, children));
+                return new LoadedWidget(cell, e, new VerticalBox(e, w, children));
             }
 
         case "horiz-mixer":
             {
                 const w = cell as HorizontalMixerProperties;
                 //HorizMixer(e, w, children);
-                return new LoadedWidget(cell, e, new FlexBox(e, w, children));
+                return new LoadedWidget(cell, e, new HorizontalBox(e, w, children));
             }
 
         case "notebutton":

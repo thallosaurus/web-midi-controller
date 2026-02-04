@@ -6,17 +6,17 @@ type = "shift"
 note = 1
 channel = 3
 
-[[cells.a.controls]]
+[[cells.a]]
 type = "vert-mixer"
 
-[[cells.a.controls.controls]]
+[[cells.a.vert]]
 type = "ccslider"
 channel = 1
 cc = 1
 mode = "relative"
 label = "Test 1"
 
-[[cells.a.controls.controls]]
+[[cells.a.vert]]
 type = "notebutton"
 channel = 3
 note = 1
@@ -25,13 +25,13 @@ mode = "trigger"
 
 #[[cells.b]]
 
-[[cells.b.controls]]
+[[cells.b]]
 type = "xypad"
 channel = 1
 label = "XY Pad"
 
-[cells.b.controls.x]
+[cells.b.x]
 cc = 4
 
-[cells.b.controls.y]
+[cells.b.y]
 cc = 5

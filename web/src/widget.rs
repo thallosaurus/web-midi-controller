@@ -58,11 +58,11 @@ pub(super) struct CCProperties {
     //label: Option<String>
 }
 
-#[derive(Serialize, Deserialize, Debug, TS)]
+/*#[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct ChildrenContainer {
-    controls: Vec<Widget>,
-}
+    grid: Vec<Widget>,
+}*/
 
 /// MARK: - JSON Definitions
 
@@ -121,8 +121,8 @@ pub(super) struct HorizontalMixerProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
-    #[serde(flatten)]
-    children: ChildrenContainer,
+    //#[serde(flatten)]
+    horiz: Vec<Widget>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -131,8 +131,8 @@ pub(super) struct VerticalMixerProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
-    #[serde(flatten)]
-    children: ChildrenContainer,
+    //#[serde(flatten)]
+    vert: Vec<Widget>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -143,8 +143,8 @@ pub(super) struct GridMixerProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
-    #[serde(flatten)]
-    children: ChildrenContainer,
+    //#[serde(flatten)]
+    grid: Vec<Widget>,
 
     /// Columns of this grid
     w: u8,
@@ -162,8 +162,8 @@ pub(super) struct ShiftAreaProperties {
     base: BaseProperties,
 
     //#[serde(flatten)]
-    a: ChildrenContainer,
-    b: ChildrenContainer,
+    a: Vec<Widget>,
+    b: Vec<Widget>,
 
     // TODO: global midi channel
     #[serde(flatten)]

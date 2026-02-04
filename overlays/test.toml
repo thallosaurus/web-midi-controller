@@ -4,33 +4,33 @@ id = "nested_toml"
 [[cells]]
 type = "horiz-mixer"
 
-[[cells.controls]]
+[[cells.horiz]]
 type = "horiz-mixer"
 
-[[cells.controls.controls]]
+[[cells.horiz.horiz]]
 type = "vert-mixer"
 
-[[cells.controls.controls.controls]]
+[[cells.horiz.horiz.vert]]
 type = "ccslider"
 channel = 1
 cc = 1
 mode = "relative"
 label = "Test 1"
 
-[[cells.controls.controls.controls]]
+[[cells.horiz.horiz.vert]]
 type = "ccslider"
 channel = 1
 cc = 2
 mode = "relative"
 label = "Test 1"
 
-[[cells.controls.controls.controls]]
+[[cells.horiz.horiz.vert]]
 type = "xypad"
 channel = 1
 label = "XY Pad"
 
-[cells.controls.controls.controls.x]
+[cells.horiz.horiz.vert.x]
 cc = 4
 
-[cells.controls.controls.controls.y]
+[cells.horiz.horiz.vert.y]
 cc = 5

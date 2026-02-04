@@ -7,94 +7,94 @@ id = "deck_a"
 w = 4
 h = 8
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 16
 label = "1/4 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 15
 label = "1/2 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 14
 label = "1 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 13
 label = "2 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 12
 label = "4 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 11
 label = "8 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 10
 label = "16 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 9
 label = "32 Loop"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 17
 label = "Kill Bass"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 16
 label = "Kill Mid"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 15
 label = "Kill Hi"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "empty"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 1
 label = "Play/Pause"
 mode = "trigger"
 
-[[cells.controls]]
+[[cells.grid]]
 type = "notebutton"
 channel = 1
 note = 2

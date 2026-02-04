@@ -21,7 +21,7 @@ export class GridMixerNew extends Layout<GridMixerProperties, EmptyLayoutState> 
         container.style.setProperty("--cols", String(options.w));
         container.style.setProperty("--rows", String(options.h));
 
-        for (const child of options.controls) {
+        for (const child of options.grid) {
             let ww = render_widget(child, children);
             container.appendChild(ww.html);
             children.push(ww);
@@ -29,12 +29,25 @@ export class GridMixerNew extends Layout<GridMixerProperties, EmptyLayoutState> 
     }
 }
 
-export class FlexBox extends Layout<HorizontalMixerProperties, EmptyLayoutState> {
+export class HorizontalBox extends Layout<HorizontalMixerProperties, EmptyLayoutState> {
     constructor(container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) {
         super({}, options);
         if (options.id) container.id = options.id;
 
-        for (const child of options.controls) {
+        for (const child of options.horiz) {
+            const ww = render_widget(child, children);
+            container.appendChild(ww.html);
+            children.push(ww);
+        }
+    }
+}
+
+export class VerticalBox extends Layout<VerticalMixerProperties, EmptyLayoutState> {
+    constructor(container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>) {
+        super({}, options);
+        if (options.id) container.id = options.id;
+
+        for (const child of options.vert) {
             const ww = render_widget(child, children);
             container.appendChild(ww.html);
             children.push(ww);
@@ -69,7 +82,7 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
 
         const panel_a = document.createElement("div");
         panel_a.classList.add("panel", "a");
-        for (const child of options.a.controls) {
+        for (const child of options.a) {
             const ww = render_widget(child, children);
             panel_a.appendChild(ww.html);
             children.push(ww);
@@ -78,7 +91,7 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
 
         const panel_b = document.createElement("div");
         panel_b.classList.add("panel", "b");
-        for (const child of options.b.controls) {
+        for (const child of options.b) {
             const ww = render_widget(child, children);
             panel_b.appendChild(ww.html);
             children.push(ww);
