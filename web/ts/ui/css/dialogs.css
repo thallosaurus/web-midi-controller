@@ -11,6 +11,7 @@ dialog[open] {
   right: 0;
   background-color: var(--ui-layer-one);
   color: white;
+  width: 30%;
 
   /*   display: grid;
   grid-template-areas:
@@ -27,13 +28,25 @@ dialog>header {
 dialog>main {
   grid-area: dialog_content;
   grid-row: 2 / 3;
+  height: 100%;
 }
 
 dialog>footer {
   grid-area: dialog_actions;
-  display: inline;
+  display: flex;
+  width: 100%;
 }
 
-dialog>footer button {}
+
+dialog>footer button {
+  border: 0;
+  width: 100%;
+  font-size: 1.2em;
+  font-family: monospace;
+  padding: 1em 0;
+  margin: 1em;
+  color: black;
+  background-color: white;
+}
 
 

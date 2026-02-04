@@ -1,6 +1,7 @@
 import { log } from "@common/logger";
 import "./css/dialogs.css";
 import "./css/overlay_menu.css"
+import './css/dialogs/sidemenu.css';
 
 export class UiDialog {
   static dialogs = new Map<string, UiDialog>();
