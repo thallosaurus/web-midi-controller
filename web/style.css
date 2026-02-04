@@ -192,3 +192,8 @@ body,
   display: inline;
   color: greenyellow;
 }
+
+/* Map Mode */
+:not(.mapmode) .map-only {
+  display: none;
+}

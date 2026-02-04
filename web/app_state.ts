@@ -1,5 +1,5 @@
 import { UiDialog } from './ts/ui/dialogs.ts'
-import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
+import { init_mapping_trigger, setup_overlay_selector } from "./ts/common/ui_utils.ts";
 import { EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./ts/event_bus/client.ts";
 import { SocketWorkerResponse, SocketWorkerResponseType } from "./ts/websocket/message.ts";
 import { sendFrontendMidiEvent } from "./ts/websocket/client.ts";
@@ -173,6 +173,7 @@ export class App {
         h.socket!.addEventListener("message", fn);
 
         this.initSocketConnectionTrigger(h)
+        init_mapping_trigger()
     }
 
     initUi(_: AppWorkerHandler) {
