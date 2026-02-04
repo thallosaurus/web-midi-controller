@@ -12,8 +12,6 @@
     height: 100%;
     grid-template-columns: 1em 1fr;
     grid-template-rows: 1fr auto;
-    
-    gap: .5em;
 }
 
 .xypad .target {
@@ -21,6 +19,7 @@
     height: calc(100% - 2em);
     background-color: darkgrey;
     touch-action: none;
+    user-select: none;
     grid-area: target;
     display: block;
 
@@ -35,12 +34,12 @@
 }
 
 .xypad .y-label {
-
     writing-mode: vertical-rl;
     text-orientation: mixed;
     white-space: nowrap;
     text-align: center;
     background-color: #111;
+    padding: 1em;
 }
 
 .xypad .x-label {

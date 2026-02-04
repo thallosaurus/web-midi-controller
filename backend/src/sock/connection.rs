@@ -6,11 +6,7 @@ use tracing::{Level, span};
 use uuid::Uuid;
 
 use crate::{
-    sock::{
-        inbox::MessageType,
-        messages::{ServerRequest, ServerResponse},
-    },
-    state::{AppState, messages::AppMessage},
+    inbox::messages::InboxMessageType, sock::messages::{ServerRequest, ServerResponse}, state::{AppState, messages::AppMessage}
 };
 
 /// Enum that describes what the event state machine should do
@@ -73,7 +69,7 @@ impl WebsocketConnection {
                                 // distribute message to all the other peers
                                 let mut responder = state.responder.lock().await;
                                 responder
-                                    .send_message(MessageType::Broadcast {
+                                    .send_message(InboxMessageType::Broadcast {
                                         from: Some(conn.id),
                                         data: server_response.into(),
                                     })

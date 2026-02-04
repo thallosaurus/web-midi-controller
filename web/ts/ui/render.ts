@@ -9,7 +9,7 @@ import { XYPadLifecycle } from "@widgets/xypad";
 import { RotaryLifecycle, RotaryState } from "@widgets/rotary";
 import { CCSliderLifecycle, CCSliderState } from "@widgets/slider";
 import { LoadedOverlay, LoadedWidget } from "./overlay";
-import { FlexBox, GridMixerNew, HorizontalBox, ShiftArea, VerticalBox } from "./layout";
+import { GridMixerNew, HorizontalBox, ShiftArea, VerticalBox } from "./layout";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
 /*export function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> | null{

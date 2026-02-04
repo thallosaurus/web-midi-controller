@@ -304,7 +304,7 @@ export const GridMixer = (container: HTMLDivElement, options: GridMixerPropertie
     container.style.setProperty("--cols", String(options.w));
     container.style.setProperty("--rows", String(options.h));
 
-    for (const child of options.controls) {
+    for (const child of options.grid) {
         let ww = render_widget(child, children);
         container.appendChild(ww.html);
         children.push(ww);
@@ -317,7 +317,7 @@ export const GridMixer = (container: HTMLDivElement, options: GridMixerPropertie
 export const HorizMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
     if (options.id) container.id = options.id;
 
-    for (const child of options.controls) {
+    for (const child of options.horiz) {
         const ww = render_widget(child, children);
         container.appendChild(ww.html);
         children.push(ww);
@@ -329,7 +329,7 @@ export const HorizMixer = (container: HTMLDivElement, options: HorizontalMixerPr
 export const VertMixer = (container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>) => {
     if (options.id) container.id = options.id;
 
-    for (const child of options.controls) {
+    for (const child of options.vert) {
         const ww = render_widget(child, children);
         container.appendChild(ww.html);
         children.push(ww);

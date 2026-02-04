@@ -170,8 +170,8 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         this.target.addEventListener("pointercancel", this.handlers.pointercancel);
         this.target.addEventListener("pointerup", this.handlers.pointerup);
 
-        this.x_label.addEventListener("pointerup", this.handlers.xlabel_pointerup);
-        this.y_label.addEventListener("pointerup", this.handlers.ylabel_pointerup);
+        this.x_label.addEventListener("pointerdown", this.handlers.xlabel_pointerup);
+        this.y_label.addEventListener("pointerdown", this.handlers.ylabel_pointerup);
         
         return false;
         
@@ -187,8 +187,8 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         this.target.removeEventListener("pointermove", this.handlers.pointermove);
         this.target.removeEventListener("pointercancel", this.handlers.pointercancel);
         this.target.removeEventListener("pointerup", this.handlers.pointerup);
-        this.x_label.removeEventListener("pointerup", this.handlers.xlabel_pointerup);
-        this.y_label.removeEventListener("pointerup", this.handlers.ylabel_pointerup);
+        this.x_label.removeEventListener("pointerdown", this.handlers.xlabel_pointerup);
+        this.y_label.removeEventListener("pointerdown", this.handlers.ylabel_pointerup);
         return false;
     }
     sendValue(v: number): void {

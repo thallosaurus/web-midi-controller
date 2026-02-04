@@ -5,23 +5,19 @@ use tokio::sync::{Mutex, mpsc};
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::{midi::messages::MidiMessage, state::messages::AppMessage};
+use crate::{inbox::messages::InboxMessageType, midi::messages::MidiMessage, state::messages::AppMessage};
 
 pub type ClientsMapNew = DashMap<Uuid, mpsc::Sender<AppMessage>>;
 pub type ClientsNew = Arc<ClientsMapNew>;
 
-#[derive(Debug, Clone, Copy)]
-pub enum MessageType<T> {
-    Broadcast { from: Option<Uuid>, data: T },
-    Direct { recipient: Uuid, data: T },
-}
+
 
 pub type SharedMessageResponder = Arc<Mutex<MessageResponder>>;
 
 #[derive(Clone, Debug)]
 pub struct MessageResponder {
     clients: ClientsNew,
-    pub sender: mpsc::Sender<MessageType<AppMessage>>
+    pub sender: mpsc::Sender<InboxMessageType<AppMessage>>,
 }
 
 impl MessageResponder {
@@ -31,12 +27,13 @@ impl MessageResponder {
 
         let clients_inner = clients.clone();
         tokio::spawn(async move {
+            let mut current_device_id = 0;
             loop {
                 tokio::select! {
                     msg = rx.recv() => {
                         // if we got a message on the broadcast channel, emit it to the recipients
                         match msg {
-                            Some(MessageType::Broadcast { from, data }) => {
+                            Some(InboxMessageType::Broadcast { from, data }) => {
                                 if let Some(from) = from {
                                     Self::broadcast(&clients_inner, data, vec![from]).await
                                 } else {
@@ -46,7 +43,17 @@ impl MessageResponder {
                                     tracing::error!("error while sending event to midi system")
                                 }
                             },
-                            Some(MessageType::Direct { recipient, data }) => Self::direct_message(&clients_inner, data, recipient).await,
+                            Some(InboxMessageType::Direct { recipient, data }) => Self::direct_message(&clients_inner, data, recipient).await,
+                            Some(InboxMessageType::ChangeOverlay { overlay_id }) => {
+                                //Self::direct_message(&clients_inner, msg, who).await
+                                tracing::debug!("got change overlay message, should change {current_device_id} to {overlay_id}");
+                            }
+                            Some(InboxMessageType::SetCurrentDeviceId { device_id }) => {
+                                // send to specific client here
+                                if (device_id as usize) <= clients_inner.len() {
+                                    current_device_id = device_id
+                                }
+                            }
                             None => break
                         }
                     }
@@ -61,14 +68,14 @@ impl MessageResponder {
     }
 
     /// send message from the AppState
-    pub async fn send_message(&mut self, msg: MessageType<AppMessage>) {
+    pub async fn send_message(&mut self, msg: InboxMessageType<AppMessage>) {
         if let Err(e) = self.sender.send(msg).await {
             tracing::error!("{e}");
         }
     }
 
     /// sends messages from an asynchronous context. spawns a tokio thread
-    pub fn send_message_sync(responder: &mut SharedMessageResponder, msg: MessageType<AppMessage>) {
+    pub fn send_message_sync(responder: &mut SharedMessageResponder, msg: InboxMessageType<AppMessage>) {
         let r = responder.clone();
 
         let lock = r.blocking_lock();
