@@ -8,7 +8,7 @@ import { JogwheelLifecycle } from "@widgets/jogwheel";
 import { XYPadLifecycle } from "@widgets/xypad";
 import { RotaryLifecycle, RotaryState } from "@widgets/rotary";
 import { CCSliderLifecycle, CCSliderState } from "@widgets/slider";
-import { HorizMixer, VertMixer, GridMixer, LoadedOverlay, LoadedWidget } from "./overlay";
+import { LoadedOverlay, LoadedWidget } from "./overlay";
 import { FlexBox, GridMixerNew, ShiftArea } from "./layout";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 

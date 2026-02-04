@@ -10,7 +10,7 @@ export function vibrate() {
   }
 }
 
-export function init_mapping_trigger() {
+/*export function init_mapping_trigger() {
   let trig = document.querySelectorAll<HTMLElement>("[data-map-mode-trigger]");
   let o = document.querySelector<HTMLDivElement>("#overlays");
 
@@ -19,7 +19,7 @@ export function init_mapping_trigger() {
       o?.classList.toggle("mapmode");
     })
   }
-}
+}*/
 
 export function setup_overlay_selector(ol: LoadedOverlay[]) {
   // setup overlay chooser
