@@ -33,6 +33,12 @@
     justify-self: center;
 }
 
+.xypad .label {
+    color: white;
+    font-family: monospace;
+    border: none;
+}
+
 .xypad .y-label {
     writing-mode: vertical-rl;
     text-orientation: mixed;

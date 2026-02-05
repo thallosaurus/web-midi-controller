@@ -56,8 +56,8 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
     handlers: WidgetStateHandlers = {};
 
     target: HTMLDivElement
-    x_label: HTMLDivElement
-    y_label: HTMLDivElement
+    x_label: HTMLButtonElement
+    y_label: HTMLButtonElement
     //touchHandler: HTMLDivElement
 
     x: Axis
@@ -68,7 +68,7 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
             activePointer: null
         }, options);
 
-        this.y_label = document.createElement("div");
+        this.y_label = document.createElement("button");
         this.y_label.classList.add("label", "y-label")
         container.appendChild(this.y_label)
 
@@ -80,7 +80,7 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         touchHandler.classList.add("touchhandler");
         this.target.appendChild(touchHandler);
 
-        this.x_label = document.createElement("div");
+        this.x_label = document.createElement("button");
         this.x_label.classList.add("label", "x-label")
         container.appendChild(this.x_label)
 
