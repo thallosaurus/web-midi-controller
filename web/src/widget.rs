@@ -8,17 +8,17 @@ use ts_rs::TS;
 #[serde(tag = "type")]
 #[deprecated]
 pub(super) enum AllowedWidgetProperties {
-        #[serde(rename = "notebutton")]
-        NoteButton,
-        #[serde(rename = "ccslider")]
-        CCSlider,
-        #[serde(rename = "ccbutton")]
-        CCButton,
-        #[serde(rename = "rotary")]
-        RotarySlider,
-        #[serde(rename = "jogwheel")]
-        Jogwheel,
-        #[serde(rename = "xypads")]
+    #[serde(rename = "notebutton")]
+    NoteButton,
+    #[serde(rename = "ccslider")]
+    CCSlider,
+    #[serde(rename = "ccbutton")]
+    CCButton,
+    #[serde(rename = "rotary")]
+    RotarySlider,
+    #[serde(rename = "jogwheel")]
+    Jogwheel,
+    #[serde(rename = "xypad")]
     XYPad,
 }
 
@@ -26,10 +26,9 @@ pub(super) enum AllowedWidgetProperties {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct BaseProperties {
-
     /// The elements Id, which also gets used as its HTML Id.
     /// Use it to refer to this element in Custom CSS Styles
-    id: Option<String>
+    id: Option<String>,
 }
 
 /// Shared Properties for all Midi Widgets
@@ -37,14 +36,14 @@ pub(super) struct BaseProperties {
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct MidiProperties {
     /// The midi channel the widget sends on. 1 = Channel 1; 0 is Overlay Global Channel
-    channel: u8
+    channel: u8,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct ButtonProperties {
     label: Option<String>,
-    mode: ButtonMode
+    mode: ButtonMode,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -59,11 +58,11 @@ pub(super) struct CCProperties {
     //label: Option<String>
 }
 
-#[derive(Serialize, Deserialize, Debug, TS)]
+/*#[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct ChildrenContainer {
-    controls: Vec<Widget>
-}
+    grid: Vec<Widget>,
+}*/
 
 /// MARK: - JSON Definitions
 
@@ -75,11 +74,11 @@ pub(super) enum Widget {
     /// Gives you a layer that conforms to the CSS flexbox
     #[serde(rename = "horiz-mixer")]
     HorizontalMixer(HorizontalMixerProperties),
-    
+
     /// Same as [Widget::HorizontalMixer], but is vertical
     #[serde(rename = "vert-mixer")]
     VerticalMixer(VerticalMixerProperties),
-    
+
     /// Gives you a CSS Grid which centers all elements as cells
     #[serde(rename = "grid-mixer")]
     GridMixer(GridMixerProperties),
@@ -103,25 +102,27 @@ pub(super) enum Widget {
     /// An input that sends out relative CC values (3Fh/41h)
     #[serde(rename = "jogwheel")]
     Jogwheel(JogwheelProperties),
-    
+
     #[serde(rename = "xypad")]
     XYPad(XYPadProperties),
 
     /// An empty cell useful as a grid placeholder
     #[serde(rename = "empty")]
     Empty,
+
+    #[serde(rename = "shift")]
+    ShiftArea(ShiftAreaProperties),
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct HorizontalMixerProperties {
     //id: Option<String>,
-
     #[serde(flatten)]
     base: BaseProperties,
 
-    #[serde(flatten)]
-    children: ChildrenContainer,
+    //#[serde(flatten)]
+    horiz: Vec<Widget>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -130,8 +131,8 @@ pub(super) struct VerticalMixerProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
-    #[serde(flatten)]
-    children: ChildrenContainer,
+    //#[serde(flatten)]
+    vert: Vec<Widget>
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -142,14 +143,38 @@ pub(super) struct GridMixerProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
-    #[serde(flatten)]
-    children: ChildrenContainer,
+    //#[serde(flatten)]
+    grid: Vec<Widget>,
 
     /// Columns of this grid
     w: u8,
 
     /// Rows of this grid
     h: u8,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct ShiftAreaProperties {
+    /// Element Id of this Overlay - can be anything. Is assigned to the HTML Element
+    /// for referencing it in CSS
+    #[serde(flatten)]
+    base: BaseProperties,
+
+    //#[serde(flatten)]
+    a: Vec<Widget>,
+    b: Vec<Widget>,
+
+    // TODO: global midi channel
+    #[serde(flatten)]
+    midi: MidiProperties,
+
+    note: u8
+    // Columns of this grid
+    //w: u8,
+
+    // Rows of this grid
+    //h: u8,
 }
 
 /// A single Notebutton. Sends out its defined Midi Note
@@ -180,27 +205,24 @@ pub(super) struct CCSliderProperties {
     #[serde(flatten)]
     ccprop: CCProperties,
 
-
     label: Option<String>,
 
     mode: SliderMode,
 
     vertical: Option<bool>,
-
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 enum SliderMode {
-
     #[serde(rename = "relative")]
     Relative,
-    
+
     #[serde(rename = "absolute")]
     Absolute,
 
     #[serde(rename = "snapback")]
-    Snapback
+    Snapback,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -223,7 +245,7 @@ pub(super) struct CCButtonProperties {
 pub(super) struct JogwheelProperties {
     #[serde(flatten)]
     base: BaseProperties,
-    
+
     #[serde(flatten)]
     midi: MidiProperties,
 
@@ -261,15 +283,14 @@ enum RotaryMode {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 enum ButtonMode {
-    
     #[serde(rename = "trigger")]
     Trigger,
-    
+
     #[serde(rename = "latch")]
     Latch,
 
     #[serde(rename = "readonly")]
-    ReadOnly
+    ReadOnly,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -288,6 +309,5 @@ pub(super) struct XYPadProperties {
     y: CCProperties,
 
     label: Option<String>,
-
     //mode: RotaryMode,
 }

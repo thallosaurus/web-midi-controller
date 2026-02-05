@@ -12,6 +12,7 @@ pub mod midi;
 /// New Implementation of websocket
 mod sock;
 pub mod state;
+pub mod inbox;
 
 //pub mod widgets;
 

@@ -14,7 +14,6 @@ use uuid::Uuid;
 use crate::{sock::connection::WebsocketConnection, state::AppState};
 
 mod connection;
-pub mod inbox;
 mod messages;
 
 //#[instrument]

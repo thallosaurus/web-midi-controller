@@ -4,8 +4,7 @@ use tokio::sync::{Mutex, mpsc};
 use tracing::{debug_span, info_span, instrument, span};
 
 use crate::{
-    midi::system::MidiSystem,
-    sock::inbox::{MessageResponder, SharedMessageResponder},
+    inbox::inbox::{MessageResponder, SharedMessageResponder}, midi::system::MidiSystem
 };
 
 pub mod messages;

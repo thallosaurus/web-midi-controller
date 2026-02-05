@@ -1,0 +1,37 @@
+name = "Shift Test"
+id = "shift_test"
+
+[[cells]]
+type = "shift"
+note = 1
+channel = 3
+
+[[cells.a]]
+type = "vert-mixer"
+
+[[cells.a.vert]]
+type = "ccslider"
+channel = 1
+cc = 1
+mode = "relative"
+label = "Test 1"
+
+[[cells.a.vert]]
+type = "notebutton"
+channel = 3
+note = 1
+label = "Shift"
+mode = "trigger"
+
+#[[cells.b]]
+
+[[cells.b]]
+type = "xypad"
+channel = 1
+label = "XY Pad"
+
+[cells.b.x]
+cc = 4
+
+[cells.b.y]
+cc = 5

@@ -1,17 +1,19 @@
 import { log } from "@common/logger";
 import "./css/dialogs.css";
 import "./css/overlay_menu.css"
+import './css/dialogs/sidemenu.css';
 
 export class UiDialog {
   static dialogs = new Map<string, UiDialog>();
-  constructor(private dialog: HTMLDialogElement) {}
+  static currentDialogId: string | null = null
+  constructor(private dialog: HTMLDialogElement) { }
   open() {
     this.dialog.showModal();
   }
   close(retValue?: string) {
     this.dialog.close(retValue);
   }
-  
+
   static initDialogs() {
     for (const c of document.querySelectorAll<HTMLDialogElement>("dialog")) {
       this.dialogs.set(c.id, new UiDialog(c));
@@ -19,22 +21,36 @@ export class UiDialog {
     log(this.dialogs);
   }
 
+  static openDialog(id: string) {
+    const d = this.dialogs.get(id)!;
+    d.open();
+  }
+
+  static closeDialog(id: string) {
+    const d = this.dialogs.get(id)!;
+    d.close()
+  }
+
+  static closeCurrentDialog() {
+    const d = this.dialogs.get(this.currentDialogId!)!;
+    d.close()
+  }
+
   static initDialogTriggers() {
     document.querySelectorAll<HTMLElement>("[data-dialog-trigger]:not(.disabled)").forEach(el => {
       const id = el.dataset.dialogTrigger;
 
       if (!id || !this.dialogs.has(id!)) throw new Error("dialog with id " + " not found");
-      
+
       el.addEventListener("click", (f) => {
         //console.log(t);
         //console.log(t.dataset.dialogTrigger);
-        const d = this.dialogs.get(id)!;
-        d.open();
-        //open_dialog(t.dataset!)
+        this.openDialog(id);
+        this.currentDialogId = id;
       });
-      
+
     })
-    
+
     document.querySelectorAll<HTMLElement>("[data-dialog-close]").forEach(el => {
       const id = el.dataset.dialogClose;
       if (!id || !this.dialogs.has(id!)) throw new Error("dialog with id " + " not found");
@@ -44,37 +60,9 @@ export class UiDialog {
         console.log(t);
         //console.log(t.dataset.dialogTrigger);
         //close_dialog(t.dataset.dialogClose!)
-        const d = this.dialogs.get(id)!;
-        d.close()
+        this.closeDialog(id);
+        this.currentDialogId = null;
       })
     })
   }
-}
-
-const close_dialog = (id: string) => {
-  console.log(id);
-  const dialog = document.querySelector<HTMLDialogElement>("dialog#" + id)!;
-  console.log(dialog);
-  dialog.close("close");
-};
-
-const init_dialogs = () => {
-
-  document.querySelectorAll<HTMLElement>("[data-dialog-trigger]").forEach(e => {
-    e.addEventListener("click", (f) => {
-      let t = f.target as HTMLElement;
-      console.log(t);
-      //console.log(t.dataset.dialogTrigger);
-      //open_dialog(t.dataset.dialogTrigger!)
-    })
-  })
-
-  document.querySelectorAll<HTMLElement>("[data-dialog-close]").forEach(e => {
-    e.addEventListener("click", (f) => {
-      let t = f.target as HTMLElement;
-      console.log(t);
-      //console.log(t.dataset.dialogTrigger);
-      //close_dialog(t.dataset.dialogClose!)
-    })
-  })
 }

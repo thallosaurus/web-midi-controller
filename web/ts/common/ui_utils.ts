@@ -10,6 +10,17 @@ export function vibrate() {
   }
 }
 
+/*export function init_mapping_trigger() {
+  let trig = document.querySelectorAll<HTMLElement>("[data-map-mode-trigger]");
+  let o = document.querySelector<HTMLDivElement>("#overlays");
+
+  for (const t of trig) {
+    t.addEventListener("click", (e) => {
+      o?.classList.toggle("mapmode");
+    })
+  }
+}*/
+
 export function setup_overlay_selector(ol: LoadedOverlay[]) {
   // setup overlay chooser
   const overlay_selector = document.querySelector<HTMLDivElement>(

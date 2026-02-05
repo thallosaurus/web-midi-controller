@@ -5,22 +5,20 @@ program = 1
 [[cells]]
 type = "horiz-mixer"
 
-
-
-[[cells.controls]]
+[[cells.horiz]]
 type = "xypad"
 channel = 2
 label = "XY Pad"
 note = 32
 
-[cells.controls.x]
+[cells.horiz.x]
 cc = 4
 
-[cells.controls.y]
+[cells.horiz.y]
 cc = 5
 
 
-[[cells.controls]]
+[[cells.horiz]]
 type = "ccslider"
 id = "vol_slider"
 channel = 1

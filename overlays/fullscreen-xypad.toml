@@ -5,14 +5,14 @@ program = 0
 [[cells]]
 type = "vert-mixer"
 
-[[cells.controls]]
+[[cells.vert]]
 type = "xypad"
 channel = 2
 label = "XY Pad"
 #note = 60
 
-[cells.controls.x]
+[cells.vert.x]
 cc = 4
 
-[cells.controls.y]
+[cells.vert.y]
 cc = 5

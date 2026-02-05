@@ -134,6 +134,7 @@ const cc_update_on_bus = (channel: number, cc: number, value: number, ext: boole
 
     for (const id of ch.get(cc)!) {
         // send update
+        console.debug("sending cc update CC" + cc + " with value " + value);
         sendUpdateCCWidget(id, channel, cc, value, ext);
     }
 }

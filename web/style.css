@@ -163,19 +163,19 @@ body,
   display: none;
 }
 
-#app #menu_container>.menu-connected-label {
+#app .menu-connected-label {
   display: inline;
 }
 
-#app.disconnected #menu_container>.menu-connected-label {
+#app.disconnected .menu-connected-label {
   display: none;
 }
 
-#app #menu_container>.menu-disconnected-label {
+#app .menu-disconnected-label {
   display: none;
 }
 
-#app.disconnected #menu_container>.menu-disconnected-label {
+#app.disconnected .menu-disconnected-label {
   display: inline;
 }
 
@@ -191,4 +191,9 @@ body,
 .menu-connected-label {
   display: inline;
   color: greenyellow;
+}
+
+/* Map Mode */
+:not(.mapmode) .map-only {
+  display: none;
 }

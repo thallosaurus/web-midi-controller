@@ -1,9 +1,17 @@
-.xypad {
+/*.xypad {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     height: 100%;
+    }*/
+    
+.xypad {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: 1em 1fr;
+    grid-template-rows: 1fr auto;
 }
 
 .xypad .target {
@@ -11,10 +19,40 @@
     height: calc(100% - 2em);
     background-color: darkgrey;
     touch-action: none;
+    user-select: none;
+    grid-area: target;
+    display: block;
+
+    grid-column: 2;
+    grid-row: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    justify-self: center;
 }
 
 .xypad .label {
-    margin: 1em;
+    color: white;
+    font-family: monospace;
+    border: none;
+}
+
+.xypad .y-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    white-space: nowrap;
+    text-align: center;
+    background-color: #111;
+    padding: 1em;
+}
+
+.xypad .x-label {
+    padding: 1em;
+    grid-column: 1 / -1;
+    text-align: center;
+    background-color: #111;
 }
 
 .xypad .target .touchhandler {
@@ -38,4 +76,5 @@
 
 .xypad .target.pressed {
     background-color: grey;
+    font-weight: bold;
 }

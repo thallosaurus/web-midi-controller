@@ -1,0 +1,89 @@
+name = "Ableton Performance"
+id = "ableton_performance"
+
+[[cells]]
+type = "horiz-mixer"
+
+  [[cells.horiz]]
+  type = "ccslider"
+  channel = 1
+  cc = 10
+  mode = "relative"
+  label = "Volume 1"
+
+  [[cells.horiz]]
+  type = "ccslider"
+  channel = 1
+  cc = 20
+  mode = "relative"
+  label = "Volume 2"
+
+  [[cells.horiz]]
+  type = "ccslider"
+  channel = 1
+  cc = 30
+  mode = "relative"
+  label = "Volume 3"
+
+  [[cells.horiz]]
+  type = "ccslider"
+  channel = 1
+  cc = 40
+  mode = "relative"
+  label = "Volume 4"
+
+  [[cells.horiz]]
+  type = "ccslider"
+  channel = 1
+  cc = 50
+  mode = "relative"
+  label = "Volume 5"
+
+  [[cells.horiz]]
+  type = "ccslider"
+  channel = 1
+  cc = 60
+  mode = "relative"
+  label = "Volume 6"
+
+  [[cells.horiz]]
+  type = "ccslider"
+  channel = 1
+  cc = 70
+  mode = "relative"
+  label = "Volume 7"
+
+  [[cells.horiz]]
+  type = "ccslider"
+  channel = 1
+  cc = 80
+  mode = "relative"
+  label = "Volume 8"
+
+[[cells]]
+type = "vert-mixer"
+id = "returns"
+
+  [[cells.vert]]
+  type = "ccslider"
+  channel = 1
+  cc = 90
+  mode = "snapback"
+  label = "Reverb"
+  vertical = true
+
+  [[cells.vert]]
+  type = "ccslider"
+  channel = 1
+  cc = 91
+  mode = "snapback"
+  label = "Filter"
+  vertical = true
+
+  [[cells.vert]]
+  type = "ccslider"
+  channel = 1
+  cc = 92
+  mode = "relative"
+  label = "Test"
+  vertical = true

@@ -1,6 +1,7 @@
 use midir::MidiOutputConnection;
 use midir::{MidiIO, MidiInput, MidiInputConnection, MidiOutput};
 use std::fmt::Display;
+use std::ops::ControlFlow;
 use tracing::instrument;
 
 #[cfg(not(target_os = "windows"))]
@@ -10,8 +11,9 @@ use midir::os::unix::VirtualOutput;
 
 use tokio::sync::mpsc;
 
+use crate::inbox::inbox::{MessageResponder, SharedMessageResponder};
+use crate::inbox::messages::InboxMessageType;
 use crate::midi::messages::MidiMessage;
-use crate::sock::inbox::{MessageResponder, MessageType, SharedMessageResponder};
 use crate::state::messages::AppMessage;
 
 //use std::fmt::Display as DebugDisplay;
@@ -114,56 +116,6 @@ impl MidiSystem {
         }
     }
 
-    #[deprecated]
-    fn init_input(
-        device_name: String,
-        responder: SharedMessageResponder,
-    ) -> Result<MidiInputConnection<SharedMessageResponder>, MidiSystemErrors> {
-        let midi_in = MidiInput::new(&device_name).map_err(|e| MidiSystemErrors::InitError(e))?;
-
-        #[cfg(target_os = "windows")]
-        let midi_in_conn = {
-            let port = select_port_by_name(&midi_in, &device_name.clone());
-            midi_in
-                .connect(&port, &device_name, Self::input_callback, responder)
-                .expect("error connecting to midi port")
-        };
-
-        #[cfg(not(target_os = "windows"))]
-        let midi_in_conn = midi_in
-            .create_virtual(&("virtual input port"), Self::input_callback, responder)
-            .map_err(|e| MidiSystemErrors::InputConnectError(e))?;
-
-        Ok(midi_in_conn)
-    }
-
-    #[deprecated]
-    fn init_output(
-        device_name: String,
-        //mut output_rx: mpsc::Receiver<AppMessage>,
-    ) -> Result<MidiOutputConnection, MidiSystemErrors> {
-        let midi_out =
-            MidiOutput::new(&device_name.clone()).map_err(|e| MidiSystemErrors::InitError(e))?;
-
-        // if not on windows
-        #[cfg(not(target_os = "windows"))]
-        let out_connection = {
-            midi_out
-                .create_virtual(&(device_name.clone() + " virtual"))
-                .map_err(|e| MidiSystemErrors::OutputConnectError(e))?
-        };
-
-        #[cfg(target_os = "windows")]
-        let out_connection = {
-            let c = select_port_by_name(&midi_out, &device_name);
-            midi_out
-                .connect(&c, &device_name)
-                .map_err(|e| MidiSystemErrors::OutputConnectError(e))?
-        };
-
-        Ok(out_connection)
-    }
-
     pub(crate) fn new(
         device_name: Option<String>,
         use_virtual: bool,
@@ -217,12 +169,13 @@ impl MidiSystem {
         Ok(())
     }
 
+    /// gets called by the midi system when there was data from the midi input
     fn input_callback(ts: u64, data: &[u8], e: &mut SharedMessageResponder) {
         let msg: AppMessage = Vec::from(data).into();
         tracing::debug!("{} midi input: {:?}", ts, msg);
         MessageResponder::send_message_sync(
             e,
-            MessageType::Broadcast {
+            InboxMessageType::Broadcast {
                 from: None,
                 data: msg,
             },
@@ -237,20 +190,35 @@ impl MidiSystem {
     ) {
         //start midi here
         loop {
-            if let Some(msg) = output_rx.recv().await {
-                let m: Vec<u8> = msg.into();
+            if let Some(in_msg) = output_rx.recv().await {
 
-                tracing::debug!("sending midi message: {:?}", msg);
-
-                tracing::trace!("sending midi message: {:?}", m);
-                if let Err(e) = midi_output.send(&m) {
-                    tracing::error!("error while sending {:?} to midi", e);
-                    break;
+                let proc = Self::process_inbox_message(in_msg);
+                if proc.is_continue() {
+                    let msg = proc.continue_value().unwrap();
+                    if let Some(msg) = msg {
+                        let m: Vec<u8> = msg.into();
+                        tracing::trace!("sending midi message: {:?}", msg);
+        
+                        if let Err(e) = midi_output.send(&m) {
+                            tracing::error!("error while sending {:?} to midi", e);
+                            break;
+                        }
+                    } else {
+                        // internal processing
+                        tracing::info!("processing internally {:?}", in_msg);
+                    }
                 }
+                
             } else {
                 break;
             }
         }
+    }
+
+    // determines if the inbox message should be sent forward or processed internally
+    fn process_inbox_message(msg: MidiMessage) -> ControlFlow<(), Option<MidiMessage>> {
+
+        ControlFlow::Continue(Some(msg))
     }
 }
 

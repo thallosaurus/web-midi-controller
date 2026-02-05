@@ -56,7 +56,8 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
     handlers: WidgetStateHandlers = {};
 
     target: HTMLDivElement
-    label: HTMLDivElement
+    x_label: HTMLButtonElement
+    y_label: HTMLButtonElement
     //touchHandler: HTMLDivElement
 
     x: Axis
@@ -67,6 +68,9 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
             activePointer: null
         }, options);
 
+        this.y_label = document.createElement("button");
+        this.y_label.classList.add("label", "y-label")
+        container.appendChild(this.y_label)
 
         this.target = document.createElement("div");
         this.target.classList.add("target");
@@ -76,16 +80,19 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         touchHandler.classList.add("touchhandler");
         this.target.appendChild(touchHandler);
 
-        this.label = document.createElement("div");
-        this.label.classList.add("label")
-        container.appendChild(this.label)
+        this.x_label = document.createElement("button");
+        this.x_label.classList.add("label", "x-label")
+        container.appendChild(this.x_label)
+
+        this.target.innerText = this.prop.label ?? "XY Pad"
 
         this.x = new Axis(AxisDirection.X, options, touchHandler);
         this.y = new Axis(AxisDirection.Y, options, touchHandler);
     }
 
     updateLabel() {
-        this.label.innerText = (this.prop.label ? (this.prop.label + ": ") : "XY Pad") + (this.x.value + "/" + this.y.value)
+        this.x_label.innerText = this.x.value + " - tap to assign"
+        this.y_label.innerText = this.y.value + " - tap to assign"
     }
 
     updateFromEvent(event: PointerEvent) {
@@ -131,7 +138,16 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
                 this.updateFromEvent(e);
             },
             pointerup: release_pointer,
-            pointercancel: release_pointer
+            pointercancel: release_pointer,
+
+            xlabel_pointerup: (e) => {
+                sendUpdateCCValue(this.prop.channel, this.prop.x.cc, this.x.value)
+                //this.x.sendValue(this.x.value);
+            },
+            ylabel_pointerup: (e) => {
+                sendUpdateCCValue(this.prop.channel, this.prop.y.cc, this.y.value)
+                //this.y.sendValue(this.y.value);
+            }
         }
 
         // register axises as cc values
@@ -154,8 +170,11 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         this.target.addEventListener("pointercancel", this.handlers.pointercancel);
         this.target.addEventListener("pointerup", this.handlers.pointerup);
 
+        this.x_label.addEventListener("pointerdown", this.handlers.xlabel_pointerup);
+        this.y_label.addEventListener("pointerdown", this.handlers.ylabel_pointerup);
+        
         return false;
-
+        
     }
     unload(options: XYPadProperties, html: HTMLDivElement): boolean {
         unregisterCCConsumer(this.x.prop.channel, this.x.prop.x.cc, this.x);
@@ -163,11 +182,13 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         if (this.prop.note) {
             unregisterNoteConsumer(this.prop.channel, this.prop.note, this);
         }
-
+        
         this.target.removeEventListener("pointerdown", this.handlers.pointerdown);
         this.target.removeEventListener("pointermove", this.handlers.pointermove);
         this.target.removeEventListener("pointercancel", this.handlers.pointercancel);
         this.target.removeEventListener("pointerup", this.handlers.pointerup);
+        this.x_label.removeEventListener("pointerdown", this.handlers.xlabel_pointerup);
+        this.y_label.removeEventListener("pointerdown", this.handlers.ylabel_pointerup);
         return false;
     }
     sendValue(v: number): void {
