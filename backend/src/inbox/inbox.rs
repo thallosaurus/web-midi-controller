@@ -75,11 +75,11 @@ impl MessageResponder {
     }
 
     /// sends messages from an asynchronous context. spawns a tokio thread
-    pub fn send_message_sync(responder: &mut SharedMessageResponder, msg: InboxMessageType<AppMessage>) {
-        let r = responder.clone();
+    pub fn send_message_sync(responder: &mut mpsc::Sender<MidiMessage>, msg: MidiMessage) {
+        //let r = responder.clone();
 
-        let lock = r.blocking_lock();
-        lock.sender.blocking_send(msg).unwrap();
+        //let lock = r.blocking_lock();
+        responder.blocking_send(msg).unwrap();
     }
 
     //#[instrument]

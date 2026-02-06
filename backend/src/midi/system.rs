@@ -19,7 +19,7 @@ use crate::state::messages::AppMessage;
 //use std::fmt::Display as DebugDisplay;
 
 pub struct MidiSystem {
-    _midi_input: MidiInputConnection<SharedMessageResponder>,
+    _midi_input: MidiInputConnection<mpsc::Sender<MidiMessage>>,
     midi_output: MidiOutputConnection,
 }
 
@@ -55,8 +55,8 @@ type MidiOutputReceiver = mpsc::Receiver<MidiMessage>;
 impl MidiSystem {
     fn init_virtual_input(
         device_name: String,
-        responder: SharedMessageResponder,
-    ) -> Result<MidiInputConnection<SharedMessageResponder>, MidiSystemErrors> {
+        responder: mpsc::Sender<MidiMessage>,
+    ) -> Result<MidiInputConnection<mpsc::Sender<MidiMessage>>, MidiSystemErrors> {
         #[cfg(not(target_os = "windows"))]
         {
             let midi_in =
@@ -91,8 +91,8 @@ impl MidiSystem {
 
     fn init_physical_input(
         device_name: String,
-        responder: SharedMessageResponder,
-    ) -> Result<MidiInputConnection<SharedMessageResponder>, MidiSystemErrors> {
+        responder: mpsc::Sender<MidiMessage>,
+    ) -> Result<MidiInputConnection<mpsc::Sender<MidiMessage>>, MidiSystemErrors> {
         let midi_in = MidiInput::new(&device_name).map_err(|e| MidiSystemErrors::InitError(e))?;
         if let Some(port) = select_port_by_name(&midi_in, &device_name.clone()) {
             Ok(midi_in
@@ -119,7 +119,7 @@ impl MidiSystem {
     pub(crate) fn new(
         device_name: Option<String>,
         use_virtual: bool,
-        responder: SharedMessageResponder,
+        midi_ingress: mpsc::Sender<MidiMessage>,
 
         // the input receiver of the output
         //midi_output_rx: mpsc::Receiver<AppMessage>,
@@ -144,11 +144,11 @@ impl MidiSystem {
         let output;
         if use_virtual {
             tracing::debug!("using virtual ports");
-            input = Self::init_virtual_input(input_name, responder.clone())?;
+            input = Self::init_virtual_input(input_name, midi_ingress)?;
             output = Self::init_virtual_output(output_name)?;
         } else {
             tracing::debug!("using physical ports");
-            input = Self::init_physical_input(input_name, responder.clone())?;
+            input = Self::init_physical_input(input_name, midi_ingress)?;
             output = Self::init_physical_output(output_name)?;
         }
 
@@ -170,15 +170,12 @@ impl MidiSystem {
     }
 
     /// gets called by the midi system when there was data from the midi input
-    fn input_callback(ts: u64, data: &[u8], e: &mut SharedMessageResponder) {
-        let msg: AppMessage = Vec::from(data).into();
+    fn input_callback(ts: u64, data: &[u8], e: &mut mpsc::Sender<MidiMessage>) {
+        let msg: MidiMessage = Vec::from(data).into();
         tracing::debug!("{} midi input: {:?}", ts, msg);
         MessageResponder::send_message_sync(
             e,
-            InboxMessageType::Broadcast {
-                from: None,
-                data: msg,
-            },
+            msg
         );
         //e.blocking_lock().send_message(MessageType::Broadcast { from: None, data: msg });
     }

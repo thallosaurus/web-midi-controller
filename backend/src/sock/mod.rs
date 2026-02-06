@@ -16,6 +16,8 @@ use crate::{sock::connection::WebsocketConnection, state::AppState};
 mod connection;
 mod messages;
 
+pub mod refactor;
+
 //#[instrument]
 pub(crate) async fn socket_handler(
     ws: WebSocketUpgrade,

@@ -1,7 +1,7 @@
 use crate::args::Args;
 use axum::http::Method;
 use clap::Parser;
-use midi_controller::{midi::default_list, serve_app, state};
+use midi_controller::{midi::default_list, serve_app, state::{self, refactor::CoreState}};
 use std::{error::Error, net::SocketAddr};
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
@@ -36,7 +36,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 
 async fn serve(args: Args, use_virtual: bool) {
-    let appstate = state::state(args.name, use_virtual);
+    //let appstate = state::state(args.name, use_virtual);
+    let appstate = CoreState::new(args.name, use_virtual);
+    
     let app = serve_app(args.overlay_path).with_state(appstate);
 
     let cors = CorsLayer::new()

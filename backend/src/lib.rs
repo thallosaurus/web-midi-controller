@@ -19,16 +19,16 @@ pub mod inbox;
 static ASSETS_DIR: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/../web/dist");
 
 use crate::{
-    sock::socket_handler, state::AppState
+    sock::{refactor::upgrade_connection, socket_handler}, state::refactor::CoreState
 };
 
-pub fn serve_app(overlay_path: String) -> Router<AppState> {
+pub fn serve_app(overlay_path: String) -> Router<CoreState> {
 
     let service = ServeDir::new(&ASSETS_DIR);
     
     Router::new()
         .fallback_service(service)
-        .route("/ws", any(socket_handler))
+        .route("/ws", any(upgrade_connection))
         .route(
             "/custom.css",
             get(|| async {

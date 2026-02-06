@@ -9,14 +9,16 @@ use crate::{
 
 pub mod messages;
 
+pub mod refactor;
+
 #[derive(Clone, Debug)]
 pub struct AppState {
     pub responder: SharedMessageResponder,
 }
 
-/// Initializes the channel and the midi system
+// Initializes the channel and the midi system
 //#[instrument(name = "state")]
-pub fn state(name: Option<String>, use_virtual: bool) -> AppState {
+/*pub fn state(name: Option<String>, use_virtual: bool) -> AppState {
     let (global_tx, global_rx) = mpsc::channel(32);
 
     let responder = Arc::new(Mutex::new(MessageResponder::task(global_tx)));
@@ -26,4 +28,4 @@ pub fn state(name: Option<String>, use_virtual: bool) -> AppState {
 
     tracing::debug!("initialized midi system");
     AppState { responder }
-}
+}*/
