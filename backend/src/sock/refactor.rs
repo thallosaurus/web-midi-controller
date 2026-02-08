@@ -1,19 +1,26 @@
 use std::{net::SocketAddr, ops::ControlFlow, sync::Arc};
 
 use axum::{
-    extract::{ConnectInfo, State, WebSocketUpgrade, ws::{Message, WebSocket}},
+    extract::{
+        ConnectInfo, State, WebSocketUpgrade,
+        ws::{Message, Utf8Bytes, WebSocket},
+    },
     response::IntoResponse,
 };
 use axum_extra::TypedHeader;
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{
-    Mutex, broadcast, mpsc::{self, Receiver, error::SendError}
+    Mutex, broadcast,
+    mpsc::{self, Receiver, error::SendError},
 };
 use ts_rs::TS;
 use uuid::Uuid;
 
-use crate::{midi::messages::{CCPayload, MidiPayload, NotePayload}, state::refactor::{CoreState, StateEvents, StateResponse}};
+use crate::{
+    midi::messages::{CCPayload, MidiPayload, NotePayload},
+    state::refactor::{CoreState, StateEvents, StateResponse},
+};
 
 pub async fn upgrade_connection(
     ws: WebSocketUpgrade,
@@ -33,13 +40,13 @@ pub async fn upgrade_connection(
     ws.on_upgrade(move |socket| {
         let inner_c = clients.clone();
         //let client_id = new_id.clone();
-        
+
         let task = WebsocketClientTask {
             id: new_id,
             clients,
             socket,
             receiver,
-            return_sender: global_sender
+            return_sender: global_sender,
         };
         tracing::info!("new client with id {}", new_id);
         //WebsocketConnection::upgrade(socket, conn, state, id)
@@ -52,9 +59,8 @@ pub async fn upgrade_connection(
 #[derive(Clone)]
 pub struct Websock {
     clients: Arc<DashMap<Uuid, WebsocketClient>>,
-    websock_sender: mpsc::Sender<ServerRequest>
-    //client_return_channel: broadcast::Sender<StateResponse>
-    //backend_sender: Arc<Mutex<
+    websock_sender: mpsc::Sender<ServerRequest>, //client_return_channel: broadcast::Sender<StateResponse>
+                                                 //backend_sender: Arc<Mutex<
 }
 
 impl Websock {
@@ -75,7 +81,7 @@ impl Websock {
                         // we got a message from
                         if let Ok(msg) = msg {
                             tracing::info!("websocket task got msg: {:?}", msg);
-                            
+
                             match msg {
                                 StateResponse::Broadcast { from, data } => {
                                     broadcast(&clients, data, vec![from]).await
@@ -96,7 +102,10 @@ impl Websock {
             }
         });
 
-        Self { clients, websock_sender: return_sender }
+        Self {
+            clients,
+            websock_sender: return_sender,
+        }
     }
 }
 
@@ -123,56 +132,83 @@ pub struct WebsocketClientTask {
     clients: Arc<DashMap<Uuid, WebsocketClient>>,
     socket: WebSocket,
     receiver: mpsc::Receiver<StateEvents>,
-    return_sender: mpsc::Sender<ServerRequest>
+    return_sender: mpsc::Sender<ServerRequest>,
 }
 
 impl WebsocketClientTask {
     pub async fn task(mut client: WebsocketClientTask) {
         //tokio::spawn(async move {
-            loop {
-                tokio::select! {
-                    msg = client.receiver.recv() => {
-                        // message from the backend
-                        if let Some(msg) = msg {
-                            tracing::info!("websocket client task got message from backend: {:?}", msg);
-                            //client.socket.send(msg);
-                        } else {
-                            // backend went away
-                            break;
-                        }
-                    }
-                    msg = client.socket.recv() => {
-                        // message from the connected client
-                        if let Some(msg) = msg {
+        if let Err(e) = client.send_connection_info().await {
+            tracing::error!("error while sending connection packet to client, exiting connection");
+            return;
+        }
 
-                            tracing::info!("websocket client task got message from frontend: {:?}", msg);
-                            let res = WebsocketClientTask::process_frontend_message(msg.unwrap());
-                            if res.is_break() {
-                                break;
-                            } else {
-                                if let Some(v) = res.continue_value() {
-
-                                    // do stuff
-                                    client.return_sender.send(v).await.unwrap();
-                                }
-                            }
-                        } else {
-                            // connection closed
-                            break;
-                        }
+        loop {
+            tokio::select! {
+                msg = client.receiver.recv() => {
+                    // message from the backend
+                    if let Some(msg) = msg {
+                        tracing::info!("websocket client task got message from backend: {:?}", msg);
+                        //client.socket.send(msg);
+                    } else {
+                        // backend went away
+                        break;
                     }
-                    
                 }
+                msg = client.socket.recv() => {
+                    // message from the connected client
+                    if let Some(msg) = msg {
+
+                        tracing::info!("websocket client task got message from frontend: {:?}", msg);
+                        let res = WebsocketClientTask::process_frontend_message(msg.unwrap());
+                        if res.is_break() {
+                            break;
+                        } else {
+                            if let Some(v) = res.continue_value() {
+
+                                // do stuff
+                                client.return_sender.send(v).await.unwrap();
+                            }
+                        }
+                    } else {
+                        // connection closed
+                        tracing::debug!("processor decided to end this connection ({})", client.id);
+                        break;
+                    }
+                }
+
             }
-            tracing::info!("closing connection with id {:?}", client.id);
-            
-            client.clients.remove(&client.id);
+        }
+        tracing::info!("closing connection with id {:?}", client.id);
+
+        client.clients.remove(&client.id);
         //});
+    }
+
+    async fn send_connection_info(&mut self) ->Result<(), axum::Error> {
+        let connect_message = ServerResponse::ConnectionInformation {
+            connection_id: self.id.to_string(),
+            overlay_path: String::from("/overlays"),
+        };
+
+        self.socket.send(connect_message.into()).await
     }
 
     fn process_frontend_message(msg: Message) -> ControlFlow<(), ServerRequest> {
         match msg {
-            Message::Text(utf8_bytes) => todo!(),
+            Message::Text(utf8_bytes) => {
+                if let Ok(r) = serde_json::from_slice(utf8_bytes.as_bytes()) {
+                    /*                    match r {
+                        ServerRequest::NoteEvent { midi, note } => ControlFlow::Continue(ServerResponse::NoteEvent { midi, note, on: note.velocity > 0 }),
+                        ServerRequest::CCEvent { midi, cc } => ControlFlow::Continue(ServerResponse::CCEvent { midi, cc }),
+                        ServerRequest::JogEvent { cc, midi } => todo!(),
+                    }*/
+                    ControlFlow::Continue(r)
+                } else {
+                    tracing::error!("error while serializing message: {:?}", utf8_bytes);
+                    ControlFlow::Break(())
+                }
+            }
             Message::Binary(bytes) => todo!(),
             Message::Ping(bytes) => todo!(),
             Message::Pong(bytes) => todo!(),
@@ -193,33 +229,31 @@ impl WebsocketClient {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "SocketMessages.ts")]
 #[serde(tag = "type")]
 pub enum ServerRequest {
-        NoteEvent {
+    NoteEvent {
         #[serde(flatten)]
         midi: MidiPayload,
-        
+
         #[serde(flatten)]
-        note: NotePayload
-        
+        note: NotePayload,
     },
     CCEvent {
         #[serde(flatten)]
         midi: MidiPayload,
-        
+
         #[serde(flatten)]
-        cc: CCPayload
+        cc: CCPayload,
     },
     JogEvent {
         #[serde(flatten)]
         cc: CCPayload,
 
         #[serde(flatten)]
-        midi: MidiPayload
-    }
+        midi: MidiPayload,
+    },
 }
 
 impl From<ServerRequest> for ServerResponse {
@@ -228,10 +262,18 @@ impl From<ServerRequest> for ServerResponse {
             ServerRequest::NoteEvent { midi, note } => {
                 let on = note.velocity > 0;
                 ServerResponse::NoteEvent { midi, note, on }
-            },
+            }
             ServerRequest::CCEvent { midi, cc } => ServerResponse::CCEvent { midi, cc },
             ServerRequest::JogEvent { cc, midi } => ServerResponse::JogEvent { cc, midi },
         }
+    }
+}
+
+/// Implementation of conversions of the #[ServerResponse] enum for websocket connections
+impl From<ServerResponse> for Message {
+    fn from(value: ServerResponse) -> Self {
+        let json = serde_json::to_string(&value).unwrap();
+        Message::text(json)
     }
 }
 
@@ -241,30 +283,29 @@ impl From<ServerRequest> for ServerResponse {
 pub enum ServerResponse {
     ConnectionInformation {
         connection_id: String,
-        overlay_path: String
+        overlay_path: String,
     },
     NoteEvent {
         #[serde(flatten)]
         midi: MidiPayload,
-        
+
         #[serde(flatten)]
         note: NotePayload,
 
-        on: bool
-        
+        on: bool,
     },
     CCEvent {
         #[serde(flatten)]
         midi: MidiPayload,
-        
+
         #[serde(flatten)]
-        cc: CCPayload
+        cc: CCPayload,
     },
     JogEvent {
         #[serde(flatten)]
         cc: CCPayload,
 
         #[serde(flatten)]
-        midi: MidiPayload
-    }
+        midi: MidiPayload,
+    },
 }
