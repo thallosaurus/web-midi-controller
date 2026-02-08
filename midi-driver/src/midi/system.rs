@@ -156,19 +156,6 @@ impl MidiSystem {
         let output = Arc::new(Mutex::new(output));
         thread::spawn(move || {
             loop {
-
-                /*let mut out = output.lock().unwrap();
-                let note_on = MidiMessage::NoteOn { midi: MidiPayload { channel: 1 }, note: NotePayload { note: 63, velocity: 82 } };
-                //output.send(&[0x90, 63, 82]).unwrap();
-                let note_on_b: Vec<u8> = note_on.into();
-                out.send(&note_on_b).unwrap();
-                std::thread::sleep(std::time::Duration::from_millis(500));
-                
-                let note_off = MidiMessage::NoteOff { midi: MidiPayload { channel: 1 }, note: NotePayload { note: 63, velocity: 0 } };
-                let note_off_b: Vec<u8> = note_off.into();
-                out.send(&note_off_b).unwrap();
-                std::thread::sleep(std::time::Duration::from_millis(500)); */
-
                 let msg = midi_engress.recv();
 
                 if let Ok(m) = msg {
