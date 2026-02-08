@@ -739,6 +739,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "midi-driver"
+version = "0.1.0"
+dependencies = [
+ "midir",
+ "once_cell",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "midir"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

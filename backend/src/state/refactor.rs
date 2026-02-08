@@ -1,5 +1,6 @@
 use std::{ops::ControlFlow, sync::Arc};
 
+use axum::extract::ws::Message;
 use dashmap::DashMap;
 use tokio::sync::{
     Mutex, broadcast,
@@ -23,6 +24,13 @@ pub enum StateEvents {
 #[derive(Debug, Clone, PartialEq)]
 pub enum StateResponse {
     Broadcast { from: Uuid, data: StateEvents },
+}
+
+impl From<StateEvents> for Message {
+    fn from(value: StateEvents) -> Self {
+        //Message::text(serde_json::to_string(&value).unwrap())
+        todo!()
+    }
 }
 
 #[derive(Clone)]
@@ -62,10 +70,6 @@ impl CoreState {
     /// used to get a new receiver for the core receiver
     pub fn subscribe(&self) -> broadcast::Receiver<StateResponse> {
         self.output_channel.resubscribe()
-    }
-
-    pub fn create_websocket_return_channel(&self) {
-
     }
 }
 
@@ -112,6 +116,8 @@ mod tests {
 
     use crate::state::refactor::{CoreState, StateEvents, StateResponse};
 
+    /// This state tests if a message that gets processed gets processed to a broadcast event.
+    /// this should ensure that the server forwards gotten midi messages 
     #[tokio::test]
     async fn test_runtime() {
         let state = CoreState::new(Some(String::from("test")), false);

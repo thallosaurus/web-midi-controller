@@ -149,6 +149,7 @@ impl WebsocketClientTask {
                     // message from the backend
                     if let Some(msg) = msg {
                         tracing::info!("websocket client task got message from backend: {:?}", msg);
+                        client.socket.send(msg.into()).await.unwrap();
                         //client.socket.send(msg);
                     } else {
                         // backend went away

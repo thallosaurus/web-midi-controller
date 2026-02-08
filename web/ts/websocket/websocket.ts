@@ -1,4 +1,3 @@
-import { MidiEvent } from "../common/events.ts";
 import { sendDisconnected, sendMidiEvent } from "./message.ts";
 //import { SocketMessageType } from '@backend/SocketMessageType';
 import { ServerResponse } from '../../../backend/bindings/SocketMessages.ts';

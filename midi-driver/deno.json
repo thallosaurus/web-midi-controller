@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "dev": "deno run -A --watch main.ts",
+    "compile": "cargo build -p midi-driver && deno compile -A main.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}
