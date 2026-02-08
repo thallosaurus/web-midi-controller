@@ -137,10 +137,10 @@ impl From<Vec<u8>> for MidiMessage {
 impl From<MidiMessage> for Vec<u8> {
     fn from(value: MidiMessage) -> Self {
         match value {
-            MidiMessage::NoteOn { midi, note } => vec![0x90 + midi.channel, note.note, note.velocity],
-            MidiMessage::NoteOff { midi, note } => vec![0x80 + midi.channel, note.note, note.velocity],
-            MidiMessage::ProgramChange { midi, value } => vec![0xC0 + (midi.channel), value],
-            MidiMessage::ControlChange { midi, cc } => vec![0xB0 + midi.channel, cc.cc, cc.value],
+            MidiMessage::NoteOn { midi, note } => vec![0x90 + (midi.channel - 1), note.note, note.velocity],
+            MidiMessage::NoteOff { midi, note } => vec![0x80 + (midi.channel - 1), note.note, note.velocity],
+            MidiMessage::ProgramChange { midi, value } => vec![0xC0 + (midi.channel - 1), value],
+            MidiMessage::ControlChange { midi, cc } => vec![0xB0 + (midi.channel - 1), cc.cc, cc.value],
             MidiMessage::Unknown => vec![],
         }
     }

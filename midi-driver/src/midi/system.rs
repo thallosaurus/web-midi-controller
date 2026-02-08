@@ -3,7 +3,7 @@ use midir::{MidiIO, MidiInput, MidiInputConnection, MidiOutput};
 use std::collections::VecDeque;
 use std::fmt::Display;
 use std::ops::ControlFlow;
-use std::sync::{self, Mutex};
+use std::sync::{self, Arc, Mutex};
 use std::thread;
 
 #[cfg(not(target_os = "windows"))]
@@ -11,7 +11,7 @@ use midir::os::unix::VirtualInput;
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualOutput;
 
-use crate::midi::messages::MidiMessage;
+use crate::midi::messages::{MidiMessage, MidiPayload, NotePayload};
 
 //use std::fmt::Display as DebugDisplay;
 
@@ -61,9 +61,9 @@ impl MidiSystem {
         #[cfg(not(target_os = "windows"))]
         {
             let midi_in =
-                MidiInput::new(&device_name).map_err(|e| MidiSystemErrors::InitError(e))?;
+                MidiInput::new(&(device_name.clone() + " (input)")).map_err(|e| MidiSystemErrors::InitError(e))?;
             return Ok(midi_in
-                .create_virtual(&("virtual input port"), Self::input_callback, responder)
+                .create_virtual(&(device_name.clone() + " (input)"), Self::input_callback, responder)
                 .map_err(|e| MidiSystemErrors::InputConnectError(e))?);
         }
 
@@ -78,11 +78,11 @@ impl MidiSystem {
     ) -> Result<MidiOutputConnection, MidiSystemErrors> {
         #[cfg(not(target_os = "windows"))]
         {
-            let midi_out = MidiOutput::new(&device_name.clone())
+            let midi_out = MidiOutput::new(&(device_name.clone() + " (output)"))
                 .map_err(|e| MidiSystemErrors::InitError(e))?;
 
             return Ok(midi_out
-                .create_virtual(&(device_name.clone() + " virtual"))
+                .create_virtual(&(device_name.clone() + " (output)"))
                 .map_err(|e| MidiSystemErrors::OutputConnectError(e))?);
         }
 
@@ -153,14 +153,32 @@ impl MidiSystem {
             //midi_output: output,
         };
 
+        let output = Arc::new(Mutex::new(output));
         thread::spawn(move || {
-            let mut output = output;
             loop {
 
-                if let Ok(m) = midi_engress.recv() {
-                    println!("egress received: {:?}", m);
-                    let payload: Vec<u8> = m.into();               
-                    let _ = output.send(&payload);
+                /*let mut out = output.lock().unwrap();
+                let note_on = MidiMessage::NoteOn { midi: MidiPayload { channel: 1 }, note: NotePayload { note: 63, velocity: 82 } };
+                //output.send(&[0x90, 63, 82]).unwrap();
+                let note_on_b: Vec<u8> = note_on.into();
+                out.send(&note_on_b).unwrap();
+                std::thread::sleep(std::time::Duration::from_millis(500));
+                
+                let note_off = MidiMessage::NoteOff { midi: MidiPayload { channel: 1 }, note: NotePayload { note: 63, velocity: 0 } };
+                let note_off_b: Vec<u8> = note_off.into();
+                out.send(&note_off_b).unwrap();
+                std::thread::sleep(std::time::Duration::from_millis(500)); */
+
+                let msg = midi_engress.recv();
+
+                if let Ok(m) = msg {
+                    let payload: Vec<u8> = m.into();
+                    println!("egress received: {:#?}, length: {}", payload, payload.len());
+                    let mut out = output.lock().unwrap();
+                    out.send(&payload).unwrap();
+                } else {
+                    let e = msg.err().unwrap();
+                    println!("{}", e);
                 }
             }
         });
@@ -172,17 +190,14 @@ impl MidiSystem {
     fn input_callback(ts: u64, data: &[u8], e: &mut sync::mpsc::Sender<MidiMessage>) {
         let msg: MidiMessage = Vec::from(data).into();
         println!("{} midi input: {:?}", ts, msg);
-        e.send(msg).unwrap();
+        if let Err(e) = e.send(msg) {
+            println!("{}", e);
+        }
         /*MessageResponder::send_message_sync(
             e,
             msg
         );*/
         //e.blocking_lock().send_message(MessageType::Broadcast { from: None, data: msg });
-    }
-
-    // determines if the inbox message should be sent forward or processed internally
-    fn process_inbox_message(msg: MidiMessage) -> ControlFlow<(), Option<MidiMessage>> {
-        ControlFlow::Continue(Some(msg))
     }
 }
 

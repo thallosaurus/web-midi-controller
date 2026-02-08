@@ -14,7 +14,7 @@ function getDefaultLibraryPath() {
   }[Deno.build.os];
 
   if (!path) throw new Error("library is not supported on this system: " + Deno.build.os)
-    return path;
+  return path;
 }
 
 interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
@@ -70,7 +70,7 @@ export class MidiDriver {
 
     //this.emitter.addEventListener("data", this.customEventHandler.bind(this));
   }
-  
+
   customEventHandler(ev: Event): void {
     const e = ev as CustomEvent;
     console.log(e.detail);
@@ -86,17 +86,34 @@ export class MidiDriver {
   }
 
   poll() {
-    const ptr = MidiDriver.dylib!.symbols.poll_event();
-    if (ptr) {
-      const msg = new Deno.UnsafePointerView(ptr).getCString();
+
+    do {
+      const ptr = MidiDriver.dylib!.symbols.poll_event();
+      if (!ptr) break;
+      const msg = new Deno.UnsafePointerView(ptr!).getCString();
       MidiDriver.dylib!.symbols.free_string(ptr);
-      
+
       const serialized = JSON.parse(msg);
 
       // process event
 
       this.emitter.dispatchEvent(new CustomEvent("data", { detail: serialized }))
-    }
+
+    } while (true);
+      
+    /*let ptr = MidiDriver.dylib!.symbols.poll_event();
+
+    const ptr = MidiDriver.dylib!.symbols.poll_event();
+    if (ptr) {
+      const msg = new Deno.UnsafePointerView(ptr).getCString();
+      MidiDriver.dylib!.symbols.free_string(ptr);
+
+      const serialized = JSON.parse(msg);
+
+      // process event
+
+      this.emitter.dispatchEvent(new CustomEvent("data", { detail: serialized }))
+    }*/
   }
 
   close() {
