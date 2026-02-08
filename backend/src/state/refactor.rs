@@ -71,13 +71,16 @@ impl CoreState {
 
 fn process_input_message(msg: StateRequest) -> ControlFlow<(), StateResponse> {
     match msg {
-        StateRequest::Event { from, data } => todo!(),
+        StateRequest::Event { from, data } => match data {
+            StateEvents::CCData {  } => ControlFlow::Continue(StateResponse::Broadcast { from, data }),
+            StateEvents::NoteData {  } => ControlFlow::Continue(StateResponse::Broadcast { from, data }),
+        }
     }
 }
 
 async fn task(
     mut reader: mpsc::Receiver<StateRequest>,
-    mut output_reader: broadcast::Sender<StateResponse>,
+    output_reader: broadcast::Sender<StateResponse>,
 ) {
     loop {
         if let Some(msg) = reader.recv().await {
@@ -89,7 +92,7 @@ async fn task(
                 if let Some(value) = next_action.continue_value() {
                     tracing::info!("processed to response: {:?}", value);
 
-                    output_reader.send(value);
+                    output_reader.send(value).unwrap();
                     continue;
                 } else {
                     tracing::info!("got none from processing, exiting");
