@@ -27,13 +27,8 @@ pub extern "C" fn start_driver() {
 
     thread::spawn(|| {
         //let mut counter = 0;
-        let system = MidiSystem::new(Some("test device".to_string()), true, tx_ingress, rx_egress);
+        let system = MidiSystem::new(Some("test device".to_string()), true, tx_ingress, rx_egress).unwrap();
         loop {
-            /*let event = format!("note_on ch=1 note={} vel=127", 60 + counter % 12);
-            EVENT_QUEUE.lock().unwrap().push_back(event);
-            counter += 1;
-            thread::sleep(Duration::from_millis(500));*/
-
             // await death here
         }
     });

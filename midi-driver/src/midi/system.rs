@@ -159,16 +159,11 @@ impl MidiSystem {
 
                 if let Ok(m) = midi_engress.recv() {
                     println!("egress received: {:?}", m);
-                    let payload: Vec<u8> = m.into();                    
+                    let payload: Vec<u8> = m.into();               
                     let _ = output.send(&payload);
                 }
             }
         });
-        //let device_name = output_name;
-        /*tokio::spawn(async move {
-            let system = system;
-            Self::task(system.midi_output, global_receiver).await
-        });*/
 
         Ok(system)
     }
@@ -177,46 +172,13 @@ impl MidiSystem {
     fn input_callback(ts: u64, data: &[u8], e: &mut sync::mpsc::Sender<MidiMessage>) {
         let msg: MidiMessage = Vec::from(data).into();
         println!("{} midi input: {:?}", ts, msg);
-        e.send(msg);
+        e.send(msg).unwrap();
         /*MessageResponder::send_message_sync(
             e,
             msg
         );*/
         //e.blocking_lock().send_message(MessageType::Broadcast { from: None, data: msg });
     }
-
-    /*async fn task(
-        mut midi_output: MidiOutputConnection,
-        mut output_rx: ReturnOutputSenderType,
-        //mut global_rx: mpsc::Receiver<AppMessage>,
-    ) {
-        //start midi here
-        loop {
-            if let Some(in_msg) = output_rx.recv().await {
-
-                let proc = Self::process_inbox_message(in_msg);
-                if proc.is_continue() {
-                    let msg = proc.continue_value().unwrap();
-                    if let Some(msg) = msg {
-                        let m: Vec<u8> = msg.into();
-                        tracing::trace!("sending midi message: {:?}", msg);
-
-                        if let Err(e) = midi_output.send(&m) {
-                            tracing::error!("error while sending {:?} to midi", e);
-                            break;
-                        }
-                    } else {
-                        // internal processing
-                        tracing::info!("processing internally {:?}", in_msg);
-                    }
-                }
-
-            } else {
-                break;
-            }
-        }
-    }
-    */
 
     // determines if the inbox message should be sent forward or processed internally
     fn process_inbox_message(msg: MidiMessage) -> ControlFlow<(), Option<MidiMessage>> {
