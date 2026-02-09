@@ -5,6 +5,8 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
     "@hono/hono": "jsr:@hono/hono",
-    "@driver": "../midi-driver/mod.ts"
+    "@driver": "../midi-driver/mod.ts",
+    "@toml": "jsr:@std/toml",
+    "@widgets": "../web/bindings/Overlay.ts"
   }
 }

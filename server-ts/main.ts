@@ -3,6 +3,8 @@ import { upgradeWebSocket } from '@hono/hono/deno'
 import { MidiDriver, MidiMessage } from "@driver";
 import { createMidiEventPayload, createWebsocketConnectionInfoPayload, WebsocketEvent, WebsocketEventPayload } from "./messages.ts";
 import { WSContext, WSEvents, WSMessageReceive } from "@hono/hono/ws";
+import { Overlay } from "@widgets"
+import { parse } from "@toml";
 
 type WSState = {
   clientId: string
@@ -99,6 +101,13 @@ class MidiState {
   bank_select_fine: number = 0
   program: number = 0
 
+  get currentConnectionId() {
+    const c = new Array(WebsocketEventHandler.clients.values());
+
+    if (this.bank_select < 0 || this.bank_select >= WebsocketEventHandler.clients.size) return null;
+    return Array.from(WebsocketEventHandler.clients.keys())[this.bank_select]
+  }
+
   mutate(msg: MidiMessage) {
     switch (msg.type) {
       case "ControlChange":
@@ -121,12 +130,31 @@ class MidiState {
 class WebsocketApplication {
   app = new Hono<{ Variables: WSState }>();
   static driver = new MidiDriver();
-  state = new MidiState();
+  static state = new MidiState();
 
   constructor() {
     this.app.get("/ws", upgradeWebSocket((c) => {
       return new WebsocketEventHandler(c);
     }));
+
+    this.app.get("/overlays", async (c) => {
+      const overlay_buffer = [];
+      for await (const dirEntry of Deno.readDir("../overlays")) {
+        if (dirEntry.isFile) {
+          const ext = dirEntry.name.split(".").pop();
+          if (ext == "toml") {
+
+            console.log(dirEntry);
+            const contents = await Deno.readTextFile("../overlays/" + dirEntry.name);
+            const data = parse(contents);
+            console.log(data);
+            overlay_buffer.push(data);
+          }
+        }
+      }
+      return c.json(overlay_buffer);
+      //let data = parse()
+    })
 
     // frontend
     this.app.get("/", (c) => {
@@ -139,11 +167,24 @@ class WebsocketApplication {
 
       const midiEvent = createMidiEventPayload(evt.detail);
 
-      if (this.state.mutate(midiEvent.data)) { 
+      if (WebsocketApplication.state.mutate(midiEvent.data)) {
         WebsocketEventHandler.broadcast(midiEvent, [])
       } else {
         // process state here
-        console.log("state mutation: ", this.state);
+        const id = WebsocketApplication.state.currentConnectionId;
+        switch (midiEvent.data.type) {
+          case "NoteOn":
+          case "NoteOff":
+          case "ProgramChange":
+            if (id !== null) {
+              const sock = WebsocketEventHandler.clients.get(id);
+              sock?.send(JSON.stringify(midiEvent));
+            }
+            break;
+          case "ControlChange":
+          case "Unknown":
+        }
+        console.log("state mutation: ", WebsocketApplication.state);
       }
     })
 
