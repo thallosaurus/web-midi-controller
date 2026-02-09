@@ -1,5 +1,7 @@
 export type WebsocketEventPayload = WebsocketConnectionInfoPayload | WebsocketMidiEventPayload;
 
+import { MidiMessage } from "@driver";
+
 export enum WebsocketEvent {
   ConnectionInformation = "connection-information",
   MidiEvent = "midi-event"
@@ -13,7 +15,7 @@ interface WebsocketConnectionInfoPayload {
 
 interface WebsocketMidiEventPayload {
     type: WebsocketEvent.MidiEvent,
-    data: any
+    data: MidiMessage
 }
 
 export function createWebsocketConnectionInfoPayload(): WebsocketConnectionInfoPayload {
@@ -24,7 +26,7 @@ export function createWebsocketConnectionInfoPayload(): WebsocketConnectionInfoP
     }
 }
 
-export function createMidiEventPayload(data: string): WebsocketMidiEventPayload {
+export function createMidiEventPayload(data: MidiMessage): WebsocketMidiEventPayload {
     return {
         type: WebsocketEvent.MidiEvent,
         data

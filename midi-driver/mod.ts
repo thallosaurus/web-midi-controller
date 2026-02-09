@@ -1,5 +1,7 @@
 const BUILD_TYPE = Deno.env.get("CARGO_BUILD_TYPE") ?? "debug";
 
+export type { CCPayload, MidiMessage, MidiPayload, NotePayload } from "./bindings/MidiPayload.ts";
+
 function getDefaultLibraryPath() {
   const path = {
     windows: "../target/" + BUILD_TYPE + "/libmidi_driver.dll",
@@ -34,6 +36,10 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
     parameters: ["pointer"],
     result: "void"
   },
+  stop_driver: {
+    parameters: [],
+    result: "void"
+  }
 }
 
 export class MidiDriver {
@@ -61,6 +67,10 @@ export class MidiDriver {
           parameters: ["pointer"],
           result: "void"
         },
+        stop_driver: {
+          parameters: [],
+          result: "void"
+        }
       } as const,
     );
 
@@ -117,10 +127,14 @@ export class MidiDriver {
   }
 
   close() {
-    clearInterval(this.pollInterval);
-    MidiDriver.dylib!.close();
+    if (MidiDriver.dylib) {
 
-    MidiDriver.dylib = null;
+      MidiDriver.dylib.symbols.stop_driver();
+      clearInterval(this.pollInterval);
+      MidiDriver.dylib.close();
+      
+      MidiDriver.dylib = null;
+    }
   }
 }
 

@@ -1,17 +1,17 @@
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 //use ts_rs::TS;
 
 //#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
-#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-//#[ts(export, export_to = "SocketMessages.ts")]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
 pub struct MidiPayload {
     pub channel: u8
 }
 
 //#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
-#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-//#[ts(export, export_to = "SocketMessages.ts")]
-
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
 pub struct NotePayload {
     //on: bool,
     pub note: u8,
@@ -19,8 +19,8 @@ pub struct NotePayload {
 }
 
 //#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
-#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
-//#[ts(export, export_to = "SocketMessages.ts")]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
 pub struct CCPayload {
     pub cc: u8,
     pub value: u8
@@ -28,7 +28,8 @@ pub struct CCPayload {
 
 //#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 //#[ts(export, export_to = "SocketMessages.ts")]
-#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
 #[serde(tag = "type")]
 pub enum MidiMessage {
     NoteOn {

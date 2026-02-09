@@ -119,6 +119,22 @@ class WebsocketApplication {
 
     Deno.serve(this.app.fetch);
   }
+
+  close() {
+    for (const [id, ws] of WebsocketEventHandler.clients.entries()) {
+      ws.close();
+      WebsocketEventHandler.clients.delete(id);
+    }
+
+    WebsocketApplication.driver.close();
+  }
 }
 
-new WebsocketApplication();
+const app = new WebsocketApplication();
+
+Deno.addSignalListener('SIGINT', () => {
+    console.log('Received SIGINT');
+    app.close();
+
+    setTimeout(() => Deno.exit(), 1000);
+});

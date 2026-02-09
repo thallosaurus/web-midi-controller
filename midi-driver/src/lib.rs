@@ -18,6 +18,8 @@ mod midi;
 static OUTPUT_CHANNEL: Lazy<Mutex<Option<Receiver<MidiMessage>>>> = Lazy::new(|| Mutex::new(None));
 static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<MidiMessage>>>> = Lazy::new(|| Mutex::new(None));
 
+static CLOSE_CHANNEL: Lazy<Mutex<Option<Sender<()>>>> = Lazy::new(|| Mutex::new(None));
+
 #[unsafe(no_mangle)]
 pub extern "C" fn start_driver() {
     let (tx_ingress, rx_ingress) = channel::<MidiMessage>();
@@ -25,11 +27,19 @@ pub extern "C" fn start_driver() {
     *OUTPUT_CHANNEL.lock().unwrap() = Some(rx_ingress);
     *INPUT_CHANNEL.lock().unwrap() = Some(tx_egress);
 
-    thread::spawn(|| {
+    let (tx_close, rx_close) = channel();
+    *CLOSE_CHANNEL.lock().unwrap() = Some(tx_close);
+
+    thread::spawn(move || {
         //let mut counter = 0;
-        let system = MidiSystem::new(Some("test device".to_string()), true, tx_ingress, rx_egress).unwrap();
+        let system =
+            MidiSystem::new(Some("test device".to_string()), true, tx_ingress, rx_egress).unwrap();
         loop {
             // await death here
+            if let Ok(s) = rx_close.recv() {
+                println!("awaited death");
+                break;
+            }
         }
     });
 }
@@ -76,4 +86,13 @@ pub extern "C" fn send_midi(ptr: *const std::os::raw::c_char) {
             let _ = tx.send(msg);
         }
     }
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn stop_driver() {
+    if let Some(tx) = &*CLOSE_CHANNEL.lock().unwrap() {
+        tx.send(()).unwrap();
+    }
+
+    *OUTPUT_CHANNEL.lock().unwrap() = None;
+    *INPUT_CHANNEL.lock().unwrap() = None;
 }

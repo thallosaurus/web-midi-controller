@@ -166,6 +166,7 @@ impl MidiSystem {
                 } else {
                     let e = msg.err().unwrap();
                     println!("{}", e);
+                    break;
                 }
             }
         });
