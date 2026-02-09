@@ -3,6 +3,7 @@ import { type ConnectedMessage, SocketWorkerResponse, SocketWorkerResponseType }
 import { MidiEvent } from "../common/events.ts";
 import { log } from "@common/logger.ts";
 import { ServerRequest, ServerResponse } from "@backend/SocketMessages.ts";
+import { WebsocketMidiEventPayload, WebsocketEvent } from "../../../server-ts/messages.ts";
 
 export enum SocketWorkerRequestType {
     Connect = "connect",
@@ -90,8 +91,7 @@ export function ConnectWebsocketWorkerWithHandler(worker: Worker) {
     })
 }
 
-export function sendMessageInput(worker: Worker, m: SocketWorkerRequest) {
-    //console.log(m);
+export function sendMessageInput(worker: Worker, m: SocketWorkerRequest | WebsocketMidiEventPayload) {
     const msg = JSON.stringify(m)
     worker.postMessage(msg);
 }
@@ -114,10 +114,10 @@ export function disconnectSocketMessage(worker: Worker) {
  * @param worker 
  * @param data 
  */
-export function sendFrontendMidiEvent(ws: Worker, data: ServerRequest) {
+export function sendFrontendMidiEvent(ws: Worker, data: WebsocketMidiEventPayload) {
     console.debug("websocket client", "sendFrontendMidiEvent", data)
     sendMessageInput(ws, {
-        type: SocketWorkerRequestType.MidiFrontendInput,
+        type: WebsocketEvent.MidiEvent,
         data
     })
 }

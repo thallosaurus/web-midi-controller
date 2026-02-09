@@ -22,6 +22,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@backend': path.resolve(__dirname, '../backend/bindings'),
+      //'@socketevents': path.resolve(__dirname, '../server-ts/messages'),
       '@core': path.resolve(__dirname, 'ts/ui'),
       '@common': path.resolve(__dirname, 'ts/common'),
       '@widgets': path.resolve(__dirname, 'ts/widgets'),

@@ -13,7 +13,7 @@ interface WebsocketConnectionInfoPayload {
     overlayPath: string
 }
 
-interface WebsocketMidiEventPayload {
+export interface WebsocketMidiEventPayload {
     type: WebsocketEvent.MidiEvent,
     data: MidiMessage
 }

@@ -13,6 +13,7 @@ import { AppEvents } from './app_events.ts'
 import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts';
 
 import { ServerResponse } from '@backend/SocketMessages.ts';
+import { WebsocketEvent } from '../server-ts/messages.ts';
 
 //const init_ui = () => {
 
@@ -47,7 +48,6 @@ export class App {
             this.initDefaultBackend().then((handlers) => {
                 this.handlers = handlers
                 console.log("were handlers set?", handlers);
-
 
                 App.defaultWorkerHandler(this.handlers);
                 this.initWebsocketUIChanges(this.handlers)
@@ -89,13 +89,24 @@ export class App {
                     if (!m.ext) {
                         console.log("sending note update to websocket backend", m);
                         //sendFrontendMidiEvent(h.socket!, new NoteEvent(m.channel, m.note, m.velocity > 0, m.velocity));
-                        sendFrontendMidiEvent(h.socket!, {
-                            type: "NoteEvent",
-                            channel: m.channel,
-                            note: m.note,
-                            velocity: m.velocity,
-                            //on: m.velocity > 0
-                        })
+                        if (m.velocity > 0) {
+
+                            sendFrontendMidiEvent(h.socket!, {
+                                type: "NoteOn",
+                                channel: m.channel,
+                                note: m.note,
+                                velocity: m.velocity,
+                                //on: m.velocity > 0
+                            })
+                        } else {
+                            sendFrontendMidiEvent(h.socket!, {
+                                type: "NoteOff",
+                                channel: m.channel,
+                                note: m.note,
+                                velocity: m.velocity,
+                                //on: m.velocity > 0
+                            })
+                        }
                     }
                     break;
                 //case EventBusProducerMessageType.RegisterCCCallback:
@@ -105,7 +116,7 @@ export class App {
                         console.log("bus update cc value on main", m);
                         //sendFrontendMidiEvent(h.socket!, new CCEvent(m.channel, m.value, m.cc));
                         sendFrontendMidiEvent(h.socket!, {
-                            type: "CCEvent",
+                            type: "ControlChange",
                             channel: m.channel,
                             cc: m.cc,
                             value: m.value

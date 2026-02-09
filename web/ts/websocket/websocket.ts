@@ -1,9 +1,10 @@
-import { sendDisconnected, sendMidiEvent } from "./message.ts";
+import { sendConnected, sendDisconnected, sendMidiEvent } from "./message.ts";
 //import { SocketMessageType } from '@backend/SocketMessageType';
-import { ServerResponse } from '../../../backend/bindings/SocketMessages.ts';
+//import { ServerResponse } from '../../../backend/bindings/SocketMessages.ts';
+import { WebsocketEvent, WebsocketEventPayload } from "../../../server-ts/messages.ts";
 
 //export const wsUri = "ws://" + location.hostname + ":8888/ws";
-const PORT = 8888;
+const PORT = 8000;
 
 let ws: WebSocket | null = null;
 //let connecting: Promise<WebSocket> | null = null;
@@ -22,10 +23,20 @@ function setupSocket(socket: WebSocket): WebSocket {
 
     // Listen for incoming websocket messages from the backend
     socket.addEventListener("message", (e) => {
-        const msg: ServerResponse = JSON.parse(e.data);
+        const msg: WebsocketEventPayload = JSON.parse(e.data);
+        console.log(msg.type);
         switch (msg.type) {
-            case "ConnectionInformation":
+            case WebsocketEvent.ConnectionInformation:
                 console.log("connection packet", msg);
+                //sendConnected()
+            break;
+
+            case WebsocketEvent.MidiEvent:
+                console.log(msg.data);
+                sendMidiEvent(msg.data)
+                break;
+            /*
+            case "ConnectionInformation":
                 break;
             case "NoteEvent":
                 sendMidiEvent(msg);
@@ -36,7 +47,7 @@ function setupSocket(socket: WebSocket): WebSocket {
             case "JogEvent":
                 sendMidiEvent(msg);
                 break;
-/*            case "noteupdate":
+            case "noteupdate":
                 console.log("external noteupdate data", msg);
                 sendMidiEvent(msg);
                 break
@@ -48,8 +59,9 @@ function setupSocket(socket: WebSocket): WebSocket {
             case "programchange":
                 console.log("program change", msg);
                 sendMidiEvent(msg);
-                break;*/
+                break;*
 
+                */
         }
     });
 

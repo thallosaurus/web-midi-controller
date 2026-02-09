@@ -3,6 +3,7 @@ import { upgradeWebSocket } from '@hono/hono/deno'
 import { MidiDriver, MidiMessage } from "@driver";
 import { createMidiEventPayload, createWebsocketConnectionInfoPayload, WebsocketEvent, WebsocketEventPayload } from "./messages.ts";
 import { WSContext, WSEvents, WSMessageReceive } from "@hono/hono/ws";
+import { cors } from '@hono/hono/cors'
 import { Overlay } from "@widgets"
 import { parse } from "@toml";
 
@@ -37,21 +38,17 @@ class WebsocketEventHandler implements WSEvents<WebSocket> {
 
   }
   onMessage(evt: MessageEvent<WSMessageReceive>, ws: WSContext<WebSocket>): void {
-    console.log("message: " + evt.data);
-
+    
     try {
       const json: WebsocketEventPayload = JSON.parse(evt.data.toString());
+      console.log("message", json);
       const own_id = this.ctx.get("clientId");
       switch (processWebsocketMessage(json)) {
         case WebsocketMessageDecision.Broadcast:
-          switch (json.type) {
-            case WebsocketEvent.MidiEvent:
-              WebsocketApplication.driver.sendMidi(json.data);
-            /* falls through */
-            default:
-              WebsocketEventHandler.broadcast(json, [own_id]);
-              break;
+          if (json.type == WebsocketEvent.MidiEvent) {
+            WebsocketApplication.driver.sendMidi(json.data);
           }
+          WebsocketEventHandler.broadcast(json, [own_id]);
           break;
 
         // send message back (for acks or something)
@@ -88,6 +85,7 @@ class WebsocketEventHandler implements WSEvents<WebSocket> {
  * @returns 
  */
 function processWebsocketMessage(msg: WebsocketEventPayload): WebsocketMessageDecision {
+  console.log(msg);
   switch (msg.type) {
     case WebsocketEvent.ConnectionInformation:
       throw new Error("client cant send connection information");
@@ -113,10 +111,12 @@ class MidiState {
       case "ControlChange":
         if (msg.cc === 0) {
           this.bank_select = msg.value;
+          return false
         } else if (msg.cc === 20) {
           this.bank_select_fine = msg.value;
+          return false
         }
-        return false
+        return true
       case "ProgramChange":
         this.program = msg.value;
         return false
@@ -136,6 +136,8 @@ class WebsocketApplication {
     this.app.get("/ws", upgradeWebSocket((c) => {
       return new WebsocketEventHandler(c);
     }));
+
+    this.app.use("/overlays", cors())
 
     this.app.get("/overlays", async (c) => {
       const overlay_buffer = [];

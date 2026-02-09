@@ -1,4 +1,5 @@
 import { ServerResponse, ServerRequest } from "../../../backend/bindings/SocketMessages";
+import { WebsocketEvent } from "../../../server-ts/messages.ts";
 import type { MidiEvent } from "../common/events";
 import { ConnectSocketMessage, SocketWorkerRequest, SocketWorkerRequestType } from "./client";
 import { connect, disconnect, send } from "./websocket";
@@ -24,8 +25,8 @@ export function process_worker_input(msg: SocketWorkerRequest) {
             }
             break;
 
-        case SocketWorkerRequestType.MidiFrontendInput:
-            //console.log("data for the backend", msg.data)
+        case WebsocketEvent.MidiEvent:
+            console.log("data for the backend", msg.data)
             const d = JSON.stringify(msg.data)
             send(d);
             break;
@@ -101,7 +102,7 @@ export function sendWorkerError(error: Error) {
         error
     })
 }
-export const overlayUri = "http://" + location.hostname + ":8888/overlays";
+export const overlayUri = "http://" + location.hostname + ":8000/overlays";
 export function sendDefaultConnected() {
     sendConnected(overlayUri)
 }
