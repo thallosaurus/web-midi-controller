@@ -1,6 +1,6 @@
 import { Context, Hono } from '@hono/hono'
 import { upgradeWebSocket } from '@hono/hono/deno'
-import { MidiDriver } from "@driver";
+import { MidiDriver, MidiMessage } from "@driver";
 import { createMidiEventPayload, createWebsocketConnectionInfoPayload, WebsocketEvent, WebsocketEventPayload } from "./messages.ts";
 import { WSContext, WSEvents, WSMessageReceive } from "@hono/hono/ws";
 
@@ -45,20 +45,20 @@ class WebsocketEventHandler implements WSEvents<WebSocket> {
           switch (json.type) {
             case WebsocketEvent.MidiEvent:
               WebsocketApplication.driver.sendMidi(json.data);
-              /* falls through */
+            /* falls through */
             default:
               WebsocketEventHandler.broadcast(json, [own_id]);
               break;
           }
           break;
-          
+
         // send message back (for acks or something)
         case WebsocketMessageDecision.Disconnect:
           WebsocketEventHandler.direct(json, own_id);
           ws.close();
           break;
       }
-      
+
     } catch (e) {
       console.error(e);
       ws.send(String(e));
@@ -86,7 +86,7 @@ class WebsocketEventHandler implements WSEvents<WebSocket> {
  * @returns 
  */
 function processWebsocketMessage(msg: WebsocketEventPayload): WebsocketMessageDecision {
-  switch(msg.type) {
+  switch (msg.type) {
     case WebsocketEvent.ConnectionInformation:
       throw new Error("client cant send connection information");
     case WebsocketEvent.MidiEvent:
@@ -94,9 +94,34 @@ function processWebsocketMessage(msg: WebsocketEventPayload): WebsocketMessageDe
   }
 }
 
+class MidiState {
+  bank_select: number = 0
+  bank_select_fine: number = 0
+  program: number = 0
+
+  mutate(msg: MidiMessage) {
+    switch (msg.type) {
+      case "ControlChange":
+        if (msg.cc === 0) {
+          this.bank_select = msg.value;
+        } else if (msg.cc === 20) {
+          this.bank_select_fine = msg.value;
+        }
+        return false
+      case "ProgramChange":
+        this.program = msg.value;
+        return false
+
+      default:
+        return true
+    }
+  }
+}
+
 class WebsocketApplication {
   app = new Hono<{ Variables: WSState }>();
   static driver = new MidiDriver();
+  state = new MidiState();
 
   constructor() {
     this.app.get("/ws", upgradeWebSocket((c) => {
@@ -114,7 +139,12 @@ class WebsocketApplication {
 
       const midiEvent = createMidiEventPayload(evt.detail);
 
-      WebsocketEventHandler.broadcast(midiEvent, [])
+      if (this.state.mutate(midiEvent.data)) { 
+        WebsocketEventHandler.broadcast(midiEvent, [])
+      } else {
+        // process state here
+        console.log("state mutation: ", this.state);
+      }
     })
 
     Deno.serve(this.app.fetch);
@@ -133,8 +163,8 @@ class WebsocketApplication {
 const app = new WebsocketApplication();
 
 Deno.addSignalListener('SIGINT', () => {
-    console.log('Received SIGINT');
-    app.close();
+  console.log('Received SIGINT');
+  app.close();
 
-    setTimeout(() => Deno.exit(), 1000);
+  setTimeout(() => Deno.exit(), 1000);
 });

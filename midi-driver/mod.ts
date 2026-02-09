@@ -110,20 +110,6 @@ export class MidiDriver {
       this.emitter.dispatchEvent(new CustomEvent("data", { detail: serialized }))
 
     } while (true);
-      
-    /*let ptr = MidiDriver.dylib!.symbols.poll_event();
-
-    const ptr = MidiDriver.dylib!.symbols.poll_event();
-    if (ptr) {
-      const msg = new Deno.UnsafePointerView(ptr).getCString();
-      MidiDriver.dylib!.symbols.free_string(ptr);
-
-      const serialized = JSON.parse(msg);
-
-      // process event
-
-      this.emitter.dispatchEvent(new CustomEvent("data", { detail: serialized }))
-    }*/
   }
 
   close() {
