@@ -12,50 +12,6 @@ import { LoadedOverlay, LoadedWidget } from "./overlay";
 import { GridMixerNew, HorizontalBox, ShiftArea, VerticalBox } from "./layout";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
-/*export function fromWidget(o: LoadedWidget): WidgetLifecycle<WidgetProperties, WidgetState> | null{
-        switch (o.option.type) {
-            case "rotary":
-                {
-                    const s = new RotaryLifecycle();
-                    s.load(o.option, o.html, o.state as unknown as RotaryState);
-                    return s;
-                }
-                //RotaryScript(o.option, o.html, o.state as RotaryState);
-            case "ccbutton":
-                {
-
-                    //                    CCButtonScript(o.option, o.html, o.state as ButtonState);
-                    const s = new CCButtonLifecycle();
-                    s.load(o.option, o.html, o.state as ButtonState);
-                    return s;
-                }
-
-            case "ccslider":
-                {
-                    const s = new CCSliderLifecycle();
-                    s.load(o.option, o.html, o.state as CCSliderState);
-                    return s;
-                }
-            //                CCSliderScript(o.option, o.html, o.state as CCSliderState);
-            //                break;
-            case "notebutton":
-                //NoteButtonScript(o.option, o.html, o.state as ButtonState);
-                {
-                    const s = new NoteButtonLifecycle();
-                    s.load(o.option, o.html, o.state as ButtonState);
-                    return s;
-                }
-            case "jogwheel":
-                {
-                    const s = new JogwheelLifecycle();
-                    s.load(o.option, o.html, o.state as JogState);
-                    return s;
-                    //JogwheelScript(o.option, o.html, o.state as JogState);
-                }
-        }
-        return null
-    }*/
-
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables and renders it into the given element
 export function render_overlay(overlay: Overlay, render_options: { element?: HTMLDivElement, id?: number }): LoadedOverlay {
     const e = render_options.element ?? document.createElement("div") as HTMLDivElement;

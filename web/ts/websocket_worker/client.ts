@@ -3,12 +3,43 @@ import { CoreWorkerClient } from "../coreworker/worker";
 import { WebsocketWorkerEvent } from "./events";
 
 export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent, WebsocketWorkerEvent> {
+    connected = false;
+    public connectionStateEventTrigger = new EventTarget();
+
+    constructor() {
+        super(new URL("worker.ts", import.meta.url));
+    }
+
     processWorkerClientMessage(msg: WebsocketWorkerEvent): void {
         //throw new Error("Method not implemented.");
         console.log(msg);
+        switch (msg.type) {
+
+            case "connection-successful":
+                this.connected = true;
+                this.sendConnectedEvent();
+                break;
+
+            case "connection-failed":
+                this.connected = false;
+                this.sendDisconnectedEvent();
+                break;
+
+            case "disconnect-successful":
+                this.sendDisconnectedEvent();
+                this.connected = false;
+                break;
+            case "disconnect-failed":
+                break;
+        }
     }
-    constructor() {
-        super(new URL("worker.js", import.meta.url));
+
+    private sendConnectedEvent() {
+        this.connectionStateEventTrigger.dispatchEvent(new CustomEvent("connect"))
+    }
+
+    private sendDisconnectedEvent() {
+        this.connectionStateEventTrigger.dispatchEvent(new CustomEvent("disconnect"))
     }
 
     sendMidiData(payload: MidiMessage) {
@@ -18,16 +49,18 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
         })
     }
 
-    connectToProdEndpoint(host: string, port: number): Promise<WebsocketWorkerEvent> {
+    connectToEndpoint(host: string, port: number, path: string): Promise<string> {
         return new Promise((res, rej) => {
             const fn = (ev: MessageEvent<WebsocketWorkerEvent>) => {
                 switch (ev.data.type) {
                     case "connection-successful":
                         this.worker.removeEventListener("message", fn);
-                        res(ev.data);
+                        //this.sendConnectionChangedEvent();
+                        res(ev.data.overlayPath);
                         break;
                     case "connection-failed":
                         this.worker.removeEventListener("message", fn);
+                        //this.sendConnectionChangedEvent();
                         rej();
                         break;
                 }
@@ -41,6 +74,10 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
                 port,
             })
         })
+    }
+
+    connectToProdEndpoint(host: string, port: number): Promise<string> {
+        return this.connectToEndpoint(host, port, "ws");
     }
 
     disconnectEndpoint(): Promise<void> {

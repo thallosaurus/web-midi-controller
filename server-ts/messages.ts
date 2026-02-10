@@ -9,7 +9,7 @@ export function createWebsocketConnectionInfoPayload(): any {
     return {
         type: "connection-information",
         connectionId: crypto.randomUUID(),
-        overlayPath: "/overlays"
+        overlayPath: "http://localhost:8000/overlays"
     }
 }
 

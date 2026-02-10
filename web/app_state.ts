@@ -13,21 +13,7 @@ import { EventbusWorkerClient } from "./ts/eventbus_worker/client.ts"
 
 //const init_ui = () => {
 
-export interface AppWorkerHandler {
-
-    // where the websocket gets mounted on app runtime
-    //socket: WebsocketWorkerClient | null,
-
-    // where the eventbus gets mounted on runtime
-    //eventbus: Worker | null
-}
-
 export class App {
-    handlers: AppWorkerHandler = {
-        //socket: null,
-        //eventbus: null
-    }
-
     // Event Target that fires when something happens
     //emitter: AppEvents = new AppEvents();
 
@@ -36,6 +22,8 @@ export class App {
     socket = new WebsocketWorkerClient();
     eventbus = new EventbusWorkerClient();
 
+    appEvents = new EventTarget();
+
     /**
      * start of app lifecycle
      */
@@ -43,9 +31,26 @@ export class App {
         setup_logger("frontend");
         const f = resolveFeatures();
 
+        this.socket.connectionStateEventTrigger.addEventListener("connect", () => {
+            this.app_elem.classList.remove("disconnected");
+            
+            //this.fetchOverlays(msg.overlay_path);
+        })
+        
+        this.socket.connectionStateEventTrigger.addEventListener("disconnect", () => {
+            this.app_elem.classList.add("disconnected");
+            clear_loaded_overlays();
+            clear_overlay_selector();
+        })
+
         if (hasFeature(f, "default")) {
-            console.log(this);
-            this.initDefaultBackend()/* .then((handlers) => {
+        this.socket.connectToProdEndpoint("localhost", 8000).then(overlayPath => {
+            console.log("getting", overlayPath);
+            this.fetchOverlays(overlayPath);
+        });
+
+
+            /* .then((handlers) => {
                 this.handlers = handlers
                 console.log("were handlers set?", handlers);
 
@@ -71,12 +76,9 @@ export class App {
 
         connectSocketMessage(h.socket!, wsUri);
     }*/
-    initDefaultBackend() {
+    async initDefaultBackend(): Promise<string> {
         //let socket = initWebsocketWorker();
-        this.eventbus.init();
-        this.socket.connectToProdEndpoint("localhost", 8000).then((info) => {
-            console.log("socket connected", info)
-        })
+        return await this.socket.connectToProdEndpoint("localhost", 8000);
 
         //let eventbus = await initEventBusWorker();
     }
@@ -159,6 +161,7 @@ export class App {
     }*/
 
     fetchOverlays(path: string) {
+        debugger
         fetch(path)
             .then(ol => ol.json())
             .then(ol => load_overlays_from_array(ol))
@@ -168,9 +171,8 @@ export class App {
             })
     }
 
-    private initWebsocketUIChanges(h: AppWorkerHandler) {
+    private initWebsocketUIChanges() {
         const fn = (ev: MessageEvent<any>) => {
-            const msg: SocketWorkerResponseType = JSON.parse(ev.data);
             switch (msg.type) {
                 case SocketWorkerResponse.Disconnected:
                     this.app_elem.classList.add("disconnected");
@@ -185,9 +187,9 @@ export class App {
                     break;
             }
         }
-        h.socket!.addEventListener("message", fn);
+        this.socket.addEventListener("message", fn);
 
-        this.initSocketConnectionTrigger(h)
+        //this.initSocketConnectionTrigger(h)
     }
 
     initUi(_: AppWorkerHandler) {

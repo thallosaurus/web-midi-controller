@@ -25,7 +25,6 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
     callbacks = new Map<string, EventBusConsumer>();
 
     override processWorkerClientMessage(msg: EventBusWorkerProducerEvent): void {
-        console.log("ebworker message", msg);
         switch (msg.type) {
             case "cc-update":
                 {
@@ -54,11 +53,11 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
     constructor() {
         super(new URL("eb_worker.ts", import.meta.url));
         //this.worker.onmessage = console.debug
-        console.log("eb worker constructor")
+        this.init();
 
-/*        this.worker.onmessage = (e) => {
-            console.log("RAW FROM WORKER", e, e.data);
-        };*/
+        /*        this.worker.onmessage = (e) => {
+                    console.log("RAW FROM WORKER", e, e.data);
+                };*/
     }
 
     init() {
@@ -69,9 +68,7 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
             const fn = (ev: MessageEvent<EventBusWorkerProducerEvent>) => {
                 switch (ev.data.type) {
                     case "init-callback":
-
                         console.log(ev);
-                        console.log("init")
                         this.worker.removeEventListener("message", fn);
                         res()
                         break;
@@ -85,38 +82,84 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
         })
     }
 
-    registerCC(channel: number, cc: number, init?: number) {
-        this.send({
-            type: "register-cc-widget",
-            channel,
-            cc,
-            init
+    registerCC(channel: number, cc: number, init?: number): Promise<string> {
+        return new Promise((res, rej) => {
+
+            const fn = (ev: MessageEvent<EventBusWorkerProducerEvent>) => {
+                switch (ev.data.type) {
+                    case "register-cc-callback":
+                        this.worker.removeEventListener("message", fn);
+                        res(ev.data.consumerId)
+                        break;
+                }
+            }
+            this.worker.addEventListener("message", fn);
+            this.send({
+                type: "register-cc-widget",
+                channel,
+                cc,
+                init
+            })
         })
     }
 
-    registerNote(channel: number, note: number, target: EventBusConsumer) {
-        this.send({
-            type: "register-note-widget",
-            channel,
-            note
+    registerNote(channel: number, note: number, target: EventBusConsumer): Promise<string> {
+        return new Promise((res, rej) => {
+            const fn = (ev: MessageEvent<EventBusWorkerProducerEvent>) => {
+                switch (ev.data.type) {
+                    case "register-note-callback":
+                        this.worker.removeEventListener("message", fn);
+                        res(ev.data.consumerId);
+                        break;
+                }
+            }
+            this.worker.addEventListener("message", fn);
+            
+            this.send({
+                type: "register-note-widget",
+                channel,
+                note
+            })
         })
 
     }
 
-    unregisterCC(id: string, channel: number, cc: number) {
-        this.send({
-            type: "unregister-cc-widget",
-            id,
-            channel,
-            cc
+    unregisterCC(id: string, channel: number, cc: number): Promise<void> {
+        return new Promise((res, rej) => {
+            const fn = (ev: MessageEvent<EventBusWorkerProducerEvent>) => {
+                switch (ev.data.type) {
+                    case "unregister-cc-callback":
+                        res();
+                        this.worker.removeEventListener("message", fn);
+                        break;
+                }
+            }
+            this.send({
+                type: "unregister-cc-widget",
+                id,
+                channel,
+                cc
+            })
         })
     }
 
-    unregisterNote(id: string, channel: number, note: number) {
-        this.send({
-            type: "unregister-note-widget",
-            id, channel,
-            note
+    unregisterNote(id: string, channel: number, note: number): Promise<void> {
+        return new Promise((res, rej) => {
+            const fn = (ev: MessageEvent<EventBusWorkerProducerEvent>) => {
+                switch (ev.data.type) {
+                    case "register-note-callback":
+                        this.worker.removeEventListener("message", fn);
+                        res();
+                    break;
+                }
+            }
+
+            this.worker.addEventListener("message", fn);
+            this.send({
+                type: "unregister-note-widget",
+                id, channel,
+                note
+            })
         })
     }
 }
