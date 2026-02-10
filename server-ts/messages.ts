@@ -1,34 +1,20 @@
-export type WebsocketEventPayload = WebsocketConnectionInfoPayload | WebsocketMidiEventPayload;
-
 import { MidiMessage } from "@driver";
 
-export enum WebsocketEvent {
-  ConnectionInformation = "connection-information",
-  MidiEvent = "midi-event"
-}
+export type WebsocketServerMessage = 
+| { type: "connection-information", connectionId: string, overlayPath: string } 
+| { type: "midi-event", data: MidiMessage }
 
-interface WebsocketConnectionInfoPayload {
-    type: WebsocketEvent.ConnectionInformation,
-    connectionId: string,
-    overlayPath: string
-}
-
-export interface WebsocketMidiEventPayload {
-    type: WebsocketEvent.MidiEvent,
-    data: MidiMessage
-}
-
-export function createWebsocketConnectionInfoPayload(): WebsocketConnectionInfoPayload {
+export function createWebsocketConnectionInfoPayload(): any {
     return {
-        type: WebsocketEvent.ConnectionInformation,
+        type: "connection-information",
         connectionId: crypto.randomUUID(),
         overlayPath: "/overlays"
     }
 }
 
-export function createMidiEventPayload(data: MidiMessage): WebsocketMidiEventPayload {
+export function createMidiEventPayload(data: MidiMessage): WebsocketServerMessage {
     return {
-        type: WebsocketEvent.MidiEvent,
+        type: "midi-event",
         data
     }
 }

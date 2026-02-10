@@ -1,26 +1,21 @@
 import { UiDialog } from './ts/ui/dialogs.ts'
 import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
 import { EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./ts/event_bus/client.ts";
-import { SocketWorkerResponse, SocketWorkerResponseType } from "./ts/websocket/message.ts";
-import { sendFrontendMidiEvent } from "./ts/websocket/client.ts";
-import { CCEvent, MidiEvent, NoteEvent, ProgramChangeEvent } from "./ts/common/events.ts";
 import { change_overlay, clear_loaded_overlays, load_overlays_from_array, process_program_change } from "./ts/ui/overlay.ts";
 import { EventBusProducerMessage, EventBusProducerMessageType } from "./ts/event_bus/message.ts";
-import { connectSocketMessage, ConnectWebsocketWorkerWithHandler, initWebsocketWorker } from "@websocket/client.ts";
 
 import { debug, setup_logger } from '@common/logger'
 import { AppEvents } from './app_events.ts'
 import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts';
 
-import { ServerResponse } from '@backend/SocketMessages.ts';
-import { WebsocketEvent } from '../server-ts/messages.ts';
+import { WebsocketWorkerClient } from "./ts/websocket_worker/client.ts"
 
 //const init_ui = () => {
 
 export interface AppWorkerHandler {
 
     // where the websocket gets mounted on app runtime
-    socket: Worker | null,
+    socket: WebsocketWorkerClient | null,
 
     // where the eventbus gets mounted on runtime
     eventbus: Worker | null
@@ -49,13 +44,13 @@ export class App {
                 this.handlers = handlers
                 console.log("were handlers set?", handlers);
 
-                App.defaultWorkerHandler(this.handlers);
-                this.initWebsocketUIChanges(this.handlers)
+                //App.defaultWorkerHandler(this.handlers);
+                //this.initWebsocketUIChanges(this.handlers)
                 let autoconnectHost = getHostFromQuery();
 
                 if (autoconnectHost) {
                     //autoconnect
-                    connectSocketMessage(handlers.socket!, autoconnectHost);
+                    //connectSocketMessage(handlers.socket!, autoconnectHost);
                 }
             });
         } else {
@@ -71,7 +66,12 @@ export class App {
         connectSocketMessage(h.socket!, wsUri);
     }*/
     async initDefaultBackend(): Promise<AppWorkerHandler> {
-        let socket = initWebsocketWorker();
+        //let socket = initWebsocketWorker();
+        let socket = new WebsocketWorkerClient();
+        socket.connectToProdEndpoint("localhost", 8000).then((info) => {
+            console.log("socket connected", info)
+        })
+
         let eventbus = await initEventBusWorker();
 
         return { eventbus, socket }
