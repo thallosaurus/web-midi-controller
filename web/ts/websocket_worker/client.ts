@@ -12,8 +12,10 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
 
     processWorkerClientMessage(msg: WebsocketWorkerEvent): void {
         //throw new Error("Method not implemented.");
-        console.log(msg);
         switch (msg.type) {
+            case "data":
+                this.sendMidiDataEvent(msg.payload);
+            break;
 
             case "connection-successful":
                 this.connected = true;
@@ -32,6 +34,10 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
             case "disconnect-failed":
                 break;
         }
+    }
+
+    private sendMidiDataEvent(data: MidiMessage) {
+        this.events.dispatchEvent(new CustomEvent("data", { detail: data }));
     }
 
     private sendConnectedEvent() {

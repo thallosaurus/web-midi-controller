@@ -10,6 +10,7 @@ import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts'
 
 import { WebsocketWorkerClient } from "./ts/websocket_worker/client.ts"
 import { EventbusWorkerClient } from "./ts/eventbus_worker/client.ts"
+import { MidiMessage } from 'server-ts/messages.ts';
 
 //const init_ui = () => {
 
@@ -48,6 +49,11 @@ export class App {
             console.log("getting", overlayPath);
             this.fetchOverlays(overlayPath);
         });
+
+        App.socket.events.addEventListener("data", (ev) => {
+            const payload = (ev as CustomEvent).detail as MidiMessage;
+            console.log(payload);
+        })
 
 
             /* .then((handlers) => {
