@@ -24,31 +24,36 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
         switch (e.type) {
             case "init":
                 console.log("initializing eventbus")
+                this.initialize(16);
                 this.send({
                     type: "init-callback"
                 })
                 break;
             case "update-cc-value":
+                this.updateCC(e.channel, e.cc, e.value);
+                break;
+            case "update-note-value":
+
                 break;
             case "register-cc-widget":
                 {
-
-                    let consumerId = this.registerCCWidget(e.channel, e.cc, e.init);
+                    this.registerCCWidget(e.id, e.channel, e.cc, e.init);
                     this.send({
-                        type: "register-cc-callback", consumerId
+                        type: "register-cc-callback", consumerId: e.id
                     })
                 }
                 break;
 
             case "register-note-widget":
                 {
-                    let consumerId = this.registerNoteWidget(e.channel, e.note, 0);
+                    this.registerNoteWidget(e.id, e.channel, e.note, 0);
                     this.send({
-                        type: "register-note-callback", consumerId
+                        type: "register-note-callback", consumerId: e.id
                     });
                 }
                 break
             case "unregister-note-widget":
+                this.unregisterNoteWidget(e.id, e.channel, e.note);
                 this.send({
                     type: "unregister-note-callback",
                     oldId: e.id
@@ -57,6 +62,7 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
 
             case "unregister-cc-widget":
                 // TODO
+                this.unregisterCCWidget(e.id, e.channel, e.cc)
                 this.send({
                     type: "unregister-cc-callback",
                     oldId: e.id
@@ -65,55 +71,101 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
         }
     }
 
-    registerNoteWidget(channel: number, note: number, value: number): string {
-        const id = uuid();
-        const n = this.notes.get(channel);
-        if (!n?.has(note)) {
-            n?.set(note, []);
+    initialize(channel_count: number) {
+        console.log("initializing eventbus with " + channel_count + " channels each")
+        for (let ch = 0; ch < channel_count; ch++) {
+            const cc_channel = new Map<number, [WidgetId]>();//Array<CCCallback>>();
+            this.cc.set(ch + 1, cc_channel);   //index + 1 for convenience
         }
 
-        const nn = n?.get(note);
-        nn?.push(id);
+        for (let ch = 0; ch < channel_count; ch++) {
+            const note_channel = new Map<number, [WidgetId]>();//Array<NoteCallback>>();
+            this.notes.set(ch + 1, note_channel);   //index + 1 for convenience
+        }
+    }
 
-        this.send({
+    registerNoteWidget(id: string, channel: number, note: number, value: number): string {
+        const n = this.notes.get(channel)!;
+        if (!n.has(note)) {
+            n.set(note, []);
+        }
+
+        const nn = n.get(note)!;
+        nn.push(id);
+
+        /*this.send({
             type: "note-update",
             consumerId: id,
             velocity: 0,
             note,
             on: false
-        })
+        })*/
 
         return id;
     }
 
-    registerCCWidget(channel: number, cc_number: number, init?: number): string {
-        const id = uuid();
+    unregisterCCWidget(id: string, channel: number, cc: number) {
+        const ccch = this.cc.get(channel)!;
 
-        const cc = this.cc.get(channel);
-        if (!cc?.has(cc_number)) {
-            cc?.set(cc_number, []);
+        if (!ccch.has(cc)) {
+            return
         }
-        const c = cc?.get(cc_number);
-        c?.push(id);
+
+        console.log("unregistering " + id + "  cc widget ", cc, " on channel ", channel);
+        const ccmap = ccch.get(cc)!;
+
+        const index = ccmap.findIndex((v, i) => {
+            return v == id
+        })
+
+        // send unregister message
+        //sendUnregisterCCCallback(id)
+
+        return ccmap.splice(index, 1);
+    }
+
+    unregisterNoteWidget(id: string, channel: number, note: number) {
+        const notech = this.notes.get(channel)!;
+
+        if (!notech.has(note)) {
+            return
+        }
+
+        console.log("unregistering " + id + " midi ", note, " on channel ", channel);
+        const notemap = notech.get(note)!;
+        const index = notemap.findIndex((v, i) => {
+            return v == id
+        })
+        // send unregister message
+        //sendUnregisterNoteCallback(id);
+
+        return notemap.splice(index, 1);
+    }
+
+    registerCCWidget(id: string, channel: number, cc_number: number, init?: number) {
+        const cc = this.cc.get(channel)!;
+        if (!cc.has(cc_number)) {
+            cc.set(cc_number, []);
+        }
+        const c = cc.get(cc_number)!;
+        c.push(id);
 
         // send init
-        this.send({
+        /*this.send({
             type: "cc-update",
             consumerId: id,
             //channel,
             //cc: cc_number,
             value: (init ?? 0)
-        })
-
-        return id
+        })*/
     }
 
     updateCC(channel: number, cc_number: number, value: number) {
-        const cc = this.cc.get(channel);
+        const cc = this.cc.get(channel)!;
 
-        if (!cc?.has(cc_number)) return;
+        if (!cc.has(cc_number)) return;
 
-        for (const consumerId of (cc.get(cc_number)!)) {
+        for (const consumerId of cc.get(cc_number)!) {
             this.send({
                 type: "cc-update",
                 consumerId,

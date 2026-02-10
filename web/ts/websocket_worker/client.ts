@@ -4,7 +4,7 @@ import { WebsocketWorkerEvent } from "./events";
 
 export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent, WebsocketWorkerEvent> {
     connected = false;
-    public connectionStateEventTrigger = new EventTarget();
+    public events = new EventTarget();
 
     constructor() {
         super(new URL("worker.ts", import.meta.url));
@@ -35,11 +35,11 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
     }
 
     private sendConnectedEvent() {
-        this.connectionStateEventTrigger.dispatchEvent(new CustomEvent("connect"))
+        this.events.dispatchEvent(new CustomEvent("connect"))
     }
 
     private sendDisconnectedEvent() {
-        this.connectionStateEventTrigger.dispatchEvent(new CustomEvent("disconnect"))
+        this.events.dispatchEvent(new CustomEvent("disconnect"))
     }
 
     sendMidiData(payload: MidiMessage) {

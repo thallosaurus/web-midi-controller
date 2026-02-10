@@ -1,3 +1,4 @@
+import { uuid } from "@common/utils";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { EventBusWorkerConsumerEvent, EventBusWorkerProducerEvent } from "./events";
 
@@ -82,20 +83,26 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
         })
     }
 
-    registerCC(channel: number, cc: number, init?: number): Promise<string> {
+    registerCC(channel: number, cc: number, init: number, target: EventBusConsumer): Promise<string> {
+        let id = uuid();
         return new Promise((res, rej) => {
 
             const fn = (ev: MessageEvent<EventBusWorkerProducerEvent>) => {
                 switch (ev.data.type) {
                     case "register-cc-callback":
-                        this.worker.removeEventListener("message", fn);
-                        res(ev.data.consumerId)
+                        if (ev.data.consumerId == id) {
+
+                            this.callbacks.set(ev.data.consumerId, target)
+                            res(ev.data.consumerId)
+                            this.worker.removeEventListener("message", fn);
+                        }
                         break;
                 }
             }
             this.worker.addEventListener("message", fn);
             this.send({
                 type: "register-cc-widget",
+                id,
                 channel,
                 cc,
                 init
@@ -104,12 +111,16 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
     }
 
     registerNote(channel: number, note: number, target: EventBusConsumer): Promise<string> {
+        const id = uuid();
         return new Promise((res, rej) => {
             const fn = (ev: MessageEvent<EventBusWorkerProducerEvent>) => {
                 switch (ev.data.type) {
                     case "register-note-callback":
-                        this.worker.removeEventListener("message", fn);
-                        res(ev.data.consumerId);
+                        if (ev.data.consumerId == id) {
+                            this.worker.removeEventListener("message", fn);
+                            this.callbacks.set(ev.data.consumerId, target)
+                            res(ev.data.consumerId);
+                        }
                         break;
                 }
             }
@@ -117,6 +128,7 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
             
             this.send({
                 type: "register-note-widget",
+                id,
                 channel,
                 note
             })
@@ -160,6 +172,24 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
                 id, channel,
                 note
             })
+        })
+    }
+
+    updateCC(channel: number, cc: number, value: number) {
+        this.send({
+            type: "update-cc-value",
+            channel,
+            cc,
+            value
+        })
+    }
+
+    updateNote(channel: number, note: number, velocity: number) {
+        this.send({
+            type: "update-note-value",
+            channel,
+            note,
+            value: velocity
         })
     }
 }

@@ -19,8 +19,8 @@ export class App {
 
     connected: boolean = false
 
-    socket = new WebsocketWorkerClient();
-    eventbus = new EventbusWorkerClient();
+    static socket = new WebsocketWorkerClient();
+    static eventbus = new EventbusWorkerClient();
 
     appEvents = new EventTarget();
 
@@ -31,20 +31,20 @@ export class App {
         setup_logger("frontend");
         const f = resolveFeatures();
 
-        this.socket.connectionStateEventTrigger.addEventListener("connect", () => {
+        App.socket.events.addEventListener("connect", () => {
             this.app_elem.classList.remove("disconnected");
             
             //this.fetchOverlays(msg.overlay_path);
         })
         
-        this.socket.connectionStateEventTrigger.addEventListener("disconnect", () => {
+        App.socket.events.addEventListener("disconnect", () => {
             this.app_elem.classList.add("disconnected");
             clear_loaded_overlays();
             clear_overlay_selector();
         })
 
         if (hasFeature(f, "default")) {
-        this.socket.connectToProdEndpoint("localhost", 8000).then(overlayPath => {
+        App.socket.connectToProdEndpoint("localhost", 8000).then(overlayPath => {
             console.log("getting", overlayPath);
             this.fetchOverlays(overlayPath);
         });
@@ -78,7 +78,7 @@ export class App {
     }*/
     async initDefaultBackend(): Promise<string> {
         //let socket = initWebsocketWorker();
-        return await this.socket.connectToProdEndpoint("localhost", 8000);
+        return await App.socket.connectToProdEndpoint("localhost", 8000);
 
         //let eventbus = await initEventBusWorker();
     }
@@ -161,7 +161,6 @@ export class App {
     }*/
 
     fetchOverlays(path: string) {
-        debugger
         fetch(path)
             .then(ol => ol.json())
             .then(ol => load_overlays_from_array(ol))
@@ -169,27 +168,6 @@ export class App {
                 setup_overlay_selector(ol);
                 change_overlay(0)
             })
-    }
-
-    private initWebsocketUIChanges() {
-        const fn = (ev: MessageEvent<any>) => {
-            switch (msg.type) {
-                case SocketWorkerResponse.Disconnected:
-                    this.app_elem.classList.add("disconnected");
-                    clear_loaded_overlays();
-                    clear_overlay_selector();
-                    break;
-
-                case SocketWorkerResponse.Connected:
-                    this.app_elem.classList.remove("disconnected");
-
-                    this.fetchOverlays(msg.overlay_path);
-                    break;
-            }
-        }
-        this.socket.addEventListener("message", fn);
-
-        //this.initSocketConnectionTrigger(h)
     }
 
     initUi(_: AppWorkerHandler) {

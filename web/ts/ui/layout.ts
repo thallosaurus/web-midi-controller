@@ -5,6 +5,7 @@ import { LoadedWidget } from "./overlay";
 
 import './css/shiftarea.css';
 import { EventBusConsumer, registerNoteConsumer } from "@eventbus/client";
+import { App } from "../../app_state";
 
 class Layout<Prop extends WidgetProperties, State> extends WidgetLifecycle<Prop, State> {
     constructor(state: State, options: Prop) {
@@ -97,7 +98,7 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
             children.push(ww);
         }
         this.container.appendChild(panel_b);
-        registerNoteConsumer(this.prop.channel, this.prop.note, this).then(id => {
+        App.eventbus.registerNote(this.prop.channel, this.prop.note, this).then(id => {
             this.consumerId = id
         })
         this.updateUi();

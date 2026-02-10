@@ -258,7 +258,6 @@ export class LoadedOverlay {
                         }
                         
                         if (k == "pointercancel") {
-                            
                             o.html.addEventListener("pointercancel", h);
                         }
                     })

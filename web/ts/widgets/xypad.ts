@@ -3,6 +3,7 @@ import type { XYPadProperties } from "@bindings/Widget";
 import { vibrate } from "@common/ui_utils";
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 import { EventBusConsumer, registerCCConsumer, registerNoteConsumer, sendUpdateCCValue, sendUpdateNoteValue, unregisterCCConsumer, unregisterNoteConsumer } from "@eventbus/client";
+import { App } from "../../app_state";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
@@ -151,15 +152,15 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         }
 
         // register axises as cc values
-        registerCCConsumer(this.x.prop.channel, this.x.prop.x.cc, null, this.x).then(id => {
+        App.eventbus.registerCC(this.x.prop.channel, this.x.prop.x.cc, 0, this.x).then(id => {
             this.x.consumerId = id
         })
-        registerCCConsumer(this.y.prop.channel, this.y.prop.y.cc, null, this.y).then(id => {
+        App.eventbus.registerCC(this.y.prop.channel, this.y.prop.y.cc, 0, this.y).then(id => {
             this.y.consumerId = id;
         })
 
         if (this.prop.note) {
-            registerNoteConsumer(this.prop.channel, this.prop.note, this).then(id=> {
+            App.eventbus.registerNote(this.prop.channel, this.prop.note, this).then(id=> {
                 this.consumerId = id;
             });
         }
@@ -177,10 +178,11 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         
     }
     unload(options: XYPadProperties, html: HTMLDivElement): boolean {
-        unregisterCCConsumer(this.x.prop.channel, this.x.prop.x.cc, this.x);
-        unregisterCCConsumer(this.y.prop.channel, this.y.prop.y.cc, this.y);
+
+        App.eventbus.unregisterCC(this.consumerId!, this.x.prop.channel, this.x.prop.x.cc);
+        App.eventbus.unregisterCC(this.consumerId!, this.y.prop.channel, this.y.prop.y.cc);
         if (this.prop.note) {
-            unregisterNoteConsumer(this.prop.channel, this.prop.note, this);
+            App.eventbus.unregisterCC(this.consumerId!, this.prop.channel, this.prop.note);
         }
         
         this.target.removeEventListener("pointerdown", this.handlers.pointerdown);
