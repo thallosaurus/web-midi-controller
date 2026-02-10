@@ -1,12 +1,17 @@
+import { MidiMessage } from "server-ts/messages";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { WebsocketWorkerEvent } from "./events";
 
-export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent> {
+export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent, WebsocketWorkerEvent> {
+    processWorkerClientMessage(msg: WebsocketWorkerEvent): void {
+        //throw new Error("Method not implemented.");
+        console.log(msg);
+    }
     constructor() {
         super(new URL("worker.js", import.meta.url));
     }
 
-    sendMidiData(payload: any) {
+    sendMidiData(payload: MidiMessage) {
         this.send({
             type: "data",
             payload

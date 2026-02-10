@@ -1,4 +1,5 @@
 import { MidiMessage } from "@driver";
+export { type MidiMessage };
 
 export type WebsocketServerMessage = 
 | { type: "connection-information", connectionId: string, overlayPath: string } 

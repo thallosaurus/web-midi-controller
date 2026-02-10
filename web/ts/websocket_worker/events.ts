@@ -1,4 +1,5 @@
 import { CoreWorkerMessage } from "../coreworker/worker";
+import { MidiMessage } from "server-ts/messages";
 
 export type WebsocketWorkerEvent =
     | CoreWorkerMessage
@@ -8,4 +9,4 @@ export type WebsocketWorkerEvent =
     | { type: "disconnect" }
     | { type: "disconnect-successful" }
     | { type: "disconnect-failed" }
-    | { type: "data", payload: any }
+    | { type: "data", payload: MidiMessage }

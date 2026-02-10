@@ -9,28 +9,32 @@ import { AppEvents } from './app_events.ts'
 import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts';
 
 import { WebsocketWorkerClient } from "./ts/websocket_worker/client.ts"
+import { EventbusWorkerClient } from "./ts/eventbus_worker/client.ts"
 
 //const init_ui = () => {
 
 export interface AppWorkerHandler {
 
     // where the websocket gets mounted on app runtime
-    socket: WebsocketWorkerClient | null,
+    //socket: WebsocketWorkerClient | null,
 
     // where the eventbus gets mounted on runtime
-    eventbus: Worker | null
+    //eventbus: Worker | null
 }
 
 export class App {
     handlers: AppWorkerHandler = {
-        socket: null,
-        eventbus: null
+        //socket: null,
+        //eventbus: null
     }
 
     // Event Target that fires when something happens
     //emitter: AppEvents = new AppEvents();
 
     connected: boolean = false
+
+    socket = new WebsocketWorkerClient();
+    eventbus = new EventbusWorkerClient();
 
     /**
      * start of app lifecycle
@@ -40,7 +44,8 @@ export class App {
         const f = resolveFeatures();
 
         if (hasFeature(f, "default")) {
-            this.initDefaultBackend().then((handlers) => {
+            console.log(this);
+            this.initDefaultBackend()/* .then((handlers) => {
                 this.handlers = handlers
                 console.log("were handlers set?", handlers);
 
@@ -53,11 +58,12 @@ export class App {
                     //connectSocketMessage(handlers.socket!, autoconnectHost);
                 }
             });
+            */
         } else {
             alert("file frontend not implemented yet")
         }
 
-        this.initUi(this.handlers);
+        //this.initUi(this.handlers);
         debug("init done", this);
     }
     /*connectToServer(h: AppWorkerHandler) {
@@ -65,18 +71,16 @@ export class App {
 
         connectSocketMessage(h.socket!, wsUri);
     }*/
-    async initDefaultBackend(): Promise<AppWorkerHandler> {
+    initDefaultBackend() {
         //let socket = initWebsocketWorker();
-        let socket = new WebsocketWorkerClient();
-        socket.connectToProdEndpoint("localhost", 8000).then((info) => {
+        this.eventbus.init();
+        this.socket.connectToProdEndpoint("localhost", 8000).then((info) => {
             console.log("socket connected", info)
         })
 
-        let eventbus = await initEventBusWorker();
-
-        return { eventbus, socket }
+        //let eventbus = await initEventBusWorker();
     }
-    static defaultWorkerHandler(h: AppWorkerHandler) {
+    /*static defaultWorkerHandler(h: AppWorkerHandler) {
         h.eventbus!.addEventListener("message", (ev) => {
             const m: EventBusProducerMessage = JSON.parse(ev.data);
 
@@ -127,7 +131,7 @@ export class App {
         })
 
         // websocket handler got a message
-        h.socket!.addEventListener("message", (ev) => {
+        this.socket.addEventListener("message", (ev) => {
             const msg: SocketWorkerResponseType = JSON.parse(ev.data);
 
             switch (msg.type) {
@@ -152,7 +156,7 @@ export class App {
             }
         });
 
-    }
+    }*/
 
     fetchOverlays(path: string) {
         fetch(path)

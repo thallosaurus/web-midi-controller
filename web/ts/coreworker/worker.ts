@@ -3,35 +3,54 @@ export type CoreWorkerMessage = { type: "terminate" }
 /**
  * The worker side of the worker. gets instantiated in the called script
  */
-export abstract class CoreWorker<Msg> {
-    gthis: typeof globalThis
-    constructor(s: typeof globalThis) {
-        this.gthis = s;
-        s.addEventListener("message", (msg) => {
-            switch(msg.data.type) {
+export abstract class CoreWorker<InMsg, OutMsg> {
+    //gthis: typeof globalThis
+    constructor() {
+        //this.gthis = s;
+        self.addEventListener("message", (msg) => {
+            switch (msg.data.type) {
                 case "terminate":
                     console.log("terminating worker");
+                    self.close();
                     break;
                 default:
-                    this.processWorkerInputMessage.bind(this)(msg.data);
+                    this.processWorkerInputMessage(msg.data);
             }
         });
     }
 
-    send(msg: Msg) {
-        this.gthis.postMessage(msg);
+    send(msg: OutMsg) {
+        self.postMessage(msg);
     }
 
-    abstract processWorkerInputMessage(e: Msg): void
+    abstract processWorkerInputMessage(e: InMsg): void
 }
 
-export abstract class CoreWorkerClient<Msg> {
+export abstract class CoreWorkerClient<InMsg, OutMsg> {
     worker: Worker
     constructor(url: URL) {
         this.worker = new Worker(url, { type: "module" });
+        this.worker.addEventListener("message", (ev) => {
+            switch (ev.data.type) {
+                case "terminate":
+                    // worker sent "terminate" - UB for now
+                    break;
+                default:
+                    this.processWorkerClientMessage(ev.data);
+                    break;
+            }
+        })
     }
-    send(msg: Msg) {
+    send(msg: OutMsg) {
         this.worker.postMessage(msg);
+    }
+
+    abstract processWorkerClientMessage(msg: InMsg): void;
+
+    terminate() {
+        this.send({
+            type: "terminate",
+        } as any)
     }
 }
 

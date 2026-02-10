@@ -2,11 +2,11 @@ import { WebsocketServerMessage } from "../../../server-ts/messages";
 import { CoreWorker } from "../coreworker/worker";
 import { WebsocketWorkerEvent } from "./events";
 
-class WebsocketWorker extends CoreWorker<WebsocketWorkerEvent> {
+class WebsocketWorker extends CoreWorker<WebsocketWorkerEvent, WebsocketWorkerEvent> {
     socket: WebSocket | null = null
     clientId: string | null = null
     constructor() {
-        super(self);
+        super();
     }
 
     socketMessageHandler(e: WebSocket) {
