@@ -20,7 +20,7 @@ class WebsocketWorker extends CoreWorker<WebsocketWorkerEvent, WebsocketWorkerEv
                         overlayPath: data.overlayPath
                     })
                     break;
-                case "midi-event":
+                case "midi-data":
                     console.log("got midi event", data);
                     this.send({
                         type: "data",
