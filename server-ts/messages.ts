@@ -3,7 +3,7 @@ export { type MidiMessage };
 
 export type WebsocketServerMessage = 
 | { type: "connection-information", connectionId: string, overlayPath: string } 
-| { type: "midi-event", data: MidiMessage }
+| { type: "midi-data", data: MidiMessage }
 
 export function createWebsocketConnectionInfoPayload(): any {
     return {
@@ -15,7 +15,7 @@ export function createWebsocketConnectionInfoPayload(): any {
 
 export function createMidiEventPayload(data: MidiMessage): WebsocketServerMessage {
     return {
-        type: "midi-event",
+        type: "midi-data",
         data
     }
 }

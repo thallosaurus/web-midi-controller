@@ -43,7 +43,7 @@ class MidiState {
 
 
 
-class WebsocketApplication {
+export class WebsocketApplication {
   app = new Hono<{ Variables: WSState }>();
   static driver = new MidiDriver();
   static state = new MidiState();
@@ -81,12 +81,13 @@ class WebsocketApplication {
 
     WebsocketApplication.driver.emitter.addEventListener("data", (ev) => {
       const evt = ev as CustomEvent;
-      console.log(evt.detail);
 
       const midiEvent = createMidiEventPayload(evt.detail);
 
+      console.log("midi event", midiEvent)
+
       switch (midiEvent.type) {
-        case "midi-event":
+        case "midi-data":
           if (WebsocketApplication.state.mutate(midiEvent.data)) {
             WebsocketEventHandler.broadcast(midiEvent, [])
           } else {

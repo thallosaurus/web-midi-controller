@@ -1,3 +1,4 @@
+import { MidiMessage } from "server-ts/messages";
 import { CoreWorkerMessage } from "../coreworker/worker";
 //import { MidiMessage } from "server-ts/messages";
 
@@ -19,9 +20,10 @@ export type EventBusWorkerConsumerEvent =
 
 export type EventBusWorkerProducerEvent =
     | { type: "init-callback" }
-    | { type: "cc-update", consumerId: string, value: number }
-    | { type: "note-update", consumerId: string, note: number, velocity: number, on: boolean }
+    | { type: "cc-update", consumerId: string, channel: number, cc: number, value: number }
+    | { type: "note-update", consumerId: string, channel: number, note: number, velocity: number, on: boolean }
     | { type: "register-cc-callback", consumerId: string }
     | { type: "register-note-callback", consumerId: string }
     | { type: "unregister-cc-callback", oldId: string }
     | { type: "unregister-note-callback", oldId: string }
+    | { type: "midi-data", data: MidiMessage }

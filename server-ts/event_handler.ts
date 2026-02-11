@@ -1,6 +1,7 @@
 import { WSContext, WSEvents, WSMessageReceive } from "@hono/hono/ws";
 import { Context } from "@hono/hono";
 import { createWebsocketConnectionInfoPayload, WebsocketServerMessage } from "./messages.ts";
+import { WebsocketApplication } from "./main.ts";
 
 export type WSState = {
   clientId: string
@@ -36,19 +37,17 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
     
     try {
       const json: WebsocketServerMessage = JSON.parse(evt.data.toString());
-      console.log("message", json);
       const own_id = this.ctx.get("clientId");
       switch (processWebsocketMessage(json)) {
         case WebsocketMessageDecision.Broadcast:
-          /*
-          if (json.type == WebsocketEvent.MidiEvent) {
-            WebsocketApplication.driver.sendMidi(json.data);
+          console.log("broadcast", json);
+          switch (json.type) {
+            case "midi-data":
+              WebsocketApplication.driver.sendMidi(json.data);
+            break;
           }
-          WebsocketEventHandler.broadcast(json, [own_id]);
           break;
-          */
 
-        // send message back (for acks or something)
         case WebsocketMessageDecision.Disconnect:
           WebsocketEventHandler.direct(json, own_id);
           ws.close();
@@ -82,11 +81,11 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
  * @returns 
  */
 function processWebsocketMessage(msg: WebsocketServerMessage): WebsocketMessageDecision {
-  console.log(msg);
+  console.log("mididata", msg);
   switch (msg.type) {
     case "connection-information":
       throw new Error("client cant send connection information");
-    case "midi-event":
+    case "midi-data":
       return WebsocketMessageDecision.Broadcast
   }
 }

@@ -10,7 +10,7 @@ import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts'
 
 import { WebsocketWorkerClient } from "./ts/websocket_worker/client.ts"
 import { EventbusWorkerClient } from "./ts/eventbus_worker/client.ts"
-import { MidiMessage } from 'server-ts/messages.ts';
+import { type MidiMessage } from 'server-ts/messages.ts';
 
 //const init_ui = () => {
 
@@ -23,8 +23,6 @@ export class App {
     static socket = new WebsocketWorkerClient();
     static eventbus = new EventbusWorkerClient();
 
-    appEvents = new EventTarget();
-
     /**
      * start of app lifecycle
      */
@@ -34,10 +32,10 @@ export class App {
 
         App.socket.events.addEventListener("connect", () => {
             this.app_elem.classList.remove("disconnected");
-            
+
             //this.fetchOverlays(msg.overlay_path);
         })
-        
+
         App.socket.events.addEventListener("disconnect", () => {
             this.app_elem.classList.add("disconnected");
             clear_loaded_overlays();
@@ -45,15 +43,28 @@ export class App {
         })
 
         if (hasFeature(f, "default")) {
-        App.socket.connectToProdEndpoint("localhost", 8000).then(overlayPath => {
-            console.log("getting", overlayPath);
-            this.fetchOverlays(overlayPath);
-        });
+            App.socket.connectToProdEndpoint("localhost", 8000).then(overlayPath => {
+                console.log("getting", overlayPath);
+                this.fetchOverlays(overlayPath);
+            });
 
-        App.socket.events.addEventListener("data", (ev) => {
-            const payload = (ev as CustomEvent).detail as MidiMessage;
-            console.log(payload);
-        })
+            App.socket.events.addEventListener("data", (ev) => {
+                const payload = (ev as CustomEvent).detail as MidiMessage;
+                switch (payload.type) {
+                    case "NoteOn":
+                    case "NoteOff":
+                        App.eventbus.updateNote(payload.channel, payload.note, payload.velocity);
+                        break;
+                }
+            })
+
+            App.eventbus.events.addEventListener("data", (ev) => {
+                //console.log(ev.detail)
+                App.socket.sendMidiData((ev as CustomEvent).detail)
+            })
+
+            UiDialog.initDialogs();
+            UiDialog.initDialogTriggers();
 
 
             /* .then((handlers) => {
@@ -178,8 +189,7 @@ export class App {
 
     initUi(_: AppWorkerHandler) {
         //init_dialogs();
-        UiDialog.initDialogs();
-        UiDialog.initDialogTriggers();
+
     }
 
     private initSocketConnectionTrigger(h: AppWorkerHandler) {

@@ -20,6 +20,7 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
     constructor() {
         super();
     }
+
     processWorkerInputMessage(e: EventBusWorkerConsumerEvent): void {
         switch (e.type) {
             case "init":
@@ -33,7 +34,7 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
                 this.updateCC(e.channel, e.cc, e.value);
                 break;
             case "update-note-value":
-
+                this.updateNote(e.channel, e.note, e.value);
                 break;
             case "register-cc-widget":
                 {
@@ -169,8 +170,65 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
             this.send({
                 type: "cc-update",
                 consumerId,
-                value
+                value,
+                cc: cc_number,
+                channel
             })
+
+            // update socket driver value
+            this.send({
+                type: "midi-data",
+                data: {
+                    type: "ControlChange",
+                    channel,
+                    cc: cc_number,
+                    value
+                }
+            })
+        }
+    }
+
+    updateNote(channel: number, note: number, velocity: number) {
+        const ch = this.notes.get(channel)!;
+
+        if (!ch.has(note)) return;
+
+        for (const id of ch.get(note)!) {
+            //send update
+            //cb(velocity)
+            this.send({
+                type: "note-update",
+                consumerId: id,
+                channel,
+                note,
+                velocity,
+                on: velocity > 0
+            })
+
+            if (velocity > 0) {
+
+                this.send({
+                    type: "midi-data",
+                    data: {
+                        type: "NoteOn",
+                        channel,
+                        note,
+                        velocity
+                    }
+                })
+            } else {
+                this.send({
+                    type: "midi-data",
+                    data: {
+                        type: "NoteOff",
+                        channel,
+                        note,
+                        velocity
+                    }
+                })
+
+            }
+            //sendUpdateNoteWidget(id, channel, note, velocity, ext)
         }
     }
 }

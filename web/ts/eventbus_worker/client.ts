@@ -1,6 +1,7 @@
 import { uuid } from "@common/utils";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { EventBusWorkerConsumerEvent, EventBusWorkerProducerEvent } from "./events";
+import { MidiMessage } from "server-ts/messages";
 
 /**
  * The class a widget or whatever should implement when it wants to listen to the eventbus
@@ -25,12 +26,28 @@ export interface EventBusConsumer {
 export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProducerEvent, EventBusWorkerConsumerEvent> {
     callbacks = new Map<string, EventBusConsumer>();
 
+    events = new EventTarget();
+
+    private sendMidiEvent(msg: MidiMessage) {
+        this.events.dispatchEvent(new CustomEvent("data", {
+            detail: msg
+        }))
+    }
+
     override processWorkerClientMessage(msg: EventBusWorkerProducerEvent): void {
         switch (msg.type) {
+            case "midi-data":
+                this.sendMidiEvent(msg);
+            break;
             case "cc-update":
                 {
                     let cb = this.callbacks.get(msg.consumerId)!;
                     cb.updateValue(msg.value);
+                /*         this.events.dispatchEvent(new CustomEvent("ccdata", {
+                        detail: {
+                            ...msg
+                        }
+                    })) */
                 }
                 break;
 
@@ -125,7 +142,7 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
                 }
             }
             this.worker.addEventListener("message", fn);
-            
+
             this.send({
                 type: "register-note-widget",
                 id,
@@ -162,7 +179,7 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
                     case "register-note-callback":
                         this.worker.removeEventListener("message", fn);
                         res();
-                    break;
+                        break;
                 }
             }
 
@@ -191,5 +208,7 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
             note,
             value: velocity
         })
+
+        //this.events.dispatchEvent(new CustomEvent("notedata", { detail: }))
     }
 }

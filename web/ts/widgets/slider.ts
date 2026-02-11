@@ -208,7 +208,10 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
             );*/
 
         
-        App.eventbus.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this);
+        App.eventbus.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this)
+        .then(id => {
+            this.consumerId = id;
+        })
         //registerCCConsumer(this.prop.channel, this.prop.cc, null, this);
 
         
