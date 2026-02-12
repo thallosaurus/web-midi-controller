@@ -9,7 +9,6 @@ import { parse } from "@toml";
 import { WebsocketEventHandler, WSState } from "./event_handler.ts";
 import { MidiState } from "./state.ts";
 
-
 export class WebsocketApplication {
   app = new Hono<{ Variables: WSState }>();
   static driver = new MidiDriver();
@@ -46,6 +45,7 @@ export class WebsocketApplication {
       return c.text("hello world")
     })
 
+    // we got a message from the MIDI Driver
     WebsocketApplication.driver.emitter.addEventListener("data", (ev) => {
       const evt = ev as CustomEvent;
 

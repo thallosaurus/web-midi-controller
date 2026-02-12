@@ -60,9 +60,6 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
     load(options: RotarySliderProperties, html: HTMLDivElement) {
         const sensitivity = 0.5;    // px -> value
 
-
-
-
         //console.log(dial);
 
         const touch_start = (e: PointerEvent) => {
