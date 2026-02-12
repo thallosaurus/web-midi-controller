@@ -2,6 +2,7 @@ import { EventBusConsumer, JogDirection, sendUpdateJogValue } from "@eventbus/cl
 import type { JogwheelProperties } from "@bindings/Widget"
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle"
 import "./css/jogwheel.css"
+import { App } from "../../app_state"
 
 export interface JogState {
     active: boolean
@@ -33,21 +34,12 @@ export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogSt
 
         if (abs < 0.002) return; // deadzone
 
-        /*if (abs < 0.01) {
-            // Feines Scrubbing
-            console.log("slow", v);
-            //process_internal({ type: "jog", mode: "scrub", delta: v });
-        } else {
-            // Schnelles Seek
-            //process_internal({ type: "jog", mode: "seek", delta: v * 1000 });
-            console.log("fast", v);
-        }*/
         if (v > 0) {
             //process_internal(new JogEvent(s.channel, s.cc, JogDirection.Forward))
-            sendUpdateJogValue(this.prop.channel, this.prop.cc, JogDirection.Forward)
+            App.eventbus.updateCC(this.prop.channel, this.prop.cc, JogDirection.Forward)
         } else {
             //process_internal(new JogEvent(s.channel, s.cc, JogDirection.Backward))
-            sendUpdateJogValue(this.prop.channel, this.prop.cc, JogDirection.Backward)
+            App.eventbus.updateCC(this.prop.channel, this.prop.cc, JogDirection.Backward)
         }
     }
 
@@ -89,6 +81,8 @@ export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogSt
         this.handlers.pointermove = touch_move;
         this.handlers.pointerup = touch_stop;
         this.handlers.pointercancel = touch_stop;
+
+        App.eventbus.registerCC(this.prop.channel, this.prop.cc, 64, this);
 
         return true
     }
