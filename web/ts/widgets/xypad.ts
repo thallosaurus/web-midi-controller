@@ -37,12 +37,12 @@ class Axis implements EventBusConsumer {
             switch (this.direction) {
                 case AxisDirection.X:
                     this.touchHandle.style.setProperty("--xpos", String(vv));
-                    sendUpdateCCValue(this.prop.channel, this.prop.x.cc, vv)
+                    App.eventbus.updateCC(this.prop.channel, this.prop.x.cc, vv)
                     break;
 
                 case AxisDirection.Y:
                     this.touchHandle.style.setProperty("--ypos", String(vv));
-                    sendUpdateCCValue(this.prop.channel, this.prop.y.cc, vv);
+                    App.eventbus.updateCC(this.prop.channel, this.prop.y.cc, vv);
                     break;
             }
         }
@@ -195,7 +195,7 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
     }
     sendValue(v: number): void {
         if (this.prop.note) {
-            sendUpdateNoteValue(this.prop.channel, this.prop.note, v, v > 0, false)
+            App.eventbus.updateNote(this.prop.channel, this.prop.note, v)
         }
     }
     consumerId: string | null = null;

@@ -54,7 +54,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
     }
 
     sendValue(v: number) {
-        sendUpdateCCValue(this.prop.channel, this.prop.cc, v)
+        App.eventbus.updateCC(this.prop.channel, this.prop.cc, v)
     }
 
     load(options: RotarySliderProperties, html: HTMLDivElement) {
