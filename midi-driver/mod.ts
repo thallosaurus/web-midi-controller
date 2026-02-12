@@ -4,7 +4,7 @@ export type { CCPayload, MidiMessage, MidiPayload, NotePayload } from "./binding
 
 function getDefaultLibraryPath() {
   const path = {
-    windows: "../target/" + BUILD_TYPE + "/libmidi_driver.dll",
+    windows: "../target/" + BUILD_TYPE + "/midi_driver.dll",
     linux: "../target/" + BUILD_TYPE + "/libmidi_driver.so",
     darwin: "../target/" + BUILD_TYPE + "/libmidi_driver.dylib",
     aix: null,
