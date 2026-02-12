@@ -23,6 +23,10 @@ jobs:
           node-version: 24
           cache-dependency-path: web/yarn.lock
 
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.4.0
+
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           rustflags: ""
@@ -40,6 +44,9 @@ jobs:
       - name: Build Web UI
         working-directory: ./web
         run: yarn && yarn build
+
+      - name: Build MIDI Driver
+        run: cargo build -p midi-driver
 
       - name: Build executable
         run: cargo build --release
