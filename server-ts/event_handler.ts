@@ -1,7 +1,8 @@
 import { WSContext, WSEvents, WSMessageReceive } from "@hono/hono/ws";
 import { Context } from "@hono/hono";
 import { createWebsocketConnectionInfoPayload, WebsocketServerMessage } from "./messages.ts";
-import { WebsocketApplication } from "./main.ts";
+import { ServerMain } from "./main.ts";
+import { CoreServerState } from "./state.ts";
 
 export type WSState = {
   clientId: string
@@ -15,8 +16,10 @@ enum WebsocketMessageDecision {
 export class WebsocketEventHandler implements WSEvents<WebSocket> {
   static clients: Map<string, WebSocket> = new Map();
   ctx: Context
-  constructor(c: Context<{ Variables: WSState }, any, {}>) {
+  state: CoreServerState
+  constructor(c: Context<{ Variables: WSState }, any, {}>, state: CoreServerState) {
     this.ctx = c;
+    this.state = state
   }
   onOpen(evt: Event, ws: WSContext<WebSocket>): void {
     const connInfo = createWebsocketConnectionInfoPayload();
@@ -34,26 +37,14 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
 
   }
   onMessage(evt: MessageEvent<WSMessageReceive>, ws: WSContext<WebSocket>): void {
-    
     try {
       const json: WebsocketServerMessage = JSON.parse(evt.data.toString());
       const own_id = this.ctx.get("clientId");
-      switch (processWebsocketMessage(json)) {
-        case WebsocketMessageDecision.Broadcast:
-          console.log("broadcast", json);
-          switch (json.type) {
-            case "midi-data":
-              WebsocketApplication.driver.sendMidi(json.data);
-            break;
-          }
-          break;
-
-        case WebsocketMessageDecision.Disconnect:
-          WebsocketEventHandler.direct(json, own_id);
-          ws.close();
+      switch (json.type) {
+        case "midi-data":
+          this.state.inputData(json.data, own_id);
           break;
       }
-
     } catch (e) {
       console.error(e);
       ws.send(String(e));
@@ -72,20 +63,5 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
   static direct(msg: WebsocketServerMessage, receiver: string) {
     const s = WebsocketEventHandler.clients.get(receiver);
     s?.send(JSON.stringify(msg));
-  }
-}
-
-/**
- * Decides what the server should do next
- * @param msg 
- * @returns 
- */
-function processWebsocketMessage(msg: WebsocketServerMessage): WebsocketMessageDecision {
-  console.log("mididata", msg);
-  switch (msg.type) {
-    case "connection-information":
-      throw new Error("client cant send connection information");
-    case "midi-data":
-      return WebsocketMessageDecision.Broadcast
   }
 }

@@ -1,10 +1,15 @@
 import { WebsocketEventHandler } from "./event_handler.ts";
 import { MidiMessage } from "./messages.ts";
 
-export class MidiState {
+export type CoreServerStateEvents =
+  { type: "note", payload: MidiMessage } | { type: "cc", payload: MidiMessage }
+
+export class CoreServerState {
   bank_select: number = 0
   bank_select_fine: number = 0
   program: number = 0
+
+  events: EventTarget = new EventTarget();
 
   get currentConnectionId() {
     const c = new Array(WebsocketEventHandler.clients.values());
@@ -13,20 +18,35 @@ export class MidiState {
     return Array.from(WebsocketEventHandler.clients.keys())[this.bank_select]
   }
 
-  mutate(msg: MidiMessage) {
+  private triggerEvent(detail: CoreServerStateEvents) {
+    this.events.dispatchEvent(new CustomEvent("data", { detail: { ...detail, type: "note" } }))
+  }
+
+  inputData(msg: MidiMessage, from = null) {
+
     switch (msg.type) {
       case "ControlChange":
         if (msg.cc === 0) {
           this.bank_select = msg.value;
-          return false
         } else if (msg.cc === 20) {
           this.bank_select_fine = msg.value;
-          return false
         }
-        return true
+        this.triggerEvent({
+          type: "cc",
+          payload: msg
+        })
+        break
       case "ProgramChange":
         this.program = msg.value;
-        return false
+        break;
+
+      case "NoteOff":
+      case "NoteOn":
+        this.triggerEvent({
+          type: "note",
+          payload: msg
+        })
+        break
 
       default:
         return true

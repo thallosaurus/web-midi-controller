@@ -7,36 +7,22 @@ import { cors } from '@hono/hono/cors'
 import { Overlay } from "@widgets"
 import { parse } from "@toml";
 import { WebsocketEventHandler, WSState } from "./event_handler.ts";
-import { MidiState } from "./state.ts";
+import { CoreServerState } from "./state.ts";
 
-export class WebsocketApplication {
+export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
-  static driver = new MidiDriver();
-  static state = new MidiState();
+  readonly driver = new MidiDriver();
+  readonly state = new CoreServerState();
 
   constructor() {
     this.app.get("/ws", upgradeWebSocket((c) => {
-      return new WebsocketEventHandler(c);
+      return new WebsocketEventHandler(c, this.state);
     }));
 
     this.app.use("/overlays", cors())
-
     this.app.get("/overlays", async (c) => {
-      const overlay_buffer = [];
-      for await (const dirEntry of Deno.readDir("../overlays")) {
-        if (dirEntry.isFile) {
-          const ext = dirEntry.name.split(".").pop();
-          if (ext == "toml") {
 
-            console.log(dirEntry);
-            const contents = await Deno.readTextFile("../overlays/" + dirEntry.name);
-            const data = parse(contents);
-            console.log(data);
-            overlay_buffer.push(data);
-          }
-        }
-      }
-      return c.json(overlay_buffer);
+      return c.json(await this.getOverlaysFromDisk());
       //let data = parse()
     })
 
@@ -45,8 +31,19 @@ export class WebsocketApplication {
       return c.text("hello world")
     })
 
+    this.state.events.addEventListener("data", (ev) => {
+      const evt = ev as CustomEvent;
+      const midiEvent = evt.detail;
+
+      console.log("state event", midiEvent);
+
+      // broadcast
+      WebsocketEventHandler.broadcast(midiEvent, []);
+      this.driver.sendMidi(midiEvent.payload!);
+    })
+
     // we got a message from the MIDI Driver
-    WebsocketApplication.driver.emitter.addEventListener("data", (ev) => {
+    this.driver.emitter.addEventListener("data", (ev) => {
       const evt = ev as CustomEvent;
 
       const midiEvent = createMidiEventPayload(evt.detail);
@@ -55,25 +52,8 @@ export class WebsocketApplication {
 
       switch (midiEvent.type) {
         case "midi-data":
-          if (WebsocketApplication.state.mutate(midiEvent.data)) {
-            WebsocketEventHandler.broadcast(midiEvent, [])
-          } else {
-            // process state here
-            const id = WebsocketApplication.state.currentConnectionId;
-            switch (midiEvent.data.type) {
-              case "NoteOn":
-              case "NoteOff":
-              case "ProgramChange":
-                if (id !== null) {
-                  const sock = WebsocketEventHandler.clients.get(id);
-                  sock?.send(JSON.stringify(midiEvent));
-                }
-                break;
-              case "ControlChange":
-              case "Unknown":
-            }
-            console.log("state mutation: ", WebsocketApplication.state);
-          }
+          this.state.inputData(midiEvent.data);
+          break
       }
     });
     Deno.serve(this.app.fetch);
@@ -85,11 +65,29 @@ export class WebsocketApplication {
       WebsocketEventHandler.clients.delete(id);
     }
 
-    WebsocketApplication.driver.close();
+    this.driver.close();
+  }
+
+  async getOverlaysFromDisk() {
+    const overlay_buffer = [];
+    for await (const dirEntry of Deno.readDir("../overlays")) {
+      if (dirEntry.isFile) {
+        const ext = dirEntry.name.split(".").pop();
+        if (ext == "toml") {
+
+          console.log(dirEntry);
+          const contents = await Deno.readTextFile("../overlays/" + dirEntry.name);
+          const data = parse(contents);
+          console.log(data);
+          overlay_buffer.push(data);
+        }
+      }
+    }
+    return overlay_buffer
   }
 }
 
-const app = new WebsocketApplication();
+const app = new ServerMain();
 
 Deno.addSignalListener('SIGINT', () => {
   console.log('Received SIGINT');
