@@ -1,4 +1,4 @@
-import { EventBusConsumer } from "@eventbus/client.ts"
+import { EventBusConsumer } from "ts/eventbus/client"
 import type { JogwheelProperties } from "@bindings/Widget"
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle"
 import "./css/jogwheel.css"

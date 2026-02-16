@@ -26,8 +26,8 @@ export default defineConfig({
       '@core': path.resolve(__dirname, 'ts/ui'),
       '@common': path.resolve(__dirname, 'ts/common'),
       '@widgets': path.resolve(__dirname, 'ts/widgets'),
-      '@eventbus': path.resolve(__dirname, 'ts/eventbus_worker'),
-      '@websocket': path.resolve(__dirname, 'ts/websocket_worker'),
+      '@eventbus': path.resolve(__dirname, 'ts/eventbus'),
+      '@websocket': path.resolve(__dirname, 'ts/websocket'),
       '@bindings': path.resolve(__dirname, 'bindings'),
     }
   },

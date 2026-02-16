@@ -1,15 +1,12 @@
 import { UiDialog } from './ts/ui/dialogs.ts'
 import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
-import { EventBusConsumerMessageType, initEventBusWorker, sendUpdateCCValue, sendUpdateExternalCCWidget, sendUpdateExternalNoteWidget, sendUpdateNoteValue } from "./ts/event_bus/client.ts";
 import { change_overlay, clear_loaded_overlays, load_overlays_from_array, process_program_change } from "./ts/ui/overlay.ts";
-import { EventBusProducerMessage, EventBusProducerMessageType } from "./ts/event_bus/message.ts";
 
 import { debug, setup_logger } from '@common/logger'
-import { AppEvents } from './app_events.ts'
 import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts';
 
-import { WebsocketWorkerClient } from "./ts/websocket_worker/client.ts"
-import { EventbusWorkerClient } from "./ts/eventbus_worker/client.ts"
+import { WebsocketWorkerClient } from "./ts/websocket/client.ts"
+import { EventbusWorkerClient } from "./ts/eventbus/client.ts"
 import { type MidiMessage } from 'server-ts/messages.ts';
 
 //const init_ui = () => {
@@ -65,22 +62,6 @@ export class App {
 
             UiDialog.initDialogs();
             UiDialog.initDialogTriggers();
-
-
-            /* .then((handlers) => {
-                this.handlers = handlers
-                console.log("were handlers set?", handlers);
-
-                //App.defaultWorkerHandler(this.handlers);
-                //this.initWebsocketUIChanges(this.handlers)
-                let autoconnectHost = getHostFromQuery();
-
-                if (autoconnectHost) {
-                    //autoconnect
-                    //connectSocketMessage(handlers.socket!, autoconnectHost);
-                }
-            });
-            */
         } else {
             alert("file frontend not implemented yet")
         }

@@ -2,7 +2,7 @@ import "./css/xypad.css"
 import type { XYPadProperties } from "@bindings/Widget";
 import { vibrate } from "@common/ui_utils";
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
-import { EventBusConsumer } from "@eventbus/client";
+import { EventBusConsumer } from "ts/eventbus/client";
 import { App } from "../../app_state";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
