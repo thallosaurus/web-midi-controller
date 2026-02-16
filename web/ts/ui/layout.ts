@@ -4,7 +4,7 @@ import { render_widget, WidgetProperties } from "./render";
 import { LoadedWidget } from "./overlay";
 
 import './css/shiftarea.css';
-import { EventBusConsumer, registerNoteConsumer } from "@eventbus/client";
+import { EventBusConsumer } from "@eventbus/client";
 import { App } from "../../app_state";
 
 class Layout<Prop extends WidgetProperties, State> extends WidgetLifecycle<Prop, State> {

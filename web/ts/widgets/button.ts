@@ -3,7 +3,7 @@ import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 
-import { sendUpdateNoteValue, unregisterNoteWidget, sendUpdateCCValue, EventBusConsumer, registerCCConsumer, unregisterCCConsumer, registerNoteConsumer } from "@eventbus/client";
+import { EventBusConsumer } from "@eventbus/client";
 import { App } from "../../app_state";
 
 
@@ -251,6 +251,6 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
     }
 
     sendValue(v: number): void {
-        sendUpdateCCValue(this.prop.channel, this.prop.cc, this.state.latch_on ? (this.prop.value ?? 127) : (this.prop.value_off ?? 0));
+        App.eventbus.updateCC(this.prop.channel, this.prop.cc, this.state.latch_on ? (this.prop.value ?? 127) : (this.prop.value_off ?? 0));
     }
 }

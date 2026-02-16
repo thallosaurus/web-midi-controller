@@ -187,17 +187,12 @@ export class App {
             })
     }
 
-    initUi(_: AppWorkerHandler) {
-        //init_dialogs();
-
-    }
-
-    private initSocketConnectionTrigger(h: AppWorkerHandler) {
+    private initSocketConnectionTrigger() {
 
         const connect_button = document.querySelector<HTMLDivElement>("#disconnect-fallback .container button.primary")!
         connect_button.addEventListener("click", (e) => {
             console.log("sending connect to socket message from button")
-            connectSocketMessage(h.socket!, location.hostname);
+            //connectSocketMessage(this, location.hostname);
         });
     }
 }

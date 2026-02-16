@@ -1,4 +1,4 @@
-import { EventBusConsumer, JogDirection, sendUpdateJogValue } from "@eventbus/client.ts"
+import { EventBusConsumer } from "@eventbus/client.ts"
 import type { JogwheelProperties } from "@bindings/Widget"
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle"
 import "./css/jogwheel.css"
@@ -36,10 +36,10 @@ export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogSt
 
         if (v > 0) {
             //process_internal(new JogEvent(s.channel, s.cc, JogDirection.Forward))
-            App.eventbus.updateCC(this.prop.channel, this.prop.cc, JogDirection.Forward)
+            App.eventbus.updateCC(this.prop.channel, this.prop.cc, 66)
         } else {
             //process_internal(new JogEvent(s.channel, s.cc, JogDirection.Backward))
-            App.eventbus.updateCC(this.prop.channel, this.prop.cc, JogDirection.Backward)
+            App.eventbus.updateCC(this.prop.channel, this.prop.cc, 64)
         }
     }
 

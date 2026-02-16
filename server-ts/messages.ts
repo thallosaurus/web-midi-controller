@@ -1,4 +1,4 @@
-import { MidiMessage } from "@driver";
+import { MidiMessage } from "../midi-driver/mod.ts";
 export { type MidiMessage };
 
 export type WebsocketServerMessage = 

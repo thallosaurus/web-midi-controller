@@ -1,7 +1,7 @@
 import { vibrate } from "@common/ui_utils";
 import type { CCSliderProperties } from "@bindings/Widget";
 import { WidgetLifecycle } from "@core/lifecycle";
-import { EventBusConsumer, registerCCConsumer, sendUpdateCCValue } from "@eventbus/client";
+import { EventBusConsumer } from "@eventbus/client";
 import "./css/slider.css";
 import { App } from "../../app_state";
 

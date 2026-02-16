@@ -2,7 +2,7 @@ import "./css/xypad.css"
 import type { XYPadProperties } from "@bindings/Widget";
 import { vibrate } from "@common/ui_utils";
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
-import { EventBusConsumer, registerCCConsumer, registerNoteConsumer, sendUpdateCCValue, sendUpdateNoteValue, unregisterCCConsumer, unregisterNoteConsumer } from "@eventbus/client";
+import { EventBusConsumer } from "@eventbus/client";
 import { App } from "../../app_state";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -142,11 +142,12 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
             pointercancel: release_pointer,
 
             xlabel_pointerup: (e) => {
-                sendUpdateCCValue(this.prop.channel, this.prop.x.cc, this.x.value)
+                App.eventbus.updateCC(this.prop.channel, this.prop.x.cc, this.x.value)
                 //this.x.sendValue(this.x.value);
             },
             ylabel_pointerup: (e) => {
-                sendUpdateCCValue(this.prop.channel, this.prop.y.cc, this.y.value)
+                App.eventbus.updateCC(this.prop.channel, this.prop.y.cc, this.y.value)
+
                 //this.y.sendValue(this.y.value);
             }
         }

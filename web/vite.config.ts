@@ -21,13 +21,13 @@ export default defineConfig({
   })],
   resolve: {
     alias: {
-      '@backend': path.resolve(__dirname, '../backend/bindings'),
+      //'@backend': path.resolve(__dirname, '../backend/bindings'),
       //'@socketevents': path.resolve(__dirname, '../server-ts/messages'),
       '@core': path.resolve(__dirname, 'ts/ui'),
       '@common': path.resolve(__dirname, 'ts/common'),
       '@widgets': path.resolve(__dirname, 'ts/widgets'),
-      '@eventbus': path.resolve(__dirname, 'ts/event_bus'),
-      '@websocket': path.resolve(__dirname, 'ts/websocket'),
+      '@eventbus': path.resolve(__dirname, 'ts/eventbus_worker'),
+      '@websocket': path.resolve(__dirname, 'ts/websocket_worker'),
       '@bindings': path.resolve(__dirname, 'bindings'),
     }
   },
