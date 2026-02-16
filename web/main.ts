@@ -3,7 +3,6 @@ import "./style.css";
 import "./colors.css";
 
 import { App } from './app_state.ts'
-import { connectSocketMessage } from "@websocket/client.ts";
 
 let app: App | null = null;
 
