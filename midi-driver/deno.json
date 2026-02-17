@@ -1,5 +1,5 @@
 {
-  "exports":"./mod.ts",
+  "exports": "./mod.ts",
   "tasks": {
     "dev": "deno run -A --watch main.ts",
     "compile:lib": "cargo build -p midi-driver"

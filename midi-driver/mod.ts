@@ -1,6 +1,11 @@
 const BUILD_TYPE = Deno.env.get("CARGO_BUILD_TYPE") ?? "debug";
 
-export type { CCPayload, MidiMessage, MidiPayload, NotePayload } from "./bindings/MidiPayload.ts";
+export type {
+  CCPayload,
+  MidiMessage,
+  MidiPayload,
+  NotePayload,
+} from "./bindings/MidiPayload.ts";
 
 function getDefaultLibraryPath() {
   const path = {
@@ -15,47 +20,50 @@ function getDefaultLibraryPath() {
     illumos: null,
   }[Deno.build.os];
 
-  if (!path) throw new Error("library is not supported on this system: " + Deno.build.os)
+  if (!path) {
+    throw new Error(
+      "library is not supported on this system: " + Deno.build.os,
+    );
+  }
   return path;
 }
 
 interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
   start_driver: {
-    parameters: [],
-    result: "void"
-  },
+    parameters: [];
+    result: "void";
+  };
   poll_event: {
-    parameters: [],
-    result: "pointer",
-  },
+    parameters: [];
+    result: "pointer";
+  };
   free_string: {
-    parameters: ["pointer"],
-    result: "void"
-  },
+    parameters: ["pointer"];
+    result: "void";
+  };
   send_midi: {
-    parameters: ["pointer"],
-    result: "void"
-  },
+    parameters: ["pointer"];
+    result: "void";
+  };
   stop_driver: {
-    parameters: [],
-    result: "void"
-  }
+    parameters: [];
+    result: "void";
+  };
 }
 
 export class MidiDriver {
-  static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null
+  static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
   constructor(path = getDefaultLibraryPath()) {
     if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
     try {
-
       MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
         path!,
         {
           start_driver: {
             parameters: [],
-            result: "void"
+            result: "void",
           },
           poll_event: {
             parameters: [],
@@ -63,23 +71,22 @@ export class MidiDriver {
           },
           free_string: {
             parameters: ["pointer"],
-            result: "void"
+            result: "void",
           },
           send_midi: {
             parameters: ["pointer"],
-            result: "void"
+            result: "void",
           },
           stop_driver: {
             parameters: [],
-            result: "void"
-          }
+            result: "void",
+          },
         } as const,
       );
 
       this.pollInterval = setInterval(this.poll.bind(this), 100);
 
       MidiDriver.dylib.symbols.start_driver();
-
     } catch (e) {
       console.error("could not load midi driver", e);
       console.warn("midi output is disabled");
@@ -98,7 +105,7 @@ export class MidiDriver {
       const encoder = new TextEncoder();
       const json = JSON.stringify(event);
       const bytes = encoder.encode(json);
-      
+
       const ptr = Deno.UnsafePointer.of(new Uint8Array(bytes));
       MidiDriver.dylib!.symbols.send_midi(ptr);
     }
@@ -111,20 +118,20 @@ export class MidiDriver {
         if (!ptr) break;
         const msg = new Deno.UnsafePointerView(ptr!).getCString();
         MidiDriver.dylib!.symbols.free_string(ptr);
-        
+
         const serialized = JSON.parse(msg);
-        
+
         // process event
-        
-        this.emitter.dispatchEvent(new CustomEvent("data", { detail: serialized }))
-        
+
+        this.emitter.dispatchEvent(
+          new CustomEvent("data", { detail: serialized }),
+        );
       } while (true);
     }
   }
 
   close() {
     if (MidiDriver.dylib) {
-
       MidiDriver.dylib.symbols.stop_driver();
       if (this.pollInterval) clearInterval(this.pollInterval);
       MidiDriver.dylib.close();
