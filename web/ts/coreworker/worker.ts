@@ -28,8 +28,9 @@ export abstract class CoreWorker<InMsg, OutMsg> {
 
 export abstract class CoreWorkerClient<InMsg, OutMsg> {
     worker: Worker
-    constructor(url: URL) {
-        this.worker = new Worker(url, { type: "module" });
+    constructor(worker: Worker) {
+        //this.worker = new Worker(url, { type: "module" });
+        this.worker = worker;
         this.worker.addEventListener("message", (ev) => {
             switch (ev.data.type) {
                 case "terminate":

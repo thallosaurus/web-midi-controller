@@ -1,7 +1,5 @@
-import { uuid } from "../common/utils";
 import { CoreWorker } from "../coreworker/worker";
-import { EventBusWorkerConsumerEvent, EventBusWorkerEvent, EventBusWorkerProducerEvent } from "./events";
-//import { WebsocketWorkerEvent } from "./events";
+import { EventBusWorkerConsumerEvent, EventBusWorkerProducerEvent } from "./events";
 
 type WidgetId = string;
 type CCWidget = WidgetId[];

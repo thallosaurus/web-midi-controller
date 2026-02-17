@@ -7,7 +7,8 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
     public events = new EventTarget();
 
     constructor() {
-        super(new URL("worker.ts", import.meta.url));
+        super(new Worker(new URL("worker.ts", import.meta.url), { type: "module" }))
+        //super(new URL("worker.ts", import.meta.url));
     }
 
     processWorkerClientMessage(msg: WebsocketWorkerEvent): void {

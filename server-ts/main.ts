@@ -8,6 +8,7 @@ import { Overlay } from "@widgets"
 import { parse } from "@toml";
 import { WebsocketEventHandler, WSState } from "./event_handler.ts";
 import { CoreServerState } from "./state.ts";
+import { serveFrontend } from "./frontend.ts";
 
 export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
@@ -27,8 +28,10 @@ export class ServerMain {
     })
 
     // frontend
-    this.app.get("/", (c) => {
-      return c.text("hello world")
+    this.app.get("/", async (c) => {
+      const file = await serveFrontend(c.req);
+
+      return file
     })
 
     this.state.events.addEventListener("data", (ev) => {

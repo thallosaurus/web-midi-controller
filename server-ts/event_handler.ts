@@ -1,7 +1,6 @@
 import { WSContext, WSEvents, WSMessageReceive } from "@hono/hono/ws";
 import { Context } from "@hono/hono";
 import { createWebsocketConnectionInfoPayload, WebsocketServerMessage } from "./messages.ts";
-import { ServerMain } from "./main.ts";
 import { CoreServerState } from "./state.ts";
 
 export type WSState = {

@@ -43,11 +43,6 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
                 {
                     let cb = this.callbacks.get(msg.consumerId)!;
                     cb.updateValue(msg.value);
-                /*         this.events.dispatchEvent(new CustomEvent("ccdata", {
-                        detail: {
-                            ...msg
-                        }
-                    })) */
                 }
                 break;
 
@@ -69,7 +64,8 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
     }
 
     constructor() {
-        super(new URL("eb_worker.ts", import.meta.url));
+        //super(new URL("eb_worker.ts", import.meta.url));
+        super(new Worker(new URL("eb_worker.ts", import.meta.url), { type: "module" }))
         //this.worker.onmessage = console.debug
         this.init();
 
