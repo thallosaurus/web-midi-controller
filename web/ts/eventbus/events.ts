@@ -1,4 +1,4 @@
-import { MidiMessage } from "server-ts/messages";
+import { type MidiMessage } from "../../../midi-driver/bindings/MidiPayload";
 import { CoreWorkerMessage } from "../coreworker/worker";
 //import { MidiMessage } from "server-ts/messages";
 

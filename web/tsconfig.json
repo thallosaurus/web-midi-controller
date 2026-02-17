@@ -8,7 +8,7 @@
     "baseUrl": ".",
     "paths": {
       //"@backend/*": ["../backend/bindings/*"],
-      "@core/*": ["./ts/ui/*"],
+      "@core/*": ["ts/core/*"],
       "@common/*": ["./ts/common/*"],
       "@websocket/*": ["ts/websocket/*"],
       "@eventbus/*": ["ts/eventbus/*"],
@@ -31,5 +31,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "ts/ui", "ts/event_bus.ts", "ts/common/events.ts", "main.ts", "ts/vite-env.d.ts", "ts/websocket/websocket.ts"]
+  "include": ["src", "ts/core", "ts/event_bus.ts", "ts/common/events.ts", "main.ts", "ts/vite-env.d.ts", "ts/websocket/websocket.ts"]
 }

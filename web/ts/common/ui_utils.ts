@@ -1,5 +1,5 @@
 import { Overlay } from "../../bindings/Overlay";
-import { change_overlay, clear_loaded_overlays, load_overlays_from_array, LoadedOverlay, setup_tabs } from "../ui/overlay";
+import { change_overlay, clear_loaded_overlays, load_overlays_from_array, LoadedOverlay, setup_tabs } from "../core/overlay";
 //import { close_dialog } from "../ui/dialogs";
 
 export function vibrate() {

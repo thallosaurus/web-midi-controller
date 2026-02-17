@@ -1,7 +1,7 @@
 import { uuid } from "@common/utils";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { EventBusWorkerConsumerEvent, EventBusWorkerProducerEvent } from "./events";
-import { MidiMessage } from "server-ts/messages";
+import { type MidiMessage } from "../../../midi-driver/bindings/MidiPayload";
 
 /**
  * The class a widget or whatever should implement when it wants to listen to the eventbus
@@ -37,7 +37,7 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
     override processWorkerClientMessage(msg: EventBusWorkerProducerEvent): void {
         switch (msg.type) {
             case "midi-data":
-                this.sendMidiEvent(msg);
+                this.sendMidiEvent(msg as any);
             break;
             case "cc-update":
                 {

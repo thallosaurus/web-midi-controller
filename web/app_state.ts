@@ -1,13 +1,13 @@
-import { UiDialog } from './ts/ui/dialogs.ts'
+import { UiDialog } from './ts/core/dialogs.ts'
 import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
-import { change_overlay, clear_loaded_overlays, load_overlays_from_array, process_program_change } from "./ts/ui/overlay.ts";
+import { change_overlay, clear_loaded_overlays, load_overlays_from_array, process_program_change } from "./ts/core/overlay.ts";
 
 import { debug, setup_logger } from '@common/logger'
 import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts';
 
 import { WebsocketWorkerClient } from "./ts/websocket/client.ts"
 import { EventbusWorkerClient } from "./ts/eventbus/client.ts"
-import { type MidiMessage } from 'server-ts/messages.ts';
+//import { type MidiMessage } from 'server-ts/messages.ts';
 
 //const init_ui = () => {
 
@@ -46,7 +46,7 @@ export class App {
             });
 
             App.socket.events.addEventListener("data", (ev) => {
-                const payload = (ev as CustomEvent).detail as MidiMessage;
+                const payload = (ev as CustomEvent).detail as any;
                 switch (payload.type) {
                     case "NoteOn":
                     case "NoteOff":

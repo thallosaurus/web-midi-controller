@@ -8,11 +8,6 @@ export type WSState = {
   clientId: string
 };
 
-enum WebsocketMessageDecision {
-  Broadcast,
-  Disconnect
-}
-
 export class WebsocketEventHandler implements WSEvents<WebSocket> {
   static clients: Map<string, WebSocket> = new Map();
   ctx: Context

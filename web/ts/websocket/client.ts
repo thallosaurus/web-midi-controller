@@ -1,4 +1,4 @@
-import { type MidiMessage } from "server-ts/messages";
+import { type MidiMessage } from "../../../midi-driver/bindings/MidiPayload";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { WebsocketWorkerEvent } from "./events";
 
