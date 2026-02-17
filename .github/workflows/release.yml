@@ -23,6 +23,10 @@ jobs:
           node-version: 24
           cache-dependency-path: web/yarn.lock
 
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.4.0
+
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           rustflags: ""
@@ -41,20 +45,35 @@ jobs:
         working-directory: ./web
         run: yarn && yarn build
 
-      - name: Build executable
-        run: cargo build --release
+      - name: Build MIDI Driver
+        run: cargo build -p midi-driver --release
+
+      - name: Build Server (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ./server
+        run: deno task compile:linux:release
+
+      - name: Build Server (Mac)
+        if: matrix.os == 'macos-latest'
+        working-directory: ./server
+        run: deno task compile:mac:release
+
+      - name: Build Server (Win)
+        if: matrix.os == 'windows-latest'
+        working-directory: ./server
+        run: deno task compile:win:release
 
       - name: Rename Output (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: mv target/release/server midi-controller-linux
+        run: mv server/homebrewdj midi-controller-linux
 
       - name: Rename Output (MacOS)
         if: matrix.os == 'macos-latest'
-        run: mv target/release/server midi-controller-macos
+        run: mv server/homebrewdj midi-controller-macos
 
       - name: Rename Output (Windows)
         if: matrix.os == 'windows-latest'
-        run: mv target/release/server.exe midi-controller-win.exe
+        run: mv server/homebrewdj.exe midi-controller-win.exe
 
       - name: Package WebUI and Vendor Files
         if: matrix.os == 'ubuntu-latest'

@@ -2,7 +2,6 @@ todo backend:
 - OSC publisher (for music video integration)
 
 todo widgets:
-- widgets class based architecture (classes exist and are working, but it could be prettier)
 - note button latch?
 - midi clock
 - step sequencer

@@ -1,0 +1,11 @@
+{
+  "exports": "./mod.ts",
+  "tasks": {
+    "dev": "deno run -A --watch main.ts",
+    "compile:lib": "cargo build -p midi-driver",
+    "monitor": "deno run -A monitor.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}

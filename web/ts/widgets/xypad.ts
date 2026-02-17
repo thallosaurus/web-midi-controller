@@ -2,7 +2,8 @@ import "./css/xypad.css"
 import type { XYPadProperties } from "@bindings/Widget";
 import { vibrate } from "@common/ui_utils";
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
-import { EventBusConsumer, registerCCConsumer, registerNoteConsumer, sendUpdateCCValue, sendUpdateNoteValue, unregisterCCConsumer, unregisterNoteConsumer } from "@eventbus/client";
+import { EventBusConsumer } from "ts/eventbus/client";
+import { App } from "../../app_state";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
@@ -36,12 +37,12 @@ class Axis implements EventBusConsumer {
             switch (this.direction) {
                 case AxisDirection.X:
                     this.touchHandle.style.setProperty("--xpos", String(vv));
-                    sendUpdateCCValue(this.prop.channel, this.prop.x.cc, vv)
+                    App.eventbus.updateCC(this.prop.channel, this.prop.x.cc, vv)
                     break;
 
                 case AxisDirection.Y:
                     this.touchHandle.style.setProperty("--ypos", String(vv));
-                    sendUpdateCCValue(this.prop.channel, this.prop.y.cc, vv);
+                    App.eventbus.updateCC(this.prop.channel, this.prop.y.cc, vv);
                     break;
             }
         }
@@ -141,25 +142,26 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
             pointercancel: release_pointer,
 
             xlabel_pointerup: (e) => {
-                sendUpdateCCValue(this.prop.channel, this.prop.x.cc, this.x.value)
+                App.eventbus.updateCC(this.prop.channel, this.prop.x.cc, this.x.value)
                 //this.x.sendValue(this.x.value);
             },
             ylabel_pointerup: (e) => {
-                sendUpdateCCValue(this.prop.channel, this.prop.y.cc, this.y.value)
+                App.eventbus.updateCC(this.prop.channel, this.prop.y.cc, this.y.value)
+
                 //this.y.sendValue(this.y.value);
             }
         }
 
         // register axises as cc values
-        registerCCConsumer(this.x.prop.channel, this.x.prop.x.cc, null, this.x).then(id => {
+        App.eventbus.registerCC(this.x.prop.channel, this.x.prop.x.cc, 0, this.x).then(id => {
             this.x.consumerId = id
         })
-        registerCCConsumer(this.y.prop.channel, this.y.prop.y.cc, null, this.y).then(id => {
+        App.eventbus.registerCC(this.y.prop.channel, this.y.prop.y.cc, 0, this.y).then(id => {
             this.y.consumerId = id;
         })
 
         if (this.prop.note) {
-            registerNoteConsumer(this.prop.channel, this.prop.note, this).then(id=> {
+            App.eventbus.registerNote(this.prop.channel, this.prop.note, this).then(id=> {
                 this.consumerId = id;
             });
         }
@@ -177,10 +179,11 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
         
     }
     unload(options: XYPadProperties, html: HTMLDivElement): boolean {
-        unregisterCCConsumer(this.x.prop.channel, this.x.prop.x.cc, this.x);
-        unregisterCCConsumer(this.y.prop.channel, this.y.prop.y.cc, this.y);
+
+        App.eventbus.unregisterCC(this.consumerId!, this.x.prop.channel, this.x.prop.x.cc);
+        App.eventbus.unregisterCC(this.consumerId!, this.y.prop.channel, this.y.prop.y.cc);
         if (this.prop.note) {
-            unregisterNoteConsumer(this.prop.channel, this.prop.note, this);
+            App.eventbus.unregisterCC(this.consumerId!, this.prop.channel, this.prop.note);
         }
         
         this.target.removeEventListener("pointerdown", this.handlers.pointerdown);
@@ -193,7 +196,7 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
     }
     sendValue(v: number): void {
         if (this.prop.note) {
-            sendUpdateNoteValue(this.prop.channel, this.prop.note, v, v > 0, false)
+            App.eventbus.updateNote(this.prop.channel, this.prop.note, v)
         }
     }
     consumerId: string | null = null;

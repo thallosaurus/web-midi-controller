@@ -2,3 +2,5 @@
 
 /target
 */bindings/
+.vscode
+server-build

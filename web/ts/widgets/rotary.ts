@@ -2,8 +2,9 @@ import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 import { vibrate } from "@common/ui_utils";
 
 import type { RotarySliderProperties } from "@bindings/Widget";
-import { EventBusConsumer, registerCCConsumer, sendUpdateCCValue, unregisterCCConsumer, unregisterCCWidget } from "@eventbus/client.ts";
+import { EventBusConsumer, } from "ts/eventbus/client";
 import "./css/rotary.css";
+import { App } from "../../app_state";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
@@ -53,14 +54,11 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
     }
 
     sendValue(v: number) {
-        sendUpdateCCValue(this.prop.channel, this.prop.cc, v)
+        App.eventbus.updateCC(this.prop.channel, this.prop.cc, v)
     }
 
     load(options: RotarySliderProperties, html: HTMLDivElement) {
         const sensitivity = 0.5;    // px -> value
-
-
-
 
         //console.log(dial);
 
@@ -102,7 +100,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
 
         //register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
         //registerCCWidget(options.channel, options.cc, options.value ?? 0, this.updateValue)
-        registerCCConsumer(this.prop.channel, this.prop.cc, null, this).then(id => {
+        App.eventbus.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this).then(id => {
             this.consumerId = id;
         });
 
@@ -123,7 +121,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
         html.removeEventListener("pointerup", this.handlers.pointerup);
         html.removeEventListener("pointercancel", this.handlers.pointercancel);
         //unregister_cc_widget(id, s.channel, s.cc);
-        unregisterCCConsumer(this.prop.channel, this.prop.cc, this);
+        App.eventbus.unregisterCC(this.consumerId!,this.prop.channel, this.prop.cc);
         /*        unregisterCCWidget(this.consumerId!, options.channel, options.cc).then(() => {
                     this.consumerId = null
                 })*/

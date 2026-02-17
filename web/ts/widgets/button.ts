@@ -3,7 +3,8 @@ import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 
-import { sendUpdateNoteValue, unregisterNoteWidget, sendUpdateCCValue, EventBusConsumer, registerCCConsumer, unregisterCCConsumer, registerNoteConsumer } from "@eventbus/client";
+import { EventBusConsumer } from "ts/eventbus/client";
+import { App } from "../../app_state";
 
 
 /**
@@ -86,7 +87,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
             this.sendUpdate(this.state.latch_on ? 127 : 0)
         };
 
-        registerNoteConsumer(this.prop.channel, this.prop.note, this)
+        App.eventbus.registerNote(this.prop.channel, this.prop.note, this)
             .then(id => {
                 this.consumerId = id;
             });
@@ -110,7 +111,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
             button.removeEventListener("pointercancel", this.handlers.pointercancel)
         }*/
         //unregister_midi_widget(id, options.channel, options.note);
-        unregisterNoteWidget(this.consumerId!, options.channel, options.note).then(id => {
+        App.eventbus.unregisterNote(this.consumerId!, options.channel, options.note).then(id => {
             //state.id
             this.consumerId = null
         });
@@ -118,7 +119,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
     }
 
     sendUpdate(v: number) {
-        sendUpdateNoteValue(this.prop.channel, this.prop.note, v, v > 0, false);
+        App.eventbus.updateNote(this.prop.channel, this.prop.note, v);
 
         // also update ui directly
         if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
@@ -218,7 +219,7 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             this.consumerId = id
         });*/
 
-        registerCCConsumer(this.prop.channel, this.prop.cc, null, this).then(id => {
+        App.eventbus.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this).then(id => {
             this.consumerId = id
         })
 
@@ -242,7 +243,7 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             html.removeEventListener("pointercancel", this.handlers.pointercancel)
         }*/
         //unregister_cc_widget(id, options.channel, options.cc)
-        unregisterCCConsumer(this.prop.channel, this.prop.cc, this);
+        App.eventbus.unregisterCC(this.consumerId!, this.prop.channel, this.prop.cc);
         /*        unregisterCCWidget(state.id!, options.channel, options.cc).then(id => {
                     state.id = null
                 })*/
@@ -250,6 +251,6 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
     }
 
     sendValue(v: number): void {
-        sendUpdateCCValue(this.prop.channel, this.prop.cc, this.state.latch_on ? (this.prop.value ?? 127) : (this.prop.value_off ?? 0));
+        App.eventbus.updateCC(this.prop.channel, this.prop.cc, this.state.latch_on ? (this.prop.value ?? 127) : (this.prop.value_off ?? 0));
     }
 }
