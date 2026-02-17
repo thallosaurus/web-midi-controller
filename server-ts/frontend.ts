@@ -1,6 +1,6 @@
 import { extname, join } from "https://deno.land/std/path/mod.ts"
 import { HonoRequest } from "@hono/hono";
-const distPath = new URL("../web/dist", import.meta.url);
+const distPath = new URL("../web/dist/", import.meta.url);
 
 export async function serveFrontend(req: HonoRequest) {
   let urlPath = new URL(req.url).pathname;
@@ -8,6 +8,7 @@ export async function serveFrontend(req: HonoRequest) {
   if (urlPath === "/") urlPath = "/index.html";
 
   const fileUrl = new URL("." + urlPath, distPath);
+  console.log(fileUrl);
 
   try {
     const file = await Deno.readFile(fileUrl);

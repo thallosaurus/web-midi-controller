@@ -1,7 +1,7 @@
 {
   "tasks": {
     "dev": "deno run -A main.ts",
-    "compile": "deno compile -A --include ../web/dist --output server-build --unstable-sloppy-imports --no-check ./main.ts"
+    "compile": "deno compile -A --include ../web/dist --unstable-sloppy-imports --output server-build ./main.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",

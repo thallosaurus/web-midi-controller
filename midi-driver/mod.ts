@@ -45,39 +45,46 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
 export class MidiDriver {
   static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null
   public emitter = new EventTarget();
-  private pollInterval: number;
+  private pollInterval: number | null = null;
   constructor(path = getDefaultLibraryPath()) {
     if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
-    MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
-      path!,
-      {
-        start_driver: {
-          parameters: [],
-          result: "void"
-        },
-        poll_event: {
-          parameters: [],
-          result: "pointer",
-        },
-        free_string: {
-          parameters: ["pointer"],
-          result: "void"
-        },
-        send_midi: {
-          parameters: ["pointer"],
-          result: "void"
-        },
-        stop_driver: {
-          parameters: [],
-          result: "void"
-        }
-      } as const,
-    );
+    try {
 
-    this.pollInterval = setInterval(this.poll.bind(this), 100);
+      MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
+        path!,
+        {
+          start_driver: {
+            parameters: [],
+            result: "void"
+          },
+          poll_event: {
+            parameters: [],
+            result: "pointer",
+          },
+          free_string: {
+            parameters: ["pointer"],
+            result: "void"
+          },
+          send_midi: {
+            parameters: ["pointer"],
+            result: "void"
+          },
+          stop_driver: {
+            parameters: [],
+            result: "void"
+          }
+        } as const,
+      );
 
-    MidiDriver.dylib.symbols.start_driver();
+      this.pollInterval = setInterval(this.poll.bind(this), 100);
 
+      MidiDriver.dylib.symbols.start_driver();
+
+    } catch (e) {
+      console.error("could not load midi driver", e);
+      console.warn("midi output is disabled");
+      MidiDriver.dylib = null;
+    }
     //this.emitter.addEventListener("data", this.customEventHandler.bind(this));
   }
 
@@ -87,41 +94,42 @@ export class MidiDriver {
   }
 
   sendMidi(event: object) {
-    const encoder = new TextEncoder();
-    const json = JSON.stringify(event);
-    const bytes = encoder.encode(json);
-
-    const ptr = Deno.UnsafePointer.of(new Uint8Array(bytes));
-    MidiDriver.dylib!.symbols.send_midi(ptr);
+    if (MidiDriver.dylib !== null) {
+      const encoder = new TextEncoder();
+      const json = JSON.stringify(event);
+      const bytes = encoder.encode(json);
+      
+      const ptr = Deno.UnsafePointer.of(new Uint8Array(bytes));
+      MidiDriver.dylib!.symbols.send_midi(ptr);
+    }
   }
 
   poll() {
-
-    do {
-      const ptr = MidiDriver.dylib!.symbols.poll_event();
-      if (!ptr) break;
-      const msg = new Deno.UnsafePointerView(ptr!).getCString();
-      MidiDriver.dylib!.symbols.free_string(ptr);
-
-      const serialized = JSON.parse(msg);
-
-      // process event
-
-      this.emitter.dispatchEvent(new CustomEvent("data", { detail: serialized }))
-
-    } while (true);
+    if (MidiDriver.dylib !== null) {
+      do {
+        const ptr = MidiDriver.dylib!.symbols.poll_event();
+        if (!ptr) break;
+        const msg = new Deno.UnsafePointerView(ptr!).getCString();
+        MidiDriver.dylib!.symbols.free_string(ptr);
+        
+        const serialized = JSON.parse(msg);
+        
+        // process event
+        
+        this.emitter.dispatchEvent(new CustomEvent("data", { detail: serialized }))
+        
+      } while (true);
+    }
   }
 
   close() {
     if (MidiDriver.dylib) {
 
       MidiDriver.dylib.symbols.stop_driver();
-      clearInterval(this.pollInterval);
+      if (this.pollInterval) clearInterval(this.pollInterval);
       MidiDriver.dylib.close();
-      
+
       MidiDriver.dylib = null;
     }
   }
 }
-
-//const driver = new MidiDriver();

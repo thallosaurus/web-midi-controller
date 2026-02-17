@@ -33,6 +33,12 @@ export class ServerMain {
 
       return file
     })
+    // frontend
+    this.app.get("/assets/*", async (c) => {
+      const file = await serveFrontend(c.req);
+
+      return file
+    })
 
     this.state.events.addEventListener("data", (ev) => {
       const evt = ev as CustomEvent;
