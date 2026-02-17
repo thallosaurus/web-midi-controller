@@ -40,6 +40,7 @@ export class ServerMain {
       return file;
     });
 
+    // the state got changed
     this.state.events.addEventListener("data", (ev) => {
       const evt = ev as CustomEvent;
       const midiEvent = evt.detail;
@@ -47,6 +48,7 @@ export class ServerMain {
       console.log("state event", midiEvent);
 
       // broadcast
+
       WebsocketEventHandler.broadcast(midiEvent, []);
       this.driver.sendMidi(midiEvent.payload!);
     });

@@ -25,7 +25,7 @@ export class CoreServerState {
 
   private triggerEvent(detail: CoreServerStateEvents) {
     this.events.dispatchEvent(
-      new CustomEvent("data", { detail: { ...detail, type: "note" } }),
+      new CustomEvent("data", { detail: { ...detail, type: "midi-data" } }),
     );
   }
 

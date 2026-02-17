@@ -13,6 +13,7 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
 
     processWorkerClientMessage(msg: WebsocketWorkerEvent): void {
         //throw new Error("Method not implemented.");
+        console.debug("ws client message", msg);
         switch (msg.type) {
             case "data":
                 this.sendMidiDataEvent(msg.payload);

@@ -24,7 +24,7 @@ class WebsocketWorker extends CoreWorker<WebsocketWorkerEvent, WebsocketWorkerEv
                     console.log("got midi event", data);
                     this.send({
                         type: "data",
-                        payload: data.data
+                        payload: data.payload!
                     })
                     break;
             }

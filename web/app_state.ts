@@ -52,6 +52,9 @@ export class App {
                     case "NoteOff":
                         App.eventbus.updateNote(payload.channel, payload.note, payload.velocity);
                         break;
+                    case "ControlChange":
+                        App.eventbus.updateCC(payload.channel, payload.cc, payload.value);
+                        break;
                 }
             })
 

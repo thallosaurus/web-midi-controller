@@ -57,7 +57,7 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
     const e = new Set(except);
     for (const id of WebsocketEventHandler.clients.keys()) {
       if (e.has(id)) continue;
-
+      console.log("broadcasting to", id, msg);
       WebsocketEventHandler.direct(msg, id);
     }
   }
