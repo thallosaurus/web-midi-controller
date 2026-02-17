@@ -51,17 +51,17 @@ jobs:
       - name: Build Server (Linux)
         if: matrix.os == 'ubuntu-latest'
         working-directory: ./server
-        run: deno task compile:release:linux
+        run: deno task compile:linux:release
 
       - name: Build Server (Mac)
         if: matrix.os == 'macos-latest'
         working-directory: ./server
-        run: deno task compile:release:mac
+        run: deno task compile:mac:release
 
       - name: Build Server (Win)
         if: matrix.os == 'windows-latest'
         working-directory: ./server
-        run: deno task compile:release:win
+        run: deno task compile:win:release
 
       - name: Rename Output (Linux)
         if: matrix.os == 'ubuntu-latest'
