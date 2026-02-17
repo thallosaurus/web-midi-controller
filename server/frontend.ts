@@ -1,4 +1,4 @@
-import { extname, join } from "https://deno.land/std/path/mod.ts";
+import { extname } from "https://deno.land/std/path/mod.ts";
 import { HonoRequest } from "@hono/hono";
 const distPath = new URL("../web/dist/", import.meta.url);
 

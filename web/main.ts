@@ -7,11 +7,6 @@ import { App } from './app_state.ts'
 let app: App | null = null;
 
 self.addEventListener("DOMContentLoaded", () => {
-  //try {
-    app = new App();
-    console.log("finished ui init")
-
-  /*} catch (e) {
-    alert(e);
-  }*/
+  app = new App();
+  console.log("finished ui init")
 });

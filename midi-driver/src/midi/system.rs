@@ -130,9 +130,6 @@ impl MidiSystem {
             .clone()
             .unwrap_or(String::from("midi control input"));
 
-        /*let input = Self::init_input(input_name, input_tx).expect("error opeing midi input");
-        let output = Self::init_output(output_name).expect("error opening midi output");*/
-
         let input;
         let output;
         if use_virtual {
@@ -148,9 +145,6 @@ impl MidiSystem {
         let system = MidiSystem {
             // passing input_tx, because midi input needs to send out (transfer)
             _midi_input: input,
-
-            // not passing output_rx, because we need to implement it ourselves
-            //midi_output: output,
         };
 
         let output = Arc::new(Mutex::new(output));
@@ -181,11 +175,6 @@ impl MidiSystem {
         if let Err(e) = e.send(msg) {
             println!("{}", e);
         }
-        /*MessageResponder::send_message_sync(
-            e,
-            msg
-        );*/
-        //e.blocking_lock().send_message(MessageType::Broadcast { from: None, data: msg });
     }
 }
 

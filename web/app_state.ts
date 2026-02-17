@@ -7,14 +7,8 @@ import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts'
 
 import { WebsocketWorkerClient } from "./ts/websocket/client.ts"
 import { EventbusWorkerClient } from "./ts/eventbus/client.ts"
-//import { type MidiMessage } from 'server-ts/messages.ts';
-
-//const init_ui = () => {
 
 export class App {
-    // Event Target that fires when something happens
-    //emitter: AppEvents = new AppEvents();
-
     connected: boolean = false
 
     static socket = new WebsocketWorkerClient();
