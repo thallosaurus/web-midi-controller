@@ -11,7 +11,7 @@ import { serveFrontend } from "./frontend.ts";
 export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
   readonly driver = new MidiDriver({
-    pollBytes: false,
+    pollBytes: true,
     useVirtual: true
   });
   readonly state = new CoreServerState();
@@ -69,6 +69,7 @@ export class ServerMain {
           break;
 
         case "overlay":
+          console.log("overlay event", midiEvent);
           //if (midiEvent.target)
           WebsocketEventHandler.direct({
             type: "midi-data",

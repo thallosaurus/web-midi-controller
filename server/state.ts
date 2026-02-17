@@ -43,7 +43,7 @@ export class CoreServerState {
     )
   }
 
-  inputData(msg: MidiMessage, from = null) {
+  inputData(msg: MidiMessage) {
     switch (msg.type) {
       case "ControlChange":
         if (msg.cc === 0) {
@@ -58,7 +58,13 @@ export class CoreServerState {
         break;
       case "ProgramChange":
         this.program = msg.value;
-        this.triggerOverlaySwitch();
+        if (this.currentConnectionId) {
+          this.triggerEvent({
+            type: "overlay",
+            overlayId: this.program,
+            target: this.currentConnectionId
+          });
+        }
         break;
 
       case "NoteOff":

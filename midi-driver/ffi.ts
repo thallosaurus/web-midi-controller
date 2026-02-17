@@ -139,12 +139,6 @@ export class MidiDriver {
     }
   }
 
-  convertBytes(bytes: Uint8Array) {
-    if (MidiDriver.dylib !== null) {
-
-    }
-  }
-
   pollBytes() {
     if (MidiDriver.dylib !== null) {
       let retData = null;
