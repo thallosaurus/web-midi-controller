@@ -51,7 +51,7 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
       const own_id = this.ctx.get("clientId");
       switch (json.type) {
         case "midi-data":
-          this.state.inputData(json.data, own_id);
+          this.state.inputData(json.data);
           break;
       }
     } catch (e) {
