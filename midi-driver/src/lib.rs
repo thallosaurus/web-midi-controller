@@ -33,7 +33,7 @@ pub extern "C" fn start_driver() {
 
     thread::spawn(move || {
         //let mut counter = 0;
-        let _ =
+        let system =
             MidiSystem::new(Some("test device".to_string()), true, tx_ingress, rx_egress).unwrap();
         loop {
             // await death here

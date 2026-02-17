@@ -10,7 +10,9 @@ import { serveFrontend } from "./frontend.ts";
 
 export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
-  readonly driver = new MidiDriver();
+  readonly driver = new MidiDriver({
+    pollBytes: false
+  });
   readonly state = new CoreServerState();
 
   constructor() {

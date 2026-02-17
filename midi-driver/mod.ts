@@ -64,15 +64,20 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
   };
 }
 
+interface MidiDriverOptions {
+  pollBytes: boolean,
+  libraryPath?: string
+}
+
 export class MidiDriver {
   static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
-  constructor(path = getDefaultLibraryPath()) {
+  constructor(options: MidiDriverOptions) {
     if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
     try {
       MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
-        path!,
+        options.libraryPath ?? getDefaultLibraryPath(),
         {
           start_driver: {
             parameters: [],
@@ -109,7 +114,11 @@ export class MidiDriver {
         } as const,
       );
 
-      this.pollInterval = setInterval(this.poll.bind(this), 100);
+      if (options.pollBytes) {
+        this.pollInterval = setInterval(this.pollBytes.bind(this), 100);
+      } else {
+        this.pollInterval = setInterval(this.poll.bind(this), 100);
+      }
 
       MidiDriver.dylib.symbols.start_driver();
     } catch (e) {
@@ -136,15 +145,28 @@ export class MidiDriver {
     }
   }
 
-  poll_bytes() {
+  pollBytes() {
     if (MidiDriver.dylib !== null) {
-      const buffer = new Uint8Array(1024);
-      const ptr = Deno.UnsafePointer.of(buffer);
+      let retData = null;
 
-      const bytesWritten = Number(MidiDriver.dylib.symbols.poll_bytes(ptr, BigInt(buffer.length)));
-
-      const eventBytes = buffer.subarray(0, bytesWritten);
-      console.log("MIDI bytes", eventBytes);
+      do {
+        const buffer = new Uint8Array(8);
+        const ptr = Deno.UnsafePointer.of(buffer);
+        
+        const bytesWritten = Number(MidiDriver.dylib.symbols.poll_bytes(ptr, BigInt(buffer.length)));
+        
+        retData = buffer.subarray(0, bytesWritten);
+        
+        if (retData.length > 0) {
+          
+          this.emitter.dispatchEvent(
+            new CustomEvent("data", { detail: retData }),
+          );
+        } else {
+          retData = null;
+        }
+      } while (retData !== null);
+      //console.log("MIDI bytes", eventBytes);
     }
   }
 
