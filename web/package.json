@@ -15,7 +15,8 @@
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-posthtml": "^0.0.3",
-    "vite-tsconfig-paths": "^6.0.5"
+    "vite-tsconfig-paths": "^6.0.5",
+    "midi-driver": "file:../midi-driver"
   },
   "dependencies": {
     "vite-plugin-handlebars": "^2.0.0",

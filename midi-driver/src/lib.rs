@@ -21,7 +21,7 @@ static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<Vec<u8>>>>> = Lazy::new(|| Mutex:
 static CLOSE_CHANNEL: Lazy<Mutex<Option<Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
 #[unsafe(no_mangle)]
-pub extern "C" fn start_driver() {
+pub extern "C" fn start_driver(use_virtual: bool) {
     //let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
     let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
     let (tx_egress, rx_egress) = channel::<Vec<u8>>();
@@ -33,8 +33,8 @@ pub extern "C" fn start_driver() {
 
     thread::spawn(move || {
         //let mut counter = 0;
-        let system =
-            MidiSystem::new(Some("test device".to_string()), true, tx_ingress, rx_egress).unwrap();
+        let _system =
+            MidiSystem::new(Some("test device".to_string()), use_virtual, tx_ingress, rx_egress).unwrap();
         loop {
             // await death here
             if let Ok(s) = rx_close.recv() {

@@ -1,5 +1,6 @@
 import { CoreWorkerMessage } from "../coreworker/worker";
-import { MidiMessage } from "../../../midi-driver/bindings/MidiPayload";
+//import { MidiMessage } from "../../../midi-driver/bindings/MidiPayload";
+import type { MidiMessage } from "midi-driver/bindings/MidiPayload";
 
 export type WebsocketWorkerEvent =
     | CoreWorkerMessage
