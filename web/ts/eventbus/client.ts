@@ -38,7 +38,7 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
         switch (msg.type) {
             case "midi-data":
                 this.sendMidiEvent(msg as any);
-            break;
+                break;
             case "cc-update":
                 {
                     let cb = this.callbacks.get(msg.consumerId)!;
@@ -188,21 +188,23 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
         })
     }
 
-    updateCC(channel: number, cc: number, value: number) {
+    updateCC(channel: number, cc: number, value: number, external = false) {
         this.send({
             type: "update-cc-value",
             channel,
             cc,
-            value
+            value,
+            external
         })
     }
 
-    updateNote(channel: number, note: number, velocity: number) {
+    updateNote(channel: number, note: number, velocity: number, external = false) {
         this.send({
             type: "update-note-value",
             channel,
             note,
-            value: velocity
+            value: velocity,
+            external
         })
 
         //this.events.dispatchEvent(new CustomEvent("notedata", { detail: }))

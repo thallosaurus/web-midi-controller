@@ -29,10 +29,10 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
                 })
                 break;
             case "update-cc-value":
-                this.updateCC(e.channel, e.cc, e.value);
+                this.updateCC(e.channel, e.cc, e.value, e.external);
                 break;
             case "update-note-value":
-                this.updateNote(e.channel, e.note, e.value);
+                this.updateNote(e.channel, e.note, e.value, e.external);
                 break;
             case "register-cc-widget":
                 {
@@ -159,7 +159,7 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
         })*/
     }
 
-    updateCC(channel: number, cc_number: number, value: number) {
+    updateCC(channel: number, cc_number: number, value: number, external: boolean) {
         const cc = this.cc.get(channel)!;
 
         if (!cc.has(cc_number)) return;
@@ -173,20 +173,23 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
                 channel
             })
 
-            // update socket driver value
-            this.send({
-                type: "midi-data",
-                data: {
-                    type: "ControlChange",
-                    channel,
-                    cc: cc_number,
-                    value
-                }
-            })
+            if (!external) {
+
+                // update socket driver value
+                this.send({
+                    type: "midi-data",
+                    data: {
+                        type: "ControlChange",
+                        channel,
+                        cc: cc_number,
+                        value
+                    }
+                })
+            }
         }
     }
 
-    updateNote(channel: number, note: number, velocity: number) {
+    updateNote(channel: number, note: number, velocity: number, external: boolean) {
         const ch = this.notes.get(channel)!;
 
         if (!ch.has(note)) return;
@@ -203,27 +206,30 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
                 on: velocity > 0
             })
 
-            if (velocity > 0) {
+            if (!external) {
 
-                this.send({
-                    type: "midi-data",
-                    data: {
-                        type: "NoteOn",
-                        channel,
-                        note,
-                        velocity
-                    }
-                })
-            } else {
-                this.send({
-                    type: "midi-data",
-                    data: {
-                        type: "NoteOff",
-                        channel,
-                        note,
-                        velocity
-                    }
-                })
+                if (velocity > 0) {
+                    
+                    this.send({
+                        type: "midi-data",
+                        data: {
+                            type: "NoteOn",
+                            channel,
+                            note,
+                            velocity
+                        }
+                    })
+                } else {
+                    this.send({
+                        type: "midi-data",
+                        data: {
+                            type: "NoteOff",
+                            channel,
+                            note,
+                            velocity
+                        }
+                    })
+                }
 
             }
             //sendUpdateNoteWidget(id, channel, note, velocity, ext)

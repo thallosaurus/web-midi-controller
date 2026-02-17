@@ -10,8 +10,8 @@ export type EventBusWorkerEvent =
 export type EventBusWorkerConsumerEvent =
     // consumer
     | { type: "init" }
-    | { type: "update-cc-value", cc: number, channel: number, value: number }
-    | { type: "update-note-value", note: number, channel: number, value: number }
+    | { type: "update-cc-value", cc: number, channel: number, value: number, external: boolean }
+    | { type: "update-note-value", note: number, channel: number, value: number, external: boolean }
     //| { type: "update-jog-value", cc: number, channel: number, value: number }
     | { type: "register-cc-widget", id: string, channel: number, cc: number, init?: number }
     | { type: "register-note-widget", id: string, channel: number, note: number, init?: number }

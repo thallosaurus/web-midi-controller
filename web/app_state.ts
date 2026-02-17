@@ -50,10 +50,10 @@ export class App {
                 switch (payload.type) {
                     case "NoteOn":
                     case "NoteOff":
-                        App.eventbus.updateNote(payload.channel, payload.note, payload.velocity);
+                        App.eventbus.updateNote(payload.channel, payload.note, payload.velocity, true);
                         break;
                     case "ControlChange":
-                        App.eventbus.updateCC(payload.channel, payload.cc, payload.value);
+                        App.eventbus.updateCC(payload.channel, payload.cc, payload.value, true);
                         break;
                 }
             })
