@@ -15,15 +15,16 @@ use crate::midi::{messages::MidiMessage, system::MidiSystem};
 
 mod midi;
 
-static OUTPUT_CHANNEL: Lazy<Mutex<Option<Receiver<MidiMessage>>>> = Lazy::new(|| Mutex::new(None));
-static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<MidiMessage>>>> = Lazy::new(|| Mutex::new(None));
+static OUTPUT_CHANNEL: Lazy<Mutex<Option<Receiver<Vec<u8>>>>> = Lazy::new(|| Mutex::new(None));
+static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<Vec<u8>>>>> = Lazy::new(|| Mutex::new(None));
 
 static CLOSE_CHANNEL: Lazy<Mutex<Option<Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
 #[unsafe(no_mangle)]
 pub extern "C" fn start_driver() {
-    let (tx_ingress, rx_ingress) = channel::<MidiMessage>();
-    let (tx_egress, rx_egress) = channel::<MidiMessage>();
+    //let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
+    let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
+    let (tx_egress, rx_egress) = channel::<Vec<u8>>();
     *OUTPUT_CHANNEL.lock().unwrap() = Some(rx_ingress);
     *INPUT_CHANNEL.lock().unwrap() = Some(tx_egress);
 
@@ -32,7 +33,7 @@ pub extern "C" fn start_driver() {
 
     thread::spawn(move || {
         //let mut counter = 0;
-        let system =
+        let _ =
             MidiSystem::new(Some("test device".to_string()), true, tx_ingress, rx_egress).unwrap();
         loop {
             // await death here
@@ -63,6 +64,33 @@ pub extern "C" fn poll_event() -> *const c_char {
 }
 
 #[unsafe(no_mangle)]
+pub extern "C" fn poll_bytes(ptr: *mut u8, len: usize) -> usize {
+    let mut guard = OUTPUT_CHANNEL.lock().unwrap();
+    if let Some(rx) = guard.as_mut() {
+        match rx.try_recv() {
+            Ok(bytes) => {
+                //let as_string = serde_json::to_string(&msg).unwrap();
+
+                //return std::ffi::CString::new(as_string).unwrap().into_raw();
+                let copy_len = usize::min(len, bytes.len());
+
+                if !ptr.is_null() {
+                    unsafe {
+                        std::ptr::copy_nonoverlapping(bytes.as_ptr(), ptr, copy_len);
+                    }
+                }
+
+                return copy_len;
+            }
+            Err(std::sync::mpsc::TryRecvError::Empty) => {}
+            Err(_) => {}
+        }
+    }
+
+    0
+}
+
+#[unsafe(no_mangle)]
 pub extern "C" fn free_string(ptr: *const c_char) {
     if !ptr.is_null() {
         unsafe {
@@ -81,9 +109,10 @@ pub extern "C" fn send_midi(ptr: *const std::os::raw::c_char) {
 
     if let Ok(msg) = serde_json::from_str::<MidiMessage>(json) {
         // sende in den Output-Thread
+        let v: Vec<u8> = msg.into();
         if let Some(tx) = &*INPUT_CHANNEL.lock().unwrap() {
             println!("EVENT FROM DENO: {:?}", msg);
-            let _ = tx.send(msg);
+            let _ = tx.send(v);
         }
     }
 }
@@ -95,4 +124,36 @@ pub extern "C" fn stop_driver() {
 
     *OUTPUT_CHANNEL.lock().unwrap() = None;
     *INPUT_CHANNEL.lock().unwrap() = None;
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
+    // Sicherstellen, dass Pointer gültig ist
+    let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
+    let v = Vec::from(slice);
+
+    // Dummy Verarbeitung
+    println!("Received {} bytes from Deno", slice.len());
+
+    let resp: MidiMessage = v.into();
+
+    // convert
+    let json = serde_json::to_string(&resp).unwrap();
+    let c_str = CString::new(json).unwrap();
+
+    // Pointer zurückgeben (Deno muss frei machen!)
+    c_str.into_raw()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn free_bytes(ptr: *const u8, len: usize) {
+    if ptr.is_null() || len == 0 {
+        return;
+    }
+
+    unsafe {
+        // Pointer + Länge zurück in Box<[u8]> verwandeln, damit Rust es droppen kann
+        let _ = Box::from_raw(std::slice::from_raw_parts_mut(ptr as *mut u8, len));
+    }
 }

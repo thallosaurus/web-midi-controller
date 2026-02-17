@@ -18,7 +18,7 @@ use crate::midi::messages::{MidiMessage, MidiPayload, NotePayload};
 type ReturnOutputSenderType = sync::mpsc::Sender<MidiMessage>;
 
 pub struct MidiSystem {
-    _midi_input: MidiInputConnection<sync::mpsc::Sender<MidiMessage>>,
+    _midi_input: MidiInputConnection<sync::mpsc::Sender<Vec<u8>>>,
     //midi_output: MidiOutputConnection,
 }
 
@@ -56,8 +56,8 @@ impl Display for MidiSystemErrors {
 impl MidiSystem {
     fn init_virtual_input(
         device_name: String,
-        responder: sync::mpsc::Sender<MidiMessage>,
-    ) -> Result<MidiInputConnection<sync::mpsc::Sender<MidiMessage>>, MidiSystemErrors> {
+        responder: sync::mpsc::Sender<Vec<u8>>,
+    ) -> Result<MidiInputConnection<sync::mpsc::Sender<Vec<u8>>>, MidiSystemErrors> {
         #[cfg(not(target_os = "windows"))]
         {
             let midi_in =
@@ -92,8 +92,8 @@ impl MidiSystem {
 
     fn init_physical_input(
         device_name: String,
-        responder: sync::mpsc::Sender<MidiMessage>,
-    ) -> Result<MidiInputConnection<sync::mpsc::Sender<MidiMessage>>, MidiSystemErrors> {
+        responder: sync::mpsc::Sender<Vec<u8>>,
+    ) -> Result<MidiInputConnection<sync::mpsc::Sender<Vec<u8>>>, MidiSystemErrors> {
         let midi_in = MidiInput::new(&device_name).map_err(|e| MidiSystemErrors::InitError(e))?;
         if let Some(port) = select_port_by_name(&midi_in, &device_name.clone()) {
             Ok(midi_in
@@ -120,8 +120,8 @@ impl MidiSystem {
     pub(crate) fn new(
         device_name: Option<String>,
         use_virtual: bool,
-        midi_ingress: sync::mpsc::Sender<MidiMessage>,
-        midi_engress: sync::mpsc::Receiver<MidiMessage>,
+        midi_ingress: sync::mpsc::Sender<Vec<u8>>,
+        midi_engress: sync::mpsc::Receiver<Vec<u8>>,
     ) -> Result<Self, MidiSystemErrors> {
         let output_name = device_name
             .clone()
@@ -175,8 +175,8 @@ impl MidiSystem {
     }
 
     /// gets called by the midi system when there was data from the midi input
-    fn input_callback(ts: u64, data: &[u8], e: &mut sync::mpsc::Sender<MidiMessage>) {
-        let msg: MidiMessage = Vec::from(data).into();
+    fn input_callback(ts: u64, data: &[u8], e: &mut sync::mpsc::Sender<Vec<u8>>) {
+        let msg= Vec::from(data);
         println!("{} midi input: {:?}", ts, msg);
         if let Err(e) = e.send(msg) {
             println!("{}", e);

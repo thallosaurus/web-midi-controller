@@ -117,6 +117,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
 
         const reset = () => {
             this.updateValue(options.default_value ?? 0);
+            App.eventbus.updateCC(this.prop.channel, this.prop.cc, options.default_value ?? 0);
             //update_bus_value(options.default_value ?? 0);
         };
 
@@ -196,18 +197,6 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
         this.handlers.pointerup = end;
         this.handlers.pointercancel = end;
 
-        /*registerCCWidgetOnBus(options.channel, options.cc, options.default_value ?? 0, update_value).then(id => {
-            //state.id = id
-            this.consumerId = id;
-        });*/
-        
-        /*const slider = document.createElement("div");
-        slider.classList.add(
-            "slider",
-            options.vertical ? "vertical" : "horizontal",
-            );*/
-
-        
         App.eventbus.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this)
         .then(id => {
             this.consumerId = id;

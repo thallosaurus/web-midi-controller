@@ -1,4 +1,5 @@
 const BUILD_TYPE = Deno.env.get("CARGO_BUILD_TYPE") ?? "debug";
+const LIBRARY_PATH = Deno.env.get("LIBRARY_PATH") ?? "../target/" + BUILD_TYPE
 
 export type {
   CCPayload,
@@ -9,9 +10,9 @@ export type {
 
 function getDefaultLibraryPath() {
   const path = {
-    windows: "../target/" + BUILD_TYPE + "/midi_driver.dll",
-    linux: "../target/" + BUILD_TYPE + "/libmidi_driver.so",
-    darwin: "../target/" + BUILD_TYPE + "/libmidi_driver.dylib",
+    windows: LIBRARY_PATH + "/midi_driver.dll",
+    linux: LIBRARY_PATH + "/libmidi_driver.so",
+    darwin: LIBRARY_PATH + "/libmidi_driver.dylib",
     aix: null,
     netbsd: null,
     android: null,
@@ -37,6 +38,10 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
     parameters: [];
     result: "pointer";
   };
+  poll_bytes: {
+    parameters: ["pointer", "usize"],
+    result: "usize",
+  };
   free_string: {
     parameters: ["pointer"];
     result: "void";
@@ -48,6 +53,14 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
   stop_driver: {
     parameters: [];
     result: "void";
+  };
+  convert_bytes: {
+    parameters: ["pointer", "usize"],
+    result: "pointer"
+  };
+  free_bytes: {
+    parameters: ["pointer"],
+    result: "void",
   };
 }
 
@@ -69,6 +82,10 @@ export class MidiDriver {
             parameters: [],
             result: "pointer",
           },
+          poll_bytes: {
+            parameters: ["pointer", "usize"],
+            result: "usize",
+          },
           free_string: {
             parameters: ["pointer"],
             result: "void",
@@ -79,6 +96,14 @@ export class MidiDriver {
           },
           stop_driver: {
             parameters: [],
+            result: "void",
+          },
+          convert_bytes: {
+            parameters: ["pointer", "usize"],
+            result: "pointer"
+          },
+          free_bytes: {
+            parameters: ["pointer"],
             result: "void",
           },
         } as const,
@@ -111,12 +136,28 @@ export class MidiDriver {
     }
   }
 
+  poll_bytes() {
+    if (MidiDriver.dylib !== null) {
+      const buffer = new Uint8Array(1024);
+      const ptr = Deno.UnsafePointer.of(buffer);
+
+      const bytesWritten = Number(MidiDriver.dylib.symbols.poll_bytes(ptr, BigInt(buffer.length)));
+
+      const eventBytes = buffer.subarray(0, bytesWritten);
+      console.log("MIDI bytes", eventBytes);
+    }
+  }
+
   poll() {
     if (MidiDriver.dylib !== null) {
       do {
         const ptr = MidiDriver.dylib!.symbols.poll_event();
         if (!ptr) break;
         const msg = new Deno.UnsafePointerView(ptr!).getCString();
+
+        //const converted = MidiDriver.dylib!.symbols.convert_bytes()
+
+
         MidiDriver.dylib!.symbols.free_string(ptr);
 
         const serialized = JSON.parse(msg);
