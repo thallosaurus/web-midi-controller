@@ -55,6 +55,9 @@ export class App {
                     case "ControlChange":
                         App.eventbus.updateCC(payload.channel, payload.cc, payload.value, true);
                         break;
+                    case "ProgramChange":
+                        change_overlay(payload.value);
+                        break;
                 }
             })
 
