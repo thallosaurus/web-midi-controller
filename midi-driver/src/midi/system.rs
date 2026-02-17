@@ -1,8 +1,6 @@
 use midir::MidiOutputConnection;
 use midir::{MidiIO, MidiInput, MidiInputConnection, MidiOutput};
-use std::collections::VecDeque;
 use std::fmt::Display;
-use std::ops::ControlFlow;
 use std::sync::{self, Arc, Mutex};
 use std::thread;
 
@@ -11,7 +9,7 @@ use midir::os::unix::VirtualInput;
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualOutput;
 
-use crate::midi::messages::{MidiMessage, MidiPayload, NotePayload};
+use crate::midi::messages::MidiMessage;
 
 //use std::fmt::Display as DebugDisplay;
 

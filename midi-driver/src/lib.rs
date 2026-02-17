@@ -1,12 +1,10 @@
 use std::{
-    collections::VecDeque,
     ffi::{CStr, CString, c_char},
     sync::{
         Mutex,
         mpsc::{Receiver, Sender, channel},
     },
     thread,
-    time::Duration,
 };
 
 use once_cell::sync::Lazy;
@@ -37,7 +35,7 @@ pub extern "C" fn start_driver(use_virtual: bool) {
             MidiSystem::new(Some("test device".to_string()), use_virtual, tx_ingress, rx_egress).unwrap();
         loop {
             // await death here
-            if let Ok(s) = rx_close.recv() {
+            if let Ok(_s) = rx_close.recv() {
                 println!("awaited death");
                 break;
             }
