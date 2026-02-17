@@ -2,7 +2,12 @@
   "exports": "./mod.ts",
   "tasks": {
     "dev": "deno run -A --watch main.ts",
-    "compile:lib": "cargo build -p midi-driver",
+    "compile:mac:debug": "cargo build -p midi-driver && mkdir -p ./native/ && mv ../target/debug/libmidi_driver.dylib ./native/",
+    "compile:linux:debug": "cargo build -p midi-driver && mkdir -p ./native/ && mv ../target/debug/libmidi_driver.so ./native/",
+    "compile:win:debug": "cargo build -p midi-driver && mkdir -p ./native/ && mv ../target/debug/midi_driver.dll ./native/",
+    "compile:mac:release": "cargo build -p midi-driver --release && mkdir -p ./native && mv ../target/release/libmidi_driver.dylib ./native/",
+    "compile:linux:release": "cargo build -p midi-driver --release && mkdir -p ./native && mv ../target/release/libmidi_driver.so ./native/",
+    "compile:win:release": "cargo build -p midi-driver --release && mkdir -p ./native && mv ../target/release/midi_driver.dll ./native/",
     "monitor": "deno run -A monitor.ts"
   },
   "imports": {

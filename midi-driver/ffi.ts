@@ -1,13 +1,8 @@
-const BUILD_TYPE = Deno.env.get("CARGO_BUILD_TYPE") ?? "debug";
-const LIBRARY_PATH = "../target/" + BUILD_TYPE
-
-console.log("BUILD TYPE:", BUILD_TYPE)
-
 function getDefaultLibraryPath() {
   const path = {
-    windows: new URL(LIBRARY_PATH + "/midi_driver.dll", import.meta.url),
-    linux: new URL(LIBRARY_PATH + "/libmidi_driver.so", import.meta.url),
-    darwin: new URL(LIBRARY_PATH + "/libmidi_driver.dylib", import.meta.url),
+    windows: new URL("./native/midi_driver.dll", import.meta.url),
+    linux: new URL("./native/libmidi_driver.so", import.meta.url),
+    darwin: new URL("./native/libmidi_driver.dylib", import.meta.url),
     aix: null,
     netbsd: null,
     android: null,
