@@ -46,22 +46,34 @@ jobs:
         run: yarn && yarn build
 
       - name: Build MIDI Driver
-        run: cargo build -p midi-driver
+        run: cargo build -p midi-driver --release
 
-      - name: Build executable
-        run: cargo build --release
+      - name: Build Server (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ./server
+        run: deno task compile:release:linux
+
+      - name: Build Server (Mac)
+        if: matrix.os == 'macos-latest'
+        working-directory: ./server
+        run: deno task compile:release:mac
+
+      - name: Build Server (Win)
+        if: matrix.os == 'windows-latest'
+        working-directory: ./server
+        run: deno task compile:release:win
 
       - name: Rename Output (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: mv target/release/server midi-controller-linux
+        run: mv server/homebrewdj midi-controller-linux
 
       - name: Rename Output (MacOS)
         if: matrix.os == 'macos-latest'
-        run: mv target/release/server midi-controller-macos
+        run: mv server/homebrewdj midi-controller-macos
 
       - name: Rename Output (Windows)
         if: matrix.os == 'windows-latest'
-        run: mv target/release/server.exe midi-controller-win.exe
+        run: mv server/homebrewdj.exe midi-controller-win.exe
 
       - name: Package WebUI and Vendor Files
         if: matrix.os == 'ubuntu-latest'

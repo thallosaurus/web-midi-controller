@@ -3,9 +3,9 @@ const LIBRARY_PATH = Deno.env.get("LIBRARY_PATH") ?? "../target/" + BUILD_TYPE
 
 function getDefaultLibraryPath() {
   const path = {
-    windows: LIBRARY_PATH + "/midi_driver.dll",
-    linux: LIBRARY_PATH + "/libmidi_driver.so",
-    darwin: LIBRARY_PATH + "/libmidi_driver.dylib",
+    windows: new URL(LIBRARY_PATH + "/midi_driver.dll", import.meta.url),
+    linux: new URL(LIBRARY_PATH + "/libmidi_driver.so", import.meta.url),
+    darwin: new URL(LIBRARY_PATH + "/libmidi_driver.dylib", import.meta.url),
     aix: null,
     netbsd: null,
     android: null,
