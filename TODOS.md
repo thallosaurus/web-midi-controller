@@ -23,6 +23,3 @@ to be fixed:
 
 settings:
 - device id for program changes
-
-Deno Rewrite:
-- MIDI Exhange between ableton and web works, but not between web peers

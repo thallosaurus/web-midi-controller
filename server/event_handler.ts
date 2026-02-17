@@ -14,6 +14,8 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
   static clients: Map<string, WebSocket> = new Map();
   ctx: Context;
   state: CoreServerState;
+  id = crypto.randomUUID();
+  ws: WSContext<WebSocket> | null = null
   constructor(
     c: Context<{ Variables: WSState }, any, {}>,
     state: CoreServerState,
@@ -21,19 +23,24 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
     this.ctx = c;
     this.state = state;
   }
+  sendConnectionInfo() {
+    const connInfo = createWebsocketConnectionInfoPayload(this.id);
+    this.ws!.send(JSON.stringify(connInfo));
+  }
   onOpen(evt: Event, ws: WSContext<WebSocket>): void {
-    const connInfo = createWebsocketConnectionInfoPayload();
+    this.ws = ws;
+
     //c.set("clientId", connInfo.connectionId);
-    this.ctx.set("clientId", connInfo.connectionId);
-    WebsocketEventHandler.clients.set(connInfo.connectionId, ws.raw!);
-    ws.send(JSON.stringify(connInfo));
-    console.log(WebsocketEventHandler.clients);
+    //this.ctx.set("clientId", connInfo.connectionId);
+    WebsocketEventHandler.clients.set(this.id, this.ws.raw!);
+    this.sendConnectionInfo();
+    //console.log(WebsocketEventHandler.clients);
   }
   onClose(evt: CloseEvent, ws: WSContext<WebSocket>): void {
-    const uuid = this.ctx.get("clientId");
-    WebsocketEventHandler.clients.delete(uuid);
+    WebsocketEventHandler.clients.delete(this.id);
     console.log("connection closed");
-    console.log(WebsocketEventHandler.clients);
+    //console.log(WebsocketEventHandler.clients);
+    this.ws = null;
   }
   onMessage(
     evt: MessageEvent<WSMessageReceive>,

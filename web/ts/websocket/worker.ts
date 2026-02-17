@@ -1,4 +1,4 @@
-import { WebsocketServerMessage } from "../../../server-ts/messages";
+import { WebsocketServerMessage } from "../../../server/messages";
 import { CoreWorker } from "../coreworker/worker";
 import { WebsocketWorkerEvent } from "./events";
 
@@ -24,7 +24,7 @@ class WebsocketWorker extends CoreWorker<WebsocketWorkerEvent, WebsocketWorkerEv
                     console.log("got midi event", data);
                     this.send({
                         type: "data",
-                        payload: (data as any).payload
+                        payload: (data as any).data
                     })
                     break;
             }

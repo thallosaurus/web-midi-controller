@@ -5,7 +5,7 @@ import { createMidiEventPayload } from "./messages.ts";
 import { cors } from "@hono/hono/cors";
 import { parse } from "@toml";
 import { WebsocketEventHandler, WSState } from "./event_handler.ts";
-import { CoreServerState } from "./state.ts";
+import { CoreServerState, CoreServerStateEvents } from "./state.ts";
 import { serveFrontend } from "./frontend.ts";
 
 export class ServerMain {
@@ -46,14 +46,41 @@ export class ServerMain {
     // the state got changed
     this.state.events.addEventListener("data", (ev) => {
       const evt = ev as CustomEvent;
-      const midiEvent = evt.detail;
+      const midiEvent = (evt.detail as CoreServerStateEvents);
 
       console.log("state event", midiEvent);
 
       // broadcast
+      switch (midiEvent.type) {
+        case "note":
+          WebsocketEventHandler.broadcast({
+            type: "midi-data",
+            data: midiEvent.payload
+          }, [])
+          this.driver.sendMidi(midiEvent.payload!);
+          break;
+          
+        case "cc":
+          WebsocketEventHandler.broadcast({
+            type: "midi-data",
+            data: midiEvent.payload
+          }, []);
+          this.driver.sendMidi(midiEvent.payload!);
+          break;
 
-      WebsocketEventHandler.broadcast(midiEvent, []);
-      this.driver.sendMidi(midiEvent.payload!);
+        case "overlay":
+          //if (midiEvent.target)
+          WebsocketEventHandler.direct({
+            type: "midi-data",
+            data: {
+              type: "ProgramChange",
+              value: midiEvent.overlayId,
+              channel: 0
+            }
+          }, midiEvent.target)
+          break;
+      }
+
     });
 
     // we got a message from the MIDI Driver
@@ -70,6 +97,7 @@ export class ServerMain {
           break;
       }
     });
+
     Deno.serve(this.app.fetch);
   }
 

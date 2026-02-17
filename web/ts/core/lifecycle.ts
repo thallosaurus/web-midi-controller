@@ -1,4 +1,3 @@
-import { AllowedWidgetProperties } from "@bindings/Overlay"
 import { WidgetProperties } from "./render"
 
 

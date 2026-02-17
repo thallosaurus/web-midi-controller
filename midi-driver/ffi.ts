@@ -64,7 +64,7 @@ interface MidiDriverOptions {
 }
 
 export class MidiDriver {
-  static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
+  private static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
   constructor(options: MidiDriverOptions) {
@@ -139,6 +139,12 @@ export class MidiDriver {
     }
   }
 
+  convertBytes(bytes: Uint8Array) {
+    if (MidiDriver.dylib !== null) {
+
+    }
+  }
+
   pollBytes() {
     if (MidiDriver.dylib !== null) {
       let retData = null;
@@ -152,9 +158,14 @@ export class MidiDriver {
         retData = buffer.subarray(0, bytesWritten);
         
         if (retData.length > 0) {
+          const dataPtr = Deno.UnsafePointer.of(retData);
+          const m = MidiDriver.dylib.symbols.convert_bytes(dataPtr, BigInt(retData.length))
+          const ptrView = new Deno.UnsafePointerView(m!).getCString()
+          const obj = JSON.parse(ptrView);
+          MidiDriver.dylib.symbols.free_string(m);
           
           this.emitter.dispatchEvent(
-            new CustomEvent("data", { detail: retData }),
+            new CustomEvent("data", { detail: obj }),
           );
         } else {
           retData = null;
@@ -170,10 +181,7 @@ export class MidiDriver {
         const ptr = MidiDriver.dylib!.symbols.poll_event();
         if (!ptr) break;
         const msg = new Deno.UnsafePointerView(ptr!).getCString();
-
-        //const converted = MidiDriver.dylib!.symbols.convert_bytes()
-
-
+        
         MidiDriver.dylib!.symbols.free_string(ptr);
 
         const serialized = JSON.parse(msg);

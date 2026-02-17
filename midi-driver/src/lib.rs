@@ -134,12 +134,12 @@ pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
     let v = Vec::from(slice);
 
     // Dummy Verarbeitung
-    println!("Received {} bytes from Deno", slice.len());
-
+    
     let resp: MidiMessage = v.into();
-
+    
     // convert
     let json = serde_json::to_string(&resp).unwrap();
+    //println!("{:?}", json);
     let c_str = CString::new(json).unwrap();
 
     // Pointer zurückgeben (Deno muss frei machen!)

@@ -4,6 +4,8 @@ import { MidiMessage } from "./messages.ts";
 export type CoreServerStateEvents = { type: "note"; payload: MidiMessage } | {
   type: "cc";
   payload: MidiMessage;
+} | {
+  type: "overlay", overlayId: number, target: string
 };
 
 export class CoreServerState {
@@ -25,8 +27,20 @@ export class CoreServerState {
 
   private triggerEvent(detail: CoreServerStateEvents) {
     this.events.dispatchEvent(
-      new CustomEvent("data", { detail: { ...detail, type: "midi-data" } }),
+      new CustomEvent("data", { detail: { ...detail } }),
     );
+  }
+
+  private triggerOverlaySwitch() {
+    this.events.dispatchEvent(
+      new CustomEvent("data", {
+        detail: {
+          overlayId: this.program,
+          target: this.currentConnectionId,
+          type: "overlay"
+        }
+      })
+    )
   }
 
   inputData(msg: MidiMessage, from = null) {
@@ -44,6 +58,7 @@ export class CoreServerState {
         break;
       case "ProgramChange":
         this.program = msg.value;
+        this.triggerOverlaySwitch();
         break;
 
       case "NoteOff":

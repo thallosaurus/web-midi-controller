@@ -9,10 +9,10 @@ export type WebsocketServerMessage =
   }
   | { type: "midi-data"; data: MidiMessage };
 
-export function createWebsocketConnectionInfoPayload(): any {
+export function createWebsocketConnectionInfoPayload(connectionId: string): any {
   return {
     type: "connection-information",
-    connectionId: crypto.randomUUID(),
+    connectionId,
     overlayPath: "http://localhost:8000/overlays",
   };
 }
