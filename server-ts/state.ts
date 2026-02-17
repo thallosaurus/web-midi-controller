@@ -1,29 +1,35 @@
 import { WebsocketEventHandler } from "./event_handler.ts";
 import { MidiMessage } from "./messages.ts";
 
-export type CoreServerStateEvents =
-  { type: "note", payload: MidiMessage } | { type: "cc", payload: MidiMessage }
+export type CoreServerStateEvents = { type: "note"; payload: MidiMessage } | {
+  type: "cc";
+  payload: MidiMessage;
+};
 
 export class CoreServerState {
-  bank_select: number = 0
-  bank_select_fine: number = 0
-  program: number = 0
+  bank_select: number = 0;
+  bank_select_fine: number = 0;
+  program: number = 0;
 
   events: EventTarget = new EventTarget();
 
   get currentConnectionId() {
     const c = new Array(WebsocketEventHandler.clients.values());
 
-    if (this.bank_select < 0 || this.bank_select >= WebsocketEventHandler.clients.size) return null;
-    return Array.from(WebsocketEventHandler.clients.keys())[this.bank_select]
+    if (
+      this.bank_select < 0 ||
+      this.bank_select >= WebsocketEventHandler.clients.size
+    ) return null;
+    return Array.from(WebsocketEventHandler.clients.keys())[this.bank_select];
   }
 
   private triggerEvent(detail: CoreServerStateEvents) {
-    this.events.dispatchEvent(new CustomEvent("data", { detail: { ...detail, type: "note" } }))
+    this.events.dispatchEvent(
+      new CustomEvent("data", { detail: { ...detail, type: "note" } }),
+    );
   }
 
   inputData(msg: MidiMessage, from = null) {
-
     switch (msg.type) {
       case "ControlChange":
         if (msg.cc === 0) {
@@ -33,9 +39,9 @@ export class CoreServerState {
         }
         this.triggerEvent({
           type: "cc",
-          payload: msg
-        })
-        break
+          payload: msg,
+        });
+        break;
       case "ProgramChange":
         this.program = msg.value;
         break;
@@ -44,12 +50,12 @@ export class CoreServerState {
       case "NoteOn":
         this.triggerEvent({
           type: "note",
-          payload: msg
-        })
-        break
+          payload: msg,
+        });
+        break;
 
       default:
-        return true
+        return true;
     }
   }
 }

@@ -1,10 +1,8 @@
-import { Context, Hono } from '@hono/hono'
-import { upgradeWebSocket } from '@hono/hono/deno'
-import { MidiDriver, MidiMessage } from "@driver";
-import { createMidiEventPayload, createWebsocketConnectionInfoPayload, WebsocketServerMessage } from "./messages.ts";
-import { WSContext, WSEvents, WSMessageReceive } from "@hono/hono/ws";
-import { cors } from '@hono/hono/cors'
-import { Overlay } from "@widgets"
+import { Hono } from "@hono/hono";
+import { upgradeWebSocket } from "@hono/hono/deno";
+import { MidiDriver } from "@driver";
+import { createMidiEventPayload } from "./messages.ts";
+import { cors } from "@hono/hono/cors";
 import { parse } from "@toml";
 import { WebsocketEventHandler, WSState } from "./event_handler.ts";
 import { CoreServerState } from "./state.ts";
@@ -16,29 +14,31 @@ export class ServerMain {
   readonly state = new CoreServerState();
 
   constructor() {
-    this.app.get("/ws", upgradeWebSocket((c) => {
-      return new WebsocketEventHandler(c, this.state);
-    }));
+    this.app.get(
+      "/ws",
+      upgradeWebSocket((c) => {
+        return new WebsocketEventHandler(c, this.state);
+      }),
+    );
 
-    this.app.use("/overlays", cors())
+    this.app.use("/overlays", cors());
     this.app.get("/overlays", async (c) => {
-
       return c.json(await this.getOverlaysFromDisk());
       //let data = parse()
-    })
+    });
 
     // frontend
     this.app.get("/", async (c) => {
       const file = await serveFrontend(c.req);
 
-      return file
-    })
+      return file;
+    });
     // frontend
     this.app.get("/assets/*", async (c) => {
       const file = await serveFrontend(c.req);
 
-      return file
-    })
+      return file;
+    });
 
     this.state.events.addEventListener("data", (ev) => {
       const evt = ev as CustomEvent;
@@ -49,7 +49,7 @@ export class ServerMain {
       // broadcast
       WebsocketEventHandler.broadcast(midiEvent, []);
       this.driver.sendMidi(midiEvent.payload!);
-    })
+    });
 
     // we got a message from the MIDI Driver
     this.driver.emitter.addEventListener("data", (ev) => {
@@ -57,12 +57,12 @@ export class ServerMain {
 
       const midiEvent = createMidiEventPayload(evt.detail);
 
-      console.log("midi event", midiEvent)
+      console.log("midi event", midiEvent);
 
       switch (midiEvent.type) {
         case "midi-data":
           this.state.inputData(midiEvent.data);
-          break
+          break;
       }
     });
     Deno.serve(this.app.fetch);
@@ -83,23 +83,24 @@ export class ServerMain {
       if (dirEntry.isFile) {
         const ext = dirEntry.name.split(".").pop();
         if (ext == "toml") {
-
           console.log(dirEntry);
-          const contents = await Deno.readTextFile("../overlays/" + dirEntry.name);
+          const contents = await Deno.readTextFile(
+            "../overlays/" + dirEntry.name,
+          );
           const data = parse(contents);
           console.log(data);
           overlay_buffer.push(data);
         }
       }
     }
-    return overlay_buffer
+    return overlay_buffer;
   }
 }
 
 const app = new ServerMain();
 
-Deno.addSignalListener('SIGINT', () => {
-  console.log('Received SIGINT');
+Deno.addSignalListener("SIGINT", () => {
+  console.log("Received SIGINT");
   app.close();
 
   setTimeout(() => Deno.exit(), 1000);

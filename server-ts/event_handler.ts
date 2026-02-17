@@ -1,26 +1,32 @@
 import { WSContext, WSEvents, WSMessageReceive } from "@hono/hono/ws";
 import { Context } from "@hono/hono";
-import { createWebsocketConnectionInfoPayload, WebsocketServerMessage } from "./messages.ts";
+import {
+  createWebsocketConnectionInfoPayload,
+  WebsocketServerMessage,
+} from "./messages.ts";
 import { CoreServerState } from "./state.ts";
 
 export type WSState = {
-  clientId: string
+  clientId: string;
 };
 
 export class WebsocketEventHandler implements WSEvents<WebSocket> {
   static clients: Map<string, WebSocket> = new Map();
-  ctx: Context
-  state: CoreServerState
-  constructor(c: Context<{ Variables: WSState }, any, {}>, state: CoreServerState) {
+  ctx: Context;
+  state: CoreServerState;
+  constructor(
+    c: Context<{ Variables: WSState }, any, {}>,
+    state: CoreServerState,
+  ) {
     this.ctx = c;
-    this.state = state
+    this.state = state;
   }
   onOpen(evt: Event, ws: WSContext<WebSocket>): void {
     const connInfo = createWebsocketConnectionInfoPayload();
     //c.set("clientId", connInfo.connectionId);
     this.ctx.set("clientId", connInfo.connectionId);
     WebsocketEventHandler.clients.set(connInfo.connectionId, ws.raw!);
-    ws.send(JSON.stringify(connInfo))
+    ws.send(JSON.stringify(connInfo));
     console.log(WebsocketEventHandler.clients);
   }
   onClose(evt: CloseEvent, ws: WSContext<WebSocket>): void {
@@ -28,9 +34,11 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
     WebsocketEventHandler.clients.delete(uuid);
     console.log("connection closed");
     console.log(WebsocketEventHandler.clients);
-
   }
-  onMessage(evt: MessageEvent<WSMessageReceive>, ws: WSContext<WebSocket>): void {
+  onMessage(
+    evt: MessageEvent<WSMessageReceive>,
+    ws: WSContext<WebSocket>,
+  ): void {
     try {
       const json: WebsocketServerMessage = JSON.parse(evt.data.toString());
       const own_id = this.ctx.get("clientId");
