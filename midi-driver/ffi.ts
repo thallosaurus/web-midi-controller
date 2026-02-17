@@ -1,5 +1,7 @@
 const BUILD_TYPE = Deno.env.get("CARGO_BUILD_TYPE") ?? "debug";
-const LIBRARY_PATH = Deno.env.get("LIBRARY_PATH") ?? "../target/" + BUILD_TYPE
+const LIBRARY_PATH = "../target/" + BUILD_TYPE
+
+console.log("BUILD TYPE:", BUILD_TYPE)
 
 function getDefaultLibraryPath() {
   const path = {
