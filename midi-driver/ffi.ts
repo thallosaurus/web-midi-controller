@@ -71,11 +71,6 @@ export class MidiDriver {
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
 
-  private unsafeCallback: Deno.UnsafeCallback<{
-        parameters: ["pointer", "usize"],
-        result: "void"
-      }> | null = null;
-
   constructor(options: MidiDriverOptions) {
     if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
     try {
@@ -121,11 +116,7 @@ export class MidiDriver {
         } as const,
       );
 
-      if (options.pollBytes) {
-        this.pollInterval = setInterval(this.pollBytes.bind(this), 100);
-      } else {
-        this.pollInterval = setInterval(this.poll.bind(this), 100);
-      }
+      this.pollLoop();
 
       const virt = Deno.build.os == "windows" ? false : options.useVirtual
 
@@ -143,12 +134,19 @@ export class MidiDriver {
       console.warn("midi output is disabled");
       MidiDriver.dylib = null;
     }
-    //this.emitter.addEventListener("data", this.customEventHandler.bind(this));
   }
 
   customEventHandler(ev: Event): void {
     const e = ev as CustomEvent;
     console.log(e.detail);
+  }
+
+  private async pollLoop() {
+    while (MidiDriver.dylib !== null) {
+      this.pollBytes();
+
+      await Promise.resolve();
+    }
   }
 
   sendMidi(event: object) {
