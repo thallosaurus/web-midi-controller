@@ -69,6 +69,10 @@ export class App {
         //this.initUi(this.handlers);
         debug("init done", this);
     }
+
+    setupEvents() {
+        
+    }
     
     async initDefaultBackend(): Promise<string> {
         return await App.socket.connectToProdEndpoint("localhost", 8000);

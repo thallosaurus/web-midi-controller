@@ -12,11 +12,12 @@ import { parseArguments, ServerSettings } from "./args.ts";
 export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
   readonly driver
-  readonly state = new CoreServerState();
+  readonly state;
 
   constructor(settings: ServerSettings) {
     this.driver = new MidiDriver(settings.midi)
-
+    this.state = new CoreServerState(settings.midi.systemChannel);
+    
     this.app.get(
       "/ws",
       upgradeWebSocket((c) => {
@@ -48,7 +49,7 @@ export class ServerMain {
       const evt = ev as CustomEvent;
       const midiEvent = (evt.detail as CoreServerStateEvents);
 
-      console.log("state event", midiEvent);
+      //console.log("state event", midiEvent);
 
       // broadcast
       switch (midiEvent.type) {
@@ -90,7 +91,7 @@ export class ServerMain {
 
       const midiEvent = createMidiEventPayload(evt.detail);
 
-      console.log("midi event", midiEvent);
+      //console.log("midi event", midiEvent);
 
       switch (midiEvent.type) {
         case "midi-data":
