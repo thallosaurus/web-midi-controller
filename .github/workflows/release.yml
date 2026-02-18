@@ -45,8 +45,23 @@ jobs:
         working-directory: ./web
         run: yarn && yarn build
 
-      - name: Build MIDI Driver
-        run: cargo build -p midi-driver --debug
+      - name: Build MIDI Driver (Mac)
+        if: matrix.os == 'macos-latest'
+        working-directory: ./midi-driver
+        #run: cargo build -p midi-driver --release
+        run: deno task compile:mac:release
+
+      - name: Build MIDI Driver (Windows)
+        if: matrix.os == 'windows-latest'
+        working-directory: ./midi-driver
+        #run: cargo build -p midi-driver --release
+        run: deno task compile:win:release
+
+      - name: Build MIDI Driver (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ./midi-driver
+        #run: cargo build -p midi-driver --release
+        run: deno task compile:linux:release
 
       - name: Build Server (Linux)
         if: matrix.os == 'ubuntu-latest'
