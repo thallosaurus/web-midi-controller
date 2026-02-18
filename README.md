@@ -40,7 +40,7 @@ midi-controller-Windows.exe -n="LoopBe Internal MIDI"
 If you don't install a virtual MIDI Driver you can only control physical MIDI ports.
 
 ### Running on MacOS and Linux
-Running the executable with the `-n` flag on any other operating system allows you to customize the name of the virtual midi ports spawned by the controller
+Running the executable with the `--inputName` and `--outputName` flag on any other operating system allows you to customize the name of the virtual midi ports spawned by the controller
 
 ## Mapping
 You can create Mappings yourself by placing them inside the overlays folder. Refer to the Repo for examples. You can also customize the `custom.css` file for advanced CSS styling capabilities

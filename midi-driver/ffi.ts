@@ -21,7 +21,7 @@ function getDefaultLibraryPath() {
 
 interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
   start_driver: {
-    parameters: ["u8"];
+    parameters: ["u8", "pointer", "pointer"];
     result: "void";
   };
   poll_event: {
@@ -57,7 +57,9 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
 interface MidiDriverOptions {
   pollBytes: boolean,
   useVirtual: boolean,
-  libraryPath?: string
+  //libraryPath?: string,
+  inputName: string
+  outputName: string
 }
 
 export class MidiDriver {
@@ -68,10 +70,10 @@ export class MidiDriver {
     if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
     try {
       MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
-        options.libraryPath ?? getDefaultLibraryPath(),
+        getDefaultLibraryPath(),
         {
           start_driver: {
-            parameters: ["u8"],
+            parameters: ["u8", "pointer", "pointer"],
             result: "void",
           },
           poll_event: {
@@ -111,7 +113,16 @@ export class MidiDriver {
         this.pollInterval = setInterval(this.poll.bind(this), 100);
       }
 
-      MidiDriver.dylib.symbols.start_driver(Number(options.useVirtual));
+      const virt = Deno.build.os == "windows" ? false : options.useVirtual
+
+      const encoder = new TextEncoder();
+      const input_name_bytes = encoder.encode(options.inputName)
+      const input_name = Deno.UnsafePointer.of(input_name_bytes)
+
+      const output_name_bytes = encoder.encode(options.outputName)
+      const output_name = Deno.UnsafePointer.of(output_name_bytes)
+
+      MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
     } catch (e) {
       console.error("could not load midi driver", e);
       console.warn("midi output is disabled");
@@ -143,18 +154,18 @@ export class MidiDriver {
       do {
         const buffer = new Uint8Array(8);
         const ptr = Deno.UnsafePointer.of(buffer);
-        
+
         const bytesWritten = Number(MidiDriver.dylib.symbols.poll_bytes(ptr, BigInt(buffer.length)));
-        
+
         retData = buffer.subarray(0, bytesWritten);
-        
+
         if (retData.length > 0) {
           const dataPtr = Deno.UnsafePointer.of(retData);
           const m = MidiDriver.dylib.symbols.convert_bytes(dataPtr, BigInt(retData.length))
           const ptrView = new Deno.UnsafePointerView(m!).getCString()
           const obj = JSON.parse(ptrView);
           MidiDriver.dylib.symbols.free_string(m);
-          
+
           this.emitter.dispatchEvent(
             new CustomEvent("data", { detail: obj }),
           );
@@ -172,7 +183,7 @@ export class MidiDriver {
         const ptr = MidiDriver.dylib!.symbols.poll_event();
         if (!ptr) break;
         const msg = new Deno.UnsafePointerView(ptr!).getCString();
-        
+
         MidiDriver.dylib!.symbols.free_string(ptr);
 
         const serialized = JSON.parse(msg);

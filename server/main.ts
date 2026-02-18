@@ -7,16 +7,16 @@ import { parse } from "@toml";
 import { WebsocketEventHandler, WSState } from "./event_handler.ts";
 import { CoreServerState, CoreServerStateEvents } from "./state.ts";
 import { serveFrontend } from "./frontend.ts";
+import { parseArguments, ServerSettings } from "./args.ts";
 
 export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
-  readonly driver = new MidiDriver({
-    pollBytes: true,
-    useVirtual: true
-  });
+  readonly driver
   readonly state = new CoreServerState();
 
-  constructor() {
+  constructor(settings: ServerSettings) {
+    this.driver = new MidiDriver(settings.midi)
+
     this.app.get(
       "/ws",
       upgradeWebSocket((c) => {
@@ -131,7 +131,8 @@ export class ServerMain {
   }
 }
 
-const app = new ServerMain();
+const args = parseArguments();
+const app = new ServerMain(args);
 
 Deno.addSignalListener("SIGINT", () => {
   console.log("Received SIGINT");
