@@ -43,7 +43,7 @@ jobs:
 
       - name: Build Web UI
         working-directory: ./web
-        run: yarn && yarn build
+        run: yarn && yarn build:release
 
       - name: Build MIDI Driver (Mac)
         if: matrix.os == 'macos-latest'

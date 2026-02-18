@@ -8,14 +8,16 @@ import { WebsocketEventHandler, WSState } from "./event_handler.ts";
 import { CoreServerState, CoreServerStateEvents } from "./state.ts";
 import { serveFrontend } from "./frontend.ts";
 import { parseArguments, ServerSettings } from "./args.ts";
+import { existsSync } from "https://deno.land/std/fs/mod.ts";
 
 export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
   readonly driver
-  readonly state = new CoreServerState();
+  readonly state;
 
   constructor(settings: ServerSettings) {
     this.driver = new MidiDriver(settings.midi)
+    this.state = new CoreServerState(settings.midi.systemChannel);
 
     this.app.get(
       "/ws",
@@ -43,12 +45,34 @@ export class ServerMain {
       return file;
     });
 
+    this.app.get("/custom.css", async (c) => {
+      const p = new URL(settings.path.overlayPath + "/css/custom.css", import.meta.url);
+      console.log(p)
+      if (existsSync(p)) {
+
+        const contents = await Deno.readTextFile(
+          p
+        );
+        return new Response(contents, {
+          headers: {
+            "Content-Type": "text/css"
+          }
+        })
+      } else {
+        return new Response("/* no custom css found */", {
+          headers: {
+            "Content-Type": "text/css"
+          }
+        })
+      }
+    })
+
     // the state got changed
     this.state.events.addEventListener("data", (ev) => {
       const evt = ev as CustomEvent;
       const midiEvent = (evt.detail as CoreServerStateEvents);
 
-      console.log("state event", midiEvent);
+      //console.log("state event", midiEvent);
 
       // broadcast
       switch (midiEvent.type) {
@@ -90,7 +114,7 @@ export class ServerMain {
 
       const midiEvent = createMidiEventPayload(evt.detail);
 
-      console.log("midi event", midiEvent);
+      //console.log("midi event", midiEvent);
 
       switch (midiEvent.type) {
         case "midi-data":
@@ -119,7 +143,7 @@ export class ServerMain {
         if (ext == "toml") {
           console.log(dirEntry);
           const contents = await Deno.readTextFile(
-            path + dirEntry.name,
+            path + "/" + dirEntry.name,
           );
           const data = parse(contents);
           console.log(data);

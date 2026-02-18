@@ -15,7 +15,9 @@ export class CoreServerState {
 
   events: EventTarget = new EventTarget();
 
-  get currentConnectionId() {
+  constructor(private systemChannel: number) { }
+
+  get selectedConnectionId() {
     const c = new Array(WebsocketEventHandler.clients.values());
 
     if (
@@ -31,19 +33,8 @@ export class CoreServerState {
     );
   }
 
-  private triggerOverlaySwitch() {
-    this.events.dispatchEvent(
-      new CustomEvent("data", {
-        detail: {
-          overlayId: this.program,
-          target: this.currentConnectionId,
-          type: "overlay"
-        }
-      })
-    )
-  }
-
-  inputData(msg: MidiMessage) {
+  private processSystemMessage(msg: MidiMessage) {
+    console.log("got system message", msg);
     switch (msg.type) {
       case "ControlChange":
         if (msg.cc === 0) {
@@ -51,32 +42,66 @@ export class CoreServerState {
         } else if (msg.cc === 20) {
           this.bank_select_fine = msg.value;
         }
-        this.triggerEvent({
-          type: "cc",
-          payload: msg,
-        });
         break;
+
       case "ProgramChange":
         this.program = msg.value;
-        if (this.currentConnectionId) {
+        if (this.selectedConnectionId) {
           this.triggerEvent({
             type: "overlay",
             overlayId: this.program,
-            target: this.currentConnectionId
+            target: this.selectedConnectionId
           });
         }
         break;
-
-      case "NoteOff":
-      case "NoteOn":
-        this.triggerEvent({
-          type: "note",
-          payload: msg,
-        });
-        break;
-
-      default:
-        return true;
     }
+  }
+
+  inputData(msg: MidiMessage) {
+    if (this.isSystemMessage(msg)) {
+      this.processSystemMessage(msg)
+    } else {
+      switch (msg.type) {
+        case "ControlChange":
+          this.triggerEvent({
+            type: "cc",
+            payload: msg,
+          });
+          break;
+
+        case "NoteOff":
+        case "NoteOn":
+          this.triggerEvent({
+            type: "note",
+            payload: msg,
+          });
+          break;
+
+        default:
+          return true;
+      }
+    }
+  }
+
+  isSystemMessage(msg: MidiMessage) {
+    switch (msg.type) {
+      case "NoteOn":
+      case "NoteOff":
+      case "ProgramChange":
+      case "ControlChange":
+        return msg.channel == this.systemChannel
+
+      case "Start":
+      case "TimingClock":
+      case "Continue":
+      case "Stop":
+      case "SongPositionPointer":
+      case "Unknown":
+        return true
+
+      //case "Pitchbend":
+
+    }
+    return false
   }
 }

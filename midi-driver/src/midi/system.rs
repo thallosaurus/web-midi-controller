@@ -122,21 +122,14 @@ impl MidiSystem {
         midi_ingress: sync::mpsc::Sender<Vec<u8>>,
         midi_engress: sync::mpsc::Receiver<Vec<u8>>,
     ) -> Result<Self, MidiSystemErrors> {
-        /*let output_name = device_name
-            .clone()
-            .unwrap_or(String::from("midi control output"));
-        let input_name = device_name
-            .clone()
-            .unwrap_or(String::from("midi control input"));*/
-
         let input;
         let output;
         if use_virtual {
-            println!("using virtual ports");
+            tracing::info!("using virtual ports, Input: {}, Output: {}", input_device_name, output_device_name);
             input = Self::init_virtual_input(input_device_name, midi_ingress)?;
             output = Self::init_virtual_output(output_device_name)?;
         } else {
-            println!("using physical ports");
+            tracing::info!("using physical ports, Input: {}, Output: {}", input_device_name, output_device_name);
             input = Self::init_physical_input(input_device_name, midi_ingress)?;
             output = Self::init_physical_output(output_device_name)?;
         }
@@ -153,12 +146,12 @@ impl MidiSystem {
 
                 if let Ok(m) = msg {
                     let payload: Vec<u8> = m.into();
-                    println!("egress received: {:#?}, length: {}", payload, payload.len());
+                    tracing::debug!("{:?}, length: {}", payload, payload.len());
                     let mut out = output.lock().unwrap();
                     out.send(&payload).unwrap();
                 } else {
                     let e = msg.err().unwrap();
-                    println!("{}", e);
+                    tracing::error!("{}", e);
                     break;
                 }
             }
@@ -168,11 +161,11 @@ impl MidiSystem {
     }
 
     /// gets called by the midi system when there was data from the midi input
-    fn input_callback(ts: u64, data: &[u8], e: &mut sync::mpsc::Sender<Vec<u8>>) {
+    fn input_callback(_ts: u64, data: &[u8], e: &mut sync::mpsc::Sender<Vec<u8>>) {
         let msg= Vec::from(data);
-        println!("{} midi input: {:?}", ts, msg);
+        tracing::debug!("{:?}", msg);
         if let Err(e) = e.send(msg) {
-            println!("{}", e);
+            tracing::error!("{}", e);
         }
     }
 }

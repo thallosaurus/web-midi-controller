@@ -34,7 +34,7 @@ export class App {
         })
 
         if (hasFeature(f, "default")) {
-            App.socket.connectToProdEndpoint("localhost", 8000).then(overlayPath => {
+            App.socket.connectToProdEndpoint(location.hostname, 8000).then(overlayPath => {
                 console.log("getting", overlayPath);
                 this.fetchOverlays(overlayPath);
             });
@@ -67,7 +67,12 @@ export class App {
         }
 
         //this.initUi(this.handlers);
+        this.initSocketConnectionTrigger();
         debug("init done", this);
+    }
+
+    setupEvents() {
+        
     }
     
     async initDefaultBackend(): Promise<string> {
@@ -87,7 +92,7 @@ export class App {
     private initSocketConnectionTrigger() {
 
         const connect_button = document.querySelector<HTMLDivElement>("#disconnect-fallback .container button.primary")!
-        connect_button.addEventListener("click", (e) => {
+        connect_button.addEventListener("pointerdown", (e) => {
             console.log("sending connect to socket message from button")
             //connectSocketMessage(this, location.hostname);
         });

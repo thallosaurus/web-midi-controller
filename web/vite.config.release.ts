@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import path from 'path'
 import fs from 'node:fs'
 
-import tsconfigPaths from 'vite-tsconfig-paths';
 import handlebars from 'vite-plugin-handlebars';
 
 //import legacy from "@vitejs/plugin-legacy";
@@ -17,6 +16,9 @@ process.env.VITE_AUTO_CONNECT_LOCAL = String(false);
 export default defineConfig({
   //plugins: [tsconfigPaths()],
   plugins: [handlebars({
+    context: {
+      devMode: false
+    },
     partialDirectory: path.resolve(__dirname, 'html')
   })],
   resolve: {

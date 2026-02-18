@@ -6,8 +6,8 @@ export type WebsocketWorkerEvent =
     | CoreWorkerMessage
     | { type: "connect", host: string, port: number, path: string }
     | { type: "connection-successful", overlayPath: string }
-    | { type: "connection-failed" }
+    | { type: "connection-failed", error: string }
     | { type: "disconnect" }
     | { type: "disconnect-successful" }
-    | { type: "disconnect-failed" }
+    | { type: "disconnect-failed", error: string }
     | { type: "data", payload: MidiMessage }

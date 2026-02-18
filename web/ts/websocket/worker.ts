@@ -55,7 +55,8 @@ class WebsocketWorker extends CoreWorker<WebsocketWorkerEvent, WebsocketWorkerEv
                     console.error("connection failed:", e);
                     //this.socket = null
                     this.send({
-                        type: "connection-failed"
+                        type: "connection-failed",
+                        error: String(e)
                     })
                 })
                 break;
@@ -71,7 +72,8 @@ class WebsocketWorker extends CoreWorker<WebsocketWorkerEvent, WebsocketWorkerEv
                     })
                 } else {
                     this.send({
-                        type: "disconnect-failed"
+                        type: "disconnect-failed",
+                        error: "couldnt disconnect"
                     })
                 }
                 break;
@@ -89,13 +91,15 @@ function connectSocketAsync(socket: WebSocket): Promise<void> {
         }
 
         const fn_close = (e: any) => {
+            console.log(e);
             socket.removeEventListener("close", fn_close);
-            reject(e);
+            reject(e.reason);
         }
 
         const fn_error = (e: any) => {
             socket.removeEventListener("error", fn_error);
-            reject(e);
+            console.log(e);
+            reject(null);
         }
 
         socket.addEventListener("error", fn_error);

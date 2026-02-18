@@ -1,4 +1,32 @@
+import { type MidiMessage } from "./bindings/MidiPayload.ts";
+
+function getLibraryPath() {
+  const override = Deno.env.get("LIBRARY");
+  if (override) {
+    if (override == "::bundled::") {
+      return getDefaultLibraryPath();
+    } else {
+      console.info("using overridden library path")
+      return new URL(override);
+    }
+  } else {
+    return getVendoredLibrary();
+  }
+}
+
+function getVendoredLibrary(): URL {
+  // host the library on github and return a link to it here
+  // TODO
+  return getDefaultLibraryPath();
+}
+
 function getDefaultLibraryPath() {
+  const override = Deno.env.get("LIBRARY");
+  if (override) {
+    console.info("using overridden library path")
+    return new URL(override);
+  }
+
   const path = {
     windows: new URL("./native/midi_driver.dll", import.meta.url),
     linux: new URL("./native/libmidi_driver.so", import.meta.url),
@@ -44,6 +72,10 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
     parameters: [];
     result: "void";
   };
+  list_devices: {
+    parameters: [];
+    result: "void";
+  };
   convert_bytes: {
     parameters: ["pointer", "usize"],
     result: "pointer"
@@ -55,7 +87,7 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
 }
 
 interface MidiDriverOptions {
-  pollBytes: boolean,
+  //pollBytes: boolean,
   useVirtual: boolean,
   //libraryPath?: string,
   inputName: string
@@ -66,11 +98,16 @@ export class MidiDriver {
   private static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
+
+  get dylibLoaded() {
+    return MidiDriver.dylib !== null;
+  }
+
   constructor(options: MidiDriverOptions) {
     if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
     try {
       MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
-        getDefaultLibraryPath(),
+        getLibraryPath(),
         {
           start_driver: {
             parameters: ["u8", "pointer", "pointer"],
@@ -96,6 +133,10 @@ export class MidiDriver {
             parameters: [],
             result: "void",
           },
+          list_devices: {
+            parameters: [],
+            result: "void",
+          },
           convert_bytes: {
             parameters: ["pointer", "usize"],
             result: "pointer"
@@ -103,15 +144,10 @@ export class MidiDriver {
           free_bytes: {
             parameters: ["pointer"],
             result: "void",
-          },
+          }
         } as const,
       );
 
-      if (options.pollBytes) {
-        this.pollInterval = setInterval(this.pollBytes.bind(this), 100);
-      } else {
-        this.pollInterval = setInterval(this.poll.bind(this), 100);
-      }
 
       const virt = Deno.build.os == "windows" ? false : options.useVirtual
 
@@ -123,12 +159,13 @@ export class MidiDriver {
       const output_name = Deno.UnsafePointer.of(output_name_bytes)
 
       MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
+      this.pollLoop();
+
     } catch (e) {
       console.error("could not load midi driver", e);
       console.warn("midi output is disabled");
       MidiDriver.dylib = null;
     }
-    //this.emitter.addEventListener("data", this.customEventHandler.bind(this));
   }
 
   customEventHandler(ev: Event): void {
@@ -136,14 +173,28 @@ export class MidiDriver {
     console.log(e.detail);
   }
 
-  sendMidi(event: object) {
-    if (MidiDriver.dylib !== null) {
+  private async pollLoop() {
+    while (this.dylibLoaded) {
+      this.pollBytes();
+
+      await new Promise((r) => setTimeout(r, 1));
+    }
+  }
+
+  sendMidi(event: MidiMessage) {
+    if (this.dylibLoaded) {
       const encoder = new TextEncoder();
       const json = JSON.stringify(event);
       const bytes = encoder.encode(json);
 
       const ptr = Deno.UnsafePointer.of(new Uint8Array(bytes));
       MidiDriver.dylib!.symbols.send_midi(ptr);
+    }
+  }
+
+  listDevices() {
+    if (MidiDriver.dylib !== null) {
+      MidiDriver.dylib.symbols.list_devices();
     }
   }
 
@@ -177,6 +228,9 @@ export class MidiDriver {
     }
   }
 
+  /**
+   * @deprecated
+   */
   poll() {
     if (MidiDriver.dylib !== null) {
       do {
