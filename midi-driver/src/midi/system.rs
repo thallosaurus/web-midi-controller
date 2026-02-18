@@ -9,11 +9,9 @@ use midir::os::unix::VirtualInput;
 #[cfg(not(target_os = "windows"))]
 use midir::os::unix::VirtualOutput;
 
-use crate::midi::messages::MidiMessage;
-
 //use std::fmt::Display as DebugDisplay;
 
-type ReturnOutputSenderType = sync::mpsc::Sender<MidiMessage>;
+//type ReturnOutputSenderType = sync::mpsc::Sender<MidiMessage>;
 
 pub struct MidiSystem {
     _midi_input: MidiInputConnection<sync::mpsc::Sender<Vec<u8>>>,
@@ -25,7 +23,7 @@ pub enum MidiSystemErrors {
     InitError(midir::InitError),
     OutputConnectError(midir::ConnectError<MidiOutput>),
     InputConnectError(midir::ConnectError<MidiInput>),
-    NotSupported,
+    _NotSupported,
     DeviceNotFound(String),
 }
 
@@ -39,7 +37,7 @@ impl Display for MidiSystemErrors {
             MidiSystemErrors::InputConnectError(connect_error) => {
                 write!(f, "input error: {}", connect_error)
             }
-            MidiSystemErrors::NotSupported => {
+            MidiSystemErrors::_NotSupported => {
                 write!(f, "virtual midi ports are not supported on this system")
             }
             MidiSystemErrors::DeviceNotFound(name) => {

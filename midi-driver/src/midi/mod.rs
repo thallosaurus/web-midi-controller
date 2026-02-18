@@ -10,8 +10,8 @@ pub enum PortListError {
 
 #[derive(Debug)]
 pub struct PortList {
-    inputs: Vec<String>,
-    outputs: Vec<String>,
+    _inputs: Vec<String>,
+    _outputs: Vec<String>,
 }
 
 pub fn default_list() -> Result<PortList, PortListError> {
@@ -22,15 +22,15 @@ pub fn default_list() -> Result<PortList, PortListError> {
 }
 
 fn list(midi_in: MidiInput, midi_out: MidiOutput) -> Result<PortList, PortListError> {
-    let mut inputs = Vec::new();
-    let mut outputs = Vec::new();
+    let mut _inputs = Vec::new();
+    let mut _outputs = Vec::new();
 
     for (_, p) in midi_in.ports().iter().enumerate() {
         //println!("{}: {} (ID: \"{}\")", i, midi_in.port_name(p).unwrap(), p.id());
         let port = midi_in
             .port_name(p)
             .map_err(|e| PortListError::PortNotValid(e))?;
-        inputs.push(port);
+        _inputs.push(port);
     }
 
     for (_, p) in midi_out.ports().iter().enumerate() {
@@ -38,8 +38,8 @@ fn list(midi_in: MidiInput, midi_out: MidiOutput) -> Result<PortList, PortListEr
         let port = midi_out
             .port_name(p)
             .map_err(|e| PortListError::PortNotValid(e))?;
-        outputs.push(port);
+        _outputs.push(port);
     }
 
-    Ok(PortList { inputs, outputs })
+    Ok(PortList { _inputs, _outputs })
 }

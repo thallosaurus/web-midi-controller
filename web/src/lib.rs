@@ -3,7 +3,7 @@ pub mod overlays;
 
 #[cfg(test)]
 mod tests {
-    use crate::overlays::{Overlay, load};
+    use crate::overlays::{Overlay};
 
     const EIGHT_X_EIGHT: &'static str = include_str!("../../overlays/8x8-midi-grid.toml");
     const FULLSCREEN_XY_NOTE: &'static str = include_str!("../../overlays/fullscreen-xypad-note.toml");
@@ -42,7 +42,7 @@ mod tests {
         mode = 'trigger'
         ";
 
-        let overlay: Overlay = toml::from_str(s).unwrap();
+        let _overlay: Overlay = toml::from_str(s).unwrap();
         assert!(true)
     }
 

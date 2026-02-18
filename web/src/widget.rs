@@ -1,27 +1,6 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-/// MARK: - typescript definitions
-/// dont use
-#[derive(TS, Serialize, Deserialize)]
-#[ts(export, export_to = "Overlay.ts")]
-#[serde(tag = "type")]
-#[deprecated]
-pub(super) enum AllowedWidgetProperties {
-    #[serde(rename = "notebutton")]
-    NoteButton,
-    #[serde(rename = "ccslider")]
-    CCSlider,
-    #[serde(rename = "ccbutton")]
-    CCButton,
-    #[serde(rename = "rotary")]
-    RotarySlider,
-    #[serde(rename = "jogwheel")]
-    Jogwheel,
-    #[serde(rename = "xypad")]
-    XYPad,
-}
-
 /// MARK: - Shared
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
