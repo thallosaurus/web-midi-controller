@@ -91,7 +91,7 @@ export class App {
     private initSocketConnectionTrigger() {
 
         const connect_button = document.querySelector<HTMLDivElement>("#disconnect-fallback .container button.primary")!
-        connect_button.addEventListener("click", (e) => {
+        connect_button.addEventListener("pointerdown", (e) => {
             console.log("sending connect to socket message from button")
             //connectSocketMessage(this, location.hostname);
         });

@@ -4,8 +4,9 @@
   "version": "0.1.11",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "vite --config vite.config.debug.ts",
+    "build": "tsc && vite build --config vite.config.debug.ts",
+    "build:release": "tsc && vite build --config vite.config.release.ts",
     "preview": "vite preview"
   },
   "devDependencies": {
