@@ -8,7 +8,8 @@
     "compile:mac:release": "cargo build -p midi-driver --release && mkdir -p ./native && mv ../target/release/libmidi_driver.dylib ./native/",
     "compile:linux:release": "cargo build -p midi-driver --release && mkdir -p ./native && mv ../target/release/libmidi_driver.so ./native/",
     "compile:win:release": "cargo build -p midi-driver --release && mkdir -p ./native && mv ../target/release/midi_driver.dll ./native/",
-    "monitor": "deno run -A monitor.ts"
+    "monitor": "deno run -A monitor.ts",
+    "create:npm": "mkdir -p npm && mkdir -p npm/native && cp native/libmidi_driver.dylib npm/native/libmidi_driver.dylib && cp package.node.json npm/package.json && deno bundle mod.ts > npm/index.js"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"
