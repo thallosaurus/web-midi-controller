@@ -70,6 +70,12 @@ export class MidiDriver {
   private static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
+
+  private unsafeCallback: Deno.UnsafeCallback<{
+        parameters: ["pointer", "usize"],
+        result: "void"
+      }> | null = null;
+
   constructor(options: MidiDriverOptions) {
     if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
     try {
@@ -111,7 +117,7 @@ export class MidiDriver {
           free_bytes: {
             parameters: ["pointer"],
             result: "void",
-          },
+          }
         } as const,
       );
 
@@ -131,6 +137,7 @@ export class MidiDriver {
       const output_name = Deno.UnsafePointer.of(output_name_bytes)
 
       MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
+
     } catch (e) {
       console.error("could not load midi driver", e);
       console.warn("midi output is disabled");
