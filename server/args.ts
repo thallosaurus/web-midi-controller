@@ -8,13 +8,17 @@ interface MidiSettings {
 }
 
 export interface ServerSettings {
-    midi: MidiSettings
+    midi: MidiSettings,
+    path: {
+        overlayPath: string
+    }
 }
 
 export function parseArguments(): ServerSettings {
     const flags = parseArgs(Deno.args, {
         boolean: ["virtual"],
-        string: ["inputName", "outputName"]
+        string: ["inputName", "outputName"],
+        default: { virtual: true }
     })
 
     if (Deno.build.os == "windows") flags.virtual = false;
@@ -25,6 +29,9 @@ export function parseArguments(): ServerSettings {
             useVirtual: flags.virtual,
             inputName: (flags.inputName ?? "homebrewdj input"),
             outputName: (flags.outputName ?? "homebrewdj output")
+        },
+        path: {
+            overlayPath: "../overlays"
         }
     }
 }

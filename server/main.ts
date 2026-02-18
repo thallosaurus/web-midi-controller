@@ -26,7 +26,7 @@ export class ServerMain {
 
     this.app.use("/overlays", cors());
     this.app.get("/overlays", async (c) => {
-      return c.json(await this.getOverlaysFromDisk());
+      return c.json(await this.getOverlaysFromDisk(settings.path.overlayPath));
       //let data = parse()
     });
 
@@ -59,7 +59,7 @@ export class ServerMain {
           }, [])
           this.driver.sendMidi(midiEvent.payload!);
           break;
-          
+
         case "cc":
           WebsocketEventHandler.broadcast({
             type: "midi-data",
@@ -111,15 +111,15 @@ export class ServerMain {
     this.driver.close();
   }
 
-  async getOverlaysFromDisk() {
+  async getOverlaysFromDisk(path: string) {
     const overlay_buffer = [];
-    for await (const dirEntry of Deno.readDir("../overlays")) {
+    for await (const dirEntry of Deno.readDir(path)) {
       if (dirEntry.isFile) {
         const ext = dirEntry.name.split(".").pop();
         if (ext == "toml") {
           console.log(dirEntry);
           const contents = await Deno.readTextFile(
-            "../overlays/" + dirEntry.name,
+            path + dirEntry.name,
           );
           const data = parse(contents);
           console.log(data);
