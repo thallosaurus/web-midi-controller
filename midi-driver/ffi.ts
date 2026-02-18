@@ -1,4 +1,10 @@
 function getDefaultLibraryPath() {
+  const override = Deno.env.get("LIBRARY");
+  if (override) {
+    console.info("using overridden library path")
+    return new URL(override);
+  }
+
   const path = {
     windows: new URL("./native/midi_driver.dll", import.meta.url),
     linux: new URL("./native/libmidi_driver.so", import.meta.url),
@@ -145,7 +151,7 @@ export class MidiDriver {
     while (MidiDriver.dylib !== null) {
       this.pollBytes();
 
-      await Promise.resolve();
+      await new Promise((r) => setTimeout(r, 1));
     }
   }
 

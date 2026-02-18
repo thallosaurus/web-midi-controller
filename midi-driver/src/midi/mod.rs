@@ -8,6 +8,7 @@ pub enum PortListError {
     PortNotValid(PortInfoError),
 }
 
+#[derive(Debug)]
 pub struct PortList {
     inputs: Vec<String>,
     outputs: Vec<String>,

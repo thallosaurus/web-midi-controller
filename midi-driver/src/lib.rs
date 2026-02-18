@@ -76,9 +76,6 @@ pub extern "C" fn poll_bytes(ptr: *mut u8, len: usize) -> usize {
     if let Some(rx) = guard.as_mut() {
         match rx.try_recv() {
             Ok(bytes) => {
-                //let as_string = serde_json::to_string(&msg).unwrap();
-
-                //return std::ffi::CString::new(as_string).unwrap().into_raw();
                 let copy_len = usize::min(len, bytes.len());
 
                 if !ptr.is_null() {
@@ -156,7 +153,9 @@ pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn list_devices() {
-    default_list().unwrap();
+    let list = default_list().unwrap();
+
+    println!("{:?}", list);
 }
 #[unsafe(no_mangle)]
 pub extern "C" fn free_bytes(ptr: *const u8, len: usize) {

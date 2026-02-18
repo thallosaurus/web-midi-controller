@@ -5,10 +5,10 @@ pub fn init_tracing() {
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
                 #[cfg(debug_assertions)]
-                return format!("{}=debug",env!("CARGO_CRATE_NAME")).into();
+                return format!("{}=debug", env!("CARGO_CRATE_NAME")).into();
 
                 #[cfg(not(debug_assertions))]
-                return format!("{}=info",env!("CARGO_CRATE_NAME")).into();
+                return format!("{}=info", env!("CARGO_CRATE_NAME")).into();
             }),
         )
         .with(tracing_subscriber::fmt::layer())
