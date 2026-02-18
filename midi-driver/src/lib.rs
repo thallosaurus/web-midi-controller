@@ -9,7 +9,7 @@ use std::{
 
 use once_cell::sync::Lazy;
 
-use crate::{logging::init_tracing, midi::{messages::MidiMessage, system::MidiSystem}};
+use crate::{logging::init_tracing, midi::{default_list, messages::MidiMessage, system::MidiSystem}};
 
 mod midi;
 mod logging;
@@ -154,6 +154,10 @@ pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
     c_str.into_raw()
 }
 
+#[unsafe(no_mangle)]
+pub extern "C" fn list_devices() {
+    default_list().unwrap();
+}
 #[unsafe(no_mangle)]
 pub extern "C" fn free_bytes(ptr: *const u8, len: usize) {
     if ptr.is_null() || len == 0 {

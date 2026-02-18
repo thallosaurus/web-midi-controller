@@ -91,8 +91,17 @@ export class CoreServerState {
       case "ControlChange":
         return msg.channel == this.systemChannel
 
+      case "Start":
+      case "TimingClock":
+      case "Continue":
+      case "Stop":
+      case "SongPositionPointer":
       case "Unknown":
-        return false
+        return true
+
+      //case "Pitchbend":
+
     }
+    return false
   }
 }

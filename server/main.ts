@@ -120,7 +120,7 @@ export class ServerMain {
         if (ext == "toml") {
           console.log(dirEntry);
           const contents = await Deno.readTextFile(
-            path + dirEntry.name,
+            path + "/" + dirEntry.name,
           );
           const data = parse(contents);
           console.log(data);

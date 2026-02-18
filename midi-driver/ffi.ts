@@ -44,6 +44,10 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
     parameters: [];
     result: "void";
   };
+  list_devices: {
+    parameters: [];
+    result: "void";
+  };
   convert_bytes: {
     parameters: ["pointer", "usize"],
     result: "pointer"
@@ -96,6 +100,10 @@ export class MidiDriver {
             parameters: [],
             result: "void",
           },
+          list_devices: {
+            parameters: [],
+            result: "void",
+          },
           convert_bytes: {
             parameters: ["pointer", "usize"],
             result: "pointer"
@@ -144,6 +152,12 @@ export class MidiDriver {
 
       const ptr = Deno.UnsafePointer.of(new Uint8Array(bytes));
       MidiDriver.dylib!.symbols.send_midi(ptr);
+    }
+  }
+
+  listDevices() {
+    if (MidiDriver.dylib !== null) {
+      MidiDriver.dylib.symbols.list_devices();
     }
   }
 

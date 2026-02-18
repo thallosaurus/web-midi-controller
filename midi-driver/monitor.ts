@@ -7,6 +7,8 @@ const driver = new MidiDriver({
     outputName: "midi monitor output"
 });
 
+driver.listDevices();
+
 driver.emitter.addEventListener("data", (ev) => {
     const data = (ev as CustomEvent).detail;
     console.log(data);
