@@ -114,8 +114,6 @@ export class ServerMain {
 
       const midiEvent = createMidiEventPayload(evt.detail);
 
-      //console.log("midi event", midiEvent);
-
       switch (midiEvent.type) {
         case "midi-data":
           this.state.inputData(midiEvent.data);
@@ -127,6 +125,7 @@ export class ServerMain {
   }
 
   close() {
+    WebsocketEventHandler.disconnectAll();
     for (const [id, ws] of WebsocketEventHandler.clients.entries()) {
       ws.close();
       WebsocketEventHandler.clients.delete(id);
@@ -141,12 +140,10 @@ export class ServerMain {
       if (dirEntry.isFile) {
         const ext = dirEntry.name.split(".").pop();
         if (ext == "toml") {
-          console.log(dirEntry);
           const contents = await Deno.readTextFile(
             path + "/" + dirEntry.name,
           );
           const data = parse(contents);
-          console.log(data);
           overlay_buffer.push(data);
         }
       }

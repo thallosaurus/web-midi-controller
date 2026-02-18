@@ -7,7 +7,8 @@ export type WebsocketServerMessage =
     connectionId: string;
     overlayPath: string;
   }
-  | { type: "midi-data"; data: MidiMessage };
+  | { type: "midi-data"; data: MidiMessage }
+  | { type: "close" }
 
 export function createWebsocketConnectionInfoPayload(connectionId: string): any {
   return {

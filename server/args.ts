@@ -17,8 +17,8 @@ export interface ServerSettings {
 export function parseArguments(): ServerSettings {
     const flags = parseArgs(Deno.args, {
         boolean: ["virtual"],
-        string: ["inputName", "outputName", "systemChannel"],
-        default: { virtual: true, systemChannel: String(15) }
+        string: ["inputName", "outputName", "systemChannel", "overlayPath"],
+        default: { virtual: true, systemChannel: String(15), overlayPath: "./overlays" }
     })
 
     if (Deno.build.os == "windows") flags.virtual = false;
@@ -31,7 +31,7 @@ export function parseArguments(): ServerSettings {
             systemChannel: Number(flags.systemChannel)
         },
         path: {
-            overlayPath: "../overlays"
+            overlayPath: flags.overlayPath
         }
     }
 }

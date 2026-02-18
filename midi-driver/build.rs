@@ -4,7 +4,7 @@ includedir=${prefix}/include
 
 Name: midicore
 Description: MIDI control runtime
-Version: 0.1.11
+Version: 0.1.12
 
 Libs: -L${libdir} -lmidicore
 Cflags: -I${includedir}";
