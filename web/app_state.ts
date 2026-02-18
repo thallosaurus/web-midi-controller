@@ -34,7 +34,7 @@ export class App {
         })
 
         if (hasFeature(f, "default")) {
-            App.socket.connectToProdEndpoint("localhost", 8000).then(overlayPath => {
+            App.socket.connectToProdEndpoint(location.hostname, 8000).then(overlayPath => {
                 console.log("getting", overlayPath);
                 this.fetchOverlays(overlayPath);
             });
@@ -67,6 +67,7 @@ export class App {
         }
 
         //this.initUi(this.handlers);
+        this.initSocketConnectionTrigger();
         debug("init done", this);
     }
 

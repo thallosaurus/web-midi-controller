@@ -13,7 +13,7 @@ export function createWebsocketConnectionInfoPayload(connectionId: string): any 
   return {
     type: "connection-information",
     connectionId,
-    overlayPath: "http://localhost:8000/overlays",
+    overlayPath: "/overlays",
   };
 }
 
