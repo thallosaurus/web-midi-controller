@@ -116,28 +116,29 @@ impl MidiSystem {
     }
 
     pub(crate) fn new(
-        device_name: Option<String>,
+        input_device_name: String,
+        output_device_name: String,
         use_virtual: bool,
         midi_ingress: sync::mpsc::Sender<Vec<u8>>,
         midi_engress: sync::mpsc::Receiver<Vec<u8>>,
     ) -> Result<Self, MidiSystemErrors> {
-        let output_name = device_name
+        /*let output_name = device_name
             .clone()
             .unwrap_or(String::from("midi control output"));
         let input_name = device_name
             .clone()
-            .unwrap_or(String::from("midi control input"));
+            .unwrap_or(String::from("midi control input"));*/
 
         let input;
         let output;
         if use_virtual {
             println!("using virtual ports");
-            input = Self::init_virtual_input(input_name, midi_ingress)?;
-            output = Self::init_virtual_output(output_name)?;
+            input = Self::init_virtual_input(input_device_name, midi_ingress)?;
+            output = Self::init_virtual_output(output_device_name)?;
         } else {
             println!("using physical ports");
-            input = Self::init_physical_input(input_name, midi_ingress)?;
-            output = Self::init_physical_output(output_name)?;
+            input = Self::init_physical_input(input_device_name, midi_ingress)?;
+            output = Self::init_physical_output(output_device_name)?;
         }
 
         let system = MidiSystem {

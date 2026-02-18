@@ -19,7 +19,7 @@ static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<Vec<u8>>>>> = Lazy::new(|| Mutex:
 static CLOSE_CHANNEL: Lazy<Mutex<Option<Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
 #[unsafe(no_mangle)]
-pub extern "C" fn start_driver(use_virtual: bool) {
+pub extern "C" fn start_driver(use_virtual: bool, input_name: *const c_char, output_name: *const c_char) {
     //let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
     let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
     let (tx_egress, rx_egress) = channel::<Vec<u8>>();
@@ -29,10 +29,16 @@ pub extern "C" fn start_driver(use_virtual: bool) {
     let (tx_close, rx_close) = channel();
     *CLOSE_CHANNEL.lock().unwrap() = Some(tx_close);
 
+    let in_cstr = unsafe { CStr::from_ptr(input_name) };
+    let input_name = in_cstr.to_str().unwrap();
+
+    let out_cstr = unsafe { CStr::from_ptr(output_name) };
+    let output_name = out_cstr.to_str().unwrap();
+
     thread::spawn(move || {
         //let mut counter = 0;
         let _system =
-            MidiSystem::new(Some("test device".to_string()), use_virtual, tx_ingress, rx_egress).unwrap();
+            MidiSystem::new(String::from(input_name), String::from(output_name), use_virtual, tx_ingress, rx_egress).unwrap();
         loop {
             // await death here
             if let Ok(_s) = rx_close.recv() {

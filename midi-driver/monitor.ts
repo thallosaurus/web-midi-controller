@@ -2,7 +2,9 @@ import { MidiDriver } from "./mod.ts";
 
 const driver = new MidiDriver({
     pollBytes: true,
-    useVirtual: true
+    useVirtual: true,
+    inputName: "midi monitor input",
+    outputName: "midi monitor output"
 });
 
 driver.emitter.addEventListener("data", (ev) => {
