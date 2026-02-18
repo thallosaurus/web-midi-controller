@@ -8,6 +8,7 @@ import { WebsocketEventHandler, WSState } from "./event_handler.ts";
 import { CoreServerState, CoreServerStateEvents } from "./state.ts";
 import { serveFrontend } from "./frontend.ts";
 import { parseArguments, ServerSettings } from "./args.ts";
+import { existsSync } from "https://deno.land/std/fs/mod.ts";
 
 export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
@@ -17,7 +18,7 @@ export class ServerMain {
   constructor(settings: ServerSettings) {
     this.driver = new MidiDriver(settings.midi)
     this.state = new CoreServerState(settings.midi.systemChannel);
-    
+
     this.app.get(
       "/ws",
       upgradeWebSocket((c) => {
@@ -43,6 +44,28 @@ export class ServerMain {
 
       return file;
     });
+
+    this.app.get("/custom.css", async (c) => {
+      const p = new URL(settings.path.overlayPath + "/css/custom.css", import.meta.url);
+      console.log(p)
+      if (existsSync(p)) {
+
+        const contents = await Deno.readTextFile(
+          p
+        );
+        return new Response(contents, {
+          headers: {
+            "Content-Type": "text/css"
+          }
+        })
+      } else {
+        return new Response("/* no custom css found */", {
+          headers: {
+            "Content-Type": "text/css"
+          }
+        })
+      }
+    })
 
     // the state got changed
     this.state.events.addEventListener("data", (ev) => {

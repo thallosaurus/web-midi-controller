@@ -1,3 +1,25 @@
+import { type MidiMessage } from "./bindings/MidiPayload.ts";
+
+function getLibraryPath() {
+  const override = Deno.env.get("LIBRARY");
+  if (override) {
+    if (override == "::bundled::") {
+      return getDefaultLibraryPath();
+    } else {
+      console.info("using overridden library path")
+      return new URL(override);
+    }
+  } else {
+    return getVendoredLibrary();
+  }
+}
+
+function getVendoredLibrary(): URL {
+  // host the library on github and return a link to it here
+  // TODO
+  return getDefaultLibraryPath();
+}
+
 function getDefaultLibraryPath() {
   const override = Deno.env.get("LIBRARY");
   if (override) {
@@ -65,7 +87,7 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
 }
 
 interface MidiDriverOptions {
-  pollBytes: boolean,
+  //pollBytes: boolean,
   useVirtual: boolean,
   //libraryPath?: string,
   inputName: string
@@ -77,11 +99,15 @@ export class MidiDriver {
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
 
+  get dylibLoaded() {
+    return MidiDriver.dylib !== null;
+  }
+
   constructor(options: MidiDriverOptions) {
     if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
     try {
       MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
-        getDefaultLibraryPath(),
+        getLibraryPath(),
         {
           start_driver: {
             parameters: ["u8", "pointer", "pointer"],
@@ -122,16 +148,16 @@ export class MidiDriver {
         } as const,
       );
 
-      
+
       const virt = Deno.build.os == "windows" ? false : options.useVirtual
-      
+
       const encoder = new TextEncoder();
       const input_name_bytes = encoder.encode(options.inputName)
       const input_name = Deno.UnsafePointer.of(input_name_bytes)
-      
+
       const output_name_bytes = encoder.encode(options.outputName)
       const output_name = Deno.UnsafePointer.of(output_name_bytes)
-      
+
       MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
       this.pollLoop();
 
@@ -148,15 +174,15 @@ export class MidiDriver {
   }
 
   private async pollLoop() {
-    while (MidiDriver.dylib !== null) {
+    while (this.dylibLoaded) {
       this.pollBytes();
 
       await new Promise((r) => setTimeout(r, 1));
     }
   }
 
-  sendMidi(event: object) {
-    if (MidiDriver.dylib !== null) {
+  sendMidi(event: MidiMessage) {
+    if (this.dylibLoaded) {
       const encoder = new TextEncoder();
       const json = JSON.stringify(event);
       const bytes = encoder.encode(json);
@@ -202,6 +228,9 @@ export class MidiDriver {
     }
   }
 
+  /**
+   * @deprecated
+   */
   poll() {
     if (MidiDriver.dylib !== null) {
       do {

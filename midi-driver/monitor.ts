@@ -1,14 +1,14 @@
 import { MidiDriver } from "./mod.ts";
 
 const driver = new MidiDriver({
-    pollBytes: true,
+    //pollBytes: true,
     useVirtual: true,
     inputName: "midi monitor input",
     outputName: "midi monitor output"
 });
 
-driver.listDevices();
 
+driver.listDevices();
 
 Deno.addSignalListener("SIGINT", () => {
     console.log("Received SIGINT");

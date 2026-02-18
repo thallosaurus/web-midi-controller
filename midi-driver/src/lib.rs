@@ -157,6 +157,7 @@ pub extern "C" fn list_devices() {
 
     println!("{:?}", list);
 }
+
 #[unsafe(no_mangle)]
 pub extern "C" fn free_bytes(ptr: *const u8, len: usize) {
     if ptr.is_null() || len == 0 {
