@@ -116,18 +116,18 @@ export class MidiDriver {
         } as const,
       );
 
-      this.pollLoop();
-
+      
       const virt = Deno.build.os == "windows" ? false : options.useVirtual
-
+      
       const encoder = new TextEncoder();
       const input_name_bytes = encoder.encode(options.inputName)
       const input_name = Deno.UnsafePointer.of(input_name_bytes)
-
+      
       const output_name_bytes = encoder.encode(options.outputName)
       const output_name = Deno.UnsafePointer.of(output_name_bytes)
-
+      
       MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
+      this.pollLoop();
 
     } catch (e) {
       console.error("could not load midi driver", e);
