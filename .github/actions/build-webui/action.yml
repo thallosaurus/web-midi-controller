@@ -1,9 +1,9 @@
 name: "Build Web Frontend"
 description: "Build Web Frontend"
 
-#inputs:
-#    target:
-#        required: true
+inputs:
+    target:
+        required: true
 
 runs:
     using: "composite"
@@ -14,6 +14,7 @@ runs:
           run: yarn && yarn build:release
 
         - uses: actions/upload-artifact@v4
+          if: inputs.target == 'linux'
           with:
             name: webui
             path: |
