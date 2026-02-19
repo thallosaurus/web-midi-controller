@@ -34,7 +34,7 @@ Before running the program, you need to download the overlays and place them nex
 If you are on Windows, you need to download a virtual MIDI driver since Windows lacks an API for it out-of-the-Box. A good and tested one is (https://www.nerds.de/en/loopbe1.html)[https://www.nerds.de/en/loopbe1.html]. Install it and run the executable file the `-n` flag, like so:
 
 ```
-midi-controller-Windows.exe -n="LoopBe Internal MIDI"
+midi-controller-Windows.exe --inputName="LoopBe Internal MIDI"
 ```
 
 If you don't install a virtual MIDI Driver you can only control physical MIDI ports.
