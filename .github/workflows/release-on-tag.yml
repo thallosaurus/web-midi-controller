@@ -84,6 +84,6 @@ jobs:
               dist/build-mac/**/homebrewdj.mac
               dist/build-win/**/homebrewdj.exe
               dist/build-mac/**/libmidi_driver.dylib
-              dist/build-linux/**/ibmidi_driver.so
+              dist/build-linux/**/libmidi_driver.so
               dist/build-win/**/midi_driver.dll
               dist/**/LICENSE
