@@ -1,0 +1,30 @@
+#name: Release on vx.x.x Tag
+name: "Build multiplatform"
+
+on:
+#  push:
+#    tags:
+#      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+          - os: macos-latest
+            target: mac
+          - os: windows-latest
+            target: win
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+        - uses: actions/checkout@v4
+        - uses: ./.github/actions/setup-env
+        - uses: ./.github/actions/build-bindings
+        - uses: ./.github/actions/build-webui
+        - uses: ./.github/actions/build-driver
+        - uses: ./.github/actions/build-server

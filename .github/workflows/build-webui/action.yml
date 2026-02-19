@@ -1,0 +1,21 @@
+name: "Build Web Frontend"
+description: "Build Web Frontend"
+
+#inputs:
+#    target:
+#        required: true
+
+runs:
+    using: "composite"
+    steps:
+        - name: Build Web UI
+          shell: bash
+          working-directory: ./web
+          run: yarn && yarn build:release
+
+        - uses: actions/upload-artifact@v4
+          with:
+            name: webui
+            path: |
+              web/bindings/*
+              web/dist/*
