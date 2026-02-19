@@ -60,6 +60,12 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
     }
   }
 
+  static disconnectAll() {
+    WebsocketEventHandler.broadcast({
+      type: "close"
+    }, []);
+  }
+
   static broadcast(msg: WebsocketServerMessage, except: string[]) {
     const e = new Set(except);
     for (const id of WebsocketEventHandler.clients.keys()) {

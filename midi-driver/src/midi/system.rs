@@ -64,7 +64,7 @@ impl MidiSystem {
         }
 
         #[cfg(target_os = "windows")]
-        return Err(MidiSystemErrors::NotSupported);
+        return Err(MidiSystemErrors::_NotSupported);
         //panic!("cant create virtual ports on windows")
     }
 
@@ -83,7 +83,7 @@ impl MidiSystem {
         }
 
         #[cfg(target_os = "windows")]
-        return Err(MidiSystemErrors::NotSupported);
+        return Err(MidiSystemErrors::_NotSupported);
     }
 
     fn init_physical_input(

@@ -1,7 +1,7 @@
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
-import { AllowedWidgetProperties, type Overlay } from "@bindings/Overlay.ts";
+import { type Overlay } from "@bindings/Overlay.ts";
 import { uuid } from "@common/utils.ts";
 
 // widget imports

@@ -15,6 +15,7 @@ process.env.VITE_AUTO_CONNECT_LOCAL = String(false);
 
 export default defineConfig({
   //plugins: [tsconfigPaths()],
+  assetsInclude: ["**/.svg"],
   plugins: [handlebars({
     context: {
       devMode: true

@@ -45,9 +45,6 @@ jobs:
         working-directory: ./web
         run: yarn && yarn build:release
         
-      - name: Install cbindgen
-        run: cargo install cbindgen
-        
       - name: Build MIDI Driver (Mac)
         if: matrix.os == 'macos-latest'
         working-directory: ./midi-driver
