@@ -1,11 +1,11 @@
 {
   "tasks": {
     "dev": "deno run -A main.ts --overlayPath=../overlays",
-    "compile:mac:debug": "deno compile -A --include ../web/dist --no-check --unstable-sloppy-imports --include ../midi-driver/native/libmidi_driver.dylib --output homebrewdj ./main.ts",
+    "compile:mac:debug": "deno compile -A --include ../web/dist --no-check --unstable-sloppy-imports --include ../midi-driver/native/libmidi_driver.dylib --output homebrewdj.mac ./main.ts",
     "compile:mac:release": "CARGO_BUILD_TYPE=release deno compile -A --include ../web/dist --no-check --unstable-sloppy-imports --include ../midi-driver/native/libmidi_driver.dylib --output homebrewdj ./main.ts",
     "compile:win:debug": "deno compile -A --include ../web/dist --no-check --unstable-sloppy-imports --include ../midi-driver/native/midi_driver.dll --output homebrewdj ./main.ts",
     "compile:win:release": "CARGO_BUILD_TYPE=release deno compile -A --include ../web/dist --no-check --unstable-sloppy-imports --include ../midi-driver/native/midi_driver.dll --output homebrewdj ./main.ts",
-    "compile:linux:debug": "deno compile -A --include ../web/dist --no-check --unstable-sloppy-imports --include ../midi-driver/native/libmidi_driver.so --output homebrewdj ./main.ts",
+    "compile:linux:debug": "deno compile -A --include ../web/dist --no-check --unstable-sloppy-imports --include ../midi-driver/native/libmidi_driver.so --output homebrewdj.linux ./main.ts",
     "compile:linux:release": "CARGO_BUILD_TYPE=release deno compile -A --include ../web/dist --no-check --unstable-sloppy-imports --include ../midi-driver/native/libmidi_driver.so --output homebrewdj ./main.ts"
   },
   "imports": {

@@ -43,7 +43,8 @@ jobs:
             web/dist/*
             midi-driver/bindings/*
             midi-driver/native/*
-            server/homebrewdj
+            server/homebrewdj.linux
+            server/homebrewdj.mac
             server/homebrewdj.exe
 
       - uses: actions/upload-artifact@v4
@@ -79,10 +80,10 @@ jobs:
           with:
             draft: true
             files: |
-              dist/build-linux/**/homebrewdj
-              dist/build-mac/**/homebrewdj
+              dist/build-linux/**/homebrewdj.linux
+              dist/build-mac/**/homebrewdj.mac
               dist/build-win/**/homebrewdj.exe
               dist/build-mac/**/libmidi_driver.dylib
-              dist/build-linux/l**/ibmidi_driver.so
+              dist/build-linux/**/ibmidi_driver.so
               dist/build-win/**/midi_driver.dll
               dist/**/LICENSE
