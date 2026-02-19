@@ -27,4 +27,8 @@ jobs:
         - uses: ./.github/actions/build-bindings
         - uses: ./.github/actions/build-webui
         - uses: ./.github/actions/build-driver
+          with:
+            target: ${{ matrix.target }}
         - uses: ./.github/actions/build-server
+          with:
+            target: ${{ matrix.target }}

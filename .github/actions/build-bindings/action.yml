@@ -1,9 +1,9 @@
 name: "Build Bindings"
 description: "Build Bindings"
 
-inputs:
-    target:
-        required: true
+#inputs:
+#    target:
+#        required: true
 
 runs:
     using: "composite"
