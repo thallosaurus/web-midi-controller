@@ -82,16 +82,17 @@ jobs:
       - name: Rename Output (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: mv server/homebrewdj midi-controller-linux
-
+        
       - name: Rename Output (MacOS)
         if: matrix.os == 'macos-latest'
         run: mv server/homebrewdj midi-controller-macos
-
+        
       - name: Rename Output (Windows)
         if: matrix.os == 'windows-latest'
         run: mv server/homebrewdj.exe midi-controller-win.exe
-
+        
       - name: Package WebUI and Vendor Files
+        if: matrix.os == 'ubuntu-latest'
         run: |
           zip -r webui.zip web/dist
           zip -r overlays.zip overlays
@@ -104,6 +105,8 @@ jobs:
             midi-controller-linux
             midi-controller-macos
             midi-controller-win.exe
+            target/release/list_ports
+            target/release/list_ports.exe
             midi-driver/native/libmidi_driver.dylib
             midi-driver/native/libmidi_driver.so
             midi-driver/native/midi_driver.dll
