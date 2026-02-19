@@ -1,0 +1,21 @@
+name: "Build Server"
+description: "Build Server"
+
+inputs:
+    target:
+        required: true
+
+runs:
+    using: "composite"
+    steps:
+      - name: Build Server
+        shell: bash
+        working-directory: ./server
+        run: deno task compile:${{ inputs.target }}:release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: server-${{ inputs.target }}
+          path: |
+            server/homebrewdj
+            server/homebrewdj.exe

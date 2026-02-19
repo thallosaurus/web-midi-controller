@@ -1,0 +1,22 @@
+name: "Build MIDI Driver"
+description: "Build MIDI Driver"
+
+inputs:
+    target:
+        required: true
+
+runs:
+    using: "composite"
+    steps:
+      - name: Build MIDI Driver (Mac)
+        shell: bash
+        working-directory: ./midi-driver
+        #run: cargo build -p midi-driver --release
+        run: deno task compile:${{ inputs.target }}:release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: midi-driver-${{ inputs.target }}
+          path: |
+            midi-driver/bindings/*
+            midi-driver/native/*
