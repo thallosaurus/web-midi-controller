@@ -22,7 +22,7 @@ runs:
 
         - name: Install dependencies (Linux)
           if: matrix.os == 'ubuntu-latest'
-          shell: /bin/bash
+          shell: bash
           run: |
             sudo apt update
             sudo apt install -y libjack-dev libasound-dev
