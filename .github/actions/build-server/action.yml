@@ -19,3 +19,4 @@ runs:
           path: |
             server/homebrewdj
             server/homebrewdj.exe
+            overlays/*
