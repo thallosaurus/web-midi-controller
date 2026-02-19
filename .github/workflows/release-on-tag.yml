@@ -36,11 +36,13 @@ jobs:
           target: ${{ matrix.target }}
 
       - uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest'
         with:
           name: overlays
           path: |
             overlays/*
       - uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest'
         with:
           name: LICENSE
           path: |
