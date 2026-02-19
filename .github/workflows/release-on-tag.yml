@@ -36,6 +36,17 @@ jobs:
           target: ${{ matrix.target }}
 
       - uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.target }}
+          path: |
+            web/bindings/*
+            web/dist/*
+            midi-driver/bindings/*
+            midi-driver/native/*
+            server/homebrewdj
+            server/homebrewdj.exe
+
+      - uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-latest'
         with:
           name: overlays
@@ -56,6 +67,9 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             path: dist
+
+        - name: Inspect dist
+          run: ls -R dist
           
         - name: Release (on tags only)
           uses: softprops/action-gh-release@master
@@ -65,10 +79,10 @@ jobs:
           with:
             draft: true
             files: |
-              dist/server-linux/homebrewdj
-              dist/server-mac/homebrewdj
-              dist/server-win/homebrewdj.exe
-              dist/midi-driver-mac/libmidi_driver.dylib
-              dist/midi-driver-linux/libmidi_driver.so
-              dist/midi-driver-win/midi_driver.dll
-              dist/LICENSE
+              dist/build-linux/**/homebrewdj
+              dist/build-mac/**/homebrewdj
+              dist/build-win/**/homebrewdj.exe
+              dist/build-mac/**/libmidi_driver.dylib
+              dist/build-linux/l**/ibmidi_driver.so
+              dist/build-win/**/midi_driver.dll
+              dist/**/LICENSE

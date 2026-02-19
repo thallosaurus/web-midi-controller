@@ -12,11 +12,3 @@ runs:
           shell: bash
           working-directory: ./web
           run: yarn && yarn build:release
-
-        - uses: actions/upload-artifact@v4
-          if: inputs.target == 'linux'
-          with:
-            name: webui
-            path: |
-              web/bindings/*
-              web/dist/*
