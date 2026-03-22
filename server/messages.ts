@@ -1,6 +1,8 @@
 import { MidiMessage } from "../midi-driver/mod.ts";
 export { type MidiMessage };
 
+const FORCE_DEV = true;
+
 export type WebsocketServerMessage =
   | {
     type: "connection-information";
@@ -14,7 +16,7 @@ export function createWebsocketConnectionInfoPayload(connectionId: string): any 
   return {
     type: "connection-information",
     connectionId,
-    overlayPath: "/overlays",
+    overlayPath: FORCE_DEV ? "http://localhost:8000/overlays" : "/overlays",
   };
 }
 

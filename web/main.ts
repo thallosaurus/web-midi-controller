@@ -3,7 +3,7 @@ import "./style.css";
 import "./colors.css";
 import menuSvgUrl from "./ts/core/icons/menu.svg";
 
-import { App } from './app_state.ts'
+import { App } from './app.ts'
 
 let app: App | null = null;
 

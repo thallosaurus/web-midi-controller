@@ -23,6 +23,6 @@ type = "ccslider"
 id = "vol_slider"
 channel = 1
 cc = 6
-mode = "relative"
+mode = "absolute"
 label = "Volume"
 vertical = false

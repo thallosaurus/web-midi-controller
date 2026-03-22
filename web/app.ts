@@ -33,38 +33,34 @@ export class App {
             clear_overlay_selector();
         })
 
-        if (hasFeature(f, "default")) {
-            App.socket.connectToProdEndpoint(location.hostname, 8000).then(overlayPath => {
-                console.log("getting", overlayPath);
-                this.fetchOverlays(overlayPath);
-            });
+        App.socket.connectToProdEndpoint(location.hostname, 8000).then(overlayPath => {
+            console.log("getting", overlayPath);
+            this.fetchOverlays(overlayPath);
+        });
 
-            App.socket.events.addEventListener("data", (ev) => {
-                const payload = (ev as CustomEvent).detail as any;
-                switch (payload.type) {
-                    case "NoteOn":
-                    case "NoteOff":
-                        App.eventbus.updateNote(payload.channel, payload.note, payload.velocity, true);
-                        break;
-                    case "ControlChange":
-                        App.eventbus.updateCC(payload.channel, payload.cc, payload.value, true);
-                        break;
-                    case "ProgramChange":
-                        change_overlay(payload.value);
-                        break;
-                }
-            })
+        App.socket.events.addEventListener("data", (ev) => {
+            const payload = (ev as CustomEvent).detail as any;
+            switch (payload.type) {
+                case "NoteOn":
+                case "NoteOff":
+                    App.eventbus.updateNote(payload.channel, payload.note, payload.velocity, true);
+                    break;
+                case "ControlChange":
+                    App.eventbus.updateCC(payload.channel, payload.cc, payload.value, true);
+                    break;
+                case "ProgramChange":
+                    change_overlay(payload.value);
+                    break;
+            }
+        })
 
-            App.eventbus.events.addEventListener("data", (ev) => {
-                //console.log(ev.detail)
-                App.socket.sendMidiData((ev as CustomEvent).detail)
-            })
+        App.eventbus.events.addEventListener("data", (ev) => {
+            //console.log(ev.detail)
+            App.socket.sendMidiData((ev as CustomEvent).detail)
+        })
 
-            UiDialog.initDialogs();
-            UiDialog.initDialogTriggers();
-        } else {
-            alert("file frontend not implemented yet")
-        }
+        UiDialog.initDialogs();
+        UiDialog.initDialogTriggers();
 
         //this.initUi(this.handlers);
         this.initSocketConnectionTrigger();
@@ -72,9 +68,9 @@ export class App {
     }
 
     setupEvents() {
-        
+
     }
-    
+
     async initDefaultBackend(): Promise<string> {
         return await App.socket.connectToProdEndpoint("localhost", 8000);
     }

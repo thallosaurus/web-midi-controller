@@ -4,7 +4,7 @@ import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Wi
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 
 import { EventBusConsumer } from "ts/eventbus/client";
-import { App } from "../../app_state";
+import { App } from "../../app";
 
 
 /**

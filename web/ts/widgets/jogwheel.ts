@@ -2,7 +2,7 @@ import { EventBusConsumer } from "ts/eventbus/client"
 import type { JogwheelProperties } from "@bindings/Widget"
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle"
 import "./css/jogwheel.css"
-import { App } from "../../app_state"
+import { App } from "../../app"
 
 export interface JogState {
     active: boolean

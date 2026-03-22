@@ -84,6 +84,6 @@ id = "returns"
   type = "ccslider"
   channel = 1
   cc = 92
-  mode = "relative"
+  mode = "absolute"
   label = "Test"
   vertical = true

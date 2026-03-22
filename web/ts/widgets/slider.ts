@@ -3,7 +3,7 @@ import type { CCSliderProperties } from "@bindings/Widget";
 import { WidgetLifecycle } from "@core/lifecycle";
 import { EventBusConsumer } from "ts/eventbus/client";
 import "./css/slider.css";
-import { App } from "../../app_state";
+import { App } from "../../app";
 
 const MAX_LEVEL = 127;
 

@@ -5,7 +5,7 @@ import { LoadedWidget } from "./overlay";
 
 import './css/shiftarea.css';
 import { EventBusConsumer } from "ts/eventbus/client";
-import { App } from "../../app_state";
+import { App } from "../../app";
 
 class Layout<Prop extends WidgetProperties, State> extends WidgetLifecycle<Prop, State> {
     constructor(state: State, options: Prop) {

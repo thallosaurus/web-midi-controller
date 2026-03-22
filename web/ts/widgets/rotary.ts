@@ -4,7 +4,7 @@ import { vibrate } from "@common/ui_utils";
 import type { RotarySliderProperties } from "@bindings/Widget";
 import { EventBusConsumer, } from "ts/eventbus/client";
 import "./css/rotary.css";
-import { App } from "../../app_state";
+import { App } from "../../app";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;

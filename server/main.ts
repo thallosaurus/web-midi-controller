@@ -10,6 +10,23 @@ import { serveFrontend } from "./frontend.ts";
 import { parseArguments, ServerSettings } from "./args.ts";
 import { existsSync } from "https://deno.land/std/fs/mod.ts";
 
+const MANIFEST = {
+  "name": "MIDI Controller",
+  "short_name": "MIDI",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
+
 export class ServerMain {
   app = new Hono<{ Variables: WSState }>();
   readonly driver
@@ -25,6 +42,10 @@ export class ServerMain {
         return new WebsocketEventHandler(c, this.state);
       }),
     );
+
+    this.app.get("/manifest.json", (c) => {
+      return c.json(MANIFEST)
+    })
 
     this.app.use("/overlays", cors());
     this.app.get("/overlays", async (c) => {

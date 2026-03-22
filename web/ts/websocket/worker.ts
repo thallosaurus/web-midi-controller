@@ -93,13 +93,13 @@ function connectSocketAsync(socket: WebSocket): Promise<void> {
         const fn_close = (e: any) => {
             console.log(e);
             socket.removeEventListener("close", fn_close);
-            reject(e.reason);
+            reject(e);
         }
 
         const fn_error = (e: any) => {
             socket.removeEventListener("error", fn_error);
             console.log(e);
-            reject(null);
+            reject(e);
         }
 
         socket.addEventListener("error", fn_error);
