@@ -26,6 +26,7 @@
 #      default = pkgsFor.${system}.call
       driver = pkgsFor.${system}.callPackage ./midi-driver {};
       server = pkgsFor.${system}.callPackage ./server {};
+#      default = packages.server;
     });
   };
 }
