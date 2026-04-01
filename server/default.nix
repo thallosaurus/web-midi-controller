@@ -1,9 +1,12 @@
 {
-    stdenv
+    stdenv,
+    pkgs,
+    deno,
+    ...
 }:
 
 stdenv.mkDerivation {
-    name = "midi-server-${version}";
+    name = "midi-server";
     version = "0.1.12";
     src = ./server;
     buildInputs = [ deno ];
