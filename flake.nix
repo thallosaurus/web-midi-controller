@@ -9,12 +9,7 @@
   let
     system = "x86_64-linux";
     pkgs = import nixpkgs { inherit system; };
-  in {
-#    packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
-#    packages.x86_64-linux.default = self.packages.x86_64-linux.hello;
-    packages.x86_64-linux.server = import ./server;
-
-    packages.x86_64-linux.midi-driver = pkgs.rustPlatform.buildRustPackage {
+    midi-driver = pkgs.rustPlatform.buildRustPackage {
       
           pname = "myapp";
           version = "0.1.12";
@@ -30,6 +25,14 @@
             lockFile = ./Cargo.lock;
           };
         };
+  in {
+#    packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
+#    packages.x86_64-linux.default = self.packages.x86_64-linux.hello;
+    packages.x86_64-linux.server = import ./server;
+
+
+
+    packages.x86_64-linux.midi-driver = midi-driver;
       
     packages.x86_64-linux.default = self.packages.x86_64-linux.midi-driver;
   };
