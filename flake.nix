@@ -12,6 +12,8 @@
   in {
 #    packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
 #    packages.x86_64-linux.default = self.packages.x86_64-linux.hello;
+    packages.x86_64-linux.server = import ./server;
+
     packages.x86_64-linux.midi-driver = pkgs.rustPlatform.buildRustPackage {
       
           pname = "myapp";
