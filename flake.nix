@@ -19,14 +19,13 @@
 #    packages.x86_64-linux.default = self.packages.x86_64-linux.hello;
 #    packages.x86_64-linux.server = pkgs.callPackage ./server.nix {};
 
-#    packages.x86_64-linux.midi-driver = import ./driver.nix;
-
 #    packages.x86_64-linux.default = self.packages.x86_64-linux.midi-driver;
     packages = forAllSystems (system: {
 #      default = pkgsFor.${system}.call
       driver = pkgsFor.${system}.callPackage ./midi-driver {};
       server = pkgsFor.${system}.callPackage ./server {};
-#      default = packages.server;
+      #default = pkgsFor.${system}.driver;
+      default = pkgsFor.${system}.callPackage ./midi-driver {};
     });
   };
 }

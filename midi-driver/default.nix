@@ -1,20 +1,20 @@
-{ rustPlatform, cargoLock, buildPackages }:
-{
-  rustPlatform.buildRustPackage rec {
+{ pkgs, rustPlatform, buildPackages, ... }:
+
+  rustPlatform.buildRustPackage {
     pname = "midi-driver";
     version = "0.1.12";
-    src = "./.";
+    src = ./.;
 
-    inherit cargoLock;
+    #inherit cargoLock;
 
     nativeBuildInputs = with pkgs; [
       pkgconf
+      gcc
     ];
     buildInputs = with pkgs; [
       alsa-lib.dev
     ];
 
-#    cargoLock.lockFile = ./Cargo.lock;
+    cargoLock.lockFile = ../Cargo.lock;
     
-  };
-}
+  }
