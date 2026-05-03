@@ -1,4 +1,4 @@
-import { MidiDriver } from "@driver";
+import { MidiDriver, MidiMessage } from "@driver";
 
 export class Launchpad {
     private control = new MidiDriver({
@@ -7,11 +7,13 @@ export class Launchpad {
         useVirtual: false
     })
 
-    private midi = new MidiDriver({
+    midi = new MidiDriver({
         inputName: "Launchpad Pro MK3 LPProMK3 MIDI",
         outputName: "Launchpad Pro MK3 LPProMK3 MIDI",
         useVirtual: false
     })
+
+    private surface: Surface | null = null;
 
     constructor() {
         this.control.ignore(["TimingClock", "Unknown"])
@@ -22,16 +24,20 @@ export class Launchpad {
             //switch ((ev as CustomEvent).detail)
             const evt = ev as CustomEvent;
             console.log(evt.detail)
+
+            if (this.surface) {
+                this.surface.onMidiInput(this, evt.detail);
+            }
         });
 
-        setTimeout(() => {
+        /*setTimeout(() => {
             this.midi.sendMidi({
                 type: "NoteOn",
                 channel: 1,
                 note: 18,
                 velocity: 127
             })
-        }, 100);
+        }, 100);*/
     }
 
     close() {
@@ -59,10 +65,14 @@ export class Launchpad {
             data: [0xF0, 0x00, 0x20, 0x29, 0x02, 0x0E, 0x0E, 0x01, 0xF7]
         });
     }
+
+    loadSurface(surface: Surface) {
+        this.surface = surface;
+    }
 }
 
-class Surface {
-    static MIDI_MAP = [
+abstract class Surface {
+    static LAUNCHPAD_PROGRAMMER_MAP = [
         81, 82, 83, 84, 85, 86, 87, 88,
         71, 72, 73, 74, 75, 76, 77, 78,
         61, 62, 63, 64, 65, 66, 67, 68,
@@ -74,10 +84,22 @@ class Surface {
     ];
 
     get map() {
-        return new Map<number, number>(Surface.MIDI_MAP.map((value, index) => [index, value]));
+        return new Map<number, number>(Surface.LAUNCHPAD_PROGRAMMER_MAP.map((value, index) => [index, value]));
     }
 
-    constructor() {
-        
+    abstract onMidiInput(caller: Launchpad, msg: MidiMessage): void;
+}
+
+export class FeedbackSurface extends Surface {
+    private activeNotes = new Map<number, number>();
+    onMidiInput(caller: Launchpad, msg: MidiMessage): void {
+        //console.log("Feedback Surface", msg);
+        switch (msg.type) {
+            case "NoteOn":
+            case "NoteOff":
+            case "ControlChange":
+                caller.midi.sendMidi(msg);
+                break;
+        }
     }
 }

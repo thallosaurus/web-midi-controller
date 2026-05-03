@@ -155,7 +155,7 @@ pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
     if let Ok(msg) = serde_json::from_str::<MidiMessage>(json) {
         // sende in den Output-Thread
         let v: Vec<u8> = msg.into();
-        tracing::debug!("{:?}", v);
+        tracing::trace!("{:?}", v);
 
         if let Some(tx) = DRIVERS.lock().unwrap().get(&handle) {
             //tracing::debug!("{:?}", msg);

@@ -171,7 +171,6 @@ export class MidiDriver {
       const output_name = Deno.UnsafePointer.of(output_name_bytes)
 
       this.handle = MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
-      console.log(this.handle);
       this.pollLoop();
 
     } catch (e) {
@@ -279,6 +278,7 @@ export class MidiDriver {
       MidiDriver.dylib.symbols.stop_driver(this.handle!);
       if (this.pollInterval) clearInterval(this.pollInterval);
       MidiDriver.dylib.close();
+      this.handle = null;
 
       MidiDriver.dylib = null;
     }
