@@ -170,7 +170,7 @@ pub extern "C" fn stop_driver(handle: u32) {
     let mut lock = DRIVERS.lock().unwrap();
 
     if let Some(h) = lock.get(&handle) {
-        tracing::debug!("sending stop signal to driver");
+        //tracing::debug!("sending stop signal to driver");
         h.close_tx.send(()).unwrap();
     }
 

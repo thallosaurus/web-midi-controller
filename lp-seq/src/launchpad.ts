@@ -26,7 +26,7 @@ export class Launchpad {
             console.log(evt.detail)
 
             if (this.surface) {
-                this.surface.onMidiInput(this, evt.detail);
+                this.surface.onInput(evt.detail);
             }
         });
 
@@ -83,22 +83,91 @@ abstract class Surface {
         11, 12, 13, 14, 15, 16, 17, 18
     ];
 
-    get map() {
-        return new Map<number, number>(Surface.LAUNCHPAD_PROGRAMMER_MAP.map((value, index) => [index, value]));
+    private pixels = new Map<number, number>();
+
+    get notes() {
+        return new Map<number, number>(Surface.LAUNCHPAD_PROGRAMMER_MAP.map((value, index) => [value, index]));
     }
 
-    abstract onMidiInput(caller: Launchpad, msg: MidiMessage): void;
-}
+    get map() {
+        return new Map<number, number>(Surface.LAUNCHPAD_PROGRAMMER_MAP.map((value, index) => [value, this.pixels.get(index) ?? 0]));
+    }
 
-export class FeedbackSurface extends Surface {
-    private activeNotes = new Map<number, number>();
-    onMidiInput(caller: Launchpad, msg: MidiMessage): void {
-        //console.log("Feedback Surface", msg);
+    protected caller: Launchpad;
+
+    constructor(caller: Launchpad) {
+        this.caller = caller;
+    }
+
+    setXY(x: number, y: number, color: number) {
+        const i = (y * 8) + x;
+        if (i >= 0 && i < 64) {
+            this.setI(i, color);
+        } else return;
+    }
+
+    setI(i: number, color: number) {
+        this.pixels.set(i, color);
+
+        const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
+
+        this.caller.midi.sendMidi({
+            type: color == 0 ? "NoteOff" : "NoteOn",
+            note: note,
+            velocity: color,
+            channel: 1
+        })
+    }
+
+    processMidiMessage(msg: MidiMessage) {
         switch (msg.type) {
             case "NoteOn":
             case "NoteOff":
-            case "ControlChange":
-                caller.midi.sendMidi(msg);
+                {
+                    const note = this.notes.get(msg.note);
+                    return note;
+
+                }
+
+            default:
+
+                break;
+        }
+    }
+
+    clear() {
+        this.pixels.clear();
+        for (const note of Surface.LAUNCHPAD_PROGRAMMER_MAP) {
+            this.caller.midi.sendMidi({
+                type: "NoteOff",
+                note: note,
+                velocity: 0,
+                channel: 1
+            })
+        }
+    }
+
+    abstract onInput(msg: MidiMessage): void;
+}
+
+export class FeedbackSurface extends Surface {
+    constructor(caller: Launchpad) {
+        super(caller);
+
+        console.log(this.notes);
+    }
+    onInput(msg: MidiMessage): void {
+        //console.log("Feedback Surface", msg);
+
+        switch (msg.type) {
+            case "NoteOn":
+            case "NoteOff":
+                {
+                    const note = this.processMidiMessage(msg)
+                    if (note !== undefined) {
+                        this.setI(note, msg.velocity);
+                    }
+                }
                 break;
         }
     }

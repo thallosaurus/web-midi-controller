@@ -3,7 +3,7 @@ import { FeedbackSurface, Launchpad } from "./src/launchpad.ts";
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   const launchpad = new Launchpad();
-  launchpad.loadSurface(new FeedbackSurface());
+  launchpad.loadSurface(new FeedbackSurface(launchpad));
 
   Deno.addSignalListener("SIGINT", () => {
     console.log("Received SIGINT");

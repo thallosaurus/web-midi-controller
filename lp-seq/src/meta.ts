@@ -1,3 +1,5 @@
+import { Launchpad } from "./launchpad.ts";
+
 enum BUTTON_DEF {
     LeftArrow = 91,
     RightArrow = 92,
@@ -32,4 +34,8 @@ export class MetaButtons {
             .filter(([key]) => !isNaN(Number(key)))
             .map(([key, value]) => [Number(key), value as keyof typeof BUTTON_DEF])
     );
+
+    constructor(caller: Launchpad) {
+        
+    }
 }
