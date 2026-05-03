@@ -1,4 +1,3 @@
-import { MidiDriver, MidiMessage } from "@driver";
 import { Launchpad } from "./src/launchpad.ts";
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
@@ -21,13 +20,4 @@ if (import.meta.main) {
   });*/
 
   launchpad.switchToCustomMode(2);
-
-  setTimeout(() => {
-    /*midi.sendMidi({
-      type: "NoteOn",
-      channel: 1,
-      note: 18,
-      velocity: 127
-    })*/
-  }, 100);
 }

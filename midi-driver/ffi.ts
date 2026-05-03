@@ -239,8 +239,6 @@ export class MidiDriver {
           MidiDriver.dylib.symbols.free_string(m);
 
           if (!this.ignoreTypes.includes((obj as any).type)) {
-            console.log(obj);
-
             this.emitter.dispatchEvent(
               new CustomEvent("data", { detail: obj }),
             );
