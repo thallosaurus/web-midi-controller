@@ -1,7 +1,7 @@
 import { MidiMessage } from "@driver";
 import { Launchpad } from "./launchpad.ts";
 
-enum BUTTON_DEF {
+export enum BUTTON_DEF {
     LeftArrow = 91,
     RightArrow = 92,
     Session = 93,
@@ -74,7 +74,11 @@ export abstract class ControlButtons {
         this.caller = caller;
     }
 
-    setCCState(cc: number, value: number) {
+    setButtonState(button: BUTTON_DEF, value: number) {
+        this.setCCState(button, value);
+    }
+
+    private setCCState(cc: number, value: number) {
         this.state.set(cc, value);
         console.log(this.reverse.get(cc) + ": " + this.state.get(cc));
 
@@ -107,10 +111,6 @@ export abstract class ControlButtons {
                 break;
         }
     }
-}
-
-interface AppState {
-
 }
 
 export class LaunchpadControlButtons extends ControlButtons {

@@ -76,7 +76,7 @@ export abstract class Surface {
             case "NoteOff":
             case "Aftertouch":
                 {
-                    return this.notes.get(msg.note);                    
+                    return this.notes.get(msg.note);
                 }
             default:
                 break;
@@ -96,6 +96,23 @@ export abstract class Surface {
     }
 
     abstract onInput(msg: MidiMessage): void;
+}
+
+export class DemoSurface extends Surface {
+    override onInput(msg: MidiMessage): void {
+        //throw new Error("Method not implemented.");
+        return;
+    }
+    constructor(caller: Launchpad) {
+        super(caller);
+
+        for (let i = 0; i < 64; i++) {
+            this.setI(i, {
+                color: Math.floor(Math.random() * 127),
+                lightMode: LightMode.Pulsing
+            })
+        }
+    }
 }
 
 export class FeedbackSurface extends Surface {

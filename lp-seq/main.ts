@@ -1,11 +1,10 @@
 import { Launchpad } from "./src/launchpad.ts";
-import { DrumSequencer } from "./src/sequencer/mod.ts";
-import { FeedbackSurface } from "./src/surface.ts";
+import { DemoSurface } from "./src/surface.ts";
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   const launchpad = new Launchpad();
-  launchpad.loadSurface(new DrumSequencer(launchpad));
+  launchpad.loadSurface(new DemoSurface(launchpad));
 
   Deno.addSignalListener("SIGINT", () => {
     launchpad.switchToLiveMode()

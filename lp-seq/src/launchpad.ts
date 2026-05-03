@@ -1,6 +1,6 @@
 import { MidiDriver, MidiMessage } from "@driver";
 import { Surface } from "./surface.ts";
-import { ControlButtons, LaunchpadControlButtons } from "./controls.ts";
+import { BUTTON_DEF, LaunchpadControlButtons } from "./controls.ts";
 
 export class Launchpad {
     private control = new MidiDriver({
@@ -23,6 +23,8 @@ export class Launchpad {
         this.control.ignore(["TimingClock", "Unknown"])
         this.midi.ignore(["TimingClock", "Unknown", "ChannelPressure"])
         MidiDriver.initLogging();
+
+        this.controlButtons.setButtonState(BUTTON_DEF.LED, 64)
 
         this.midi.emitter.addEventListener("data", (ev) => {
             //switch ((ev as CustomEvent).detail)
@@ -65,9 +67,7 @@ export class Launchpad {
 
     loadSurface(surface: Surface) {
         if (this.surface) this.surface.clear();
-
         this.surface = surface;
-        this.surface.clear();
     }
 
     sendMidi(msg: MidiMessage) {
