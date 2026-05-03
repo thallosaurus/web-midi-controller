@@ -1,7 +1,7 @@
 import { MidiMessage } from "@driver";
 import { Launchpad } from "./launchpad.ts";
 
-enum LightMode {
+export enum LightMode {
     Normal = 1,
     Flashing = 2,
     Pulsing = 3
@@ -51,7 +51,7 @@ export abstract class Surface {
         this.pixels.set(i, pixel);
 
         const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
-        
+
         this.caller.sendMidi({
             type: pixel.color == 0 ? "NoteOff" : "NoteOn",
             note: note,
@@ -59,7 +59,7 @@ export abstract class Surface {
             channel: pixel.lightMode
         })
     }
-    
+
     updateI(i: number, pixel: Pixel) {
         const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
         /*this.caller.sendMidi({
@@ -76,8 +76,7 @@ export abstract class Surface {
             case "NoteOff":
             case "Aftertouch":
                 {
-                    const note = this.notes.get(msg.note);
-                    return note;
+                    return this.notes.get(msg.note);                    
                 }
             default:
                 break;

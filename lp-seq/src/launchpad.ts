@@ -1,7 +1,6 @@
 import { MidiDriver, MidiMessage } from "@driver";
 import { Surface } from "./surface.ts";
 import { ControlButtons, LaunchpadControlButtons } from "./controls.ts";
-import { EventEmitter } from "node:stream";
 
 export class Launchpad {
     private control = new MidiDriver({
@@ -38,6 +37,7 @@ export class Launchpad {
     }
 
     close() {
+        this.surface?.clear();
         this.midi.close();
         this.control.close();
     }
@@ -67,6 +67,7 @@ export class Launchpad {
         if (this.surface) this.surface.clear();
 
         this.surface = surface;
+        this.surface.clear();
     }
 
     sendMidi(msg: MidiMessage) {

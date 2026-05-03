@@ -100,14 +100,17 @@ export abstract class ControlButtons {
         switch (msg.type) {
             case "ControlChange":
                 {
-                    //                    return this.reverse.get(msg.cc);
-                    return true
+                    return this.reverse.get(msg.cc);
                 }
 
             default:
                 break;
         }
     }
+}
+
+interface AppState {
+
 }
 
 export class LaunchpadControlButtons extends ControlButtons {
