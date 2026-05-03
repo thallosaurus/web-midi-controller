@@ -27,11 +27,9 @@ enum BUTTON_DEF {
 }
 
 export class MetaButtons {
-    static LP_PRO_CC_MAP = new Map<number, string>(
+    static LP_PRO_CC_MAP = new Map<number, keyof typeof BUTTON_DEF>(
         Object.entries(BUTTON_DEF)
             .filter(([key]) => !isNaN(Number(key)))
-            .map(([key, value]) => [Number(key), value as string])
+            .map(([key, value]) => [Number(key), value as keyof typeof BUTTON_DEF])
     );
-
-    
 }
