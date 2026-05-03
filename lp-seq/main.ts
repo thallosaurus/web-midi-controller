@@ -1,4 +1,5 @@
-import { FeedbackSurface, Launchpad } from "./src/launchpad.ts";
+import { Launchpad } from "./src/launchpad.ts";
+import { FeedbackSurface } from "./src/surface.ts";
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -6,6 +7,7 @@ if (import.meta.main) {
   launchpad.loadSurface(new FeedbackSurface(launchpad));
 
   Deno.addSignalListener("SIGINT", () => {
+    launchpad.switchToLiveMode()
     console.log("Received SIGINT");
     launchpad.close();
 

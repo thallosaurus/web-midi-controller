@@ -70,6 +70,14 @@ pub enum MidiMessage {
     Continue,
     Stop,
     Unknown,
+    Aftertouch {
+        #[serde(flatten)]
+        midi: MidiPayload,
+
+        #[serde(flatten)]
+        note: NotePayload
+
+    },
     SongPositionPointer {
         value: u16,
     },
@@ -119,7 +127,16 @@ impl From<Vec<u8>> for MidiMessage {
                         velocity: 0,
                     },
                 }
-            }
+            },
+
+            [0xA0..=0xAF, note, vel] => {
+                let ch = data[0] - 0xA0;
+
+                Self::Aftertouch {
+                    note: NotePayload { note: *note, velocity: *vel },
+                    midi: MidiPayload { channel: ch }
+                }
+            },
 
             [0xB0..=0xBF, cc, val] => {
                 let ch = data[0] - 0xB0;
@@ -187,6 +204,9 @@ impl From<MidiMessage> for Vec<u8> {
             },
             MidiMessage::SysEx { data } => {
                 data.clone()
+            },
+            MidiMessage::Aftertouch { midi, note } => {
+                vec![0xA0 + midi.channel, note.note, note.velocity]
             }
         }
     }
