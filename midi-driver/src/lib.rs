@@ -1,7 +1,9 @@
 use std::{
+    collections::HashMap,
     ffi::{CStr, CString, c_char},
     sync::{
         Mutex,
+        atomic::{AtomicU32, Ordering},
         mpsc::{Receiver, Sender, channel},
     },
     thread,
@@ -9,16 +11,28 @@ use std::{
 
 use once_cell::sync::Lazy;
 
-use crate::{logging::init_tracing, midi::{default_list, messages::MidiMessage, system::MidiSystem}};
+use crate::{
+    logging::init_tracing,
+    midi::{default_list, messages::MidiMessage, system::MidiSystem},
+};
 
-mod midi;
 mod logging;
+mod midi;
 
-static OUTPUT_CHANNEL: Lazy<Mutex<Option<Receiver<Vec<u8>>>>> = Lazy::new(|| Mutex::new(None));
-static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<Vec<u8>>>>> = Lazy::new(|| Mutex::new(None));
+//static OUTPUT_CHANNEL: Lazy<Mutex<Option<Receiver<Vec<u8>>>>> = Lazy::new(|| Mutex::new(None));
+//static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<Vec<u8>>>>> = Lazy::new(|| Mutex::new(None));
 
-static CLOSE_CHANNEL: Lazy<Mutex<Option<Sender<()>>>> = Lazy::new(|| Mutex::new(None));
+//static CLOSE_CHANNEL: Lazy<Mutex<Option<Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
+struct DriverHandle {
+    output_rx: Receiver<Vec<u8>>,
+    input_tx: Sender<Vec<u8>>,
+    close_tx: Sender<()>,
+}
+
+static DRIVERS: Lazy<Mutex<HashMap<u32, DriverHandle>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+
+static NEXT_ID: AtomicU32 = AtomicU32::new(1);
 
 #[unsafe(no_mangle)]
 pub extern "C" fn init_logging() {
@@ -26,16 +40,16 @@ pub extern "C" fn init_logging() {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn start_driver(use_virtual: bool, input_name: *const c_char, output_name: *const c_char) {
+pub extern "C" fn start_driver(
+    use_virtual: bool,
+    input_name: *const c_char,
+    output_name: *const c_char,
+) -> u32 {
     //let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
     //init_tracing();
     let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
     let (tx_egress, rx_egress) = channel::<Vec<u8>>();
-    *OUTPUT_CHANNEL.lock().unwrap() = Some(rx_ingress);
-    *INPUT_CHANNEL.lock().unwrap() = Some(tx_egress);
-
     let (tx_close, rx_close) = channel();
-    *CLOSE_CHANNEL.lock().unwrap() = Some(tx_close);
 
     let in_cstr = unsafe { CStr::from_ptr(input_name) };
     let input_name = in_cstr.to_str().unwrap();
@@ -45,8 +59,14 @@ pub extern "C" fn start_driver(use_virtual: bool, input_name: *const c_char, out
 
     thread::spawn(move || {
         //let mut counter = 0;
-        let _system =
-            MidiSystem::new(String::from(input_name), String::from(output_name), use_virtual, tx_ingress, rx_egress).unwrap();
+        let _system = MidiSystem::new(
+            String::from(input_name),
+            String::from(output_name),
+            use_virtual,
+            tx_ingress,
+            rx_egress,
+        )
+        .unwrap();
         loop {
             // await death here
             if let Ok(_s) = rx_close.recv() {
@@ -55,14 +75,28 @@ pub extern "C" fn start_driver(use_virtual: bool, input_name: *const c_char, out
             }
         }
     });
+
+    let handle = DriverHandle {
+        output_rx: rx_ingress,
+        input_tx: tx_egress,
+        close_tx: tx_close,
+    };
+
+    let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
+
+    DRIVERS.lock().unwrap().insert(id, handle);
+
+    id
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn poll_event() -> *const c_char {
-    let mut guard = OUTPUT_CHANNEL.lock().unwrap();
+pub extern "C" fn poll_event(handle: u32) -> *const c_char {
+    //let mut guard = OUTPUT_CHANNEL.lock().unwrap();
 
-    if let Some(rx) = guard.as_mut() {
-        match rx.try_recv() {
+    let ch = DRIVERS.lock().unwrap();
+
+    if let Some(handle) = ch.get(&handle).as_mut() {
+        match handle.output_rx.try_recv() {
             Ok(msg) => {
                 let as_string = serde_json::to_string(&msg).unwrap();
 
@@ -77,10 +111,10 @@ pub extern "C" fn poll_event() -> *const c_char {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn poll_bytes(ptr: *mut u8, len: usize) -> usize {
-    let mut guard = OUTPUT_CHANNEL.lock().unwrap();
-    if let Some(rx) = guard.as_mut() {
-        match rx.try_recv() {
+pub extern "C" fn poll_bytes(handle: u32, ptr: *mut u8, len: usize) -> usize {
+    let ch = DRIVERS.lock().unwrap();
+    if let Some(handle) = ch.get(&handle).as_mut() {
+        match handle.output_rx.try_recv() {
             Ok(bytes) => {
                 let copy_len = usize::min(len, bytes.len());
 
@@ -109,7 +143,7 @@ pub extern "C" fn free_string(ptr: *const c_char) {
     }
 }
 #[unsafe(no_mangle)]
-pub extern "C" fn send_midi(ptr: *const std::os::raw::c_char) {
+pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
     if ptr.is_null() {
         return;
     }
@@ -117,25 +151,30 @@ pub extern "C" fn send_midi(ptr: *const std::os::raw::c_char) {
     let cstr = unsafe { CStr::from_ptr(ptr) };
     let json = cstr.to_str().unwrap(); // now you have the JSON string
 
+
     if let Ok(msg) = serde_json::from_str::<MidiMessage>(json) {
         // sende in den Output-Thread
         let v: Vec<u8> = msg.into();
         tracing::debug!("{:?}", v);
-        if let Some(tx) = &*INPUT_CHANNEL.lock().unwrap() {
+
+        if let Some(tx) = DRIVERS.lock().unwrap().get(&handle) {
             //tracing::debug!("{:?}", msg);
-            let _ = tx.send(v);
+            let _ = tx.input_tx.send(v);
         }
     }
 }
 #[unsafe(no_mangle)]
-pub extern "C" fn stop_driver() {
-    if let Some(tx) = &*CLOSE_CHANNEL.lock().unwrap() {
+pub extern "C" fn stop_driver(handle: u32) {
+    
+    //if let Some(tx) = &*CLOSE_CHANNEL.lock().unwrap() {
+    let mut lock = DRIVERS.lock().unwrap();
+
+    if let Some(h) = lock.get(&handle) {
         tracing::debug!("sending stop signal to driver");
-        tx.send(()).unwrap();
+        h.close_tx.send(()).unwrap();
     }
 
-    *OUTPUT_CHANNEL.lock().unwrap() = None;
-    *INPUT_CHANNEL.lock().unwrap() = None;
+    lock.remove(&handle);
 }
 
 #[unsafe(no_mangle)]
@@ -143,10 +182,10 @@ pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
     // Sicherstellen, dass Pointer gültig ist
     let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
 
-    let v = Vec::from(slice);    
+    let v = Vec::from(slice);
     let resp: MidiMessage = v.into();
     tracing::trace!("converted {:?}", resp);
-    
+
     // convert
     let json = serde_json::to_string(&resp).unwrap();
     //println!("{:?}", json);

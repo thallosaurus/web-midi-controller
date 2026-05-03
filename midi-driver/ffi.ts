@@ -54,14 +54,14 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
   };
   start_driver: {
     parameters: ["u8", "pointer", "pointer"];
-    result: "void";
+    result: "u32";
   };
   poll_event: {
-    parameters: [];
+    parameters: ["u32"];
     result: "pointer";
   };
   poll_bytes: {
-    parameters: ["pointer", "usize"],
+    parameters: ["u32", "pointer", "usize"],
     result: "usize",
   };
   free_string: {
@@ -69,11 +69,11 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
     result: "void";
   };
   send_midi: {
-    parameters: ["pointer"];
+    parameters: ["u32", "pointer"];
     result: "void";
   };
   stop_driver: {
-    parameters: [];
+    parameters: ["u32"];
     result: "void";
   };
   list_devices: {
@@ -105,6 +105,8 @@ export class MidiDriver {
 
   private ignoreTypes: string[] = [];
 
+  private handle: number | null = null;
+
   get dylibLoaded() {
     return MidiDriver.dylib !== null;
   }
@@ -121,14 +123,14 @@ export class MidiDriver {
           },
           start_driver: {
             parameters: ["u8", "pointer", "pointer"],
-            result: "void",
+            result: "u32",
           },
           poll_event: {
-            parameters: [],
+            parameters: ["u32"],
             result: "pointer",
           },
           poll_bytes: {
-            parameters: ["pointer", "usize"],
+            parameters: ["u32", "pointer", "usize"],
             result: "usize",
           },
           free_string: {
@@ -136,11 +138,11 @@ export class MidiDriver {
             result: "void",
           },
           send_midi: {
-            parameters: ["pointer"],
+            parameters: ["u32", "pointer"],
             result: "void",
           },
           stop_driver: {
-            parameters: [],
+            parameters: ["u32"],
             result: "void",
           },
           list_devices: {
@@ -168,7 +170,8 @@ export class MidiDriver {
       const output_name_bytes = encoder.encode(options.outputName)
       const output_name = Deno.UnsafePointer.of(output_name_bytes)
 
-      MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
+      this.handle = MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
+      console.log(this.handle);
       this.pollLoop();
 
     } catch (e) {
@@ -206,7 +209,7 @@ export class MidiDriver {
       const bytes = encoder.encode(json);
 
       const ptr = Deno.UnsafePointer.of(new Uint8Array(bytes));
-      MidiDriver.dylib!.symbols.send_midi(ptr);
+      MidiDriver.dylib!.symbols.send_midi(this.handle!, ptr);
     }
   }
 
@@ -224,7 +227,7 @@ export class MidiDriver {
         const buffer = new Uint8Array(8);
         const ptr = Deno.UnsafePointer.of(buffer);
 
-        const bytesWritten = Number(MidiDriver.dylib.symbols.poll_bytes(ptr, BigInt(buffer.length)));
+        const bytesWritten = Number(MidiDriver.dylib.symbols.poll_bytes(this.handle!, ptr, BigInt(buffer.length)));
 
         retData = buffer.subarray(0, bytesWritten);
 
@@ -256,7 +259,7 @@ export class MidiDriver {
   poll() {
     if (MidiDriver.dylib !== null) {
       do {
-        const ptr = MidiDriver.dylib!.symbols.poll_event();
+        const ptr = MidiDriver.dylib!.symbols.poll_event(this.handle!);
         if (!ptr) break;
         const msg = new Deno.UnsafePointerView(ptr!).getCString();
 
@@ -275,7 +278,7 @@ export class MidiDriver {
 
   close() {
     if (MidiDriver.dylib) {
-      MidiDriver.dylib.symbols.stop_driver();
+      MidiDriver.dylib.symbols.stop_driver(this.handle!);
       if (this.pollInterval) clearInterval(this.pollInterval);
       MidiDriver.dylib.close();
 

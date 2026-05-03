@@ -7,15 +7,15 @@ export class Launchpad {
         useVirtual: false
     })
 
-    /*private midi = new MidiDriver({
+    private midi = new MidiDriver({
         inputName: "Launchpad Pro MK3 LPProMK3 MIDI",
         outputName: "Launchpad Pro MK3 LPProMK3 MIDI",
         useVirtual: false
-    })*/
+    })
 
     constructor() {
         this.control.ignore(["TimingClock", "Unknown"])
-        //this.midi.ignore(["TimingClock", "Unknown"])
+        this.midi.ignore(["TimingClock", "Unknown"])
         MidiDriver.initLogging();
 
         /*this.midi.emitter.addEventListener("data", (ev) => {
