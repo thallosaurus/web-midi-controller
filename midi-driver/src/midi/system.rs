@@ -144,7 +144,7 @@ impl MidiSystem {
 
                 if let Ok(m) = msg {
                     let payload: Vec<u8> = m.into();
-                    tracing::debug!("{:?}, length: {}", payload, payload.len());
+                    tracing::trace!("{:?}, length: {}", payload, payload.len());
                     let mut out = output.lock().unwrap();
                     out.send(&payload).unwrap();
                 } else {
@@ -161,7 +161,7 @@ impl MidiSystem {
     /// gets called by the midi system when there was data from the midi input
     fn input_callback(_ts: u64, data: &[u8], e: &mut sync::mpsc::Sender<Vec<u8>>) {
         let msg= Vec::from(data);
-        tracing::debug!("{:?}", msg);
+        tracing::trace!("{:?}", msg);
         if let Err(e) = e.send(msg) {
             tracing::error!("{}", e);
         }

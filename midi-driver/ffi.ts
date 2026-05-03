@@ -103,6 +103,8 @@ export class MidiDriver {
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
 
+  private ignoreTypes: string[] = [];
+
   get dylibLoaded() {
     return MidiDriver.dylib !== null;
   }
@@ -193,6 +195,10 @@ export class MidiDriver {
     MidiDriver.dylib!.symbols.init_logging();
   }
 
+  ignore(t: string[]) {
+    this.ignoreTypes = t;
+  }
+
   sendMidi(event: MidiMessage) {
     if (this.dylibLoaded) {
       const encoder = new TextEncoder();
@@ -229,9 +235,13 @@ export class MidiDriver {
           const obj = JSON.parse(ptrView);
           MidiDriver.dylib.symbols.free_string(m);
 
-          this.emitter.dispatchEvent(
-            new CustomEvent("data", { detail: obj }),
-          );
+          if (!this.ignoreTypes.includes((obj as any).type)) {
+            console.log(obj);
+
+            this.emitter.dispatchEvent(
+              new CustomEvent("data", { detail: obj }),
+            );
+          }
         } else {
           retData = null;
         }
