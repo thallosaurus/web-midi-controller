@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }:
   let
-    system = "x86_64-linux";
+    #system = "x86_64-linux";
     pkgs = import nixpkgs { inherit system; };
     supportedSystems = [ "x86_64-linux" ];
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;

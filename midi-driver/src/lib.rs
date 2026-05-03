@@ -19,10 +19,16 @@ static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<Vec<u8>>>>> = Lazy::new(|| Mutex:
 
 static CLOSE_CHANNEL: Lazy<Mutex<Option<Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
+
+#[unsafe(no_mangle)]
+pub extern "C" fn init_logging() {
+    init_tracing();
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn start_driver(use_virtual: bool, input_name: *const c_char, output_name: *const c_char) {
     //let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
-    init_tracing();
+    //init_tracing();
     let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
     let (tx_egress, rx_egress) = channel::<Vec<u8>>();
     *OUTPUT_CHANNEL.lock().unwrap() = Some(rx_ingress);
@@ -114,9 +120,9 @@ pub extern "C" fn send_midi(ptr: *const std::os::raw::c_char) {
     if let Ok(msg) = serde_json::from_str::<MidiMessage>(json) {
         // sende in den Output-Thread
         let v: Vec<u8> = msg.into();
-        tracing::trace!("{:?}", v);
+        tracing::debug!("{:?}", v);
         if let Some(tx) = &*INPUT_CHANNEL.lock().unwrap() {
-            tracing::debug!("{:?}", msg);
+            //tracing::debug!("{:?}", msg);
             let _ = tx.send(v);
         }
     }

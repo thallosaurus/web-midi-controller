@@ -48,6 +48,10 @@ function getDefaultLibraryPath() {
 }
 
 interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
+  init_logging: {
+    parameters: [];
+    result: "void";
+  };
   start_driver: {
     parameters: ["u8", "pointer", "pointer"];
     result: "void";
@@ -104,11 +108,15 @@ export class MidiDriver {
   }
 
   constructor(options: MidiDriverOptions) {
-    if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
+    //if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
     try {
       MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
         getLibraryPath(),
         {
+          init_logging: {
+            parameters: [],
+            result: "void"
+          },
           start_driver: {
             parameters: ["u8", "pointer", "pointer"],
             result: "void",
@@ -179,6 +187,10 @@ export class MidiDriver {
 
       await new Promise((r) => setTimeout(r, 1));
     }
+  }
+
+  static initLogging() {
+    MidiDriver.dylib!.symbols.init_logging();
   }
 
   sendMidi(event: MidiMessage) {

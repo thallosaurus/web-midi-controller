@@ -28,7 +28,7 @@ pub struct CCPayload {
 
 //#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 //#[ts(export, export_to = "SocketMessages.ts")]
-#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[derive(Clone, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 #[serde(tag = "type")]
 pub enum MidiMessage {
@@ -73,6 +73,9 @@ pub enum MidiMessage {
     SongPositionPointer {
         value: u16,
     },
+    SysEx {
+        data: Vec<u8>
+    }
 }
 
 impl From<Vec<u8>> for MidiMessage {
@@ -145,15 +148,11 @@ impl From<Vec<u8>> for MidiMessage {
             [0xF2, lsb, msb] => {
                 let value = ((*msb as u16) << 7) | (*lsb as u16);
                 Self::SongPositionPointer { value }
-            }
-            _ => Self::Unknown, /*
-                                [0xF8] => {
-                                    //Self::Clock
-                                }*/
-                                /*_ => {
-                                    error!("{:?}", data);
-                                    //Self::Unknown
-                                }*/
+            },
+            [0xF0, _] => {
+                Self::SysEx { data }
+            },
+            _ => Self::Unknown,
         }
     }
 }
@@ -185,6 +184,9 @@ impl From<MidiMessage> for Vec<u8> {
                 let lsb = (value & 0x7F) as u8;
                 let msb = ((value >> 7) & 0x7F) as u8;
                 vec![0xF2, lsb, msb]
+            },
+            MidiMessage::SysEx { data } => {
+                data.clone()
             }
         }
     }
