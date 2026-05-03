@@ -65,6 +65,12 @@ pub enum MidiMessage {
         #[serde(flatten)]
         cc: CCPayload,
     },
+    ChannelPressure {
+        #[serde(flatten)]
+        midi: MidiPayload,
+        
+        pressure: u8
+    },
     TimingClock,
     Start,
     Continue,
@@ -169,6 +175,10 @@ impl From<Vec<u8>> for MidiMessage {
             [0xF0, _] => {
                 Self::SysEx { data }
             },
+            [0xD0..=0xDF, pressure] => {
+                let ch = data[0] - 0xD0;
+                Self::ChannelPressure { midi: MidiPayload { channel: ch }, pressure: *pressure }
+            }
             _ => Self::Unknown,
         }
     }
@@ -205,6 +215,9 @@ impl From<MidiMessage> for Vec<u8> {
             MidiMessage::SysEx { data } => {
                 data.clone()
             },
+            MidiMessage::ChannelPressure { midi, pressure } => {
+                vec![0xD0 + midi.channel, pressure]
+            }
             MidiMessage::Aftertouch { midi, note } => {
                 vec![0xA0 + midi.channel, note.note, note.velocity]
             }

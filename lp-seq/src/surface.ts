@@ -52,7 +52,7 @@ export abstract class Surface {
 
         const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
         
-        this.caller.midi.sendMidi({
+        this.caller.sendMidi({
             type: pixel.color == 0 ? "NoteOff" : "NoteOn",
             note: note,
             velocity: pixel.color,
@@ -62,12 +62,12 @@ export abstract class Surface {
     
     updateI(i: number, pixel: Pixel) {
         const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
-        this.caller.midi.sendMidi({
+        /*this.caller.sendMidi({
             type: "Aftertouch",
             note: note,
             velocity: pixel.color,
             channel: pixel.lightMode
-        })
+        })*/
     }
 
     processMidiMessage(msg: MidiMessage) {
@@ -79,7 +79,6 @@ export abstract class Surface {
                     const note = this.notes.get(msg.note);
                     return note;
                 }
-
             default:
                 break;
         }
@@ -88,7 +87,7 @@ export abstract class Surface {
     clear() {
         this.pixels.clear();
         for (const note of Surface.LAUNCHPAD_PROGRAMMER_MAP) {
-            this.caller.midi.sendMidi({
+            this.caller.sendMidi({
                 type: "NoteOff",
                 note: note,
                 velocity: 0,
@@ -115,13 +114,12 @@ export class FeedbackSurface extends Surface {
                     }
                 }
                 break;
-            case "Aftertouch":
+            case "ChannelPressure":
                 {
                     const note = this.processMidiMessage(msg)
-                    console.log("Aftertouch")
                     if (note !== undefined) {
                         this.updateI(note, {
-                            color: msg.velocity,
+                            color: msg.pressure,
                             lightMode: LightMode.Normal
                         });
                     }

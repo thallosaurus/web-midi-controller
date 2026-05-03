@@ -46,17 +46,18 @@ enum BUTTON_DEF {
     PrintToClip = 19,
 }
 
-export class ControlButtons {
+
+export abstract class ControlButtons {
     static LP_PRO_CC_MAP = new Map<number, keyof typeof BUTTON_DEF>(
         Object.entries(BUTTON_DEF)
             .filter(([key]) => !isNaN(Number(key)))
             .map(([key, value]) => [Number(key), value as keyof typeof BUTTON_DEF])
     );
 
-    state = new Map<number, boolean>(
+    state = new Map<number, number>(
         Object.entries(BUTTON_DEF)
             .filter(([key]) => !isNaN(Number(key)))
-            .map(([key]) => [Number(key), false])
+            .map(([key]) => [Number(key), 0])
     )
 
     get reverse() {
@@ -73,11 +74,11 @@ export class ControlButtons {
         this.caller = caller;
     }
 
-    setState(cc: number, value: number) {
-        this.state.set(cc, value > 0 ? true : false);
+    setCCState(cc: number, value: number) {
+        this.state.set(cc, value);
         console.log(this.reverse.get(cc) + ": " + this.state.get(cc));
 
-        this.caller.midi.sendMidi({
+        this.caller.sendMidi({
             type: "ControlChange",
             cc: cc,
             value: value,
@@ -85,15 +86,15 @@ export class ControlButtons {
         })
     }
 
-    onInput(msg: MidiMessage) {
+    /*onInput(msg: MidiMessage) {
         switch (msg.type) {
             case "ControlChange":
                 {
-                    this.setState(msg.cc, msg.value);
+                    //this.setCCState(msg.cc, msg.value);
                 }
                 break;
         }
-    }
+    }*/
 
     processMidiMessage(msg: MidiMessage) {
         switch (msg.type) {
@@ -104,6 +105,23 @@ export class ControlButtons {
                 }
 
             default:
+                break;
+        }
+    }
+}
+
+export class LaunchpadControlButtons extends ControlButtons {
+
+    constructor(caller: Launchpad) {
+        super(caller);
+    }
+
+    onInput(msg: MidiMessage) {
+        switch (msg.type) {
+            case "ControlChange":
+                {
+                    //this.setCCState(msg.cc, msg.value);
+                }
                 break;
         }
     }

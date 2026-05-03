@@ -1,6 +1,7 @@
 import { MidiDriver, MidiMessage } from "@driver";
 import { Surface } from "./surface.ts";
-import { ControlButtons } from "./controls.ts";
+import { ControlButtons, LaunchpadControlButtons } from "./controls.ts";
+import { EventEmitter } from "node:stream";
 
 export class Launchpad {
     private control = new MidiDriver({
@@ -9,7 +10,7 @@ export class Launchpad {
         useVirtual: false
     })
 
-    midi = new MidiDriver({
+    private midi = new MidiDriver({
         inputName: "Launchpad Pro MK3 LPProMK3 MIDI",
         outputName: "Launchpad Pro MK3 LPProMK3 MIDI",
         useVirtual: false
@@ -17,18 +18,18 @@ export class Launchpad {
 
     private surface: Surface | null = null;
 
-    private metaControls: ControlButtons = new ControlButtons(this);
+    private controlButtons: LaunchpadControlButtons = new LaunchpadControlButtons(this);
 
     constructor() {
         this.control.ignore(["TimingClock", "Unknown"])
-        this.midi.ignore(["TimingClock", "Unknown"])
+        this.midi.ignore(["TimingClock", "Unknown", "ChannelPressure"])
         MidiDriver.initLogging();
 
         this.midi.emitter.addEventListener("data", (ev) => {
             //switch ((ev as CustomEvent).detail)
             const evt = ev as CustomEvent;
             console.log(evt.detail)
-            this.metaControls.onInput(evt.detail);
+            this.controlButtons.onInput(evt.detail);
 
             if (this.surface) {
                 this.surface.onInput(evt.detail);
@@ -66,5 +67,9 @@ export class Launchpad {
         if (this.surface) this.surface.clear();
 
         this.surface = surface;
+    }
+
+    sendMidi(msg: MidiMessage) {
+        this.midi.sendMidi(msg)
     }
 }
