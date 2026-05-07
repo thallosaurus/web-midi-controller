@@ -1,15 +1,16 @@
 // defined all allowed widgets for type definitions - add when necessary
 export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties | XYPadProperties | GridMixerProperties | HorizontalMixerProperties | VerticalMixerProperties | ShiftAreaProperties;
 
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, ShiftAreaProperties, VerticalMixerProperties, Widget, XYPadProperties } from "../bindings/Widget";
-import { CCButtonLifecycle, NoteButtonLifecycle } from "./widgets/button";
-import type { Overlay } from "../bindings/Overlay";
-import { JogwheelLifecycle } from "./widgets/jogwheel";
-import { XYPadLifecycle } from "./widgets/xypad";
-import { RotaryLifecycle, RotaryState } from "./widgets/rotary";
-import { CCSliderLifecycle, CCSliderState } from "./widgets/slider";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, ShiftAreaProperties, VerticalMixerProperties, Widget, XYPadProperties } from "../bindings/Widget.ts";
+import { CCButtonLifecycle, NoteButtonLifecycle, ReactNoteButton } from "./widgets/button.tsx";
+import type { Overlay } from "../bindings/Overlay.ts";
+import { JogwheelLifecycle } from "./widgets/jogwheel.ts";
+import { XYPadLifecycle } from "./widgets/xypad.ts";
+import { RotaryLifecycle, RotaryState } from "./widgets/rotary.ts";
+import { CCSliderLifecycle, CCSliderState } from "./widgets/slider.ts";
 import { LoadedOverlay, LoadedWidget } from "./overlay.ts";
-import { GridMixerNew, HorizontalBox, ShiftArea, VerticalBox } from "./layout.ts";
+import { EmptyBox, GridMixerNew, GridMixerReact, HorizontalBox, HorizontalBoxReact, ShiftArea, VerticalBox, VerticalBoxReact } from "./layout.tsx";
+import React, { ReactNode } from "react";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables and renders it into the given element
@@ -105,4 +106,30 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
     let ww = new LoadedWidget(cell, e);
     //children.push(ww);
     return ww;
+}
+
+// MARK: - React Extension
+
+export const renderWidgetReact = (p: Widget) => {
+    switch (p.type) {
+        case "horiz-mixer":
+            //return <HorizontalBoxReact { ...p }) />;
+            return React.createElement(HorizontalBoxReact, { p });
+        case "notebutton":
+            //return (ReactNoteButton({ p }));
+            return React.createElement(ReactNoteButton, { p });
+        case "vert-mixer":
+            return React.createElement(VerticalBoxReact, { p });
+        case "grid-mixer":
+            return React.createElement(GridMixerReact, { p });
+        case "ccslider":
+        case "ccbutton":
+        case "rotary":
+        case "jogwheel":
+        case "xypad":
+        case "shift":
+        case "empty":
+        default:
+            return React.createElement(EmptyBox, {})
+    }
 }

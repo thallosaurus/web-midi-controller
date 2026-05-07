@@ -1,0 +1,38 @@
+.horiz-mixer {
+    display: flex;
+    gap: 1em;
+    width: calc(100% - 1em) !important;
+}
+
+.vert-mixer {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    width: calc(100% - 1em) !important;
+}
+
+#overlays:empty {
+    display: none !important;
+}
+
+#overlays:not(:empty) + #overlays_fallback {
+    display: none !important;
+}
+
+#overlays > * {
+  margin: .5em;
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.widget {
+    height: 100%;
+    width: 100%;
+}
+
+.grid-mixer {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+}

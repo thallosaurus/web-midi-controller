@@ -2,7 +2,7 @@ import { WidgetLifecycle, WidgetStateHandlers } from "../lifecycle";
 import { vibrate } from "../common/ui_utils";
 
 import type { RotarySliderProperties } from "../../bindings/Widget";
-import { EventBusConsumer, } from "../eventbus/client";
+import { EventBusConsumer, } from "../eventbus/client.tsx";
 import "./css/rotary.css";
 //import { App } from "../../app";
 

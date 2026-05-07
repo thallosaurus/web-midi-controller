@@ -1,7 +1,7 @@
 import { vibrate } from "../common/ui_utils";
 import type { CCSliderProperties } from "../../bindings/Widget";
 import { WidgetLifecycle } from "../lifecycle";
-import { EventBusConsumer } from "../eventbus/client";
+import { EventBusConsumer } from "../eventbus/client.tsx";
 import "./css/slider.css";
 //import { App } from "../../app";
 
@@ -228,3 +228,6 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
         //this.updateValue(v);
     }
 }
+
+// MARK:- React Port
+

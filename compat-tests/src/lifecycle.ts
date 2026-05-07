@@ -1,4 +1,4 @@
-import { WidgetProperties } from "./render"
+import { WidgetProperties } from "./render.tsx"
 
 
 /*export interface WidgetState {

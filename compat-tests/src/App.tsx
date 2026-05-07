@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { createContext, FC, useEffect, useState } from 'react'
 import './App.css'
-import { WebsocketWorkerClient } from './websocket/client'
+import { useWebsocket, WebsocketWorkerClient } from './websocket/client.tsx'
 import { Overlay } from '../bindings/Overlay';
-import { EventbusWorkerClient } from './eventbus/client'
+import { EventbusWorkerClient, useEventBus } from './eventbus/client.tsx'
+import { renderWidgetReact } from './render.tsx';
 
-const ws = new WebsocketWorkerClient();
-const eventbus = new EventbusWorkerClient();
 
 const App = () => {
+  const eventbus = useEventBus();
+  const ws = useWebsocket();
+
   const [connected, setConnected] = useState(false);
   //const [messages, setMessages] = useState<string[]>([]);
   const [overlays, setOverlays] = useState<Overlay[]>([]);
@@ -20,7 +22,7 @@ const App = () => {
     const ol = await fetchOverlays(overlayPath)
     setOverlays(ol);
     console.log(ol);
-    setOverlayId(0);
+    setOverlayId(8);
   }
 
   const disconnectAndUnload = () => {
@@ -74,7 +76,7 @@ const App = () => {
       ws.events.removeEventListener("data", onData);
       eventbus.events.removeEventListener("data", onEventbusData);
     }
-  });
+  }, []);
 
   return (
     <>
@@ -111,10 +113,23 @@ const App = () => {
   )
 }
 
-const OverlayView = ({ overlay }) => {
-  return <pre>{
-    JSON.stringify(overlay)
-  }</pre>
+const OverlayView: FC<{ overlay: Overlay }> = ({ overlay }) => {
+  useEffect(() => {
+    console.log(overlay.cells);
+  })
+
+  return (
+    <div id="overlays">
+      <div>
+
+      {
+        overlay.cells.map((v, i) => {
+          return <>{renderWidgetReact(v)}</>
+        })
+      }
+      </div>
+    </div>
+  )
 }
 
 export default App

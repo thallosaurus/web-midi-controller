@@ -1,10 +1,12 @@
-import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "../bindings/Widget";
+import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "../bindings/Widget.ts";
 import { WidgetLifecycle } from "./lifecycle.ts";
-import { render_widget, WidgetProperties } from "./render";
+import { render_widget, renderWidgetReact, WidgetProperties } from "./render.tsx";
 import { LoadedWidget } from "./overlay.ts";
 
-import './css/shiftarea.css';
-import { EventBusConsumer } from "./eventbus/client";
+//import './css/shiftarea.css';
+import './layout.css';
+import { EventBusConsumer } from "./eventbus/client.tsx";
+import { FC } from "react";
 //import { App } from "../../app";
 
 class Layout<Prop extends WidgetProperties, State> extends WidgetLifecycle<Prop, State> {
@@ -71,14 +73,14 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
 
     container: HTMLDivElement
     consumerId: string | null = null;
-    
+
     constructor(container: HTMLDivElement, options: ShiftAreaProperties, children: Array<LoadedWidget>) {
         super({
             shift: ShiftState.A
         }, options);
 
         this.container = container;
-        
+
         if (options.id) this.container.id = options.id;
 
         const panel_a = document.createElement("div");
@@ -103,7 +105,7 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
         })*/
         this.updateUi();
     }
-    
+
     updateValue(v: number): void {
         if (v > 64) {
             this.state.shift = ShiftState.B;
@@ -121,10 +123,61 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
             case ShiftState.A:
                 this.container.dataset.alternate = String(false);
                 break;
-                
+
             case ShiftState.B:
                 this.container.dataset.alternate = String(true);
                 break;
         }
     }
+}
+
+// MARK: - React Extensions
+export const HorizontalBoxReact: FC<{ p: HorizontalMixerProperties }> = ({ p }) => {
+
+    //if (p.id) 
+    return (
+        <div className="widget horiz-mixer">
+            {p.horiz.map((v, i) => {
+                return (<>
+                    {renderWidgetReact(v)}
+                </>)
+            })}
+        </div>
+    )
+}
+
+export const VerticalBoxReact: FC<{ p: VerticalMixerProperties }> = ({ p }) => {
+
+    //if (p.id) 
+    return (
+        <div className="widget vert-mixer">
+            {p.vert.map((v, i) => {
+                return (
+                    <>
+                        {renderWidgetReact(v)}
+                    </>)
+            })}
+        </div>
+    )
+}
+
+export const EmptyBox: FC = () => {
+    return (
+        <div></div>
+    )
+}
+
+export const GridMixerReact: FC<{ p: GridMixerProperties }> = ({ p }) => {
+    return (<div className="widget grid-mixer" style={{
+        "--cols": p.w,
+        "--rows": p.h
+    } as React.CSSProperties}>
+        {p.grid.map((v, i) => {
+            return (
+                <>
+                    {renderWidgetReact(v)}
+                </>
+            )
+        })}
+    </div>);
 }

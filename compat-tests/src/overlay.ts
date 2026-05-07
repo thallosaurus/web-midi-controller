@@ -1,12 +1,12 @@
-import "./css/overlay.css";
-import "./css/grid.css";
-import "./css/layout.css";
+//import "./css/overlay.css";
+//import "./css/grid.css";
+//import "./css/layout.css";
 import { type Overlay } from "../bindings/Overlay.ts";
 import { uuid } from "./common/utils.ts";
 
 // widget imports
 import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "../bindings/Widget.ts";
-import { render_overlay, render_widget, WidgetProperties } from "./render";
+import { render_overlay, render_widget, WidgetProperties } from "./render.tsx";
 import { WidgetLifecycle, WidgetStateHandlers } from "./lifecycle.ts";
 //import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 

@@ -1,6 +1,7 @@
 import { type MidiMessage } from "midi-driver";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { WebsocketWorkerEvent } from "./events";
+import { createContext, useContext, useRef } from "react";
 
 export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent, WebsocketWorkerEvent> {
     connected = false;
@@ -109,4 +110,31 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
             })
         })
     }
+}
+
+// MARK: - React Extension
+
+const WsContext = createContext(null);
+export function WsProvider({ children }) {
+    const wsRef = useRef<WebsocketWorkerClient | null>(null);
+
+    if (!wsRef.current) {
+        wsRef.current = new WebsocketWorkerClient();
+    }
+
+    return (
+        <WsContext.Provider value={wsRef.current}>
+            {children}
+        </WsContext.Provider>
+    )
+}
+
+export function useWebsocket() {
+    const ctx = useContext<WebsocketWorkerClient>(WsContext);
+
+    if (!ctx) {
+        throw new Error("useWebsocket must be used inside WsProvider");
+    }
+
+    return ctx;
 }

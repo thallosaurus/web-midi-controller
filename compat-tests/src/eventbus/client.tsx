@@ -2,6 +2,7 @@ import { uuid } from "../common/utils";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { EventBusWorkerConsumerEvent, EventBusWorkerProducerEvent } from "./events";
 import { type MidiMessage } from "midi-driver";
+import { createContext, useContext, useRef } from "react";
 
 /**
  * The class a widget or whatever should implement when it wants to listen to the eventbus
@@ -209,4 +210,31 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
 
         //this.events.dispatchEvent(new CustomEvent("notedata", { detail: }))
     }
+}
+
+// MARK: - React Extension
+
+const EventBusContext = createContext(null);
+export function EventBusProvider({ children }) {
+    const eventbusRef = useRef<EventbusWorkerClient | null>(null);
+
+    if (!eventbusRef.current) {
+        eventbusRef.current = new EventbusWorkerClient();
+    }
+
+    return (
+        <EventBusContext.Provider value={eventbusRef.current}>
+            {children}
+        </EventBusContext.Provider>
+    )
+}
+
+export function useEventBus() {
+    const ctx = useContext<EventbusWorkerClient>(EventBusContext);
+
+    if (!ctx) {
+        throw new Error("useEventBus must be used inside EventBusProvider");
+    }
+
+    return ctx;
 }

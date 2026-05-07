@@ -1,9 +1,10 @@
-import { vibrate } from "../common/ui_utils";
+import { vibrate } from "../common/ui_utils.ts";
 import "./css/button.css";
-import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget';
-import { WidgetLifecycle, WidgetStateHandlers } from "../lifecycle";
+import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
+import { WidgetLifecycle, WidgetStateHandlers } from "../lifecycle.ts";
 
-import { EventBusConsumer } from "../eventbus/client";
+import { EventBusConsumer, useEventBus } from "../eventbus/client.tsx";
+import { FC, useEffect, useRef, useState } from "react";
 //import { App } from "../../app";
 
 
@@ -253,4 +254,109 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
     sendValue(v: number): void {
         App.eventbus.updateCC(this.prop.channel, this.prop.cc, this.state.latch_on ? (this.prop.value ?? 127) : (this.prop.value_off ?? 0));
     }
+}
+
+// MARK: React Extension
+
+export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
+    const eventbus = useEventBus();
+    const [label, setLabel] = useState<string>(p.label);
+    const [activePointer, setActivePointer] = useState<number | null>(null);
+
+    const [value, setValue] = useState<boolean>(false);
+
+    const targetRef = useRef<HTMLDivElement | null>(null);
+
+    const consumerRef = useRef<EventBusConsumer>({
+        consumerId: null,
+        updateValue(v) {
+            setValue(v > 0);
+        },
+        sendValue(v) {
+            eventbus.updateNote(p.channel, p.note, v ? 127 : 0)
+        },
+    })
+
+
+    useEffect(() => {
+        let consumerId: string | null = null;
+
+        const consumer = consumerRef.current;
+        if (!consumer) return;
+
+        eventbus.registerNote(p.channel, p.note, consumer)
+            .then(id => {
+                //this.consumerId = id;
+                consumerId = id;
+            });
+        return () => {
+            eventbus.unregisterNote(consumerId, p.channel, p.note).then(id => {
+                //state.id
+                consumerId = null
+            });
+        }
+    }, [eventbus]);
+
+    useEffect(() => {
+        const el = targetRef.current;
+        if (!el) return;
+
+        const touch_start = (e: PointerEvent) => {
+            e.preventDefault();
+            vibrate();
+            //const el = e.currentTarget as HTMLElement;
+            //this.state.active_pointer = e.pointerId;
+            setActivePointer(e.pointerId);
+            el.setPointerCapture(e.pointerId);
+
+            eventbus.updateNote(p.channel, p.note, 127);
+
+            //if (options.mode == "trigger") {
+            //this.state.latch_on = true;
+            //touch_update();
+            //}
+
+        };
+
+        const touch_end = (e: PointerEvent) => {
+            if (e.pointerId !== activePointer) return;
+
+            el.releasePointerCapture(e.pointerId);
+            setActivePointer(null);
+
+            //el.classList.remove("press");
+            eventbus.updateNote(p.channel, p.note, 0);
+
+            /*            if (options.mode == "trigger") {
+                this.state.latch_on = false;
+                    } else if (options.mode == "latch") {
+                        this.state.latch_on = !this.state.latch_on;
+                    }*/
+            //touch_update();
+        };
+
+        const touch_update = () => {
+            //this.sendUpdate(this.state.latch_on ? 127 : 0)
+
+        };
+
+        el.addEventListener("pointerdown", touch_start);
+        //targetRef.current.addEventListener("touchmove", touch_start);
+        el.addEventListener("pointerup", touch_end);
+        return () => {
+            el.removeEventListener("pointerdown", touch_start);
+            //targetRef.current.addEventListener("touchmove", touch_start);
+            el.removeEventListener("pointerup", touch_end);
+        }
+    }, [])
+
+    /*useEffect(() => {
+        
+    }, [value]);*/
+
+    return (<div>
+        <div ref={targetRef}>
+            note
+        </div>
+    </div>)
 }
