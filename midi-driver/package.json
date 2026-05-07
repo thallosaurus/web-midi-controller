@@ -1,7 +1,7 @@
 {
   "name": "midi-driver",
   "version": "0.1.12",
-  "main": "index.js",
+  "main": "index.ts",
   "license": "MIT",
   "private": true
 }

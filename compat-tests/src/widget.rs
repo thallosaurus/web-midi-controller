@@ -4,7 +4,7 @@ use ts_rs::TS;
 /// MARK: - Shared
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct BaseProperties {
+pub struct BaseProperties {
     /// The elements Id, which also gets used as its HTML Id.
     /// Use it to refer to this element in Custom CSS Styles
     id: Option<String>,
@@ -13,21 +13,21 @@ pub(super) struct BaseProperties {
 /// Shared Properties for all Midi Widgets
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct MidiProperties {
+pub struct MidiProperties {
     /// The midi channel the widget sends on. 1 = Channel 1; 0 is Overlay Global Channel
     channel: u8,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct ButtonProperties {
+pub struct ButtonProperties {
     label: Option<String>,
     mode: ButtonMode,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct CCProperties {
+pub struct CCProperties {
     cc: u8,
     value: Option<u8>,
 
@@ -48,7 +48,7 @@ pub(super) struct ChildrenContainer {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 #[serde(tag = "type")]
-pub(super) enum Widget {
+pub enum Widget {
     /// Horizontal Flex
     /// Gives you a layer that conforms to the CSS flexbox
     #[serde(rename = "horiz-mixer")]
@@ -95,7 +95,7 @@ pub(super) enum Widget {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct HorizontalMixerProperties {
+pub struct HorizontalMixerProperties {
     //id: Option<String>,
     #[serde(flatten)]
     base: BaseProperties,
@@ -106,7 +106,7 @@ pub(super) struct HorizontalMixerProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct VerticalMixerProperties {
+pub struct VerticalMixerProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
@@ -116,7 +116,7 @@ pub(super) struct VerticalMixerProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct GridMixerProperties {
+pub struct GridMixerProperties {
     /// Element Id of this Overlay - can be anything. Is assigned to the HTML Element
     /// for referencing it in CSS
     #[serde(flatten)]
@@ -134,7 +134,7 @@ pub(super) struct GridMixerProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct ShiftAreaProperties {
+pub struct ShiftAreaProperties {
     /// Element Id of this Overlay - can be anything. Is assigned to the HTML Element
     /// for referencing it in CSS
     #[serde(flatten)]
@@ -159,7 +159,7 @@ pub(super) struct ShiftAreaProperties {
 /// A single Notebutton. Sends out its defined Midi Note
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct NoteButtonProperties {
+pub struct NoteButtonProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
@@ -174,7 +174,7 @@ pub(super) struct NoteButtonProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct CCSliderProperties {
+pub struct CCSliderProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
@@ -206,7 +206,7 @@ enum SliderMode {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct CCButtonProperties {
+pub struct CCButtonProperties {
     #[serde(flatten)]
     base: BaseProperties,
     #[serde(flatten)]
@@ -221,7 +221,7 @@ pub(super) struct CCButtonProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct JogwheelProperties {
+pub struct JogwheelProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
@@ -234,7 +234,7 @@ pub(super) struct JogwheelProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct RotarySliderProperties {
+pub struct RotarySliderProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
@@ -274,7 +274,7 @@ enum ButtonMode {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct XYPadProperties {
+pub struct XYPadProperties {
     #[serde(flatten)]
     base: BaseProperties,
 

@@ -1,7 +1,3 @@
-use ts_rs::TS;
-
-use crate::overlays::Overlay;
-
 pub mod widget;
 pub mod overlays;
 

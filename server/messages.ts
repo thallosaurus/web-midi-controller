@@ -1,4 +1,4 @@
-import { MidiMessage } from "../midi-driver/mod.ts";
+import { MidiMessage } from "@driver";
 export { type MidiMessage };
 
 const FORCE_DEV = true;

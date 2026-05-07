@@ -1,6 +1,6 @@
 import { CoreWorkerMessage } from "../coreworker/worker";
 //import { MidiMessage } from "../../../midi-driver/bindings/MidiPayload";
-import type { MidiMessage } from "midi-driver/bindings/MidiPayload";
+//import type { MidiMessage } from "midi-driver";
 
 export type WebsocketWorkerEvent =
     | CoreWorkerMessage
@@ -10,4 +10,4 @@ export type WebsocketWorkerEvent =
     | { type: "disconnect" }
     | { type: "disconnect-successful" }
     | { type: "disconnect-failed", error: string }
-    | { type: "data", payload: MidiMessage }
+    | { type: "data", payload: any }

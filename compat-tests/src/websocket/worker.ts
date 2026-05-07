@@ -1,4 +1,4 @@
-import { WebsocketServerMessage } from "../../../server/messages";
+//import { WebsocketServerMessage } from "../../../server/messages";
 import { CoreWorker } from "../coreworker/worker";
 import { WebsocketWorkerEvent } from "./events";
 
@@ -11,7 +11,7 @@ class WebsocketWorker extends CoreWorker<WebsocketWorkerEvent, WebsocketWorkerEv
 
     socketMessageHandler(e: WebSocket) {
         e.addEventListener("message", (e) => {
-            const data: WebsocketServerMessage = JSON.parse(e.data);
+            const data: any = JSON.parse(e.data);
             switch (data.type) {
                 case "connection-information":
                     this.clientId = data.connectionId;

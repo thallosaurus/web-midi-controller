@@ -5,15 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "cargo test export_bindings && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "midi-driver": "../midi-driver",
     "react": "^19.1.0",
     "react-app-polyfill": "^3.0.0",
     "react-dom": "^19.1.0",
-    "midi-driver": "../midi-driver"
+    "terser": "^5.47.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
