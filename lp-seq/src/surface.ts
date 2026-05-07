@@ -99,13 +99,30 @@ export abstract class Surface {
 }
 
 export class DemoSurface extends Surface {
+    displayingAnimation = false;
+
     override onInput(msg: MidiMessage): void {
-        //throw new Error("Method not implemented.");
+        if (this.displayingAnimation) return;
+        this.clear();
+        this.animation().then(() => {
+            this.displayRandomColors();
+        })
+
         return;
     }
     constructor(caller: Launchpad) {
         super(caller);
 
+        this.displayRandomColors();
+    }
+
+    animation(): Promise<void> {
+        return new Promise((res, rej) => {
+            this.displayingAnimation = true            
+        });
+    }
+
+    displayRandomColors() {
         for (let i = 0; i < 64; i++) {
             this.setI(i, {
                 color: Math.floor(Math.random() * 127),

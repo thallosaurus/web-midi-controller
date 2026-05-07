@@ -178,6 +178,14 @@ pub extern "C" fn stop_driver(handle: u32) {
 }
 
 #[unsafe(no_mangle)]
+pub extern "C" fn stop_all() {
+    let lock = DRIVERS.lock().unwrap();
+    let k: Vec<u32> = lock.keys().map(|e| *e).collect();
+    drop(lock);
+    k.iter().for_each(|e|stop_driver(*e));
+}
+
+#[unsafe(no_mangle)]
 pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
     // Sicherstellen, dass Pointer gültig ist
     let slice = unsafe { std::slice::from_raw_parts(ptr, len) };

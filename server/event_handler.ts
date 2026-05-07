@@ -34,6 +34,7 @@ export class WebsocketEventHandler implements WSEvents<WebSocket> {
     //this.ctx.set("clientId", connInfo.connectionId);
     WebsocketEventHandler.clients.set(this.id, this.ws.raw!);
     this.sendConnectionInfo();
+    console.log("connection successful")
     //console.log(WebsocketEventHandler.clients);
   }
   onClose(evt: CloseEvent, ws: WSContext<WebSocket>): void {

@@ -52,6 +52,10 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
     parameters: [];
     result: "void";
   };
+  stop_all: {
+    parameters: [],
+    result: "void"
+  };
   start_driver: {
     parameters: ["u8", "pointer", "pointer"];
     result: "u32";
@@ -99,7 +103,7 @@ interface MidiDriverOptions {
 }
 
 export class MidiDriver {
-  private static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
+  static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
 
@@ -107,7 +111,7 @@ export class MidiDriver {
 
   private handle: number | null = null;
 
-  get dylibLoaded() {
+  static get dylibLoaded() {
     return MidiDriver.dylib !== null;
   }
 
@@ -118,6 +122,10 @@ export class MidiDriver {
         getLibraryPath(),
         {
           init_logging: {
+            parameters: [],
+            result: "void"
+          },
+          stop_all: {
             parameters: [],
             result: "void"
           },
@@ -186,7 +194,7 @@ export class MidiDriver {
   }
 
   private async pollLoop() {
-    while (this.dylibLoaded) {
+    while (MidiDriver.dylibLoaded) {
       this.pollBytes();
 
       await new Promise((r) => setTimeout(r, 1));
@@ -202,7 +210,7 @@ export class MidiDriver {
   }
 
   sendMidi(event: MidiMessage) {
-    if (this.dylibLoaded) {
+    if (MidiDriver.dylibLoaded) {
       const encoder = new TextEncoder();
       const json = JSON.stringify(event);
       const bytes = encoder.encode(json);
@@ -280,6 +288,15 @@ export class MidiDriver {
       MidiDriver.dylib.close();
       this.handle = null;
 
+      MidiDriver.dylib = null;
+    }
+  }
+  
+  closeNew () {
+    if (MidiDriver.dylibLoaded && MidiDriver.dylib) {
+      MidiDriver.dylib.symbols.stop_all();
+      if (this.pollInterval) clearInterval(this.pollInterval);
+      MidiDriver.dylib.close();
       MidiDriver.dylib = null;
     }
   }
