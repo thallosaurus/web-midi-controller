@@ -3,7 +3,6 @@ import './App.css'
 import { useWebsocket, WebsocketWorkerClient } from './websocket/client.tsx'
 import { Overlay } from '../bindings/Overlay';
 import { EventbusWorkerClient, useEventBus } from './eventbus/client.tsx'
-import { renderWidgetReact } from './ui/render.tsx';
 import { useOverlays } from './ui/overlay.tsx';
 import { LegacyOverlay, LegacyShim } from './widgets/legacy.tsx';
 
