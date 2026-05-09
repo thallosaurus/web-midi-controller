@@ -114,7 +114,9 @@ const App = () => {
         {selectedOverlay !== null ? <OverlayView /> : <></>}
       </main>*/}
 
-      <OverlayView />
+        <main id="overlays">
+          <OverlayView />
+        </main>
 
 
       <footer>

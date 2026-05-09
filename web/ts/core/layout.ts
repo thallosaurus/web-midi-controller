@@ -4,6 +4,7 @@ import { render_widget, WidgetProperties } from "./render";
 import { LoadedWidget } from "./overlay";
 
 import './css/shiftarea.css';
+import './css/layout.css';
 import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
 import { App } from "../../app";
 
