@@ -23,7 +23,7 @@ export class GridMixerNew extends Layout<GridMixerProperties, EmptyLayoutState> 
         container.style.setProperty("--rows", String(options.h));
 
         for (const child of options.grid) {
-            let ww = render_widget(child, children);
+            let ww = render_widget(child, children, eb);
             container.appendChild(ww.html);
             children.push(ww);
         }
@@ -36,7 +36,7 @@ export class HorizontalBox extends Layout<HorizontalMixerProperties, EmptyLayout
         if (options.id) container.id = options.id;
 
         for (const child of options.horiz) {
-            const ww = render_widget(child, children);
+            const ww = render_widget(child, children, eb);
             container.appendChild(ww.html);
             children.push(ww);
         }
@@ -49,7 +49,7 @@ export class VerticalBox extends Layout<VerticalMixerProperties, EmptyLayoutStat
         if (options.id) container.id = options.id;
 
         for (const child of options.vert) {
-            const ww = render_widget(child, children);
+            const ww = render_widget(child, children, eb);
             container.appendChild(ww.html);
             children.push(ww);
         }
@@ -84,7 +84,7 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
         const panel_a = document.createElement("div");
         panel_a.classList.add("panel", "a");
         for (const child of options.a) {
-            const ww = render_widget(child, children);
+            const ww = render_widget(child, children, eb);
             panel_a.appendChild(ww.html);
             children.push(ww);
         }
@@ -93,7 +93,7 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
         const panel_b = document.createElement("div");
         panel_b.classList.add("panel", "b");
         for (const child of options.b) {
-            const ww = render_widget(child, children);
+            const ww = render_widget(child, children, eb);
             panel_b.appendChild(ww.html);
             children.push(ww);
         }

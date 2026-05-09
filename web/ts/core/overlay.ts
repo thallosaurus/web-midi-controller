@@ -8,6 +8,8 @@ import { uuid } from "../common/utils.ts";
 import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";
 import { render_overlay, render_widget, WidgetProperties } from "./render";
 import { WidgetLifecycle, WidgetStateHandlers } from "./lifecycle";
+import { EventbusWorkerClient } from "@eventbus/client.ts";
+import { App } from "../../app.ts";
 //import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 
 let current_overlay_id = -1;
@@ -105,7 +107,8 @@ function unload_overlay(id: number) {
  */
 function parse_overlay(overlay: Overlay) {
     const oo = render_overlay(overlay, {
-        id: get_current_overlay_id()
+        id: get_current_overlay_id(),
+        eventbus: App.eventbus
     });
     register_overlay(oo);
     return oo;
@@ -296,7 +299,7 @@ export const process_program_change = (value: number) => {
     overlay_emitter.dispatchEvent(new ProgramChangeEvent(value));
 }
 
-export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) => {
+export const GridMixer = (container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) => {
     //const grid = document.createElement("div");
     if (options.id) container.id = options.id;
 
@@ -304,7 +307,7 @@ export const GridMixer = (container: HTMLDivElement, options: GridMixerPropertie
     container.style.setProperty("--rows", String(options.h));
 
     for (const child of options.grid) {
-        let ww = render_widget(child, children);
+        let ww = render_widget(child, children, eb);
         container.appendChild(ww.html);
         children.push(ww);
     }
@@ -313,11 +316,11 @@ export const GridMixer = (container: HTMLDivElement, options: GridMixerPropertie
     return container;
 }
 
-export const HorizMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) => {
+export const HorizMixer = (container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) => {
     if (options.id) container.id = options.id;
 
     for (const child of options.horiz) {
-        const ww = render_widget(child, children);
+        const ww = render_widget(child, children, eb);
         container.appendChild(ww.html);
         children.push(ww);
     }
@@ -325,11 +328,11 @@ export const HorizMixer = (container: HTMLDivElement, options: HorizontalMixerPr
     return container;
 }
 
-export const VertMixer = (container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>) => {
+export const VertMixer = (container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) => {
     if (options.id) container.id = options.id;
 
     for (const child of options.vert) {
-        const ww = render_widget(child, children);
+        const ww = render_widget(child, children, eb);
         container.appendChild(ww.html);
         children.push(ww);
     }

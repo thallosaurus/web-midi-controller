@@ -7,25 +7,9 @@ import { renderWidgetReact } from './ui/render.tsx';
 import { useOverlays } from './ui/overlay.tsx';
 import { LegacyOverlay, LegacyShim } from './widgets/legacy.tsx';
 
-interface IAppShim {
-  eventbus: EventbusWorkerClient | null,
-  ws: WebsocketWorkerClient | null
-}
-
-/**
- * @deprecated
- */
-export const AppShim: IAppShim = {
-  eventbus: null,
-  ws: null
-}
-
 const App = () => {
   const eventbus = useEventBus();
   const ws = useWebsocket();
-
-  AppShim.eventbus = eventbus;
-  AppShim.ws = ws;
 
   const [connected, setConnected] = useState(false);
 
@@ -130,6 +114,8 @@ const App = () => {
         {selectedOverlay !== null ? <OverlayView /> : <></>}
       </main>*/}
 
+      <OverlayView />
+
 
       <footer>
         footer
@@ -143,13 +129,13 @@ const OverlayView: FC = () => {
   const overlay = overlays[selectedOverlay];
 
   return (
-    /*overlay ?
-      (<>{overlay.cells.map((v, i) => {
+    overlay ?
+      (<>{/*overlay.cells.map((v, i) => {
             return <>{renderWidgetReact(v)}</>
-          })}
+          })*/}
+      <LegacyOverlay overlay={overlay} id={selectedOverlay} />
         </>)
-      : (<p>error</p>)*/
-      <LegacyShim cell={overlay} />
+      : (<p>error</p>)
   )
 }
 

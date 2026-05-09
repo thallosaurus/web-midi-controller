@@ -7,13 +7,11 @@ import { WsProvider } from './websocket/client.tsx'
 import { OverlayProvider } from './ui/overlay.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
     <WsProvider>
       <EventBusProvider>
         <OverlayProvider>
           <App />
         </OverlayProvider>
       </EventBusProvider>
-    </WsProvider>
-  </StrictMode>,
+    </WsProvider>,
 )

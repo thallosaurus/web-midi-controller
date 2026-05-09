@@ -1,21 +1,28 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Widget, LoadedWidget, NoteButtonLifecycle, NoteButtonProperties, WidgetLifecycle, render_overlay, Overlay } from "midi-controller";
 import { useEventBus } from "../eventbus/client";
 import { LoadedOverlay } from "midi-controller/ts/core/overlay";
 
-export const LegacyOverlay: FC<{overlay: Overlay}> = ({ overlay }) => {
+export const LegacyOverlay: FC<{overlay: Overlay, id?: number }> = ({ overlay, id }) => {
     const loadedOverlay = useRef<LoadedOverlay | null>(null);
     const container = useRef<HTMLDivElement | null>(null);
+    const eventbus = useEventBus();
+
+    //const [_, forceRedraw] = useState(0);
+
     useEffect(() => {
         if (container) {
-            loadedOverlay.current = render_overlay(overlay, { id: 0 });
+            console.log(eventbus);
+            loadedOverlay.current = render_overlay(overlay, { id, element: container.current, eventbus: eventbus as any });
+            console.log(loadedOverlay.current);
             loadedOverlay.current.load();
         }
 
         return () => {
             loadedOverlay.current.unload();
+            container.current = null;
         }
-    })
+    }, [])
 
     return (
         <div ref={container}></div>

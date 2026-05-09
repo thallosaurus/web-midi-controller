@@ -68,6 +68,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
         }
         //set_reset_label();
         this.setResetLabel();
+        super.value(v);
     }
 
     setResetLabel() {
