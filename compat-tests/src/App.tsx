@@ -6,10 +6,25 @@ import { EventbusWorkerClient, useEventBus } from './eventbus/client.tsx'
 import { renderWidgetReact } from './ui/render.tsx';
 import { useOverlays } from './ui/overlay.tsx';
 
+interface IAppShim {
+  eventbus: EventbusWorkerClient | null,
+  ws: WebsocketWorkerClient | null
+}
+
+/**
+ * @deprecated
+ */
+export const AppShim: IAppShim = {
+  eventbus: null,
+  ws: null
+}
 
 const App = () => {
   const eventbus = useEventBus();
   const ws = useWebsocket();
+
+  AppShim.eventbus = eventbus;
+  AppShim.ws = ws;
 
   const [connected, setConnected] = useState(false);
 

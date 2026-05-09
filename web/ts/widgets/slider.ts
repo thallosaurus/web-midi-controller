@@ -1,9 +1,9 @@
 import { vibrate } from "@common/ui_utils";
 import type { CCSliderProperties } from "@bindings/Widget";
 import { WidgetLifecycle } from "@core/lifecycle";
-import { EventBusConsumer } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
 import "./css/slider.css";
-import { App } from "../../app";
+//import { App } from "../../app";
 
 const MAX_LEVEL = 127;
 
@@ -27,7 +27,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
      */
     consumerId: string | null = null;
 
-    constructor(container: HTMLDivElement, options: CCSliderProperties) {
+    constructor(container: HTMLDivElement, options: CCSliderProperties, eb: EventbusWorkerClient) {
         super({
             value: options.default_value ?? 0,
             active_pointer: null,
@@ -35,7 +35,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
             baseX: 0,
             baseY: 0,
             //handlers: {}
-        }, options);
+        }, options, eb);
 
         /*this.state.value = options.default_value ?? 0;
         this.state.active_pointer = null;
@@ -117,7 +117,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
 
         const reset = () => {
             this.updateValue(options.default_value ?? 0);
-            App.eventbus.updateCC(this.prop.channel, this.prop.cc, options.default_value ?? 0);
+            this.eventbus!.updateCC(this.prop.channel, this.prop.cc, options.default_value ?? 0);
             //update_bus_value(options.default_value ?? 0);
         };
 
@@ -197,7 +197,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
         this.handlers.pointerup = end;
         this.handlers.pointercancel = end;
 
-        App.eventbus.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this)
+        this.eventbus!.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this)
         .then(id => {
             this.consumerId = id;
         })
@@ -212,7 +212,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
         return false;
     }
     unload(options: CCSliderProperties, html: HTMLDivElement): boolean {
-        App.eventbus.unregisterCC(this.consumerId!, this.prop.channel, this.prop.cc);
+        this.eventbus!.unregisterCC(this.consumerId!, this.prop.channel, this.prop.cc);
         const slider = html.querySelector<HTMLDivElement>(".slider")!;
         slider.addEventListener("pointerdown", this.handlers.pointerdown);
         slider.addEventListener("pointermove", this.handlers.pointermove);
@@ -222,7 +222,7 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
     }
 
     sendValue(v: number) {
-        App.eventbus.updateCC(this.prop.channel, this.prop.cc, v);
+        this.eventbus!.updateCC(this.prop.channel, this.prop.cc, v);
 
         // update ui - TODO gate behind feature gate
         //this.updateValue(v);

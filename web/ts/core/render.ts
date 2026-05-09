@@ -10,6 +10,7 @@ import { RotaryLifecycle, RotaryState } from "@widgets/rotary";
 import { CCSliderLifecycle, CCSliderState } from "@widgets/slider";
 import { LoadedOverlay, LoadedWidget } from "./overlay";
 import { GridMixerNew, HorizontalBox, ShiftArea, VerticalBox } from "./layout";
+import { App } from "app";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables and renders it into the given element
@@ -38,68 +39,68 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
                 const w = cell as CCButtonProperties;
                 //if (w.id) e.id = cell.id;
                 //CCButton(e, w);
-                return new LoadedWidget(cell, e, new CCButtonLifecycle(e, w))
+                return new LoadedWidget(cell, e, new CCButtonLifecycle(e, w, App.eventbus))
             }
 
         case "rotary":
             {
                 const w = cell as RotarySliderProperties;
                 //Rotary(e, w);
-                return new LoadedWidget(cell, e, new RotaryLifecycle(e, w))
+                return new LoadedWidget(cell, e, new RotaryLifecycle(e, w, App.eventbus))
             }
 
         case "ccslider":
             {
                 const w = cell as CCSliderProperties;
                 //CCSlider(e, w);
-                return new LoadedWidget(cell, e, new CCSliderLifecycle(e, w))
+                return new LoadedWidget(cell, e, new CCSliderLifecycle(e, w, App.eventbus))
             }
 
         case "grid-mixer":
             {
                 const w = cell as GridMixerProperties;
                 //GridMixer(e, w, children);
-                return new LoadedWidget(cell, e, new GridMixerNew(e, w, children));
+                return new LoadedWidget(cell, e, new GridMixerNew(e, w, children, App.eventbus));
             }
 
         case "vert-mixer":
             {
                 const w = cell as VerticalMixerProperties;
                 //VertMixer(e, w, children);
-                return new LoadedWidget(cell, e, new VerticalBox(e, w, children));
+                return new LoadedWidget(cell, e, new VerticalBox(e, w, children, App.eventbus));
             }
 
         case "horiz-mixer":
             {
                 const w = cell as HorizontalMixerProperties;
                 //HorizMixer(e, w, children);
-                return new LoadedWidget(cell, e, new HorizontalBox(e, w, children));
+                return new LoadedWidget(cell, e, new HorizontalBox(e, w, children, App.eventbus));
             }
 
         case "notebutton":
             {
                 const w = cell as NoteButtonProperties;
                 //NoteButton(e, w);
-                return new LoadedWidget(cell, e, new NoteButtonLifecycle(e, w))
+                return new LoadedWidget(cell, e, new NoteButtonLifecycle(e, w, App.eventbus))
             }
 
         case "jogwheel":
             {
                 const w = cell as JogwheelProperties;
-                return new LoadedWidget(cell, e, new JogwheelLifecycle(e, w));
+                return new LoadedWidget(cell, e, new JogwheelLifecycle(e, w, App.eventbus));
                 //Jogwheel(e, w);
             }
 
         case "xypad":
             {
                 const w = cell as XYPadProperties;
-                return new LoadedWidget(cell, e, new XYPadLifecycle(e, w));
+                return new LoadedWidget(cell, e, new XYPadLifecycle(e, w, App.eventbus));
             }
 
         case "shift":
             {
                 const w = cell as ShiftAreaProperties;
-                return new LoadedWidget(cell, e, new ShiftArea(e, w, children));
+                return new LoadedWidget(cell, e, new ShiftArea(e, w, children, App.eventbus));
             }
     }
     let ww = new LoadedWidget(cell, e);

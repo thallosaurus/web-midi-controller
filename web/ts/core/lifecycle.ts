@@ -1,3 +1,4 @@
+import { EventbusWorkerClient } from "@eventbus/client";
 import { WidgetProperties } from "./render"
 
 
@@ -17,10 +18,12 @@ export class WidgetLifecycle<O extends WidgetProperties, S> {
     state: S
     prop: O
     handlers: WidgetStateHandlers = {}
-    constructor(s: S, p: O) { 
+    eventbus: EventbusWorkerClient | null
+    constructor(s: S, p: O, eb: EventbusWorkerClient) { 
         this.prop = p;
 
         this.state = s
+        this.eventbus = eb;
     }
     /**
      * loads this lifecycle

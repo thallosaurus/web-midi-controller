@@ -5,7 +5,7 @@ import { WidgetLifecycle, WidgetStateHandlers } from "../ui/lifecycle.ts";
 
 import { EventBusConsumer, useEventBus } from "../eventbus/client.tsx";
 import { FC, useEffect, useRef, useState } from "react";
-//import { App } from "../../app";
+import { AppShim as App } from "../App.tsx";
 
 
 /**
@@ -279,7 +279,6 @@ export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
         },
     })
 
-
     useEffect(() => {
 
         const consumer = consumerRef.current;
@@ -356,7 +355,7 @@ export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
     }, [value]);*/
 
     return (<div className="widget notebutton">
-        <div ref={targetRef}>
+        <div className="target" ref={targetRef}>
             { String(value) }
         </div>
     </div>)

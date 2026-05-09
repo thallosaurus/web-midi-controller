@@ -2,9 +2,9 @@ import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 import { vibrate } from "@common/ui_utils";
 
 import type { RotarySliderProperties } from "@bindings/Widget";
-import { EventBusConsumer, } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient, } from "ts/eventbus/client";
 import "./css/rotary.css";
-import { App } from "../../app";
+//import { App } from "../../app";
 
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
@@ -21,12 +21,12 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
     dial: HTMLDivElement
     label: HTMLDivElement
 
-    constructor(container: HTMLDivElement, options: RotarySliderProperties) {
+    constructor(container: HTMLDivElement, options: RotarySliderProperties, eb: EventbusWorkerClient) {
         super({
             value: 0,
             lastX: 0,
             active: false
-        }, options);
+        }, options, eb);
 
         this.widget = document.createElement("div");
         this.widget.classList.add("widget");
@@ -54,7 +54,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
     }
 
     sendValue(v: number) {
-        App.eventbus.updateCC(this.prop.channel, this.prop.cc, v)
+        this.eventbus!.updateCC(this.prop.channel, this.prop.cc, v)
     }
 
     load(options: RotarySliderProperties, html: HTMLDivElement) {
@@ -100,7 +100,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
 
         //register_cc_widget(id, s.default_value ?? 0, s.channel, s.cc, update_value);
         //registerCCWidget(options.channel, options.cc, options.value ?? 0, this.updateValue)
-        App.eventbus.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this).then(id => {
+        this.eventbus!.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this).then(id => {
             this.consumerId = id;
         });
 
@@ -121,7 +121,7 @@ export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, Rot
         html.removeEventListener("pointerup", this.handlers.pointerup);
         html.removeEventListener("pointercancel", this.handlers.pointercancel);
         //unregister_cc_widget(id, s.channel, s.cc);
-        App.eventbus.unregisterCC(this.consumerId!,this.prop.channel, this.prop.cc);
+        this.eventbus!.unregisterCC(this.consumerId!,this.prop.channel, this.prop.cc);
         /*        unregisterCCWidget(this.consumerId!, options.channel, options.cc).then(() => {
                     this.consumerId = null
                 })*/

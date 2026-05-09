@@ -4,20 +4,20 @@ import { render_widget, WidgetProperties } from "./render";
 import { LoadedWidget } from "./overlay";
 
 import './css/shiftarea.css';
-import { EventBusConsumer } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
 import { App } from "../../app";
 
 class Layout<Prop extends WidgetProperties, State> extends WidgetLifecycle<Prop, State> {
-    constructor(state: State, options: Prop) {
-        super(state, options)
+    constructor(state: State, options: Prop, eb: EventbusWorkerClient) {
+        super(state, options, eb)
     }
 }
 
 interface EmptyLayoutState { }
 
 export class GridMixerNew extends Layout<GridMixerProperties, EmptyLayoutState> {
-    constructor(container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>) {
-        super({}, options);
+    constructor(container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) {
+        super({}, options, eb);
         if (options.id) container.id = options.id;
         container.style.setProperty("--cols", String(options.w));
         container.style.setProperty("--rows", String(options.h));
@@ -31,8 +31,8 @@ export class GridMixerNew extends Layout<GridMixerProperties, EmptyLayoutState> 
 }
 
 export class HorizontalBox extends Layout<HorizontalMixerProperties, EmptyLayoutState> {
-    constructor(container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>) {
-        super({}, options);
+    constructor(container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) {
+        super({}, options, eb);
         if (options.id) container.id = options.id;
 
         for (const child of options.horiz) {
@@ -44,8 +44,8 @@ export class HorizontalBox extends Layout<HorizontalMixerProperties, EmptyLayout
 }
 
 export class VerticalBox extends Layout<VerticalMixerProperties, EmptyLayoutState> {
-    constructor(container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>) {
-        super({}, options);
+    constructor(container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) {
+        super({}, options, eb);
         if (options.id) container.id = options.id;
 
         for (const child of options.vert) {
@@ -72,10 +72,10 @@ export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> imple
     container: HTMLDivElement
     consumerId: string | null = null;
     
-    constructor(container: HTMLDivElement, options: ShiftAreaProperties, children: Array<LoadedWidget>) {
+    constructor(container: HTMLDivElement, options: ShiftAreaProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) {
         super({
             shift: ShiftState.A
-        }, options);
+        }, options, eb);
 
         this.container = container;
         

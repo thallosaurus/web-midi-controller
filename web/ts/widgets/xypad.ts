@@ -2,7 +2,7 @@ import "./css/xypad.css"
 import type { XYPadProperties } from "@bindings/Widget";
 import { vibrate } from "@common/ui_utils";
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
-import { EventBusConsumer } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
 import { App } from "../../app";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -64,10 +64,10 @@ export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState>
     x: Axis
     y: Axis
 
-    constructor(container: HTMLDivElement, options: XYPadProperties) {
+    constructor(container: HTMLDivElement, options: XYPadProperties, eb: EventbusWorkerClient) {
         super({
             activePointer: null
-        }, options);
+        }, options, eb);
 
         this.y_label = document.createElement("button");
         this.y_label.classList.add("label", "y-label")

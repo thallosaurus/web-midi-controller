@@ -3,8 +3,8 @@ import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
 import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
 
-import { EventBusConsumer } from "ts/eventbus/client";
-import { App } from "../../app";
+import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
+//import { App } from "../../app";
 
 
 /**
@@ -22,11 +22,11 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
 
     target: HTMLDivElement
 
-    constructor(container: HTMLDivElement, options: NoteButtonProperties) {
+    constructor(container: HTMLDivElement, options: NoteButtonProperties, eb: EventbusWorkerClient) {
         super({
             latch_on: false,
             active_pointer: null
-        }, options);
+        }, options, eb);
 
         this.target = document.createElement("div");
         this.target.classList.add("target");
@@ -87,7 +87,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
             this.sendUpdate(this.state.latch_on ? 127 : 0)
         };
 
-        App.eventbus.registerNote(this.prop.channel, this.prop.note, this)
+        this.eventbus!.registerNote(this.prop.channel, this.prop.note, this)
             .then(id => {
                 this.consumerId = id;
             });
@@ -111,7 +111,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
             button.removeEventListener("pointercancel", this.handlers.pointercancel)
         }*/
         //unregister_midi_widget(id, options.channel, options.note);
-        App.eventbus.unregisterNote(this.consumerId!, options.channel, options.note).then(id => {
+        this.eventbus!.unregisterNote(this.consumerId!, options.channel, options.note).then(id => {
             //state.id
             this.consumerId = null
         });
@@ -119,7 +119,7 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
     }
 
     sendUpdate(v: number) {
-        App.eventbus.updateNote(this.prop.channel, this.prop.note, v);
+        this.eventbus!.updateNote(this.prop.channel, this.prop.note, v);
 
         // also update ui directly
         if (import.meta.env.VITE_SELF_UPDATE_WIDGETS == "true") {
@@ -132,11 +132,11 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
 export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, ButtonState> implements EventBusConsumer {
     button: HTMLDivElement;
 
-    constructor(container: HTMLDivElement, options: CCButtonProperties) {
+    constructor(container: HTMLDivElement, options: CCButtonProperties, eb: EventbusWorkerClient) {
         super({
             latch_on: false,
             active_pointer: null,
-        }, options);
+        }, options, eb);
 
         //CCButton(container, options);
         this.button = document.createElement("div");
@@ -219,7 +219,7 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             this.consumerId = id
         });*/
 
-        App.eventbus.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this).then(id => {
+        this.eventbus!.registerCC(this.prop.channel, this.prop.cc, this.prop.default_value ?? 0, this).then(id => {
             this.consumerId = id
         })
 
@@ -243,7 +243,7 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
             html.removeEventListener("pointercancel", this.handlers.pointercancel)
         }*/
         //unregister_cc_widget(id, options.channel, options.cc)
-        App.eventbus.unregisterCC(this.consumerId!, this.prop.channel, this.prop.cc);
+        this.eventbus!.unregisterCC(this.consumerId!, this.prop.channel, this.prop.cc);
         /*        unregisterCCWidget(state.id!, options.channel, options.cc).then(id => {
                     state.id = null
                 })*/
@@ -251,6 +251,6 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
     }
 
     sendValue(v: number): void {
-        App.eventbus.updateCC(this.prop.channel, this.prop.cc, this.state.latch_on ? (this.prop.value ?? 127) : (this.prop.value_off ?? 0));
+        this.eventbus!.updateCC(this.prop.channel, this.prop.cc, this.state.latch_on ? (this.prop.value ?? 127) : (this.prop.value_off ?? 0));
     }
 }
