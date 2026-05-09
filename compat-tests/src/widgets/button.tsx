@@ -261,12 +261,14 @@ export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, Butto
 export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
     const eventbus = useEventBus();
     const [label, setLabel] = useState<string>(p.label);
-    const [activePointer, setActivePointer] = useState<number | null>(null);
+    const activePointer = useRef<number | null>(null);
 
     const [value, setValue] = useState<boolean>(false);
 
     const targetRef = useRef<HTMLDivElement | null>(null);
+    const consumerId = useRef<string | null>(null);
 
+    // the object responsible for updating the value
     const consumerRef = useRef<EventBusConsumer>({
         consumerId: null,
         updateValue(v) {
@@ -279,7 +281,6 @@ export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
 
 
     useEffect(() => {
-        let consumerId: string | null = null;
 
         const consumer = consumerRef.current;
         if (!consumer) return;
@@ -287,12 +288,12 @@ export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
         eventbus.registerNote(p.channel, p.note, consumer)
             .then(id => {
                 //this.consumerId = id;
-                consumerId = id;
+                consumerId.current = id;
             });
         return () => {
-            eventbus.unregisterNote(consumerId, p.channel, p.note).then(id => {
+            eventbus.unregisterNote(consumerId.current, p.channel, p.note).then(id => {
                 //state.id
-                consumerId = null
+                consumerId.current = null
             });
         }
     }, [eventbus]);
@@ -306,7 +307,7 @@ export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
             vibrate();
             //const el = e.currentTarget as HTMLElement;
             //this.state.active_pointer = e.pointerId;
-            setActivePointer(e.pointerId);
+            activePointer.current = e.pointerId;
             el.setPointerCapture(e.pointerId);
 
             eventbus.updateNote(p.channel, p.note, 127);
@@ -319,10 +320,10 @@ export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
         };
 
         const touch_end = (e: PointerEvent) => {
-            if (e.pointerId !== activePointer) return;
+            if (e.pointerId !== activePointer.current) return;
 
             el.releasePointerCapture(e.pointerId);
-            setActivePointer(null);
+            activePointer.current = null;
 
             //el.classList.remove("press");
             eventbus.updateNote(p.channel, p.note, 0);
@@ -354,9 +355,9 @@ export const ReactNoteButton: FC<{ p: NoteButtonProperties }> = ({ p }) => {
         
     }, [value]);*/
 
-    return (<div>
+    return (<div className="widget notebutton">
         <div ref={targetRef}>
-            note
+            { String(value) }
         </div>
     </div>)
 }

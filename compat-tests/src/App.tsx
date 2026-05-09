@@ -42,6 +42,7 @@ const App = () => {
     }
 
     const onDisconnect = () => {
+      unloadOverlays();
       setConnected(false);
     }
 
@@ -64,7 +65,7 @@ const App = () => {
     ws.events.addEventListener("data", onData);
     eventbus.events.addEventListener("data", onEventbusData);
 
-    window.addEventListener('error', function(event) {
+    /*window.addEventListener('error', function(event) {
     //reportError({ message: event.reason?.message, stack: event.reason?.stack });
       this.alert(event.error);
     });
@@ -72,7 +73,7 @@ const App = () => {
     window.addEventListener('unhandledrejection', function (event) {
       this.alert(event.reason.message + ": " + event.reason.stack);
       //this.alert(JSON.stringify(event.reason));
-    });
+    });*/
 
 
     return () => {
@@ -109,24 +110,12 @@ const App = () => {
           }}>Connect</button>)}
       </header>
 
-      <main>
+      <main id="overlays">
         {selectedOverlay !== null ? <OverlayView /> : <></>}
       </main>
 
       <footer>
         footer
-        <pre>
-
-          <select onChange={(e) => {
-            setSelectedOverlay(Number(e.target.value));
-          }}>
-            {overlays.map((v, i) => {
-              return (
-                <option key={i} value={i}>{v.name}</option>
-              )
-            })}
-          </select>
-        </pre>
       </footer>
     </>
   )
@@ -135,23 +124,13 @@ const App = () => {
 const OverlayView: FC = () => {
   const { selectedOverlay, overlays } = useOverlays();
   const overlay = overlays[selectedOverlay];
-  useEffect(() => {
-    alert(overlay.name);
-  })
 
   return (
     overlay ?
-      (<div id="overlays">
-        <div>
-
-          {overlay.cells.map((v, i) => {
+      (<>{overlay.cells.map((v, i) => {
             return <>{renderWidgetReact(v)}</>
           })}
-        </div>
-        <pre>
-          {JSON.stringify(overlay)}
-        </pre>
-      </div>)
+        </>)
       : (<p>error</p>)
   )
 }

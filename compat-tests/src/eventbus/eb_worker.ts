@@ -84,6 +84,7 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
     }
 
     registerNoteWidget(id: string, channel: number, note: number, value: number): string {
+        console.log("registering " + id + " midi ", note, " on channel ", channel);
         const n = this.notes.get(channel)!;
         if (!n.has(note)) {
             n.set(note, []);
@@ -137,10 +138,10 @@ export class EventBusWorker extends CoreWorker<EventBusWorkerConsumerEvent, Even
         })
         // send unregister message
         //sendUnregisterNoteCallback(id);
-
+        
         return notemap.splice(index, 1);
     }
-
+    
     registerCCWidget(id: string, channel: number, cc_number: number, init?: number) {
         const cc = this.cc.get(channel)!;
         if (!cc.has(cc_number)) {

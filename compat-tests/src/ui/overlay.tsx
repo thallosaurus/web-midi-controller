@@ -383,6 +383,7 @@ export function OverlayProvider({ children }) {
 
     const unloadOverlays = () => {
         overlayRef.current = [];
+        setSelectedOverlay(null);
     }
 
     /*unload() {
