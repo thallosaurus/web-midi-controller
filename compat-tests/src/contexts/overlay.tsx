@@ -1,7 +1,9 @@
 import { createContext, useRef, useState, useContext } from "react";
 import { Overlay } from "../../bindings/Overlay";
 
-// MARK: - React Extensions
+export const OverlaySelector = () => {
+    
+}
 const OverlayContext = createContext(null);
 export function OverlayProvider({ children }) {
     const overlayRef = useRef<Overlay[]>([]);

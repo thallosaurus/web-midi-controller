@@ -99,7 +99,7 @@ mode = "trigger"
 [[cells.grid]]
 type = "notebutton"
 channel = 1
-note = 16
+note = 24
 mode = "trigger"
 
 [[cells.grid]]

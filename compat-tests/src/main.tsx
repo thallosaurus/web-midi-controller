@@ -4,7 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { EventBusProvider } from './eventbus/client.tsx'
 import { WsProvider } from './websocket/client.tsx'
-import { OverlayProvider } from './ui/overlay.tsx'
+import { OverlayProvider } from './contexts/overlay.tsx'
 
 createRoot(document.getElementById('root')!).render(
     <WsProvider>

@@ -14,3 +14,12 @@ body {
     display: flex;
     justify-content: space-between;
 }
+
+#overlays {
+  padding: 1em 0;
+  grid-area: main;
+  align-self: stretch;
+  width: calc(100% - 2em);
+  height: 100%;
+  margin: 0 1em;
+}

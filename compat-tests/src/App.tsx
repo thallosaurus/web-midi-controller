@@ -3,7 +3,7 @@ import './App.css'
 import { useWebsocket, WebsocketWorkerClient } from './websocket/client.tsx'
 import { Overlay } from '../bindings/Overlay';
 import { EventbusWorkerClient, useEventBus } from './eventbus/client.tsx'
-import { useOverlays } from './ui/overlay.tsx';
+import { useOverlays } from './contexts/overlay.tsx';
 import { LegacyOverlay, LegacyShim } from './widgets/legacy.tsx';
 
 const App = () => {
@@ -16,7 +16,6 @@ const App = () => {
     overlays,
     fetchOverlays,
     unloadOverlays,
-    selectedOverlay,
     setSelectedOverlay
   } = useOverlays();
 
@@ -32,7 +31,6 @@ const App = () => {
   const disconnectAndUnload = () => {
     ws.disconnectEndpoint();
     unloadOverlays();
-    //registry.unload();
   }
 
   useEffect(() => {
@@ -117,11 +115,6 @@ const App = () => {
         <main id="overlays">
           <OverlayView />
         </main>
-
-
-      <footer>
-        footer
-      </footer>
     </>
   )
 }
