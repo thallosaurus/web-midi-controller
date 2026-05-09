@@ -3,14 +3,12 @@ import './App.css'
 import { useWebsocket, WebsocketWorkerClient } from './websocket/client.tsx'
 import { Overlay } from '../bindings/Overlay';
 import { EventbusWorkerClient, useEventBus } from './eventbus/client.tsx'
-import { useOverlays } from './contexts/overlay.tsx';
+import { OverlaySelector, useOverlays } from './ui/overlay.tsx';
 import { LegacyOverlay, LegacyShim } from './widgets/legacy.tsx';
 
 const App = () => {
   const eventbus = useEventBus();
-  const ws = useWebsocket();
-
-  const [connected, setConnected] = useState(false);
+  const { ws, connected, load, unload } = useWebsocket();
 
   const {
     overlays,
@@ -34,20 +32,28 @@ const App = () => {
   }
 
   useEffect(() => {
-    const onConnect = () => {
-      setConnected(true);
-    }
-
     const onDisconnect = () => {
       unloadOverlays();
-      setConnected(false);
     }
 
     const onData = (ev: Event) => {
       const data = (ev as CustomEvent).detail;
       console.log(data);
 
-      //setMessages(prev => [...prev, data]);
+      switch (data.type) {
+        case "NoteOn":
+        case "NoteOff":
+          eventbus.updateNote(data.channel, data.note, data.velocity, true);
+          break;
+        case "ControlChange":
+          eventbus.updateCC(data.channel, data.cc, data.value, true);
+          break;
+        case "ProgramChange":
+          //change_overlay(payload.value);
+          break;
+
+        //setMessages(prev => [...prev, data]);
+      }
     }
 
     const onEventbusData = (ev: Event) => {
@@ -57,7 +63,9 @@ const App = () => {
       //socket
     }
 
-    ws.events.addEventListener("connect", onConnect);
+    load();
+
+    //ws.events.addEventListener("connect", onConnect);
     ws.events.addEventListener("disconnect", onDisconnect);
     ws.events.addEventListener("data", onData);
     eventbus.events.addEventListener("data", onEventbusData);
@@ -74,9 +82,12 @@ const App = () => {
 
 
     return () => {
-      ws.events.removeEventListener("connect", onConnect);
+      //ws.events.removeEventListener("connect", onConnect);
       ws.events.removeEventListener("disconnect", onDisconnect);
       ws.events.removeEventListener("data", onData);
+
+      unload();
+
       eventbus.events.removeEventListener("data", onEventbusData);
     }
   }, []);
@@ -88,18 +99,7 @@ const App = () => {
           {connected ? "connected" : "disconnected"}
         </h1>
 
-        {connected ?
-          <select onChange={(e) => {
-            console.log(e.target.value);
-            setSelectedOverlay(Number(e.target.value));
-          }}>
-            {overlays.map((v, i) => {
-              return (
-                <option key={i} value={i}>{v.name}</option>
-              )
-            })}
-          </select>
-          : (<></>)}
+        <OverlaySelector />
 
         {connected
           ? (<button onClick={disconnectAndUnload}>Disconnect</button>)
@@ -112,9 +112,9 @@ const App = () => {
         {selectedOverlay !== null ? <OverlayView /> : <></>}
       </main>*/}
 
-        <main id="overlays">
-          <OverlayView />
-        </main>
+      <main id="overlays">
+        <OverlayView />
+      </main>
     </>
   )
 }
@@ -132,8 +132,8 @@ const OverlayView: FC = () => {
       (<>{/*overlay.cells.map((v, i) => {
             return <>{renderWidgetReact(v)}</>
           })*/}
-      <LegacyOverlay overlay={overlay} id={selectedOverlay} />
-        </>)
+        <LegacyOverlay overlay={overlay} id={selectedOverlay} />
+      </>)
       : (<p>error</p>)
   )
 }

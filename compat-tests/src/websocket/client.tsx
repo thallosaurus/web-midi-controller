@@ -1,7 +1,7 @@
 import { type MidiMessage } from "midi-driver";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { WebsocketWorkerEvent } from "./events";
-import { createContext, useContext, useRef } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 
 export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent, WebsocketWorkerEvent> {
     connected = false;
@@ -18,7 +18,7 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
         switch (msg.type) {
             case "data":
                 this.sendMidiDataEvent(msg.payload);
-            break;
+                break;
 
             case "connection-successful":
                 this.connected = true;
@@ -117,20 +117,42 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
 const WsContext = createContext(null);
 export function WsProvider({ children }) {
     const wsRef = useRef<WebsocketWorkerClient | null>(null);
+    const [connected, setConnected] = useState(false);
+
+    const onConnect = () => {
+        setConnected(true);
+    }
+
+    const onDisconnect = () => {
+        //   unloadOverlays();
+        setConnected(false);
+    }
 
     if (!wsRef.current) {
-        wsRef.current = new WebsocketWorkerClient();
+        const ws = new WebsocketWorkerClient();
+        wsRef.current = ws;
     }
 
     return (
-        <WsContext.Provider value={wsRef.current}>
+        <WsContext.Provider value={{
+            ws: wsRef.current,
+            connected,
+            load: () => {
+                wsRef.current.events.addEventListener("connect", onConnect);
+                wsRef.current.events.addEventListener("disconnect", onDisconnect);
+            },
+            unload: () => {
+                wsRef.current.events.removeEventListener("connect", onConnect);
+                wsRef.current.events.removeEventListener("disconnect", onDisconnect);
+            }
+        }}>
             {children}
         </WsContext.Provider>
     )
 }
 
 export function useWebsocket() {
-    const ctx = useContext<WebsocketWorkerClient>(WsContext);
+    const ctx = useContext(WsContext);
 
     if (!ctx) {
         throw new Error("useWebsocket must be used inside WsProvider");

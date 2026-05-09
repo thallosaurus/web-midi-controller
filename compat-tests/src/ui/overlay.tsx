@@ -2,7 +2,23 @@ import { createContext, useRef, useState, useContext } from "react";
 import { Overlay } from "../../bindings/Overlay";
 
 export const OverlaySelector = () => {
-    
+    const {
+        overlays,
+        setSelectedOverlay
+    } = useOverlays();
+
+    return (
+        <select onChange={(e) => {
+            console.log(e.target.value);
+            setSelectedOverlay(Number(e.target.value));
+          }}>
+            {overlays.map((v, i) => {
+              return (
+                <option key={i} value={i}>{v.name}</option>
+              )
+            })}
+          </select>
+    )
 }
 const OverlayContext = createContext(null);
 export function OverlayProvider({ children }) {

@@ -23,7 +23,6 @@ export const LegacyOverlay: FC<{overlay: Overlay, id?: number }> = ({ overlay, i
 
         return () => {
             loadedOverlay.current.unload();
-            container.current.innerHTML = "";
         }
     })
 
