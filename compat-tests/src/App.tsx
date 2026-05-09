@@ -93,6 +93,7 @@ const App = () => {
 
         {connected ?
           <select onChange={(e) => {
+            console.log(e.target.value);
             setSelectedOverlay(Number(e.target.value));
           }}>
             {overlays.map((v, i) => {
@@ -127,6 +128,10 @@ const App = () => {
 const OverlayView: FC = () => {
   const { selectedOverlay, overlays } = useOverlays();
   const overlay = overlays[selectedOverlay];
+
+  useEffect(() => {
+    console.log("current overlay", overlay);
+  })
 
   return (
     overlay ?

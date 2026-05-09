@@ -12,17 +12,20 @@ export const LegacyOverlay: FC<{overlay: Overlay, id?: number }> = ({ overlay, i
 
     useEffect(() => {
         if (container) {
-            console.log(eventbus);
+
             loadedOverlay.current = render_overlay(overlay, { id, element: container.current, eventbus: eventbus as any });
-            console.log(loadedOverlay.current);
+            container.current = loadedOverlay.current.html
             loadedOverlay.current.load();
+
+            console.log(eventbus);
+            console.log(loadedOverlay.current);
         }
 
         return () => {
             loadedOverlay.current.unload();
-            container.current = null;
+            container.current.innerHTML = "";
         }
-    }, [])
+    })
 
     return (
         <div ref={container}></div>
