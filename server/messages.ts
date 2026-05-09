@@ -16,7 +16,7 @@ export function createWebsocketConnectionInfoPayload(connectionId: string): any 
   return {
     type: "connection-information",
     connectionId,
-    overlayPath: FORCE_DEV ? "http://localhost:8000/overlays" : "/overlays",
+    overlayPath: FORCE_DEV ? "http://10.0.0.30:8000/overlays" : "/overlays",
   };
 }
 

@@ -1,4 +1,4 @@
-import { WidgetLifecycle, WidgetStateHandlers } from "../lifecycle";
+import { WidgetLifecycle, WidgetStateHandlers } from "../ui/lifecycle";
 import { vibrate } from "../common/ui_utils";
 
 import type { RotarySliderProperties } from "../../bindings/Widget";

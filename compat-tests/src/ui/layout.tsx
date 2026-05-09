@@ -1,11 +1,11 @@
-import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "../bindings/Widget.ts";
-import { WidgetLifecycle } from "./lifecycle.ts";
-import { render_widget, renderWidgetReact, WidgetProperties } from "./render.tsx";
-import { LoadedWidget } from "./overlay.ts";
+import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "../../bindings/Widget.ts";
+import { WidgetLifecycle } from "./lifecycle";
+import { render_widget, renderWidgetReact, WidgetProperties } from "./render";
+import { LoadedWidget } from "./overlay";
 
 //import './css/shiftarea.css';
 import './layout.css';
-import { EventBusConsumer } from "./eventbus/client.tsx";
+import { EventBusConsumer } from "../eventbus/client.tsx";
 import { FC } from "react";
 //import { App } from "../../app";
 

@@ -3,7 +3,8 @@ import './App.css'
 import { useWebsocket, WebsocketWorkerClient } from './websocket/client.tsx'
 import { Overlay } from '../bindings/Overlay';
 import { EventbusWorkerClient, useEventBus } from './eventbus/client.tsx'
-import { renderWidgetReact } from './render.tsx';
+import { renderWidgetReact } from './ui/render.tsx';
+import { useOverlays } from './ui/overlay.tsx';
 
 
 const App = () => {
@@ -11,35 +12,28 @@ const App = () => {
   const ws = useWebsocket();
 
   const [connected, setConnected] = useState(false);
-  //const [messages, setMessages] = useState<string[]>([]);
-  const [overlays, setOverlays] = useState<Overlay[]>([]);
-  const [selectedOverlayId, setOverlayId] = useState<number | null>(null);
+
+  const {
+    overlays,
+    fetchOverlays,
+    unloadOverlays,
+    selectedOverlay,
+    setSelectedOverlay
+  } = useOverlays();
 
   const connectAndLoad = async () => {
     const overlayPath = await ws.connectToProdEndpoint(location.hostname, 8000)
     //setMessages(prev => [...prev, overlayPath])
     console.log("data from ws: ", overlayPath);
     const ol = await fetchOverlays(overlayPath)
-    setOverlays(ol);
-    console.log(ol);
-    setOverlayId(8);
+    console.log("overlays", ol);
+    setSelectedOverlay(0);
   }
 
   const disconnectAndUnload = () => {
     ws.disconnectEndpoint();
-    setOverlays([]);
-    setOverlayId(null);
-  }
-
-  const fetchOverlays = async (path: string) => {
-    const data = await fetch(path);
-    const json = await data.json();
-    return json;
-    /*.then(ol => load_overlays_from_array(ol))
-    .then((ol) => {
-        setup_overlay_selector(ol);
-        change_overlay(0)
-    })*/
+    unloadOverlays();
+    //registry.unload();
   }
 
   useEffect(() => {
@@ -70,6 +64,17 @@ const App = () => {
     ws.events.addEventListener("data", onData);
     eventbus.events.addEventListener("data", onEventbusData);
 
+    window.addEventListener('error', function(event) {
+    //reportError({ message: event.reason?.message, stack: event.reason?.stack });
+      this.alert(event.error);
+    });
+    
+    window.addEventListener('unhandledrejection', function (event) {
+      this.alert(event.reason.message + ": " + event.reason.stack);
+      //this.alert(JSON.stringify(event.reason));
+    });
+
+
     return () => {
       ws.events.removeEventListener("connect", onConnect);
       ws.events.removeEventListener("disconnect", onDisconnect);
@@ -87,7 +92,7 @@ const App = () => {
 
         {connected ?
           <select onChange={(e) => {
-            setOverlayId(Number(e.target.value));
+            setSelectedOverlay(Number(e.target.value));
           }}>
             {overlays.map((v, i) => {
               return (
@@ -99,36 +104,55 @@ const App = () => {
 
         {connected
           ? (<button onClick={disconnectAndUnload}>Disconnect</button>)
-          : (<button onClick={connectAndLoad}>Connect</button>)}
+          : (<button onClick={() => {
+            connectAndLoad()
+          }}>Connect</button>)}
       </header>
 
       <main>
-        {selectedOverlayId !== null ? <OverlayView overlay={overlays[selectedOverlayId]} /> : <></>}
+        {selectedOverlay !== null ? <OverlayView /> : <></>}
       </main>
 
       <footer>
         footer
+        <pre>
+
+          <select onChange={(e) => {
+            setSelectedOverlay(Number(e.target.value));
+          }}>
+            {overlays.map((v, i) => {
+              return (
+                <option key={i} value={i}>{v.name}</option>
+              )
+            })}
+          </select>
+        </pre>
       </footer>
     </>
   )
 }
 
-const OverlayView: FC<{ overlay: Overlay }> = ({ overlay }) => {
+const OverlayView: FC = () => {
+  const { selectedOverlay, overlays } = useOverlays();
+  const overlay = overlays[selectedOverlay];
   useEffect(() => {
-    console.log(overlay.cells);
+    alert(overlay.name);
   })
 
   return (
-    <div id="overlays">
-      <div>
+    overlay ?
+      (<div id="overlays">
+        <div>
 
-      {
-        overlay.cells.map((v, i) => {
-          return <>{renderWidgetReact(v)}</>
-        })
-      }
-      </div>
-    </div>
+          {overlay.cells.map((v, i) => {
+            return <>{renderWidgetReact(v)}</>
+          })}
+        </div>
+        <pre>
+          {JSON.stringify(overlay)}
+        </pre>
+      </div>)
+      : (<p>error</p>)
   )
 }
 

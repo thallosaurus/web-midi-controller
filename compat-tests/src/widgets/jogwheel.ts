@@ -1,6 +1,6 @@
 import { EventBusConsumer } from "../eventbus/client.tsx"
 import type { JogwheelProperties } from "../../bindings/Widget"
-import { WidgetLifecycle, WidgetStateHandlers } from "../lifecycle"
+import { WidgetLifecycle, WidgetStateHandlers } from "../ui/lifecycle"
 import "./css/jogwheel.css"
 //import { App } from "../../app"
 

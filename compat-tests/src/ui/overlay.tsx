@@ -1,13 +1,14 @@
 //import "./css/overlay.css";
 //import "./css/grid.css";
 //import "./css/layout.css";
-import { type Overlay } from "../bindings/Overlay.ts";
-import { uuid } from "./common/utils.ts";
+import { type Overlay } from "../../bindings/Overlay.ts";
+import { uuid } from "../common/utils.ts";
 
 // widget imports
-import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "../bindings/Widget.ts";
+import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "../../bindings/Widget.ts";
 import { render_overlay, render_widget, WidgetProperties } from "./render.tsx";
 import { WidgetLifecycle, WidgetStateHandlers } from "./lifecycle.ts";
+import { createContext, useContext, useRef, useState } from "react";
 //import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 
 let current_overlay_id = -1;
@@ -130,11 +131,11 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
     console.log(ev);
 
 
-    
+
     if (ev.type == "change_overlay") {
         const e = ev as ChangeOverlayEvent;
         //console.log(e.id);
-        
+
         const new_overlay = overlays[e.id];
         unload_overlay(current_overlay_id);
         if (new_overlay) {
@@ -150,7 +151,7 @@ overlay_emitter.addEventListener("change", (ev: Event) => {
             throw new Error("overlay with id " + e.id + " not found")
         }
     }
-    
+
     if (ev.type == "program_change") {
         // lookup program change id and change to the overlay
 
@@ -214,17 +215,17 @@ export class LoadedOverlay {
                         if (k == "pointerdown") {
                             o.html.removeEventListener("pointerdown", h)
                         }
-                        
+
                         if (k == "pointermove") {
                             o.html.removeEventListener("pointermove", h);
                         }
-                        
+
                         if (k == "pointerup") {
                             o.html.removeEventListener("pointerup", h);
                         }
-                        
+
                         if (k == "pointercancel") {
-                            
+
                             o.html.removeEventListener("pointercancel", h);
                         }
                     });
@@ -248,15 +249,15 @@ export class LoadedOverlay {
                         if (k == "pointerdown") {
                             o.html.addEventListener("pointerdown", h)
                         }
-                        
+
                         if (k == "pointermove") {
                             o.html.addEventListener("pointermove", h);
                         }
-                        
+
                         if (k == "pointerup") {
                             o.html.addEventListener("pointerup", h);
                         }
-                        
+
                         if (k == "pointercancel") {
                             o.html.addEventListener("pointercancel", h);
                         }
@@ -359,3 +360,54 @@ export const setup_tabs = (ols: LoadedOverlay[], parent: HTMLDivElement, cb: (in
 export const setup_chooser = (options: Array<any>, cb: (v: any) => void) => {
     options.map(cb);
 };
+
+
+// MARK: - React Extensions
+const OverlayContext = createContext(null);
+export function OverlayProvider({ children }) {
+    const overlayRef = useRef<Overlay[]>([]);
+
+    //const [overlays, setOverlays] = useState<Overlay[]>([]);
+    const [selectedOverlay, setSelectedOverlay] = useState<number | null>(null);
+
+    const fetchOverlays = async (path: string) => {
+        console.log("fetch", path);
+        const data = await fetch(path);
+        overlayRef.current = await data.json();
+        /*.then(ol => load_overlays_from_array(ol))
+        .then((ol) => {
+            setup_overlay_selector(ol);
+            change_overlay(0)
+        })*/
+    }
+
+    const unloadOverlays = () => {
+        overlayRef.current = [];
+    }
+
+    /*unload() {
+      
+    }*/
+
+    return (
+        <OverlayContext.Provider value={{
+            overlays: overlayRef.current,
+            selectedOverlay,
+            setSelectedOverlay,
+            fetchOverlays,
+            unloadOverlays
+        }}>
+            {children}
+        </OverlayContext.Provider>
+    )
+}
+
+export function useOverlays() {
+    const ctx = useContext(OverlayContext);
+
+    if (!ctx) {
+        throw new Error("useOverlays must be used inside OverlayProvider");
+    }
+
+    return ctx;
+}

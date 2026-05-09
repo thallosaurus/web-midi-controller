@@ -1,15 +1,15 @@
 // defined all allowed widgets for type definitions - add when necessary
 export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties | XYPadProperties | GridMixerProperties | HorizontalMixerProperties | VerticalMixerProperties | ShiftAreaProperties;
 
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, ShiftAreaProperties, VerticalMixerProperties, Widget, XYPadProperties } from "../bindings/Widget.ts";
-import { CCButtonLifecycle, NoteButtonLifecycle, ReactNoteButton } from "./widgets/button.tsx";
-import type { Overlay } from "../bindings/Overlay.ts";
-import { JogwheelLifecycle } from "./widgets/jogwheel.ts";
-import { XYPadLifecycle } from "./widgets/xypad.ts";
-import { RotaryLifecycle, RotaryState } from "./widgets/rotary.ts";
-import { CCSliderLifecycle, CCSliderState } from "./widgets/slider.ts";
-import { LoadedOverlay, LoadedWidget } from "./overlay.ts";
-import { EmptyBox, GridMixerNew, GridMixerReact, HorizontalBox, HorizontalBoxReact, ShiftArea, VerticalBox, VerticalBoxReact } from "./layout.tsx";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, ShiftAreaProperties, VerticalMixerProperties, Widget, XYPadProperties } from "../../bindings/Widget.ts";
+import { CCButtonLifecycle, NoteButtonLifecycle, ReactNoteButton } from "../widgets/button.tsx";
+import type { Overlay } from "../../bindings/Overlay.ts";
+import { JogwheelLifecycle } from "../widgets/jogwheel.ts";
+import { XYPadLifecycle } from "../widgets/xypad.ts";
+import { RotaryLifecycle, RotaryState } from "../widgets/rotary.ts";
+import { CCSliderLifecycle, CCSliderState } from "../widgets/slider.ts";
+import { LoadedOverlay, LoadedWidget } from "./overlay.tsx";
+import { EmptyBox, GridMixerNew, GridMixerReact, HorizontalBox, HorizontalBoxReact, ShiftArea, VerticalBox, VerticalBoxReact } from "./Layout.tsx";
 import React, { ReactNode } from "react";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
@@ -111,6 +111,7 @@ export function render_widget(cell: Widget, children: Array<LoadedWidget>, eleme
 // MARK: - React Extension
 
 export const renderWidgetReact = (p: Widget) => {
+    console.log(p.type);
     switch (p.type) {
         case "horiz-mixer":
             //return <HorizontalBoxReact { ...p }) />;

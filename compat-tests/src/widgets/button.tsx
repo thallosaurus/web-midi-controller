@@ -1,7 +1,7 @@
 import { vibrate } from "../common/ui_utils.ts";
 import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget.ts';
-import { WidgetLifecycle, WidgetStateHandlers } from "../lifecycle.ts";
+import { WidgetLifecycle, WidgetStateHandlers } from "../ui/lifecycle.ts";
 
 import { EventBusConsumer, useEventBus } from "../eventbus/client.tsx";
 import { FC, useEffect, useRef, useState } from "react";

@@ -76,6 +76,7 @@ export class App {
     }
 
     fetchOverlays(path: string) {
+        alert(path);
         fetch(path)
             .then(ol => ol.json())
             .then(ol => load_overlays_from_array(ol))
