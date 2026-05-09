@@ -31,5 +31,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "ts/core", "ts/event_bus.ts", "ts/common/events.ts", "main.ts", "ts/vite-env.d.ts", "ts/websocket/websocket.ts"]
+  "include": ["src", "ts/core", "ts/event_bus.ts", "ts/common/events.ts", "react_main.ts", "ts/vite-env.d.ts", "ts/websocket/websocket.ts"]
 }

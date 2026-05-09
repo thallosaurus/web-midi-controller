@@ -1,4 +1,4 @@
-import { EventbusWorkerClient } from "@eventbus/client";
+import { EventbusWorkerClient } from "../eventbus/client";
 import { WidgetProperties } from "./render"
 
 

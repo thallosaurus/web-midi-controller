@@ -2,15 +2,15 @@
 export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties | XYPadProperties | GridMixerProperties | HorizontalMixerProperties | VerticalMixerProperties | ShiftAreaProperties;
 
 import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, ShiftAreaProperties, VerticalMixerProperties, Widget, XYPadProperties } from "@bindings/Widget";
-import { CCButtonLifecycle, NoteButtonLifecycle } from "@widgets/button";
-import type { Overlay } from "@bindings/Overlay";
-import { JogwheelLifecycle } from "@widgets/jogwheel";
-import { XYPadLifecycle } from "@widgets/xypad";
-import { RotaryLifecycle, RotaryState } from "@widgets/rotary";
-import { CCSliderLifecycle, CCSliderState } from "@widgets/slider";
+import { CCButtonLifecycle, NoteButtonLifecycle } from "../widgets/button";
+import type { Overlay } from "../../bindings/Overlay";
+import { JogwheelLifecycle } from "../widgets/jogwheel";
+import { XYPadLifecycle } from "../widgets/xypad";
+import { RotaryLifecycle, RotaryState } from "../widgets/rotary";
+import { CCSliderLifecycle, CCSliderState } from "../widgets/slider";
 import { LoadedOverlay, LoadedWidget } from "./overlay";
 import { GridMixerNew, HorizontalBox, ShiftArea, VerticalBox } from "./layout";
-import { App } from "app";
+import { App } from "../../app";
 //import { WidgetLifecycle, WidgetState } from "./lifecycle";
 
 // Converts the given Overlay to a LoadedOverlay which contains runtime variables and renders it into the given element

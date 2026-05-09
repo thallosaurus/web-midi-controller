@@ -1,6 +1,6 @@
-import { vibrate } from "@common/ui_utils";
-import type { CCSliderProperties } from "@bindings/Widget";
-import { WidgetLifecycle } from "@core/lifecycle";
+import { vibrate } from "../common/ui_utils";
+import type { CCSliderProperties } from "../../bindings/Widget";
+import { WidgetLifecycle } from "../core/lifecycle";
 import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
 import "./css/slider.css";
 //import { App } from "../../app";

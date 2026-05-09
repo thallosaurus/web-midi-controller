@@ -5,6 +5,7 @@ import { Overlay } from '../bindings/Overlay';
 import { EventbusWorkerClient, useEventBus } from './eventbus/client.tsx'
 import { renderWidgetReact } from './ui/render.tsx';
 import { useOverlays } from './ui/overlay.tsx';
+import { LegacyOverlay, LegacyShim } from './widgets/legacy.tsx';
 
 interface IAppShim {
   eventbus: EventbusWorkerClient | null,
@@ -125,9 +126,10 @@ const App = () => {
           }}>Connect</button>)}
       </header>
 
-      <main id="overlays">
+      {/*<main id="overlays">
         {selectedOverlay !== null ? <OverlayView /> : <></>}
-      </main>
+      </main>*/}
+
 
       <footer>
         footer
@@ -141,12 +143,13 @@ const OverlayView: FC = () => {
   const overlay = overlays[selectedOverlay];
 
   return (
-    overlay ?
+    /*overlay ?
       (<>{overlay.cells.map((v, i) => {
             return <>{renderWidgetReact(v)}</>
           })}
         </>)
-      : (<p>error</p>)
+      : (<p>error</p>)*/
+      <LegacyShim cell={overlay} />
   )
 }
 

@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.12",
   "type": "module",
+  "main": "mod.ts",
   "scripts": {
     "dev": "vite --config vite.config.debug.ts",
     "dev:release": "vite --config vite.config.release.ts",

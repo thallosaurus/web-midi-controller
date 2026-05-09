@@ -1,4 +1,4 @@
-import { log } from "@common/logger";
+import { log } from "../common/logger";
 import "./css/dialogs.css";
 import "./css/overlay_menu.css"
 import './css/dialogs/sidemenu.css';

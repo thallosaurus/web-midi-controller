@@ -1,7 +1,7 @@
 import "./css/xypad.css"
-import type { XYPadProperties } from "@bindings/Widget";
-import { vibrate } from "@common/ui_utils";
-import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
+import type { XYPadProperties } from ".../../bindings/Widget";
+import { vibrate } from "../common/ui_utils";
+import { WidgetLifecycle, WidgetStateHandlers } from "../core/lifecycle";
 import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
 import { App } from "../../app";
 

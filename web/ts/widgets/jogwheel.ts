@@ -1,8 +1,8 @@
 import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client"
-import type { JogwheelProperties } from "@bindings/Widget"
-import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle"
+import type { JogwheelProperties } from "../../bindings/Widget"
+import { WidgetLifecycle, WidgetStateHandlers } from "../core/lifecycle"
 import "./css/jogwheel.css"
-import { App } from "../../app"
+//import { App } from "../../app"
 
 export interface JogState {
     active: boolean
@@ -36,10 +36,10 @@ export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogSt
 
         if (v > 0) {
             //process_internal(new JogEvent(s.channel, s.cc, JogDirection.Forward))
-            App.eventbus.updateCC(this.prop.channel, this.prop.cc, 66)
+            this.eventbus!.updateCC(this.prop.channel, this.prop.cc, 66)
         } else {
             //process_internal(new JogEvent(s.channel, s.cc, JogDirection.Backward))
-            App.eventbus.updateCC(this.prop.channel, this.prop.cc, 64)
+            this.eventbus!.updateCC(this.prop.channel, this.prop.cc, 64)
         }
     }
 
@@ -82,7 +82,7 @@ export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogSt
         this.handlers.pointerup = touch_stop;
         this.handlers.pointercancel = touch_stop;
 
-        App.eventbus.registerCC(this.prop.channel, this.prop.cc, 64, this);
+        this.eventbus!.registerCC(this.prop.channel, this.prop.cc, 64, this);
 
         return true
     }

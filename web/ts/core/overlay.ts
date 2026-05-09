@@ -1,8 +1,8 @@
 import "./css/overlay.css";
 import "./css/grid.css";
 import "./css/layout.css";
-import { type Overlay } from "@bindings/Overlay.ts";
-import { uuid } from "@common/utils.ts";
+import { type Overlay } from "../../bindings/Overlay.ts";
+import { uuid } from "../common/utils.ts";
 
 // widget imports
 import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";

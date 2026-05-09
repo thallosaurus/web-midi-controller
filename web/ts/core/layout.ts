@@ -1,4 +1,4 @@
-import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "@bindings/Widget";
+import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "../../bindings/Widget";
 import { WidgetLifecycle } from "./lifecycle";
 import { render_widget, WidgetProperties } from "./render";
 import { LoadedWidget } from "./overlay";

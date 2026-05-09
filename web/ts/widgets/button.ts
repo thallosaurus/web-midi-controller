@@ -1,7 +1,7 @@
-import { vibrate } from "@common/ui_utils";
+import { vibrate } from "../common/ui_utils";
 import "./css/button.css";
-import { type CCButtonProperties, type NoteButtonProperties } from '@bindings/Widget';
-import { WidgetLifecycle, WidgetStateHandlers } from "@core/lifecycle";
+import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget';
+import { WidgetLifecycle, WidgetStateHandlers } from "../core/lifecycle";
 
 import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
 //import { App } from "../../app";

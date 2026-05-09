@@ -2,8 +2,8 @@ import { UiDialog } from './ts/core/dialogs.ts'
 import { setup_overlay_selector } from "./ts/common/ui_utils.ts";
 import { change_overlay, clear_loaded_overlays, load_overlays_from_array, process_program_change } from "./ts/core/overlay.ts";
 
-import { debug, setup_logger } from '@common/logger'
-import { getHostFromQuery, hasFeature, resolveFeatures } from '@common/utils.ts';
+import { debug, setup_logger } from './ts/common/logger'
+import { getHostFromQuery, hasFeature, resolveFeatures } from './ts/common/utils.ts';
 
 import { WebsocketWorkerClient } from "./ts/websocket/client.ts"
 import { EventbusWorkerClient } from "./ts/eventbus/client.ts"

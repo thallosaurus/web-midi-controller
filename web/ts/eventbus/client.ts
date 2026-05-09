@@ -1,4 +1,4 @@
-import { uuid } from "@common/utils";
+import { uuid } from "../common/utils";
 import { CoreWorkerClient } from "../coreworker/worker";
 import { EventBusWorkerConsumerEvent, EventBusWorkerProducerEvent } from "./events";
 import { type MidiMessage } from "../../../midi-driver/bindings/MidiPayload";

@@ -2099,6 +2099,12 @@ meow@^13.0.0:
   resolved "https://registry.yarnpkg.com/meow/-/meow-13.2.0.tgz#6b7d63f913f984063b3cc261b6e8800c4cd3474f"
   integrity sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==
 
+midi-controller@../web:
+  version "0.1.12"
+  dependencies:
+    typed-event-target "^4.1.0"
+    vite-plugin-handlebars "^2.0.0"
+
 midi-driver@../midi-driver:
   version "0.1.12"
 
@@ -2567,12 +2573,6 @@ vite@^6.3.5:
     tinyglobby "^0.2.13"
   optionalDependencies:
     fsevents "~2.3.3"
-
-web@../web:
-  version "0.1.12"
-  dependencies:
-    typed-event-target "^4.1.0"
-    vite-plugin-handlebars "^2.0.0"
 
 whatwg-fetch@^3.6.2:
   version "3.6.20"

@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "midi-driver": "../midi-driver",
-    "web": "../web",
+    "midi-controller": "../web",
     "react": "^19.1.0",
     "react-app-polyfill": "^3.0.0",
     "react-dom": "^19.1.0",
