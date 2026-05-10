@@ -49,10 +49,10 @@ body {
     grid-template-columns: 20vw 80vw;
 }
 
-.sidemenu.sidemenu-shown {
+.sidemenu-shown {
     display: block;
 }
 
-.sidemenu.sidemenu-hidden {
+.sidemenu-hidden {
     display: none;
 }
