@@ -48,3 +48,11 @@ body {
 #overlays.sidemenu-shown {
     grid-template-columns: 20vw 80vw;
 }
+
+.sidemenu.sidemenu-shown {
+    display: block;
+}
+
+.sidemenu.sidemenu-hidden {
+    display: none;
+}

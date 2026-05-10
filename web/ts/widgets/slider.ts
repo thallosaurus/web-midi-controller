@@ -1,7 +1,7 @@
 import { vibrate } from "../common/ui_utils";
 import type { CCSliderProperties } from "../../bindings/Widget";
 import { WidgetLifecycle } from "../core/lifecycle";
-import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient } from "../eventbus/client";
 import "./css/slider.css";
 //import { App } from "../../app";
 
@@ -68,7 +68,6 @@ export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSli
         }
         //set_reset_label();
         this.setResetLabel();
-        super.value(v);
     }
 
     setResetLabel() {

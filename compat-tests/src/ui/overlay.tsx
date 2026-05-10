@@ -13,11 +13,13 @@ export const OverlayList = () => {
             overlays.current.map((v, i) => {
                 return (
                     <button style={{
-                        backgroundColor: "white",
+                        backgroundColor: selectedOverlay == i ? "#eeeeee" : "white",
                         color: "black",
                         width: "100%",
                         padding: "1em",
-                        fontFamily: "monospace"
+                        fontFamily: "monospace",
+                        fontWeight: selectedOverlay == i ? "bold" : "normal",
+                        border: "none"
                     }}
                         onClick={() => {
                             console.log(i);

@@ -20,8 +20,6 @@ export class WidgetLifecycle<O extends WidgetProperties, S> {
     handlers: WidgetStateHandlers = {}
     eventbus: EventbusWorkerClient | null
 
-    static redrawTrigger: ((v: number) => void) | null = null;
-
     constructor(s: S, p: O, eb: EventbusWorkerClient) { 
         this.prop = p;
 
@@ -48,12 +46,6 @@ export class WidgetLifecycle<O extends WidgetProperties, S> {
      */
     unload(options: O, html: HTMLDivElement): boolean {
         return false;
-    }
-
-    value(v: number) {
-        if (WidgetLifecycle.redrawTrigger) {
-            WidgetLifecycle.redrawTrigger(v);
-        }
     }
 
     /*registerCCWidget(widget: CCWidgetConsumer) {

@@ -7,6 +7,7 @@ export const Sidemenu = ({ children }) => {
         marginBlockEnd: "0",
         paddingInlineStart: "0",
         width: "100%",
+        height: "calc(100% - 2em"
     }}>
         <li className="sidemenu-children">
             {children}
