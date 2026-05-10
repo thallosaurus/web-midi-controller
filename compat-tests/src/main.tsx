@@ -5,13 +5,17 @@ import App from './App.tsx'
 import { EventBusProvider } from './eventbus/client.tsx'
 import { WsProvider } from './websocket/client.tsx'
 import { OverlayProvider } from './ui/overlay.tsx'
+import { MenuProvider } from './ui/sidemenu.tsx'
 
 createRoot(document.getElementById('root')!).render(
-    <WsProvider>
-      <EventBusProvider>
-        <OverlayProvider>
+  <WsProvider>
+    <EventBusProvider>
+      <OverlayProvider>
+        <MenuProvider>
+
           <App />
-        </OverlayProvider>
-      </EventBusProvider>
-    </WsProvider>,
+        </MenuProvider>
+      </OverlayProvider>
+    </EventBusProvider>
+  </WsProvider>,
 )
