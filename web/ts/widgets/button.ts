@@ -3,7 +3,7 @@ import "./css/button.css";
 import { type CCButtonProperties, type NoteButtonProperties } from '../../bindings/Widget';
 import { WidgetLifecycle, WidgetStateHandlers } from "../core/lifecycle";
 
-import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient } from "../eventbus/client";
 //import { App } from "../../app";
 
 
@@ -17,6 +17,9 @@ export interface ButtonState {
 }
 
 export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, ButtonState> implements EventBusConsumer {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     handlers: WidgetStateHandlers = {};
     consumerId: string | null = null;
 
@@ -130,6 +133,9 @@ export class NoteButtonLifecycle extends WidgetLifecycle<NoteButtonProperties, B
 }
 
 export class CCButtonLifecycle extends WidgetLifecycle<CCButtonProperties, ButtonState> implements EventBusConsumer {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     button: HTMLDivElement;
 
     constructor(container: HTMLDivElement, options: CCButtonProperties, eb: EventbusWorkerClient) {

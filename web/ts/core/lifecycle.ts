@@ -12,13 +12,16 @@ export interface WidgetStateHandlers {
     [key: string]: (e: PointerEvent) => void 
 }
 
-export class WidgetLifecycle<O extends WidgetProperties, S> {
+export abstract class WidgetLifecycle<O extends WidgetProperties, S> {
     // appends stuff to the widget before the widget itself
 
     state: S
     prop: O
     handlers: WidgetStateHandlers = {}
     eventbus: EventbusWorkerClient | null
+
+    private static editMode = false;
+    static uiEvents = new EventTarget();
 
     constructor(s: S, p: O, eb: EventbusWorkerClient) { 
         this.prop = p;
@@ -34,6 +37,7 @@ export class WidgetLifecycle<O extends WidgetProperties, S> {
      * @returns 
      */
     load(options: O, html: HTMLDivElement): boolean {
+        WidgetLifecycle.uiEvents.addEventListener("edit", this.processEditMode)
         return false;
     }
 
@@ -45,7 +49,16 @@ export class WidgetLifecycle<O extends WidgetProperties, S> {
      * @returns 
      */
     unload(options: O, html: HTMLDivElement): boolean {
+        WidgetLifecycle.uiEvents.removeEventListener("edit", this.processEditMode)
         return false;
+    }
+
+    abstract processEditMode(data: Event): void;
+
+    static setEditMode(v: boolean) {
+        this.editMode = v;
+
+        this.uiEvents.dispatchEvent(new CustomEvent("edit", { detail: { edit: this.editMode } } ) )
     }
 
     /*registerCCWidget(widget: CCWidgetConsumer) {

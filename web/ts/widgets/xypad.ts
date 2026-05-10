@@ -1,8 +1,8 @@
 import "./css/xypad.css"
-import type { XYPadProperties } from ".../../bindings/Widget";
+import type { XYPadProperties } from "../../bindings/Widget";
 import { vibrate } from "../common/ui_utils";
 import { WidgetLifecycle, WidgetStateHandlers } from "../core/lifecycle";
-import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient } from "../eventbus/client";
 import { App } from "../../app";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -54,6 +54,9 @@ export interface XYPadState {
 }
 
 export class XYPadLifecycle extends WidgetLifecycle<XYPadProperties, XYPadState> implements EventBusConsumer {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     handlers: WidgetStateHandlers = {};
 
     target: HTMLDivElement

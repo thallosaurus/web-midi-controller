@@ -17,6 +17,9 @@ export interface CCSliderState {
 }
 
 export class CCSliderLifecycle extends WidgetLifecycle<CCSliderProperties, CCSliderState> implements EventBusConsumer {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
 
     resetButton: HTMLButtonElement
     fill: HTMLDivElement

@@ -49,7 +49,7 @@ export const LegacyShim: FC<{cell: Widget}> = ({ cell }) => {
     useEffect(() => {
         if (container.current) {
             console.log(container.current)
-            lifecycle.current = new NoteButtonLifecycle(container.current, cell as NoteButtonProperties, eventbus);
+            lifecycle.current = new NoteButtonLifecycle(container.current, cell as NoteButtonProperties, eventbus as any);
             widget.current = new LoadedWidget(cell, container.current, lifecycle.current as unknown as WidgetLifecycle<any, any>);
             console.log("loaded widget:", widget.current);
 

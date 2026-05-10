@@ -1,4 +1,4 @@
-import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client"
+import { EventBusConsumer, EventbusWorkerClient } from "../eventbus/client"
 import type { JogwheelProperties } from "../../bindings/Widget"
 import { WidgetLifecycle, WidgetStateHandlers } from "../core/lifecycle"
 import "./css/jogwheel.css"
@@ -11,6 +11,9 @@ export interface JogState {
 }
 
 export class JogwheelLifecycle extends WidgetLifecycle<JogwheelProperties, JogState> implements EventBusConsumer {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.")
+    }
     handlers: WidgetStateHandlers = {}
     
     constructor(container: HTMLDivElement, options: JogwheelProperties, eb: EventbusWorkerClient) {

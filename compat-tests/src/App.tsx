@@ -7,6 +7,7 @@ import { OverlayList, OverlaySelector, useOverlays } from './ui/overlay.tsx';
 import { LegacyOverlay, LegacyShim } from './widgets/legacy.tsx';
 import { Sidemenu, SidemenuChildren } from './ui/sidemenu.tsx';
 import { WebsocketWorkerEvent } from './websocket/events.ts';
+import { WidgetLifecycle } from 'midi-controller';
 
 const App = () => {
   const eventbus = useEventBus();
@@ -137,6 +138,16 @@ const AppSidemenu: FC<{ showMenu: boolean }> = ({ showMenu }) => {
           <p>
             <span>Connected</span>
           </p>
+                    <button style={{
+            backgroundColor: "#333333",
+            border: "none",
+            color: "white",
+            width: "100%",
+            padding: "1em",
+            fontFamily: "monospace"
+          }} onClick={() => {
+            WidgetLifecycle.setEditMode(true)
+          }}>Trigger Edit</button>
         </SidemenuChildren>
       </Sidemenu>
     </div>

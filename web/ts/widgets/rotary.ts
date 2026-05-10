@@ -2,7 +2,7 @@ import { WidgetLifecycle, WidgetStateHandlers } from "../core/lifecycle";
 import { vibrate } from "../common/ui_utils";
 
 import type { RotarySliderProperties } from "../../bindings/Widget";
-import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient } from "../eventbus/client";
 import "./css/rotary.css";
 //import { App } from "../../app";
 
@@ -17,6 +17,9 @@ export interface RotaryState {
 }
 
 export class RotaryLifecycle extends WidgetLifecycle<RotarySliderProperties, RotaryState> implements EventBusConsumer {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     widget: HTMLDivElement
     dial: HTMLDivElement
     label: HTMLDivElement
