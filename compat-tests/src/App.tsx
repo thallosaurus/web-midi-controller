@@ -2,10 +2,9 @@ import { FC, useEffect, useState } from 'react'
 import './App.css'
 import { useWebsocket } from './websocket/client.tsx'
 import { useEventBus } from './eventbus/client.tsx'
-import { OverlayList, useOverlays } from './ui/overlay.tsx';
+import { useOverlays } from './ui/overlay.tsx';
 import { LegacyOverlay } from './widgets/legacy.tsx';
-import { AppSidemenu, MenuProvider, Sidemenu, SidemenuChildren, useMenuContext } from './ui/sidemenu.tsx';
-import { WidgetLifecycle } from 'midi-controller';
+import { AppSidemenu, useMenuContext } from './ui/sidemenu.tsx';
 import { WebsocketWorkerEvent } from './websocket/events.ts';
 import { WebAudioSynthView } from './synth/synth.tsx';
 
@@ -36,16 +35,6 @@ const App = () => {
   })
 
   useEffect(() => {
-    /*const onConnect = () => {
-      setMainContent(MainViewContent.Overlays)
-    }
-    const onDisconnect = () => {
-      unloadOverlays();
-      setShowMenu(false);
-    }*/
-    //    ws.events.addEventListener("connect", onConnect);
-    //    ws.events.addEventListener("disconnect", onDisconnect);
-
     if (!connected) setMainContent(MainViewContent.Connect)
   }, [connected]);
 
@@ -109,7 +98,7 @@ const App = () => {
       const overlayPath = await ws.connectToProdEndpoint(location.hostname, 8000)
       //setMessages(prev => [...prev, overlayPath])
       await fetchOverlays(overlayPath)
-      setMainContent(MainViewContent.Overlays);
+      setMainContent(MainViewContent.Synth);
       setSelectedOverlay(0);
     }
 
