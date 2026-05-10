@@ -5,10 +5,13 @@ import { LoadedWidget } from "./overlay";
 
 import './css/shiftarea.css';
 import './css/layout.css';
-import { EventBusConsumer, EventbusWorkerClient } from "ts/eventbus/client";
+import { EventBusConsumer, EventbusWorkerClient } from "../eventbus/client";
 import { App } from "../../app";
 
 class Layout<Prop extends WidgetProperties, State> extends WidgetLifecycle<Prop, State> {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     constructor(state: State, options: Prop, eb: EventbusWorkerClient) {
         super(state, options, eb)
     }
@@ -17,6 +20,9 @@ class Layout<Prop extends WidgetProperties, State> extends WidgetLifecycle<Prop,
 interface EmptyLayoutState { }
 
 export class GridMixerNew extends Layout<GridMixerProperties, EmptyLayoutState> {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     constructor(container: HTMLDivElement, options: GridMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) {
         super({}, options, eb);
         if (options.id) container.id = options.id;
@@ -32,6 +38,9 @@ export class GridMixerNew extends Layout<GridMixerProperties, EmptyLayoutState> 
 }
 
 export class HorizontalBox extends Layout<HorizontalMixerProperties, EmptyLayoutState> {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     constructor(container: HTMLDivElement, options: HorizontalMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) {
         super({}, options, eb);
         if (options.id) container.id = options.id;
@@ -45,6 +54,9 @@ export class HorizontalBox extends Layout<HorizontalMixerProperties, EmptyLayout
 }
 
 export class VerticalBox extends Layout<VerticalMixerProperties, EmptyLayoutState> {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     constructor(container: HTMLDivElement, options: VerticalMixerProperties, children: Array<LoadedWidget>, eb: EventbusWorkerClient) {
         super({}, options, eb);
         if (options.id) container.id = options.id;
@@ -67,6 +79,9 @@ interface ShiftAreaState extends EmptyLayoutState {
 }
 
 export class ShiftArea extends Layout<ShiftAreaProperties, ShiftAreaState> implements EventBusConsumer {
+    processEditMode(data: Event): void {
+        throw new Error("Method not implemented.");
+    }
     //areaA: HTMLDivElement;
     //areaB: HTMLDivElement;
 

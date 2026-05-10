@@ -50,7 +50,7 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
         this.events.dispatchEvent(new CustomEvent("disconnect"))
     }
 
-    sendMidiData(payload: MidiMessage) {
+    sendMidiData(payload: any) {
         this.send({
             type: "data",
             payload

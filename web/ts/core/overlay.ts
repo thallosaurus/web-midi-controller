@@ -5,10 +5,10 @@ import { type Overlay } from "../../bindings/Overlay.ts";
 import { uuid } from "../common/utils.ts";
 
 // widget imports
-import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "@bindings/Widget.ts";
+import type { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties, Widget } from "../../bindings/Widget.ts";
 import { render_overlay, render_widget, WidgetProperties } from "./render";
 import { WidgetLifecycle, WidgetStateHandlers } from "./lifecycle";
-import { EventbusWorkerClient } from "@eventbus/client.ts";
+import { EventbusWorkerClient } from "../eventbus/client.ts";
 import { App } from "../../app.ts";
 //import { RotaryLifecycle, UnloadRotaryScript, type RotaryState } from "@widgets/rotary";
 

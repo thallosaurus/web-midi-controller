@@ -4,6 +4,11 @@ import { useEventBus } from "../eventbus/client";
 import { LoadedOverlay } from "midi-controller/ts/core/overlay";
 import { useOverlays } from "../ui/overlay";
 
+const renderOverlayShim = (overlay: Overlay, render_options: { id?: number }) => {
+    //const eventbus = useEventBus();
+    const children = useRef<LoadedWidget[]>([]);
+}
+
 export const LegacyOverlay: FC<{overlay: Overlay, id?: number }> = ({ overlay, id }) => {
     const loadedOverlay = useRef<LoadedOverlay | null>(null);
     const { selectedOverlay } = useOverlays();
@@ -29,7 +34,6 @@ export const LegacyOverlay: FC<{overlay: Overlay, id?: number }> = ({ overlay, i
             loadedOverlay.current = null
 
             if (container.current) {
-
                 container.current.innerText = "";
             }
         }

@@ -1,7 +1,7 @@
 // defined all allowed widgets for type definitions - add when necessary
 export type WidgetProperties = NoteButtonProperties | CCSliderProperties | CCButtonProperties | RotarySliderProperties | JogwheelProperties | XYPadProperties | GridMixerProperties | HorizontalMixerProperties | VerticalMixerProperties | ShiftAreaProperties;
 
-import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, ShiftAreaProperties, VerticalMixerProperties, Widget, XYPadProperties } from "@bindings/Widget";
+import type { CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, JogwheelProperties, NoteButtonProperties, RotarySliderProperties, ShiftAreaProperties, VerticalMixerProperties, Widget, XYPadProperties } from "../../bindings/Widget";
 import { CCButtonLifecycle, NoteButtonLifecycle } from "../widgets/button";
 import type { Overlay } from "../../bindings/Overlay";
 import { JogwheelLifecycle } from "../widgets/jogwheel";
