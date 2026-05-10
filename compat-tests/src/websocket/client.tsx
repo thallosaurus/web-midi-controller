@@ -44,7 +44,7 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
     }
 
     private sendConnectedEvent() {
-        this.events.dispatchEvent(new CustomEvent("connect"))
+        this.events.dispatchEvent(new CustomEvent("connect", { detail: {}}))
     }
 
     private sendDisconnectedEvent() {
@@ -137,11 +137,11 @@ export function WsProvider({ children }) {
         <WsContext.Provider value={{
             ws: wsRef.current,
             connected,
-            load: () => {
+            loadWebsocket: () => {
                 wsRef.current.events.addEventListener("connect", onConnect);
                 wsRef.current.events.addEventListener("disconnect", onDisconnect);
             },
-            unload: () => {
+            unloadWebsocket: () => {
                 wsRef.current.events.removeEventListener("connect", onConnect);
                 wsRef.current.events.removeEventListener("disconnect", onDisconnect);
             }

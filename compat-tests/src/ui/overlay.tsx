@@ -1,5 +1,32 @@
 import { createContext, useRef, useState, useContext } from "react";
 import { Overlay } from "../../bindings/Overlay";
+import { Sidemenu } from "./sidemenu";
+
+export const OverlayList = () => {
+    const {
+        overlays,
+        setSelectedOverlay,
+        selectedOverlay
+    } = useOverlays();
+    return (<>
+        {
+            overlays.current.map((v, i) => {
+                return (
+                    <button style={{
+                        backgroundColor: "white",
+                        color: "black",
+                        width: "100%",
+                        padding: "1em",
+                        fontFamily: "monospace"
+                    }}
+                        onClick={() => {
+                            console.log(i);
+                            setSelectedOverlay(i)
+                        }} key={i} disabled={selectedOverlay == i}>{v.name}</button>
+                )
+            })
+        }</>)
+}
 
 export const OverlaySelector = () => {
     const {
@@ -11,13 +38,13 @@ export const OverlaySelector = () => {
         <select onChange={(e) => {
             console.log(e.target.value);
             setSelectedOverlay(Number(e.target.value));
-          }}>
-            {overlays.map((v, i) => {
-              return (
-                <option key={i} value={i}>{v.name}</option>
-              )
+        }}>
+            {overlays.current.map((v, i) => {
+                return (
+                    <option key={i} value={i}>{v.name}</option>
+                )
             })}
-          </select>
+        </select>
     )
 }
 const OverlayContext = createContext(null);
@@ -25,12 +52,13 @@ export function OverlayProvider({ children }) {
     const overlayRef = useRef<Overlay[]>([]);
 
     //const [overlays, setOverlays] = useState<Overlay[]>([]);
-    const [selectedOverlay, setSelectedOverlay] = useState<number | null>(null);
+    const [selectedOverlay, setSelectedOverlay] = useState<number>(-1);
 
     const fetchOverlays = async (path: string) => {
         console.log("fetch", path);
         const data = await fetch(path);
         overlayRef.current = await data.json();
+        setSelectedOverlay(0)
         /*.then(ol => load_overlays_from_array(ol))
         .then((ol) => {
             setup_overlay_selector(ol);
@@ -40,7 +68,7 @@ export function OverlayProvider({ children }) {
 
     const unloadOverlays = () => {
         overlayRef.current = [];
-        setSelectedOverlay(null);
+        setSelectedOverlay(-1);
     }
 
     /*unload() {
@@ -49,7 +77,7 @@ export function OverlayProvider({ children }) {
 
     return (
         <OverlayContext.Provider value={{
-            overlays: overlayRef.current,
+            overlays: overlayRef,
             selectedOverlay,
             setSelectedOverlay,
             fetchOverlays,

@@ -1,17 +1,20 @@
-import { createContext, FC, useEffect, useState } from 'react'
+import { createContext, FC, useEffect, useRef, useState } from 'react'
 import './App.css'
 import { useWebsocket, WebsocketWorkerClient } from './websocket/client.tsx'
 import { Overlay } from '../bindings/Overlay';
 import { EventbusWorkerClient, useEventBus } from './eventbus/client.tsx'
-import { OverlaySelector, useOverlays } from './ui/overlay.tsx';
+import { OverlayList, OverlaySelector, useOverlays } from './ui/overlay.tsx';
 import { LegacyOverlay, LegacyShim } from './widgets/legacy.tsx';
+import { Sidemenu, SidemenuChildren } from './ui/sidemenu.tsx';
+import { WebsocketWorkerEvent } from './websocket/events.ts';
 
 const App = () => {
   const eventbus = useEventBus();
-  const { ws, connected, load, unload } = useWebsocket();
+  const { ws, connected, loadWebsocket, unloadWebsocket } = useWebsocket();
+
+  const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const {
-    overlays,
     fetchOverlays,
     unloadOverlays,
     setSelectedOverlay
@@ -26,19 +29,21 @@ const App = () => {
     setSelectedOverlay(0);
   }
 
-  const disconnectAndUnload = () => {
-    ws.disconnectEndpoint();
-    unloadOverlays();
-  }
-
   useEffect(() => {
     const onDisconnect = () => {
       unloadOverlays();
+      setShowMenu(false);
     }
+    ws.events.addEventListener("disconnect", onDisconnect);
 
+    return () => {
+      ws.events.removeEventListener("disconnect", onDisconnect);
+    }
+  }, []);
+
+  useEffect(() => {
     const onData = (ev: Event) => {
       const data = (ev as CustomEvent).detail;
-      console.log(data);
 
       switch (data.type) {
         case "NoteOn":
@@ -56,6 +61,14 @@ const App = () => {
       }
     }
 
+    ws.events.addEventListener("data", onData);
+
+    return () => {
+      ws.events.removeEventListener("data", onData);
+    }
+  }, [])
+
+  useEffect(() => {
     const onEventbusData = (ev: Event) => {
       const data = (ev as CustomEvent).detail;
       console.log("eventbus", data);
@@ -63,78 +76,107 @@ const App = () => {
       //socket
     }
 
-    load();
-
-    //ws.events.addEventListener("connect", onConnect);
-    ws.events.addEventListener("disconnect", onDisconnect);
-    ws.events.addEventListener("data", onData);
     eventbus.events.addEventListener("data", onEventbusData);
 
-    /*window.addEventListener('error', function(event) {
-    //reportError({ message: event.reason?.message, stack: event.reason?.stack });
-      this.alert(event.error);
-    });
-    
-    window.addEventListener('unhandledrejection', function (event) {
-      this.alert(event.reason.message + ": " + event.reason.stack);
-      //this.alert(JSON.stringify(event.reason));
-    });*/
-
-
     return () => {
-      //ws.events.removeEventListener("connect", onConnect);
-      ws.events.removeEventListener("disconnect", onDisconnect);
-      ws.events.removeEventListener("data", onData);
-
-      unload();
-
       eventbus.events.removeEventListener("data", onEventbusData);
     }
   }, []);
 
+  useEffect(() => {
+    loadWebsocket()
+    return () => {
+      unloadWebsocket();
+    }
+  }, [])
+
   return (
     <>
       <header>
-        <h1>
-          {connected ? "connected" : "disconnected"}
+        <h1 onClick={() => { if (connected) setShowMenu(!showMenu) }}>
+          HomebrewDJ
         </h1>
-
-        <OverlaySelector />
-
-        {connected
-          ? (<button onClick={disconnectAndUnload}>Disconnect</button>)
-          : (<button onClick={() => {
-            connectAndLoad()
-          }}>Connect</button>)}
       </header>
-
-      {/*<main id="overlays">
-        {selectedOverlay !== null ? <OverlayView /> : <></>}
-      </main>*/}
-
-      <main id="overlays">
-        <OverlayView />
-      </main>
+      {
+        connected ? (
+          <div id="overlays" className={showMenu ? "sidemenu-shown" : "sidemenu-hidden"}>
+            <AppSidemenu showMenu={showMenu}></AppSidemenu>
+            <OverlayView />
+          </div>
+        ) : (<ConnectView connect={connectAndLoad} />)
+      }
     </>
+  )
+}
+
+const AppSidemenu: FC<{ showMenu: boolean }> = ({ showMenu }) => {
+  const { ws, connected } = useWebsocket();
+  return (
+    <div id="sidemenu" className={showMenu ? "sidemenu-shown" : "sidemenu-hidden"}>
+
+      <Sidemenu>
+        <SidemenuChildren label="Overlays">
+          <OverlayList></OverlayList>
+        </SidemenuChildren>
+        <SidemenuChildren label="Connection">
+          <p>
+            <span>{connected ? "Connected" : "Disconnected"}</span>
+          </p>
+          <button style={{
+            backgroundColor: "#333333",
+            border: "none",
+            color: "white",
+            width: "100%",
+            padding: "1em",
+            fontFamily: "monospace"
+          }} onClick={() => {
+            ws.disconnectEndpoint();
+          }}>Disconnect</button>
+        </SidemenuChildren>
+        <SidemenuChildren label="Debug">
+          <p>
+            <span>Connected</span>
+          </p>
+        </SidemenuChildren>
+      </Sidemenu>
+    </div>
+  )
+}
+
+const ConnectView: FC<{ connect: () => void }> = ({ connect }) => {
+  return (
+    <div style={{
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      justifyContent: "space-around",
+    }}>
+      <div style={{
+        width: "50%",
+        height: "auto",
+        flexDirection: "column",
+      }}>
+        <h1>Connect to Server</h1>
+        <button style={{
+          height: "4em",
+          width: "100%",
+          fontFamily: "monospace",
+          fontWeight: "bold"
+        }} onClick={async () => {
+          connect()
+        }}>Connect</button>
+      </div>
+    </div>
   )
 }
 
 const OverlayView: FC = () => {
   const { selectedOverlay, overlays } = useOverlays();
-  const overlay = overlays[selectedOverlay];
-
-  useEffect(() => {
-    console.log("current overlay", overlay);
-  })
 
   return (
-    overlay ?
-      (<>{/*overlay.cells.map((v, i) => {
-            return <>{renderWidgetReact(v)}</>
-          })*/}
-        <LegacyOverlay overlay={overlay} id={selectedOverlay} />
-      </>)
-      : (<p>error</p>)
+    selectedOverlay != -1 ?
+      (<LegacyOverlay overlay={overlays.current[selectedOverlay]} id={0} />)
+      : (<p>no overlays loaded</p>)
   )
 }
 

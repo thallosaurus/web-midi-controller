@@ -29,6 +29,10 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
 
     events = new EventTarget();
 
+    statRecv: number = 0;
+    statXfer: number = 0;
+
+
     private sendMidiEvent(msg: MidiMessage) {
         this.events.dispatchEvent(new CustomEvent("data", {
             detail: msg
@@ -121,6 +125,8 @@ export class EventbusWorkerClient extends CoreWorkerClient<EventBusWorkerProduce
                 cc,
                 init
             })
+
+            this.updateCC(channel, cc, init, true);
         })
     }
 
