@@ -7,6 +7,7 @@ import { LegacyOverlay } from './widgets/legacy.tsx';
 import { AppSidemenu, MenuProvider, Sidemenu, SidemenuChildren, useMenuContext } from './ui/sidemenu.tsx';
 import { WidgetLifecycle } from 'midi-controller';
 import { WebsocketWorkerEvent } from './websocket/events.ts';
+import { WebAudioSynthView } from './synth/synth.tsx';
 
 const App = () => {
   const eventbus = useEventBus();
@@ -120,7 +121,8 @@ const App = () => {
         </div >)
 
       case MainViewContent.Synth:
-        return (<>synth</>)
+        //return (<>synth</>)
+        return (<WebAudioSynthView />)
       case MainViewContent.Connect:
         return (<ConnectView connect={connectAndLoad} />)
     }
@@ -135,9 +137,7 @@ const App = () => {
       </header>
 
 
-      {
-        getMainViewContent(currentMainContent, menuShown)
-      }
+      {getMainViewContent(currentMainContent, menuShown)}
     </>
   )
 }
