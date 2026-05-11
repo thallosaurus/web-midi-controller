@@ -4,7 +4,7 @@ import { useWebsocket } from "../websocket/client";
 import { WidgetLifecycle } from "midi-controller";
 
 const MenuContext = createContext(null);
-export function MenuProvider({children}) {
+export function MenuProvider({ children }) {
     const [menuShown, setMenuShown] = useState<boolean>(false);
 
     return (
@@ -64,6 +64,19 @@ export const AppSidemenu: FC<{ showMenu: boolean }> = ({ showMenu }) => {
                         WidgetLifecycle.setEditMode(true)
                     }}>Trigger Edit</button>
                 </SidemenuChildren>
+
+                <button style={{
+                    backgroundColor: "#333333",
+                    border: "none",
+                    color: "white",
+                    width: "100%",
+                    padding: "1em",
+                    fontWeight: "bold",
+                    fontFamily: "monospace"
+                }} onClick={() => {
+                    
+                }}>test</button>
+
             </Sidemenu>
         </div>
     )

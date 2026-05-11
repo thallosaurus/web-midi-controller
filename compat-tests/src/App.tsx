@@ -1,12 +1,13 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, SetStateAction, useEffect, useRef, useState } from 'react'
 import './App.css'
 import { useWebsocket } from './websocket/client.tsx'
 import { useEventBus } from './eventbus/client.tsx'
 import { useOverlays } from './ui/overlay.tsx';
-import { LegacyOverlay } from './widgets/legacy.tsx';
+import { LegacyOverlay, RenderOverlayShim } from './widgets/legacy.tsx';
 import { AppSidemenu, useMenuContext } from './ui/sidemenu.tsx';
 import { WebsocketWorkerEvent } from './websocket/events.ts';
 import { WebAudioSynthView } from './synth/synth.tsx';
+import { LoadedWidget } from 'midi-controller';
 
 const App = () => {
   const eventbus = useEventBus();
@@ -25,11 +26,13 @@ const App = () => {
 
   useEffect(() => {
     //connection-successful
-    ws.events.addEventListener("message", (ev: MessageEvent<WebsocketWorkerEvent>) => {
+    const messageLog = (ev: MessageEvent<WebsocketWorkerEvent>) => {
       console.log("from app", ev);
-    })
-
+    };
+    ws.events.addEventListener("message", messageLog);
+    
     return () => {
+      ws.events.removeEventListener("message", messageLog);
 
     }
   })
@@ -98,22 +101,28 @@ const App = () => {
       const overlayPath = await ws.connectToProdEndpoint(location.hostname, 8000)
       //setMessages(prev => [...prev, overlayPath])
       await fetchOverlays(overlayPath)
-      setMainContent(MainViewContent.Synth);
+      setMainContent(MainViewContent.Overlays);
       setSelectedOverlay(0);
     }
+
+    const { overlays, selectedOverlay } = useOverlays();
+    const children = useRef<LoadedWidget[]>([]);
 
     switch (view) {
       case MainViewContent.Overlays:
         return (< div id="overlays" className={menuShown ? "sidemenu-shown" : "sidemenu-hidden"}>
           <AppSidemenu showMenu={menuShown}></AppSidemenu>
           <OverlayView />
+          {/*<RenderOverlayShim w={overlays.current[selectedOverlay]} c={children.current}></RenderOverlayShim>*/}
         </div >)
 
       case MainViewContent.Synth:
         //return (<>synth</>)
         return (<WebAudioSynthView />)
       case MainViewContent.Connect:
-        return (<ConnectView connect={connectAndLoad} />)
+        return (<ConnectView connect={connectAndLoad} openSynth={() => {
+          setMainContent(MainViewContent.Synth)
+        }} />)
     }
   }
 
@@ -138,7 +147,7 @@ enum MainViewContent {
   Connect
 }
 
-const ConnectView: FC<{ connect: () => void }> = ({ connect }) => {
+const ConnectView: FC<{ connect: () => void, openSynth: () => void }> = ({ connect, openSynth }) => {
   return (
     <div style={{
       height: "100%",
@@ -151,7 +160,8 @@ const ConnectView: FC<{ connect: () => void }> = ({ connect }) => {
         height: "auto",
         flexDirection: "column",
       }}>
-        <h1>Connect to Server</h1>
+        <h2>Connect to Server</h2>
+        <p>Connect to the Server running this application</p>
         <button style={{
           height: "4em",
           width: "100%",
@@ -160,6 +170,17 @@ const ConnectView: FC<{ connect: () => void }> = ({ connect }) => {
         }} onClick={async () => {
           connect()
         }}>Connect</button>
+
+        <h2>Local Synthesizer</h2>
+        <p>Experimental Synthesizer based on WebAudio</p>
+        <button style={{
+          height: "4em",
+          width: "100%",
+          fontFamily: "monospace",
+          fontWeight: "bold"
+        }} onClick={() => {
+          openSynth();
+        }}>WebAudio Synthesizer</button>
       </div>
     </div>
   )

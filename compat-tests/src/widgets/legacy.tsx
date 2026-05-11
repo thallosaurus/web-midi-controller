@@ -3,19 +3,101 @@ import { Widget, LoadedWidget, NoteButtonLifecycle, NoteButtonProperties, Widget
 import { useEventBus } from "../eventbus/client";
 import { LoadedOverlay } from "midi-controller/ts/core/overlay";
 import { useOverlays } from "../ui/overlay";
+import { GridMixerNew, HorizontalBox, ShiftArea, VerticalBox } from "midi-controller/ts/core/layout";
+import { CCSliderLifecycle } from "midi-controller/ts/widgets/slider";
+import { CCButtonLifecycle } from "midi-controller/ts/widgets/button";
+import { RotaryLifecycle } from "midi-controller/ts/widgets/rotary";
+import { JogwheelLifecycle } from "midi-controller/ts/widgets/jogwheel";
+import { XYPadLifecycle } from "midi-controller/ts/widgets/xypad";
 
-const renderOverlayShim = (overlay: Overlay, render_options: { id?: number }) => {
+export const RenderOverlayShim: FC<{ w: Widget, c: LoadedWidget[] }> = ({ w, c }) => {
     //const eventbus = useEventBus();
-    const children = useRef<LoadedWidget[]>([]);
+    //const children = useRef<LoadedWidget[]>([]);
+    const element = useRef<HTMLDivElement | null>(null);
+    const eventbus = useEventBus() as any;
+
+    const lifecycle = useRef<WidgetLifecycle<any, any> | null>(null)
+    const widget = useRef<LoadedWidget | null>(null);
+
+    useEffect(() => {
+        if (element.current) {
+            console.log(element.current)
+            //lifecycle.current = new NoteButtonLifecycle(container.current, cell as NoteButtonProperties, eventbus as any);
+            lifecycle.current = loadLifecycle();
+            console.log("loaded widget:", lifecycle.current);
+            widget.current = new LoadedWidget(w, element.current);
+
+            lifecycle.current.load(w, element.current)
+        }
+
+        return () => {
+            lifecycle.current.unload(w, element.current)
+            //lifecycle.current = null;
+        }
+    }, []);
+
+    const loadLifecycle = () => {
+
+        switch (w.type) {
+            case "horiz-mixer":
+                return new HorizontalBox(element.current, w, c, eventbus);
+
+            case "vert-mixer":
+                return new VerticalBox(element.current, w, c, eventbus);
+
+            case "grid-mixer":
+                return new GridMixerNew(element.current, w, c, eventbus)
+
+            case "notebutton":
+                return new NoteButtonLifecycle(element.current, w, eventbus)
+
+            case "ccslider":
+                return new CCSliderLifecycle(element.current, w, eventbus)
+
+            case "ccbutton":
+                return new CCButtonLifecycle(element.current, w, eventbus)
+
+            case "rotary":
+                return new RotaryLifecycle(element.current, w, eventbus)
+
+            case "jogwheel":
+                return new JogwheelLifecycle(element.current, w, eventbus)
+
+            case "xypad":
+                return new XYPadLifecycle(element.current, w, eventbus)
+
+            case "shift":
+                return new ShiftArea(element.current, w, c, eventbus)
+
+            case "empty":
+            default:
+                break;
+        }
+    };
+
+    return (<div ref={element}></div>)
 }
 
-export const LegacyOverlay: FC<{overlay: Overlay, id?: number }> = ({ overlay, id }) => {
+export const OverlayRewrite: FC<{ overlay: Overlay }> = ({ overlay }) => {
+    const loadedOverlay = useRef<LoadedOverlay | null>(null);
+    const { selectedOverlay, overlays } = useOverlays();
+
+    useEffect(() => {
+
+    });
+
+    return (<div id="overlays">
+        {overlays[selectedOverlay].cells.map((v, i) => {
+
+        })}
+    </div>)
+}
+
+export const LegacyOverlay: FC<{ overlay: Overlay, id?: number }> = ({ overlay, id }) => {
     const loadedOverlay = useRef<LoadedOverlay | null>(null);
     const { selectedOverlay } = useOverlays();
     const container = useRef<HTMLDivElement | null>(null);
     const eventbus = useEventBus();
-
-    //const [_, forceRedraw] = useState(0);
 
     useEffect(() => {
         if (container) {
@@ -42,29 +124,4 @@ export const LegacyOverlay: FC<{overlay: Overlay, id?: number }> = ({ overlay, i
     return (
         <div ref={container} data-id={selectedOverlay}></div>
     )
-}
-
-export const LegacyShim: FC<{cell: Widget}> = ({ cell }) => {
-    const container = useRef<HTMLDivElement | null>(null);
-    const lifecycle = useRef<NoteButtonLifecycle | null>(null)
-    const widget = useRef<LoadedWidget | null>(null);
-    const eventbus = useEventBus();
-
-    useEffect(() => {
-        if (container.current) {
-            console.log(container.current)
-            lifecycle.current = new NoteButtonLifecycle(container.current, cell as NoteButtonProperties, eventbus as any);
-            widget.current = new LoadedWidget(cell, container.current, lifecycle.current as unknown as WidgetLifecycle<any, any>);
-            console.log("loaded widget:", widget.current);
-
-            lifecycle.current.load(cell as unknown as NoteButtonProperties, container.current)
-        }
-
-        return () => {
-            lifecycle.current.unload(cell as unknown as NoteButtonProperties, container.current)
-            lifecycle.current = null;
-        }
-    }, []);
-
-    return (<div ref={container}></div>)
 }
