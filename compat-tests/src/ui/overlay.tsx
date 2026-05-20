@@ -1,6 +1,7 @@
-import { createContext, useRef, useState, useContext } from "react";
+import { createContext, useRef, useState, useContext, FC } from "react";
 import { Overlay } from "../../bindings/Overlay";
 import { Sidemenu } from "./sidemenu";
+import { LegacyOverlay } from "../widgets/legacy";
 
 export const OverlayList = () => {
     const {
@@ -98,4 +99,14 @@ export function useOverlays() {
     }
 
     return ctx;
+}
+
+export const OverlayView: FC = () => {
+  const { selectedOverlay, overlays } = useOverlays();
+
+  return (
+    selectedOverlay != -1 ?
+      (<LegacyOverlay overlay={overlays.current[selectedOverlay]} id={0} />)
+      : (<p>no overlays loaded</p>)
+  )
 }
