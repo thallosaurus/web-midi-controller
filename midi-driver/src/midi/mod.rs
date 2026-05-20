@@ -5,7 +5,7 @@ pub mod system;
 
 #[derive(Debug)]
 pub enum PortListError {
-    PortNotValid(PortInfoError),
+    PortNotValid(()),
 }
 
 #[derive(Debug)]
@@ -29,7 +29,7 @@ fn list(midi_in: MidiInput, midi_out: MidiOutput) -> Result<PortList, PortListEr
         //println!("{}: {} (ID: \"{}\")", i, midi_in.port_name(p).unwrap(), p.id());
         let port = midi_in
             .port_name(p)
-            .map_err(|e| PortListError::PortNotValid(e))?;
+            .map_err(|e| PortListError::PortNotValid(()))?;
         _inputs.push(port);
     }
 
@@ -37,7 +37,7 @@ fn list(midi_in: MidiInput, midi_out: MidiOutput) -> Result<PortList, PortListEr
         //println!("{}: {} (ID: \"{}\")", i, midi_out.port_name(p)?, p.id());
         let port = midi_out
             .port_name(p)
-            .map_err(|e| PortListError::PortNotValid(e))?;
+            .map_err(|e| PortListError::PortNotValid(()))?;
         _outputs.push(port);
     }
 

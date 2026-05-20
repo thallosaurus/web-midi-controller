@@ -56,10 +56,14 @@ impl MidiSystem {
     ) -> Result<MidiInputConnection<sync::mpsc::Sender<Vec<u8>>>, MidiSystemErrors> {
         #[cfg(not(target_os = "windows"))]
         {
-            let midi_in =
-                MidiInput::new(&(device_name.clone() + " (input)")).map_err(|e| MidiSystemErrors::InitError(e))?;
+            let midi_in = MidiInput::new(&(device_name.clone() + " (input)"))
+                .map_err(|e| MidiSystemErrors::InitError(e))?;
             return Ok(midi_in
-                .create_virtual(&(device_name.clone() + " (input)"), Self::input_callback, responder)
+                .create_virtual(
+                    &(device_name.clone() + " (input)"),
+                    Self::input_callback,
+                    responder,
+                )
                 .map_err(|e| MidiSystemErrors::InputConnectError(e))?);
         }
 
@@ -123,11 +127,19 @@ impl MidiSystem {
         let input;
         let output;
         if use_virtual {
-            tracing::info!("using virtual ports, Input: {}, Output: {}", input_device_name, output_device_name);
+            tracing::info!(
+                "using virtual ports, Input: {}, Output: {}",
+                input_device_name,
+                output_device_name
+            );
             input = Self::init_virtual_input(input_device_name, midi_ingress)?;
             output = Self::init_virtual_output(output_device_name)?;
         } else {
-            tracing::info!("using physical ports, Input: {}, Output: {}", input_device_name, output_device_name);
+            tracing::info!(
+                "using physical ports, Input: {}, Output: {}",
+                input_device_name,
+                output_device_name
+            );
             input = Self::init_physical_input(input_device_name, midi_ingress)?;
             output = Self::init_physical_output(output_device_name)?;
         }
@@ -160,7 +172,7 @@ impl MidiSystem {
 
     /// gets called by the midi system when there was data from the midi input
     fn input_callback(_ts: u64, data: &[u8], e: &mut sync::mpsc::Sender<Vec<u8>>) {
-        let msg= Vec::from(data);
+        let msg = Vec::from(data);
         tracing::trace!("{:?}", msg);
         if let Err(e) = e.send(msg) {
             tracing::error!("{}", e);

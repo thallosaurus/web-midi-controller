@@ -30,7 +30,59 @@ struct DriverHandle {
     close_tx: Sender<()>,
 }
 
+struct DriverHost {
+    handles: HashMap<u32, DriverHandle>,
+    nextId: AtomicU32,
+}
+
+impl DriverHost {
+    fn new() -> Self {
+        Self {
+            handles: HashMap::new(),
+            nextId: AtomicU32::new(1),
+        }
+    }
+    fn add_driver(&mut self, input_name: String, output_name: String, use_virtual: bool) -> u32 {
+        let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
+        let (tx_egress, rx_egress) = channel::<Vec<u8>>();
+        let (tx_close, rx_close) = channel();
+
+        thread::spawn(move || {
+            // Initialize MidiSystem
+            let _system = MidiSystem::new(
+                String::from(input_name),
+                String::from(output_name),
+                use_virtual,
+                tx_ingress,
+                rx_egress,
+            )
+            .unwrap();
+            loop {
+                // await death here
+                if let Ok(_s) = rx_close.recv() {
+                    println!("awaited death");
+                    break;
+                }
+            }
+        });
+
+        let handle = DriverHandle {
+            output_rx: rx_ingress,
+            input_tx: tx_egress,
+            close_tx: tx_close,
+        };
+
+        let id = self.nextId.fetch_add(1, Ordering::Relaxed);
+
+        self.handles.insert(id, handle);
+
+        id
+    }
+}
+
 static DRIVERS: Lazy<Mutex<HashMap<u32, DriverHandle>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+
+static DRIVERHOST: Lazy<Mutex<DriverHost>> = Lazy::new(|| Mutex::new(DriverHost::new()));
 
 static NEXT_ID: AtomicU32 = AtomicU32::new(1);
 
@@ -51,14 +103,16 @@ pub extern "C" fn start_driver(
     let (tx_egress, rx_egress) = channel::<Vec<u8>>();
     let (tx_close, rx_close) = channel();
 
+    // Convert Input Name to native type
     let in_cstr = unsafe { CStr::from_ptr(input_name) };
     let input_name = in_cstr.to_str().unwrap();
 
+    // Convert Output Name to native type
     let out_cstr = unsafe { CStr::from_ptr(output_name) };
     let output_name = out_cstr.to_str().unwrap();
 
     thread::spawn(move || {
-        //let mut counter = 0;
+        // Initialize MidiSystem
         let _system = MidiSystem::new(
             String::from(input_name),
             String::from(output_name),
@@ -151,7 +205,6 @@ pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
     let cstr = unsafe { CStr::from_ptr(ptr) };
     let json = cstr.to_str().unwrap(); // now you have the JSON string
 
-
     if let Ok(msg) = serde_json::from_str::<MidiMessage>(json) {
         // sende in den Output-Thread
         let v: Vec<u8> = msg.into();
@@ -165,7 +218,6 @@ pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
 }
 #[unsafe(no_mangle)]
 pub extern "C" fn stop_driver(handle: u32) {
-    
     //if let Some(tx) = &*CLOSE_CHANNEL.lock().unwrap() {
     let mut lock = DRIVERS.lock().unwrap();
 
@@ -182,7 +234,7 @@ pub extern "C" fn stop_all() {
     let lock = DRIVERS.lock().unwrap();
     let k: Vec<u32> = lock.keys().map(|e| *e).collect();
     drop(lock);
-    k.iter().for_each(|e|stop_driver(*e));
+    k.iter().for_each(|e| stop_driver(*e));
 }
 
 #[unsafe(no_mangle)]

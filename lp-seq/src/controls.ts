@@ -1,4 +1,4 @@
-import { MidiMessage } from "@driver";
+import { type MidiMessage } from "@driver";
 import { Launchpad } from "./launchpad.ts";
 
 export enum BUTTON_DEF {
