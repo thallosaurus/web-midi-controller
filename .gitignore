@@ -1,6 +1,7 @@
 # Added by cargo
 
 /target
+*target
 */bindings/
 .vscode
 server-build
