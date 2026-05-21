@@ -8,3 +8,4 @@ server-build
 hdj-vue-shim
 /result
 dist/
+doc/
