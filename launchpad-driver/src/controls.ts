@@ -104,7 +104,9 @@ export abstract class ControlButtons {
         switch (msg.type) {
             case "ControlChange":
                 {
-                    return this.reverse.get(msg.cc);
+                    let r = this.reverse.get(msg.cc);
+                    console.log(r);
+                    return r;
                 }
 
             default:
@@ -129,3 +131,10 @@ export class LaunchpadControlButtons extends ControlButtons {
         }
     }
 }
+
+Deno.test({
+    name: "lookup works",
+    fn() {
+        
+    }
+})

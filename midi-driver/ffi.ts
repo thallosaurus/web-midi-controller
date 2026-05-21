@@ -181,14 +181,7 @@ export class MidiDriver {
     const output_name = Deno.UnsafePointer.of(output_name_bytes)
 
     if (MidiDriver.dylib) this.handle = MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
-/*     catch (e) {
-      console.error("could not load midi driver", e);
-      console.warn("midi output is disabled");
-      //MidiDriver.dylib = null;
-    }
-    return null */
     this.pollLoop();
-
   }
 
   customEventHandler(ev: Event): void {
@@ -257,7 +250,6 @@ export class MidiDriver {
           retData = null;
         }
       } while (retData !== null);
-      //console.log("MIDI bytes", eventBytes);
     }
   }
 

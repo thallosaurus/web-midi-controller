@@ -56,6 +56,7 @@ export class Launchpad {
         this.control.emitter.addEventListener("data", (ev) => {
             const evt = ev as CustomEvent;
             console.log("DAW", evt.detail)
+            this.controlButtons.onInput(evt.detail);
             if (this.sessionSurface) {
                 this.sessionSurface.onInput(evt.detail);
             }
