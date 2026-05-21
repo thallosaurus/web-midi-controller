@@ -172,7 +172,7 @@ impl From<Vec<u8>> for MidiMessage {
                 let value = ((*msb as u16) << 7) | (*lsb as u16);
                 Self::SongPositionPointer { value }
             },
-            [0xF0, _] => {
+            [0xF0, ..] => {
                 Self::SysEx { data }
             },
             [0xD0..=0xDF, pressure] => {

@@ -1,7 +1,7 @@
 {
   "tasks": {
     "dev": "deno run --watch -A main.ts",
-    "launchpad_monitor": "RUST_LOG=debug LIBRARY=../midi-driver/target/debug/libmidi_driver.dylib deno run -A bin/monitor.ts"
+    "launchpad_monitor": "RUST_LOG=trace LIBRARY=../midi-driver/target/debug/libmidi_driver.dylib deno run -A bin/monitor.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",

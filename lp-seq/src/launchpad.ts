@@ -56,6 +56,9 @@ export class Launchpad {
         this.control.emitter.addEventListener("data", (ev) => {
             const evt = ev as CustomEvent;
             console.log("DAW", evt.detail)
+            if (this.sessionSurface) {
+                this.sessionSurface.onInput(evt.detail);
+            }
         })
 
         this.midi.emitter.addEventListener("data", (ev) => {

@@ -1,7 +1,9 @@
 import { Launchpad } from "../src/launchpad.ts";
+import { DemoSurface } from "../src/surface.ts";
 
 const launchpad = new Launchpad();
 launchpad.switchToDawMode();
+launchpad.loadSessionSurface(new DemoSurface(launchpad));
 
 /*const driver = new MidiDriver({
     //pollBytes: true,
@@ -12,5 +14,6 @@ launchpad.switchToDawMode();
 
 
 Deno.addSignalListener("SIGINT", () => {
+    launchpad.switchToStandaloneMode();
     launchpad.close();
 });
