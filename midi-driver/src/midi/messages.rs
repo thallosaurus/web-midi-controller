@@ -1,15 +1,12 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
-//use ts_rs::TS;
 
-//#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 pub struct MidiPayload {
     pub channel: u8,
 }
 
-//#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 pub struct NotePayload {
@@ -18,7 +15,6 @@ pub struct NotePayload {
     pub velocity: u8,
 }
 
-//#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 pub struct CCPayload {
@@ -26,8 +22,6 @@ pub struct CCPayload {
     pub value: u8,
 }
 
-//#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
-//#[ts(export, export_to = "SocketMessages.ts")]
 #[derive(Clone, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 #[serde(tag = "type")]

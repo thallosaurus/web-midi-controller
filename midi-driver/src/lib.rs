@@ -121,13 +121,15 @@ impl DriverHost {
 
 static DRIVERHOST: Lazy<Mutex<DriverHost>> = Lazy::new(|| Mutex::new(DriverHost::new()));
 
-static NEXT_ID: AtomicU32 = AtomicU32::new(1);
+//static NEXT_ID: AtomicU32 = AtomicU32::new(1);
 
+/// sets the logging from outside. just calls the init function
 #[unsafe(no_mangle)]
 pub extern "C" fn init_logging() {
     init_tracing();
 }
 
+/// Starts a new Instance and returns the Handle ID
 #[unsafe(no_mangle)]
 pub extern "C" fn start_driver(
     use_virtual: bool,
@@ -152,6 +154,7 @@ pub extern "C" fn start_driver(
     id
 }
 
+/// Polls bytes into the given memory address
 #[unsafe(no_mangle)]
 pub extern "C" fn poll_bytes(handle: u32, ptr: *mut u8, len: usize) -> usize {
     //let ch = DRIVERS.lock().unwrap();
@@ -180,6 +183,7 @@ pub extern "C" fn poll_bytes(handle: u32, ptr: *mut u8, len: usize) -> usize {
     }
 }
 
+/// Frees a string allocated by Rust
 #[unsafe(no_mangle)]
 pub extern "C" fn free_string(ptr: *const c_char) {
     if !ptr.is_null() {
@@ -188,6 +192,8 @@ pub extern "C" fn free_string(ptr: *const c_char) {
         }
     }
 }
+
+/// Sends Data to the Port
 #[unsafe(no_mangle)]
 pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
     if ptr.is_null() {
@@ -208,6 +214,8 @@ pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
         }
     }
 }
+
+/// Stops the given driver handle
 #[unsafe(no_mangle)]
 pub extern "C" fn stop_driver(handle: u32) {
     //if let Some(tx) = &*CLOSE_CHANNEL.lock().unwrap() {
@@ -216,17 +224,9 @@ pub extern "C" fn stop_driver(handle: u32) {
     drop(lock);
 }
 
-/*#[unsafe(no_mangle)]
-pub extern "C" fn stop_all() {
-    let lock = DRIVERS.lock().unwrap();
-    let k: Vec<u32> = lock.keys().map(|e| *e).collect();
-    drop(lock);
-    k.iter().for_each(|e| stop_driver(*e));
-}*/
-
+/// Coverts Bytes to their JSON Counterpart
 #[unsafe(no_mangle)]
 pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
-    // Sicherstellen, dass Pointer gültig ist
     let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
 
     let v = Vec::from(slice);
@@ -235,14 +235,12 @@ pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
 
     // convert
     let json = serde_json::to_string(&resp).unwrap();
-    //println!("{:?}", json);
     tracing::trace!("{}", json);
     let c_str = CString::new(json).unwrap();
-
-    // Pointer zurückgeben (Deno muss frei machen!)
     c_str.into_raw()
 }
 
+/// Helper function to print available MIDI Devices on stdout
 #[unsafe(no_mangle)]
 pub extern "C" fn list_devices() {
     let list = default_list().unwrap();
@@ -250,6 +248,7 @@ pub extern "C" fn list_devices() {
     println!("{:?}", list);
 }
 
+/// frees the given bytes allocated by Rust
 #[unsafe(no_mangle)]
 pub extern "C" fn free_bytes(ptr: *const u8, len: usize) {
     if ptr.is_null() || len == 0 {
@@ -257,7 +256,7 @@ pub extern "C" fn free_bytes(ptr: *const u8, len: usize) {
     }
 
     unsafe {
-        // Pointer + Länge zurück in Box<[u8]> verwandeln, damit Rust es droppen kann
+        // pointer + length
         let _ = Box::from_raw(std::slice::from_raw_parts_mut(ptr as *mut u8, len));
     }
 }

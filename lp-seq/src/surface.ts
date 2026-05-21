@@ -107,18 +107,23 @@ export class DemoSurface extends Surface {
         this.animation().then(() => {
             this.displayRandomColors();
         })
-
+        
         return;
     }
     constructor(caller: Launchpad) {
         super(caller);
-
+        
         this.displayRandomColors();
     }
-
+    
     animation(): Promise<void> {
         return new Promise((res, rej) => {
-            this.displayingAnimation = true            
+            this.displayingAnimation = true    
+            
+            setTimeout(() => {
+                this.displayingAnimation = false;
+                res();
+            }, 1000);
         });
     }
 
