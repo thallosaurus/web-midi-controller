@@ -76,14 +76,17 @@ impl DriverHost {
 
         let _join_handle = thread::spawn(move || {
             // Initialize MidiSystem
-            let _system =
-                MidiSystem::new(input_name, output_name, use_virtual, tx_ingress, rx_egress)
-                    .unwrap();
-            loop {
-                // await death here
-                if let Ok(_s) = rx_close.recv() {
-                    info!("exiting midi system");
-                    break;
+            match MidiSystem::new(input_name, output_name, use_virtual, tx_ingress, rx_egress) {
+                Ok(_) => loop {
+                    // await death here
+                    if let Ok(_s) = rx_close.recv() {
+                        info!("exiting midi system");
+                        break;
+                    }
+                },
+                Err(e) => {
+                    error!("add driver: {e}");
+                    return;
                 }
             }
         });
@@ -167,15 +170,14 @@ pub extern "C" fn poll_bytes(handle: u32, ptr: *mut u8, len: usize) -> usize {
 
             return copy_len;
         }
-        Err(e) => { match e {
-            TryRecvError::Empty => { 0 },
+        Err(e) => match e {
+            TryRecvError::Empty => 0,
             TryRecvError::Disconnected => {
-                info!("poll bytes: receiver disconnected. exiting...");
+                info!("poll bytes: receiver disconnected");
                 0
-            },
-        }}
+            }
+        },
     }
-
 }
 
 #[unsafe(no_mangle)]
