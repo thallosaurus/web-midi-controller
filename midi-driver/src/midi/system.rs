@@ -161,7 +161,7 @@ impl MidiSystem {
                     out.send(&payload).unwrap();
                 } else {
                     let e = msg.err().unwrap();
-                    tracing::error!("{}", e);
+                    tracing::error!("output callback: {}, exiting...", e);
                     break;
                 }
             }
@@ -175,7 +175,7 @@ impl MidiSystem {
         let msg = Vec::from(data);
         tracing::trace!("{:?}", msg);
         if let Err(e) = e.send(msg) {
-            tracing::error!("{}", e);
+            tracing::error!("input callback: {}, exiting...", e);
         }
     }
 }

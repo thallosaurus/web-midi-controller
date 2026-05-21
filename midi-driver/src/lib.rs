@@ -1,15 +1,17 @@
 use std::{
     collections::HashMap,
     ffi::{CStr, CString, c_char},
+    io,
     sync::{
         Mutex,
         atomic::{AtomicU32, Ordering},
-        mpsc::{Receiver, Sender, channel},
+        mpsc::{Receiver, Sender, TryRecvError, channel},
     },
-    thread,
+    thread::{self, JoinHandle},
 };
 
 use once_cell::sync::Lazy;
+use tracing::{debug, error, info, trace};
 
 use crate::{
     logging::init_tracing,
@@ -28,39 +30,59 @@ struct DriverHandle {
     output_rx: Receiver<Vec<u8>>,
     input_tx: Sender<Vec<u8>>,
     close_tx: Sender<()>,
+    _join_handle: JoinHandle<()>
+}
+
+impl DriverHandle {
+    fn stop(&self) {
+        self.close_tx.send(()).unwrap();
+    }
+
+    fn poll(&self) -> Result<Vec<u8>, TryRecvError> {
+        Ok(self.output_rx.try_recv()?)
+    }
 }
 
 struct DriverHost {
     handles: HashMap<u32, DriverHandle>,
-    nextId: AtomicU32,
+    next_id: AtomicU32,
+}
+
+#[derive(Debug)]
+enum DriverHostError {
+    HandleNotFound(u32),
 }
 
 impl DriverHost {
     fn new() -> Self {
         Self {
             handles: HashMap::new(),
-            nextId: AtomicU32::new(1),
+            next_id: AtomicU32::new(1),
         }
     }
+
+    fn get_handle(&mut self, handle_id: u32) -> Result<&mut DriverHandle, DriverHostError> {
+        match self.handles.get_mut(&handle_id) {
+            Some(h) => Ok(h),
+            None => Err(DriverHostError::HandleNotFound(handle_id)),
+        }
+    }
+
     fn add_driver(&mut self, input_name: String, output_name: String, use_virtual: bool) -> u32 {
         let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
         let (tx_egress, rx_egress) = channel::<Vec<u8>>();
         let (tx_close, rx_close) = channel();
+        debug!("adding new driver");
 
-        thread::spawn(move || {
+        let _join_handle = thread::spawn(move || {
             // Initialize MidiSystem
-            let _system = MidiSystem::new(
-                String::from(input_name),
-                String::from(output_name),
-                use_virtual,
-                tx_ingress,
-                rx_egress,
-            )
-            .unwrap();
+            let _system =
+                MidiSystem::new(input_name, output_name, use_virtual, tx_ingress, rx_egress)
+                    .unwrap();
             loop {
                 // await death here
                 if let Ok(_s) = rx_close.recv() {
-                    println!("awaited death");
+                    info!("exiting midi system");
                     break;
                 }
             }
@@ -70,17 +92,29 @@ impl DriverHost {
             output_rx: rx_ingress,
             input_tx: tx_egress,
             close_tx: tx_close,
+            _join_handle
         };
 
-        let id = self.nextId.fetch_add(1, Ordering::Relaxed);
+        let id = self.next_id.fetch_add(1, Ordering::Relaxed);
 
         self.handles.insert(id, handle);
 
         id
     }
+
+    fn remove_driver(&mut self, handle: u32) {
+        let h = self.handles.get(&handle).unwrap();
+
+        h.stop();
+        self.handles.remove(&handle);
+    }
+
+    //fn sendToHandle(&self, handle: u32, data:)
 }
 
-static DRIVERS: Lazy<Mutex<HashMap<u32, DriverHandle>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+/*static DRIVERS: Lazy<Mutex<HashMap<u32, DriverHandle>>> = Lazy::new(|| {
+    Mutex::new(HashMap::new())
+});*/
 
 static DRIVERHOST: Lazy<Mutex<DriverHost>> = Lazy::new(|| Mutex::new(DriverHost::new()));
 
@@ -97,12 +131,6 @@ pub extern "C" fn start_driver(
     input_name: *const c_char,
     output_name: *const c_char,
 ) -> u32 {
-    //let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
-    //init_tracing();
-    let (tx_ingress, rx_ingress) = channel::<Vec<u8>>();
-    let (tx_egress, rx_egress) = channel::<Vec<u8>>();
-    let (tx_close, rx_close) = channel();
-
     // Convert Input Name to native type
     let in_cstr = unsafe { CStr::from_ptr(input_name) };
     let input_name = in_cstr.to_str().unwrap();
@@ -111,81 +139,43 @@ pub extern "C" fn start_driver(
     let out_cstr = unsafe { CStr::from_ptr(output_name) };
     let output_name = out_cstr.to_str().unwrap();
 
-    thread::spawn(move || {
-        // Initialize MidiSystem
-        let _system = MidiSystem::new(
-            String::from(input_name),
-            String::from(output_name),
-            use_virtual,
-            tx_ingress,
-            rx_egress,
-        )
-        .unwrap();
-        loop {
-            // await death here
-            if let Ok(_s) = rx_close.recv() {
-                println!("awaited death");
-                break;
-            }
-        }
-    });
-
-    let handle = DriverHandle {
-        output_rx: rx_ingress,
-        input_tx: tx_egress,
-        close_tx: tx_close,
-    };
-
-    let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
-
-    DRIVERS.lock().unwrap().insert(id, handle);
-
+    let mut host = DRIVERHOST.lock().unwrap();
+    let id = host.add_driver(
+        String::from(input_name),
+        String::from(output_name),
+        use_virtual,
+    );
+    tracing::debug!("{}", id);
     id
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn poll_event(handle: u32) -> *const c_char {
-    //let mut guard = OUTPUT_CHANNEL.lock().unwrap();
-
-    let ch = DRIVERS.lock().unwrap();
-
-    if let Some(handle) = ch.get(&handle).as_mut() {
-        match handle.output_rx.try_recv() {
-            Ok(msg) => {
-                let as_string = serde_json::to_string(&msg).unwrap();
-
-                return std::ffi::CString::new(as_string).unwrap().into_raw();
-            }
-            Err(std::sync::mpsc::TryRecvError::Empty) => {}
-            Err(_) => {}
-        }
-    }
-
-    std::ptr::null()
-}
-
-#[unsafe(no_mangle)]
 pub extern "C" fn poll_bytes(handle: u32, ptr: *mut u8, len: usize) -> usize {
-    let ch = DRIVERS.lock().unwrap();
-    if let Some(handle) = ch.get(&handle).as_mut() {
-        match handle.output_rx.try_recv() {
-            Ok(bytes) => {
-                let copy_len = usize::min(len, bytes.len());
+    //let ch = DRIVERS.lock().unwrap();
+    let mut host = DRIVERHOST.lock().unwrap();
+    let h = host.get_handle(handle).unwrap();
 
-                if !ptr.is_null() {
-                    unsafe {
-                        std::ptr::copy_nonoverlapping(bytes.as_ptr(), ptr, copy_len);
-                    }
+    match h.poll() {
+        Ok(bytes) => {
+            let copy_len = usize::min(len, bytes.len());
+            trace!("copying {} bytes", copy_len);
+            if !ptr.is_null() {
+                unsafe {
+                    std::ptr::copy_nonoverlapping(bytes.as_ptr(), ptr, copy_len);
                 }
-
-                return copy_len;
             }
-            Err(std::sync::mpsc::TryRecvError::Empty) => {}
-            Err(_) => {}
+
+            return copy_len;
         }
+        Err(e) => { match e {
+            TryRecvError::Empty => { 0 },
+            TryRecvError::Disconnected => {
+                info!("poll bytes: receiver disconnected. exiting...");
+                0
+            },
+        }}
     }
 
-    0
 }
 
 #[unsafe(no_mangle)]
@@ -207,11 +197,11 @@ pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
 
     if let Ok(msg) = serde_json::from_str::<MidiMessage>(json) {
         // sende in den Output-Thread
+        //tracing::debug!("send midi: {:?}", msg);
         let v: Vec<u8> = msg.into();
-        tracing::trace!("{:?}", v);
+        tracing::debug!("send midi: {:?}", v);
 
-        if let Some(tx) = DRIVERS.lock().unwrap().get(&handle) {
-            //tracing::debug!("{:?}", msg);
+        if let Some(tx) = DRIVERHOST.lock().unwrap().handles.get(&handle) {
             let _ = tx.input_tx.send(v);
         }
     }
@@ -219,23 +209,18 @@ pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
 #[unsafe(no_mangle)]
 pub extern "C" fn stop_driver(handle: u32) {
     //if let Some(tx) = &*CLOSE_CHANNEL.lock().unwrap() {
-    let mut lock = DRIVERS.lock().unwrap();
-
-    if let Some(h) = lock.get(&handle) {
-        //tracing::debug!("sending stop signal to driver");
-        h.close_tx.send(()).unwrap();
-    }
-
-    lock.remove(&handle);
+    let mut lock = DRIVERHOST.lock().unwrap();
+    lock.remove_driver(handle);
+    drop(lock);
 }
 
-#[unsafe(no_mangle)]
+/*#[unsafe(no_mangle)]
 pub extern "C" fn stop_all() {
     let lock = DRIVERS.lock().unwrap();
     let k: Vec<u32> = lock.keys().map(|e| *e).collect();
     drop(lock);
     k.iter().for_each(|e| stop_driver(*e));
-}
+}*/
 
 #[unsafe(no_mangle)]
 pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {

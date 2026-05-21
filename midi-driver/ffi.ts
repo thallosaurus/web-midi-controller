@@ -7,7 +7,7 @@ function getLibraryPath() {
       return getDefaultLibraryPath();
     } else {
       console.info("using overridden library path")
-      return new URL(override);
+      return new URL(override, import.meta.url);
     }
   } else {
     return getVendoredLibrary();
@@ -52,18 +52,18 @@ interface MidiDriverFFI extends Deno.ForeignLibraryInterface {
     parameters: [];
     result: "void";
   };
-  stop_all: {
+  /*stop_all: {
     parameters: [],
     result: "void"
-  };
+  };*/
   start_driver: {
     parameters: ["u8", "pointer", "pointer"];
     result: "u32";
   };
-  poll_event: {
+  /*poll_event: {
     parameters: ["u32"];
     result: "pointer";
-  };
+  };*/
   poll_bytes: {
     parameters: ["u32", "pointer", "usize"],
     result: "usize",
@@ -102,8 +102,60 @@ interface MidiDriverOptions {
   outputName: string
 }
 
+function loadDylib(): Deno.DynamicLibrary<MidiDriverFFI> {
+  return Deno.dlopen<MidiDriverFFI>(
+    getLibraryPath(),
+    {
+      init_logging: {
+        parameters: [],
+        result: "void"
+      },
+      /*stop_all: {
+        parameters: [],
+        result: "void"
+      },*/
+      start_driver: {
+        parameters: ["u8", "pointer", "pointer"],
+        result: "u32",
+      },
+      /*poll_event: {
+        parameters: ["u32"],
+        result: "pointer",
+      },*/
+      poll_bytes: {
+        parameters: ["u32", "pointer", "usize"],
+        result: "usize",
+      },
+      free_string: {
+        parameters: ["pointer"],
+        result: "void",
+      },
+      send_midi: {
+        parameters: ["u32", "pointer"],
+        result: "void",
+      },
+      stop_driver: {
+        parameters: ["u32"],
+        result: "void",
+      },
+      list_devices: {
+        parameters: [],
+        result: "void",
+      },
+      convert_bytes: {
+        parameters: ["pointer", "usize"],
+        result: "pointer"
+      },
+      free_bytes: {
+        parameters: ["pointer"],
+        result: "void",
+      }
+    } as const,
+  );
+}
+
 export class MidiDriver {
-  static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null;
+  static dylib: Deno.DynamicLibrary<MidiDriverFFI> | null = loadDylib();
   public emitter = new EventTarget();
   private pollInterval: number | null = null;
 
@@ -117,75 +169,26 @@ export class MidiDriver {
 
   constructor(options: MidiDriverOptions) {
     //if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
-    try {
-      MidiDriver.dylib = Deno.dlopen<MidiDriverFFI>(
-        getLibraryPath(),
-        {
-          init_logging: {
-            parameters: [],
-            result: "void"
-          },
-          stop_all: {
-            parameters: [],
-            result: "void"
-          },
-          start_driver: {
-            parameters: ["u8", "pointer", "pointer"],
-            result: "u32",
-          },
-          poll_event: {
-            parameters: ["u32"],
-            result: "pointer",
-          },
-          poll_bytes: {
-            parameters: ["u32", "pointer", "usize"],
-            result: "usize",
-          },
-          free_string: {
-            parameters: ["pointer"],
-            result: "void",
-          },
-          send_midi: {
-            parameters: ["u32", "pointer"],
-            result: "void",
-          },
-          stop_driver: {
-            parameters: ["u32"],
-            result: "void",
-          },
-          list_devices: {
-            parameters: [],
-            result: "void",
-          },
-          convert_bytes: {
-            parameters: ["pointer", "usize"],
-            result: "pointer"
-          },
-          free_bytes: {
-            parameters: ["pointer"],
-            result: "void",
-          }
-        } as const,
-      );
 
 
-      const virt = Deno.build.os == "windows" ? false : options.useVirtual
+    const virt = Deno.build.os == "windows" ? false : options.useVirtual
 
-      const encoder = new TextEncoder();
-      const input_name_bytes = encoder.encode(options.inputName)
-      const input_name = Deno.UnsafePointer.of(input_name_bytes)
+    const encoder = new TextEncoder();
+    const input_name_bytes = encoder.encode(options.inputName)
+    const input_name = Deno.UnsafePointer.of(input_name_bytes)
 
-      const output_name_bytes = encoder.encode(options.outputName)
-      const output_name = Deno.UnsafePointer.of(output_name_bytes)
+    const output_name_bytes = encoder.encode(options.outputName)
+    const output_name = Deno.UnsafePointer.of(output_name_bytes)
 
-      this.handle = MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
-      this.pollLoop();
-
-    } catch (e) {
+    if (MidiDriver.dylib) this.handle = MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
+/*     catch (e) {
       console.error("could not load midi driver", e);
       console.warn("midi output is disabled");
-      MidiDriver.dylib = null;
+      //MidiDriver.dylib = null;
     }
+    return null */
+    this.pollLoop();
+
   }
 
   customEventHandler(ev: Event): void {
@@ -258,29 +261,6 @@ export class MidiDriver {
     }
   }
 
-  /**
-   * @deprecated
-   */
-  poll() {
-    if (MidiDriver.dylib !== null) {
-      do {
-        const ptr = MidiDriver.dylib!.symbols.poll_event(this.handle!);
-        if (!ptr) break;
-        const msg = new Deno.UnsafePointerView(ptr!).getCString();
-
-        MidiDriver.dylib!.symbols.free_string(ptr);
-
-        const serialized = JSON.parse(msg);
-
-        // process event
-
-        this.emitter.dispatchEvent(
-          new CustomEvent("data", { detail: serialized }),
-        );
-      } while (true);
-    }
-  }
-
   close() {
     if (MidiDriver.dylib) {
       MidiDriver.dylib.symbols.stop_driver(this.handle!);
@@ -291,10 +271,10 @@ export class MidiDriver {
       MidiDriver.dylib = null;
     }
   }
-  
-  closeNew () {
+
+  closeNew() {
     if (MidiDriver.dylibLoaded && MidiDriver.dylib) {
-      MidiDriver.dylib.symbols.stop_all();
+      //MidiDriver.dylib.symbols.stop_all();
       if (this.pollInterval) clearInterval(this.pollInterval);
       MidiDriver.dylib.close();
       MidiDriver.dylib = null;
