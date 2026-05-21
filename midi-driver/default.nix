@@ -15,6 +15,6 @@
       alsa-lib.dev
     ];
 
-    cargoLock.lockFile = ../Cargo.lock;
+    cargoLock.lockFile = ./Cargo.lock;
     
   }

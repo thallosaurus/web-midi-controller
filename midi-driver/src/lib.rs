@@ -30,7 +30,7 @@ struct DriverHandle {
     output_rx: Receiver<Vec<u8>>,
     input_tx: Sender<Vec<u8>>,
     close_tx: Sender<()>,
-    _join_handle: JoinHandle<()>
+    //_join_handle: JoinHandle<()>
 }
 
 impl DriverHandle {
@@ -92,7 +92,7 @@ impl DriverHost {
             output_rx: rx_ingress,
             input_tx: tx_egress,
             close_tx: tx_close,
-            _join_handle
+            //_join_handle
         };
 
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);

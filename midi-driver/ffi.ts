@@ -204,7 +204,7 @@ export class MidiDriver {
     }
   }
 
-  static initLogging() {
+  public static initLogging(): void {
     MidiDriver.dylib!.symbols.init_logging();
   }
 
