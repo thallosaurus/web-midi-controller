@@ -10,6 +10,39 @@ class DemoSessionSurface extends Surface {
   constructor(caller: Launchpad) {
     super(caller)
 
+    this.setXY(0, 0, {
+      "color": 110,
+      "lightMode": LightMode.Normal
+    })
+    this.setXY(1, 0, {
+      "color": 111,
+      "lightMode": LightMode.Normal
+    })
+    this.setXY(2, 0, {
+      "color": 112,
+      "lightMode": LightMode.Normal
+    })
+    this.setXY(3, 0, {
+      "color": 113,
+      "lightMode": LightMode.Normal
+    })
+    this.setXY(4, 0, {
+      "color": 114,
+      "lightMode": LightMode.Normal
+    })
+    this.setXY(5, 0, {
+      "color": 115,
+      "lightMode": LightMode.Normal
+    })
+    this.setXY(6, 0, {
+      "color": 116,
+      "lightMode": LightMode.Normal
+    })
+    this.setXY(7, 0, {
+      "color": 117,
+      "lightMode": LightMode.Normal
+    })
+
     /*setInterval(() => {
       this.drawBuffer((msg) => {
         this.caller.sendSessionMidi(msg);
@@ -24,20 +57,20 @@ class DemoSessionSurface extends Surface {
 
     switch (msg.type) {
       case "NoteOn":
-        this.setXY(1, 0, {
+        /*this.setXY(1, 0, {
           "color": 119,
           "lightMode": LightMode.Normal
-        })
+        })*/
 
-        this.setControlButton(BUTTON_DEF.Volume, {
+        /*this.setControlButton(BUTTON_DEF.Volume, {
           "color": 119,
           "lightMode": LightMode.Normal
-        })
+        })*/
         break;
 
       case "NoteOff":
-        this.setXY(1, 0, null);
-        this.setControlButton(BUTTON_DEF.Volume, null)
+        //this.setXY(1, 0, null);
+        //this.setControlButton(BUTTON_DEF.Volume, null)
         break;
     }
 
