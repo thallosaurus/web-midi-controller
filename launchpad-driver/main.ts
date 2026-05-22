@@ -14,7 +14,7 @@ if (import.meta.main) {
   launchpad.switchToDawMode();
   setTimeout(() => {
     launchpad.switchInbuiltLayout(1, 0)
-    launchpad.setFader(FaderBank.Volumes, FaderOrientation.Horizontal, fader)
+    //launchpad.setFader(FaderBank.Volumes, FaderOrientation.Horizontal, fader)
   }, 2000);
   //launchpad.loadSurface(new DemoSurface(launchpad));
 

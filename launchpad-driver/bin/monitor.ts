@@ -1,17 +1,56 @@
 import { MidiMessage } from "../../midi-driver/deno_mod.ts";
 import { Launchpad } from "../src/launchpad.ts";
-import { DemoSurface, Surface } from "../src/surface.ts";
+import { BUTTON_DEF, LightMode, Surface } from "../src/surface.ts";
 
 class DemoSessionSurface extends Surface {
-  override onInput(msg: MidiMessage): void {
+  override onDraw(): void {
+    throw new Error("Method not implemented.");
+  }
+
+  constructor(caller: Launchpad) {
+    super(caller)
+
+    /*setInterval(() => {
+      this.drawBuffer((msg) => {
+        this.caller.sendSessionMidi(msg);
+      });
+    }, 100);*/
+
+
+  }
+
+  override onMatrixInput(msg: MidiMessage): void {
     console.log("demo session", msg);
+
+    switch (msg.type) {
+      case "NoteOn":
+        this.setXY(1, 0, {
+          "color": 119,
+          "lightMode": LightMode.Normal
+        })
+
+        this.setControlButton(BUTTON_DEF.Volume, {
+          "color": 119,
+          "lightMode": LightMode.Normal
+        })
+        break;
+
+      case "NoteOff":
+        this.setXY(1, 0, null);
+        this.setControlButton(BUTTON_DEF.Volume, null)
+        break;
+    }
+
+    this.drawBuffer((msg) => {
+      this.caller.sendSessionMidi(msg);
+    });
   }
 }
 
 const launchpad = new Launchpad();
 launchpad.switchToDawMode();
-//launchpad.loadSurface(new DemoSurface(launchpad));
 launchpad.loadSessionSurface(new DemoSessionSurface(launchpad));
+//launchpad.loadSessionSurface(new DemoSessionSurface(launchpad));
 
 /*const driver = new MidiDriver({
     //pollBytes: true,
@@ -22,6 +61,6 @@ launchpad.loadSessionSurface(new DemoSessionSurface(launchpad));
 
 
 Deno.addSignalListener("SIGINT", () => {
-    launchpad.switchToStandaloneMode();
-    launchpad.close();
+  launchpad.switchToStandaloneMode();
+  launchpad.close();
 });

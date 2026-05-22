@@ -1,6 +1,9 @@
 import { type MidiMessage } from "@driver";
 import { Launchpad } from "./launchpad.ts";
 
+/**
+ * @deprecated
+ */
 export enum BUTTON_DEF {
     LeftArrow = 91,
     RightArrow = 92,
@@ -126,15 +129,18 @@ export class LaunchpadControlButtons extends ControlButtons {
             case "ControlChange":
                 {
                     //this.setCCState(msg.cc, msg.value);
+                    console.log("launchpad control buttons", msg);
+                    return true;
                 }
-                break;
         }
+
+        return false;
     }
 }
 
 Deno.test({
     name: "lookup works",
     fn() {
-        
+
     }
 })
