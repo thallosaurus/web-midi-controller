@@ -115,6 +115,14 @@ export abstract class Surface {
         //const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
     }
 
+    clearMatrix() {
+        this.pixels.clear();
+    }
+
+    clearControlButtons() {
+        this.controlpixels.clear();
+    }
+
     setControlButton(i: BUTTON_DEF, pixel: Pixel | null) {
         if (pixel !== null) {
             this.controlpixels.set(i, pixel);
@@ -125,8 +133,8 @@ export abstract class Surface {
 
     public drawBuffer(sender: (msg: MidiMessage) => void) {
 
-        console.log(this.pixels);
-        console.log(this.controlpixels);
+        //console.log(this.pixels);
+        //console.log(this.controlpixels);
         this.clear(sender);
         // matrix
         for (let i = 0; i < 8 * 8; i++) {
@@ -196,8 +204,10 @@ export abstract class Surface {
     onMidiMessage(msg: MidiMessage) {
         switch (msg.type) {
             case "NoteOn":
+                this.onMatrixPressed(msg);
+                break;
             case "NoteOff":
-                this.onMatrixInput(msg);
+                this.onMatrixReleased(msg);
                 break;
             case "ControlChange":
                 if (msg.value > 0) {
@@ -209,9 +219,8 @@ export abstract class Surface {
         }
     }
 
-    abstract onMatrixInput(msg: MidiMessage): void;
-
-    abstract onDraw(): void;
+    abstract onMatrixPressed(msg: MidiMessage): void;
+    abstract onMatrixReleased(msg: MidiMessage): void;
 }
 
 /**

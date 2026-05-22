@@ -120,17 +120,17 @@ export class Launchpad {
         this.control.close();
     }
 
-    switchInbuiltLayout(layout: number, index: number) {
+    switchInbuiltLayout(layout: number, page: number) {
         /*this.control.sendMidi({
             type: "SysEx",
             data: [...NOVATION_SYSEX_HEADER, 0x00, layout, index, 0x00, 0xF7]
         });*/
 
-        this.sendNovationMessage([0x10, layout, index, 0x00])
+        this.sendNovationMessage([0x00, layout, page, 0x00])
     }
 
-    switchToCustomMode(index: number) {
-        this.switchInbuiltLayout(3, index)
+    switchToCustomMode(page: number) {
+        this.switchInbuiltLayout(3, page)
     }
 
     switchToLiveMode() {
