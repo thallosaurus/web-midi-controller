@@ -126,6 +126,7 @@ export class Launchpad {
     close() {
         //this.surface?.clear();
         //this.sessionSurface?.clear();
+        this.sessionSurface?.close();
         this.midi.close();
         this.control.close();
     }

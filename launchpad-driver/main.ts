@@ -1,12 +1,5 @@
-import { Fader, FaderBank, FaderOrientation, FaderType, Launchpad } from "./src/launchpad.ts";
-import { DemoSurface } from "./src/surface.ts";
+import { Launchpad } from "./src/launchpad.ts";
 
-const fader: Fader = {
-  index: 0,
-  type: FaderType.Unipolar,
-  controlchange: 1,
-  color: 2
-}
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {

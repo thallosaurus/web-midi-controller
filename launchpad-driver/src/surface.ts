@@ -236,58 +236,13 @@ export abstract class Surface {
         }
     }
 
+    close() {
+
+        this.onClose();
+    }
+
     abstract onMatrixPressed(msg: MidiMessage): void;
     abstract onMatrixReleased(msg: MidiMessage): void;
-}
 
-/**
- * @deprecated
- */
-export class DemoSurface extends Surface {
-    displayingAnimation = false;
-
-    override onMatrixInput(msg: MidiMessage): void {
-        if (this.displayingAnimation) return;
-        this.clear();
-        this.animation().then(() => {
-            this.displayRandomColors();
-        })
-
-        return;
-    }
-    constructor(caller: Launchpad) {
-        super(caller);
-
-        this.displayRandomColors();
-    }
-
-    /**
-     * @deprecated
-     * @returns 
-     */
-    animation(): Promise<void> {
-        return new Promise((res, rej) => {
-            this.displayingAnimation = true
-
-            setTimeout(() => {
-                this.displayingAnimation = false;
-                res();
-            }, 1000);
-        });
-    }
-
-    displayRandomColors() {
-        for (let i = 0; i < 64; i++) {
-            this.setI(i, {
-                color: Math.floor(Math.random() * 127),
-                lightMode: LightMode.Pulsing
-            })
-        }
-    }
-}
-
-export class FeedbackSurface extends Surface {
-    onMatrixInput(msg: MidiMessage): void {
-
-    }
+    abstract onClose(): void;
 }

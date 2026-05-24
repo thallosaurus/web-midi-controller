@@ -1,8 +1,75 @@
+import { Cipheriv } from "node:crypto";
 import { MidiMessage } from "../../midi-driver/deno_mod.ts";
 import { Launchpad } from "../src/launchpad.ts";
 import { BUTTON_DEF, LightMode, Surface } from "../src/surface.ts";
 
+class SmileySurface extends Surface {
+  override onClose(): void {
+    clearInterval(this.interval)
+  }
+  data = [
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 120, 120, 0, 0, 120, 120, 0,
+    0, 120, 120, 0, 0, 120, 120, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 120, 0, 0, 0, 0, 120, 0,
+    0, 120, 120, 0, 0, 120, 120, 0,
+    0, 0, 120, 120, 120, 120, 0, 0,
+  ]
+  override onMatrixPressed(msg: MidiMessage): void {
+    this.active = true;
+    this.loadSmiley();
+    this.drawBuffer((p) => {
+      this.caller.sendSessionMidi(p);
+    })
+
+  }
+
+  override onMatrixReleased(msg: MidiMessage): void {
+    this.active = false;
+    this.loadSmiley();
+    this.drawBuffer((p) => {
+      this.caller.sendSessionMidi(p);
+    })
+  }
+
+  active = false;
+  interval: number;
+
+  loadSmiley() {
+    for (let i = 0; i < 64; i++) {
+      const b = this.data.at(i);
+      if (b) {
+        const color = this.active ? 66 : b;
+        console.log(color);
+        this.setI(i, {
+          "color": color,
+          "lightMode": LightMode.Normal
+        })
+      } else {
+        this.setI(i, null);
+      }
+    }
+  }
+
+  constructor(caller: Launchpad) {
+    super(caller);
+    this.loadSmiley()
+
+    this.interval = setInterval(() => {
+      this.active = !this.active;
+      this.loadSmiley();
+      this.drawBuffer((p) => {
+        this.caller.sendSessionMidi(p);
+      });
+    }, 500)
+  }
+}
+
 class DemoSessionSurface extends Surface {
+  override onClose(): void {
+
+  }
   override onMatrixPressed(msg: MidiMessage): void {
     this.drawBuffer((msg) => {
       this.caller.sendSessionMidi(msg);
@@ -60,7 +127,7 @@ class DemoSessionSurface extends Surface {
 
 const launchpad = new Launchpad();
 launchpad.switchToDawMode();
-launchpad.loadSessionSurface(new DemoSessionSurface(launchpad));
+launchpad.loadSessionSurface(new SmileySurface(launchpad));
 
 //switch to session view
 launchpad.switchInbuiltLayout(0, 0);
