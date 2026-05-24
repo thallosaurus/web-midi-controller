@@ -12,7 +12,6 @@ export interface Pixel {
     lightMode: LightMode
 }
 
-
 export enum BUTTON_DEF {
     LeftArrow = 91,
     RightArrow = 92,
@@ -58,8 +57,8 @@ export enum BUTTON_DEF {
     PrintToClip = 19,
 }
 
-export abstract class Surface {
-    static LAUNCHPAD_PROGRAMMER_MAP = [
+function LaunchpadProMap() {
+    return [
         81, 82, 83, 84, 85, 86, 87, 88,
         71, 72, 73, 74, 75, 76, 77, 78,
         61, 62, 63, 64, 65, 66, 67, 68,
@@ -68,25 +67,38 @@ export abstract class Surface {
         31, 32, 33, 34, 35, 36, 37, 38,
         21, 22, 23, 24, 25, 26, 27, 28,
         11, 12, 13, 14, 15, 16, 17, 18
-    ];
+    ]
+}
+
+export abstract class Surface {
+    /*static LAUNCHPAD_PROGRAMMER_MAP = [
+        81, 82, 83, 84, 85, 86, 87, 88,
+        71, 72, 73, 74, 75, 76, 77, 78,
+        61, 62, 63, 64, 65, 66, 67, 68,
+        51, 52, 53, 54, 55, 56, 57, 58,
+        41, 42, 43, 44, 45, 46, 47, 48,
+        31, 32, 33, 34, 35, 36, 37, 38,
+        21, 22, 23, 24, 25, 26, 27, 28,
+        11, 12, 13, 14, 15, 16, 17, 18
+    ];*/
 
     private pixels = new Map<number, Pixel>();
     private controlpixels = new Map<BUTTON_DEF, Pixel>();
 
     private notes() {
-        return Surface.LAUNCHPAD_PROGRAMMER_MAP.map((value, index) => [value, index])
+        return LaunchpadProMap().map((value, index) => [value, index])
     }
 
     private map() {
-        return Surface.LAUNCHPAD_PROGRAMMER_MAP.map((value, index) => [value, this.pixels.get(index)!])
+        return LaunchpadProMap().map((value, index) => [value, this.pixels.get(index)!])
     }
 
     get notes_() {
-        return new Map<number, number>(Surface.LAUNCHPAD_PROGRAMMER_MAP.map((value, index) => [value, index]));
+        return new Map<number, number>(LaunchpadProMap().map((value, index) => [value, index]));
     }
 
     get map_() {
-        return new Map<number, Pixel>(Surface.LAUNCHPAD_PROGRAMMER_MAP.map((value, index) => [value, this.pixels.get(index)!]));
+        return new Map<number, Pixel>(LaunchpadProMap().map((value, index) => [value, this.pixels.get(index)!]));
     }
 
     protected caller: Launchpad;
@@ -106,13 +118,17 @@ export abstract class Surface {
         if (pixel !== null) {
 
             this.pixels.set(i, pixel);
-            console.debug(this.pixels);
+            //console.debug(this.pixels);
         } else {
             this.pixels.delete(i);
-            console.debug(this.pixels);
+            //console.debug(this.pixels);
         }
 
         //const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
+    }
+
+    loadMatrix(pixels: Map<number, Pixel>) {
+        this.pixels = pixels;
     }
 
     clearMatrix() {
@@ -132,6 +148,7 @@ export abstract class Surface {
     }
 
     public drawBuffer(sender: (msg: MidiMessage) => void) {
+        console.debug("redraw requested")
 
         //console.log(this.pixels);
         //console.log(this.controlpixels);
@@ -146,14 +163,14 @@ export abstract class Surface {
                 //for (const [i, pixel] of this.pixels) {
                 sender({
                     type: "NoteOn",
-                    note: Surface.LAUNCHPAD_PROGRAMMER_MAP[i],
+                    note: LaunchpadProMap()[i],
                     channel: pixel.lightMode,
                     velocity: pixel.color
                 })
             } else {
                 sender({
                     type: "NoteOff",
-                    note: Surface.LAUNCHPAD_PROGRAMMER_MAP[i],
+                    note: LaunchpadProMap()[i],
                     channel: 1,
                     velocity: 0
                 })
@@ -185,7 +202,7 @@ export abstract class Surface {
 
     clear(sender: (msg: MidiMessage) => void) {
         //this.pixels.clear();
-        for (const note of Surface.LAUNCHPAD_PROGRAMMER_MAP) {
+        for (const note of LaunchpadProMap()) {
             /*this.caller.sendMidi({
                 type: "NoteOff",
                 note: note,

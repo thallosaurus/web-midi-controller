@@ -101,6 +101,16 @@ export class Launchpad {
 
             console.log("current launchpad mode", cmd, sub);
 
+            switch (cmd) {
+                case 0:
+                this.sessionSurface?.drawBuffer((msg) => {
+                    this.sendSessionMidi(msg);
+                });
+                break;
+
+                default:
+                    return false;
+            }
             // if launchpad switched to session mode
             if (cmd == 0) {
                 this.sessionSurface?.drawBuffer((msg) => {
@@ -121,11 +131,6 @@ export class Launchpad {
     }
 
     switchInbuiltLayout(layout: number, page: number) {
-        /*this.control.sendMidi({
-            type: "SysEx",
-            data: [...NOVATION_SYSEX_HEADER, 0x00, layout, index, 0x00, 0xF7]
-        });*/
-
         this.sendNovationMessage([0x00, layout, page, 0x00])
     }
 
@@ -134,11 +139,6 @@ export class Launchpad {
     }
 
     switchToLiveMode() {
-        /*this.control.sendMidi({
-            type: "SysEx",
-            data: [...NOVATION_SYSEX_HEADER, 0x0E, 0x00, 0xF7]
-        });*/
-
         this.sendNovationMessage([0x0E, 0x00])
     }
 
@@ -150,27 +150,10 @@ export class Launchpad {
     }
 
     switchToDawMode() {
-        /*this.control.sendMidi({
-            type: "SysEx",
-            data: [...NOVATION_SYSEX_HEADER, 0x10, 0x01, 0xF7]
-        })*/
-
         this.sendNovationMessage([0x10, 0x01])
     }
 
-    /*setFader(bank: FaderBank, orientation: FaderOrientation, fader: Fader) {
-        this.control.sendMidi({
-            type: "SysEx",
-            data: [...NOVATION_SYSEX_HEADER, 0x01, bank, orientation, fader.index, fader.type, fader.controlchange, fader.color]
-        })
-    }*/
-
     switchToStandaloneMode() {
-        /*this.control.sendMidi({
-            type: "SysEx",
-            data: [...NOVATION_SYSEX_HEADER, 0x10, 0x00, 0xF7]
-        })*/
-
         this.sendNovationMessage([0x10, 0x00])
     }
 
@@ -187,10 +170,6 @@ export class Launchpad {
         });
         this.sessionSurface = surface;
     }
-    /*loadSurface(surface: Surface) {
-        if (this.surface) this.surface.clear();
-        this.surface = surface;
-    }*/
 
     sendMidi(msg: MidiMessage) {
         this.midi.sendMidi(msg)
