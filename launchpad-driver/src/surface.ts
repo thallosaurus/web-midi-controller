@@ -9,7 +9,8 @@ export enum LightMode {
 
 export interface Pixel {
     color: number,
-    lightMode: LightMode
+    lightMode: LightMode,
+    //    onTap?: (msg: MidiMessage) => void
 }
 
 export enum BUTTON_DEF {
@@ -83,7 +84,12 @@ export abstract class Surface {
     ];*/
 
     private pixels = new Map<number, Pixel>();
+    private pixelsCallback = new Map<number, (pressed: boolean, msg: MidiMessage) => void>();
+
     private controlpixels = new Map<BUTTON_DEF, Pixel>();
+
+    public controlpixelsActions = new Map<BUTTON_DEF, (msg: MidiMessage) => void>();
+    protected caller: Launchpad;
 
     private notes() {
         return LaunchpadProMap().map((value, index) => [value, index])
@@ -100,8 +106,6 @@ export abstract class Surface {
     get map_() {
         return new Map<number, Pixel>(LaunchpadProMap().map((value, index) => [value, this.pixels.get(index)!]));
     }
-
-    protected caller: Launchpad;
 
     constructor(caller: Launchpad) {
         this.caller = caller;
@@ -124,7 +128,26 @@ export abstract class Surface {
             //console.debug(this.pixels);
         }
 
+
+
         //const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
+    }
+
+    setMatrixCallbackXY(x: number, y: number, onTap: ((pressed: boolean, msg: MidiMessage) => void) | null) {
+        const i = (y * 8) + x;
+        if (i >= 0 && i < 64) {
+            this.setMatrixCallbackI(i, onTap);
+        } else return;
+    }
+
+    setMatrixCallbackI(i: number, onTap: ((pressed: boolean, msg: MidiMessage) => void) | null) {
+        if (onTap) {
+            if (onTap !== null) {
+                this.pixelsCallback.set(i, onTap);
+            } else {
+                this.pixelsCallback.delete(i);
+            }
+        }
     }
 
     loadMatrix(pixels: Map<number, Pixel>) {
@@ -133,6 +156,7 @@ export abstract class Surface {
 
     clearMatrix() {
         this.pixels.clear();
+        //this.pixelsCallback.delete();
     }
 
     clearControlButtons() {
@@ -147,9 +171,13 @@ export abstract class Surface {
         }
     }
 
-    public drawBuffer(sender: (msg: MidiMessage) => void) {
-        console.debug("redraw requested")
+    public drawBufferToSession() {
+        this.drawBuffer((p) => {
+            this.caller.sendSessionMidi(p);
+        })
+    }
 
+    private drawBuffer(sender: (msg: MidiMessage) => void) {
         //console.log(this.pixels);
         //console.log(this.controlpixels);
         this.clear(sender);
@@ -227,7 +255,7 @@ export abstract class Surface {
                 this.onMatrixReleased(msg);
                 break;
             case "ControlChange":
-                if (msg.value > 0) {
+                if (msg.value > 64) {
                     console.log("pressed", BUTTON_DEF[msg.cc])
                 } else {
                     console.log("released", BUTTON_DEF[msg.cc])
@@ -237,12 +265,10 @@ export abstract class Surface {
     }
 
     close() {
-
         this.onClose();
     }
 
     abstract onMatrixPressed(msg: MidiMessage): void;
     abstract onMatrixReleased(msg: MidiMessage): void;
-
     abstract onClose(): void;
 }

@@ -57,7 +57,7 @@ export class Launchpad {
         // events from the outer control buttons
         this.control.emitter.addEventListener("data", (ev) => {
             const evt = ev as CustomEvent;
-            
+
             // process sysex message
             if (!this.processSysexMessage(evt.detail)) {
                 //was not a sysex message
@@ -103,19 +103,15 @@ export class Launchpad {
 
             switch (cmd) {
                 case 0:
-                this.sessionSurface?.drawBuffer((msg) => {
-                    this.sendSessionMidi(msg);
-                });
-                break;
+                    this.sessionSurface?.drawBufferToSession();
+                    break;
 
                 default:
                     return false;
             }
             // if launchpad switched to session mode
             if (cmd == 0) {
-                this.sessionSurface?.drawBuffer((msg) => {
-                    this.sendSessionMidi(msg);
-                });
+                this.sessionSurface?.drawBufferToSession();
             }
             return true;
         }
@@ -175,7 +171,7 @@ export class Launchpad {
     sendMidi(msg: MidiMessage) {
         this.midi.sendMidi(msg)
     }
-    
+
     sendSessionMidi(msg: MidiMessage) {
         this.control.sendMidi(msg)
     }

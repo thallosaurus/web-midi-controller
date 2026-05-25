@@ -29,3 +29,6 @@ Deno.addSignalListener("SIGINT", () => {
   setTimeout(() => Deno.exit(), 1000);
 });
 ```
+
+### Using virtual ports
+Using Virtual MIDI Ports on Windows is unfortunately not possible

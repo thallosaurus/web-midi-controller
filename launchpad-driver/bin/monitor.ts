@@ -5,7 +5,7 @@ import { BUTTON_DEF, LightMode, Surface } from "../src/surface.ts";
 
 class SmileySurface extends Surface {
   override onClose(): void {
-    clearInterval(this.interval)
+    //clearInterval(this.interval)
   }
   data = [
     0, 0, 0, 0, 0, 0, 0, 0,
@@ -17,31 +17,21 @@ class SmileySurface extends Surface {
     0, 0, 120, 120, 120, 120, 0, 0,
   ]
   override onMatrixPressed(msg: MidiMessage): void {
-    this.active = true;
-    this.loadSmiley();
-    this.drawBuffer((p) => {
-      this.caller.sendSessionMidi(p);
-    })
 
   }
 
   override onMatrixReleased(msg: MidiMessage): void {
-    this.active = false;
-    this.loadSmiley();
-    this.drawBuffer((p) => {
-      this.caller.sendSessionMidi(p);
-    })
+
   }
 
   active = false;
-  interval: number;
+  //interval: number;
 
   loadSmiley() {
     for (let i = 0; i < 64; i++) {
       const b = this.data.at(i);
       if (b) {
         const color = this.active ? 66 : b;
-        console.log(color);
         this.setI(i, {
           "color": color,
           "lightMode": LightMode.Normal
@@ -54,15 +44,21 @@ class SmileySurface extends Surface {
 
   constructor(caller: Launchpad) {
     super(caller);
-    this.loadSmiley()
+    /*this.loadSmiley()
 
     this.interval = setInterval(() => {
       this.active = !this.active;
       this.loadSmiley();
-      this.drawBuffer((p) => {
-        this.caller.sendSessionMidi(p);
-      });
-    }, 500)
+      this.drawBufferToSession();
+    }, 500)*/
+
+    this.setXY(0, 0, {
+      "color": 120,
+      "lightMode": LightMode.Normal
+    })
+    this.setMatrixCallbackXY(0, 0, ((msg) => {
+      console.log("tap");
+    }));
   }
 }
 
@@ -71,9 +67,7 @@ class DemoSessionSurface extends Surface {
 
   }
   override onMatrixPressed(msg: MidiMessage): void {
-    this.drawBuffer((msg) => {
-      this.caller.sendSessionMidi(msg);
-    });
+
   }
   override onMatrixReleased(msg: MidiMessage): void {
     //throw new Error("Method not implemented.");
