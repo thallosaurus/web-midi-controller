@@ -5,9 +5,6 @@ import { LaunchpadProMap, LightMode, Surface } from "../src/surface.ts";
 import { BUTTON_DEF } from "../src/controls.ts";
 
 class SmileySurface extends Surface {
-
-
-
   static getData(col: number) {
     return [
       0, 0, 0, 0, 0, 0, 0, 0,
@@ -46,7 +43,6 @@ class SmileySurface extends Surface {
       //console.log("shift", p ? "pressed" : "released");
       this.currentColor = p ? 69 : 66;
       this.loadMatrixPattern(SmileySurface.getData(this.currentColor));
-
     })
     
     for (let x = 0; x < 8; x++) {
@@ -110,17 +106,6 @@ class TestSurface extends Surface {
     this.setControlMapping(BUTTON_DEF.Volume, (pressed, cc) => {
       console.log(pressed, cc);
     })
-
-    /*     this.events.addEventListener("matrix", (ev) => {
-          const evt = ev as CustomEvent;
-          console.log(evt.detail);
-        }) */
-
-    /*this.events.addEventListener("controls", (ev) => {
-      const evt = ev as CustomEvent;
-
-
-    })*/
   }
 }
 
@@ -132,13 +117,6 @@ launchpad.switchToDawMode();
 
 //switch to session view
 launchpad.switchInbuiltLayout(0, 0);
-
-/*const driver = new MidiDriver({
-    //pollBytes: true,
-    useVirtual: false,
-    inputName: "Launchpad Pro MK3 LPProMK3 MIDI",
-    outputName: "Launchpad Pro MK3 LPProMK3 MIDI"
-});*/
 
 
 Deno.addSignalListener("SIGINT", () => {

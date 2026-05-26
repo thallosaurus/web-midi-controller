@@ -179,7 +179,7 @@ export abstract class Surface {
         this.matrixManager.setXYColor(x, y, pixel);
     }
 
-    deleteMatrixColorXY(x: number, y: number, pixel: Pixel) {
+    deleteMatrixColorXY(x: number, y: number) {
         this.matrixManager.setXYColor(x, y, {
             "color": 0,
             lightMode: LightMode.Normal

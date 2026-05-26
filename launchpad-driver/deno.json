@@ -2,6 +2,7 @@
   "tasks": {
     "dev": "deno run --watch -A main.ts",
     "launchpad_monitor": "RUST_LOG=info LIBRARY=../midi-driver/target/debug/libmidi_driver.dylib deno run -A bin/monitor.ts",
+    "traktor": "RUST_LOG=info LIBRARY=../midi-driver/target/debug/libmidi_driver.dylib deno run -A bin/traktor.ts",
     "launchpad_monitor_debug": "RUST_LOG=debug LIBRARY=../midi-driver/target/debug/libmidi_driver.dylib deno run -A bin/monitor.ts",
     "docs": "mkdir -p ./dist && deno run -A npm:tsuml2 --glob ./src/**/*.ts --outMermaidDsl ./dist/uml.mermaid.dsl -o ./dist/uml.svg"
   },
