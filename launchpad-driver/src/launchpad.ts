@@ -1,6 +1,7 @@
 import { MidiDriver, type MidiMessage } from "@driver-deno";
-import { Surface } from "./surface.ts";
-import { BUTTON_DEF, LaunchpadControlButtons } from "./controls.ts";
+import { LaunchpadProMap, LightMode, Surface } from "./surface.ts";
+import { ControlButtons } from "./controls.ts";
+//import { BUTTON_DEF, LaunchpadControlButtons } from "./controls.ts";
 
 export const NOVATION_SYSEX_HEADER = [0xF0, 0x00, 0x20, 0x29, 0x02, 0x0E];
 
@@ -28,6 +29,16 @@ export interface Fader {
     color: number
 }*/
 
+export enum LaunchpadSurfaceStore {
+    Session,
+    Custom
+}
+
+interface LaunchpadHandler {
+    onMidiMessage: (msg: MidiMessage) => void;
+    draw: () => void
+}
+
 export class Launchpad {
     private control = new MidiDriver({
         inputName: "Launchpad Pro MK3 LPProMK3 DAW",
@@ -42,46 +53,19 @@ export class Launchpad {
     })
 
     //private surface: Surface | null = null;
-    private sessionSurface: Surface | null = null;
-
-    //private controlButtons: LaunchpadControlButtons = new LaunchpadControlButtons(this);
+    private surface: Surface | null = null;
+    private surfaceStorage: LaunchpadSurfaceStore | null = null
 
     constructor() {
         this.control.ignore(["TimingClock", "Unknown"])
-        this.midi.ignore(["TimingClock", "Unknown", "ChannelPressure"])
+        this.midi.ignore(["TimingClock", "Unknown"])
         MidiDriver.initLogging();
 
         //this.controlButtons.setButtonState(BUTTON_DEF.LED, 64)
 
 
         // events from the outer control buttons
-        this.control.emitter.addEventListener("data", (ev) => {
-            const evt = ev as CustomEvent;
 
-            // process sysex message
-            if (!this.processSysexMessage(evt.detail)) {
-                //was not a sysex message
-                console.log("DAW", evt.detail)
-                this.sessionSurface?.onMidiMessage(evt.detail)
-            }
-
-            /*this.controlButtons.onInput(evt.detail);
-            if (this.sessionSurface) {
-                this.sessionSurface.onInput(evt.detail);
-            }*/
-        })
-
-        // events of the 8x8 matrix
-        this.midi.emitter.addEventListener("data", (ev) => {
-            //switch ((ev as CustomEvent).detail)
-            const evt = ev as CustomEvent;
-            console.log(evt.detail)
-            /*this.controlButtons.onInput(evt.detail);
-
-            if (this.surface) {
-                this.surface.onInput(evt.detail);
-            }*/
-        });
     }
 
     processSysexMessage(msg: MidiMessage) {
@@ -103,7 +87,8 @@ export class Launchpad {
 
             switch (cmd) {
                 case 0:
-                    this.sessionSurface?.drawBufferToSession();
+                    this.drawToLaunchpad(LaunchpadSurfaceStore.Session);
+                    //this.surface?.drawBufferToSession();
                     break;
 
                 default:
@@ -111,18 +96,18 @@ export class Launchpad {
             }
             // if launchpad switched to session mode
             if (cmd == 0) {
-                this.sessionSurface?.drawBufferToSession();
+                this.drawToLaunchpad(LaunchpadSurfaceStore.Session);
+                //this.surface?.drawBufferToSession();
             }
             return true;
         }
         return false
     }
 
-
     close() {
         //this.surface?.clear();
         //this.sessionSurface?.clear();
-        this.sessionSurface?.close();
+        this.surface?.close();
         this.midi.close();
         this.control.close();
     }
@@ -161,18 +146,104 @@ export class Launchpad {
         })
     }
 
-    loadSessionSurface(surface: Surface) {
-        if (this.sessionSurface) this.sessionSurface.clear((msg) => {
-            this.sendSessionMidi(msg);
-        });
-        this.sessionSurface = surface;
+    private clearLaunchpad(store: LaunchpadSurfaceStore) {
+        //this.pixels.clear();
+        for (const note of LaunchpadProMap()) {
+            /*this.caller.sendMidi({
+                type: "NoteOff",
+                note: note,
+                velocity: 0,
+                channel: 1
+            })*/
+            const dest = store == LaunchpadSurfaceStore.Session ? this.control : this.midi
+            dest.sendMidi({
+                type: "NoteOff",
+                note: note,
+                velocity: 0,
+                channel: 1
+            })
+        }
     }
 
-    sendMidi(msg: MidiMessage) {
-        this.midi.sendMidi(msg)
+    drawToLaunchpad(store: LaunchpadSurfaceStore) {
+
+        const dest = store == LaunchpadSurfaceStore.Session ? this.control : this.midi
+        const buffer = this.surface?.renderState();
+        console.log("digga", buffer);
+
+        for (const [v, i] of buffer?.matrix!) {
+            this.sendMidi(dest, {
+                type: "NoteOn",
+                channel: LightMode.Normal,
+                note: v,
+                velocity: i
+            })
+        }
+    }
+
+    loadSurface(store: LaunchpadSurfaceStore, surface: Surface) {
+        this.clearLaunchpad(LaunchpadSurfaceStore.Session);
+        this.clearLaunchpad(LaunchpadSurfaceStore.Custom);
+        switch (store) {
+            case LaunchpadSurfaceStore.Session:
+
+                this.control.emitter.addEventListener("data", (ev) => {
+                    const evt = ev as CustomEvent;
+
+                    console.log("DAW")
+                    // process sysex message
+                    if (!this.processSysexMessage(evt.detail)) {
+                        //was not a sysex message
+                        //console.log("DAW", evt.detail)
+                        this.surface?.processInput(evt.detail)
+                    }
+
+                    /*this.controlButtons.onInput(evt.detail);
+                    if (this.sessionSurface) {
+                        this.sessionSurface.onInput(evt.detail);
+                        }*/
+                })
+                break;
+
+            case LaunchpadSurfaceStore.Custom:
+                this.midi.emitter.addEventListener("data", (ev) => {
+                    //switch ((ev as CustomEvent).detail)
+                    const evt = ev as CustomEvent;
+                    console.log(evt.detail)
+                    this.surface?.processInput(evt.detail)
+                });
+                break;
+        }
+
+        this.surface = surface;
+        this.surfaceStorage = store;
+    }
+
+    sendMidi(destination: MidiDriver, msg: MidiMessage) {
+        //this.midi.sendMidi(msg)
+
+        destination.sendMidi(msg);
     }
 
     sendSessionMidi(msg: MidiMessage) {
         this.control.sendMidi(msg)
+    }
+
+    clear(sender: (msg: MidiMessage) => void) {
+        //this.pixels.clear();
+        for (const note of LaunchpadProMap()) {
+            /*this.caller.sendMidi({
+                type: "NoteOff",
+                note: note,
+                velocity: 0,
+                channel: 1
+            })*/
+            sender({
+                type: "NoteOff",
+                note: note,
+                velocity: 0,
+                channel: 1
+            })
+        }
     }
 }

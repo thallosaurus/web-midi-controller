@@ -1,7 +1,7 @@
 import { Cipheriv } from "node:crypto";
 import { MidiMessage } from "../../midi-driver/deno_mod.ts";
-import { Launchpad } from "../src/launchpad.ts";
-import { BUTTON_DEF, LightMode, Surface } from "../src/surface.ts";
+import { Launchpad, LaunchpadSurfaceStore } from "../src/launchpad.ts";
+import { LightMode, Surface } from "../src/surface.ts";
 
 class SmileySurface extends Surface {
   override onClose(): void {
@@ -16,13 +16,6 @@ class SmileySurface extends Surface {
     0, 120, 120, 0, 0, 120, 120, 0,
     0, 0, 120, 120, 120, 120, 0, 0,
   ]
-  override onMatrixPressed(msg: MidiMessage): void {
-
-  }
-
-  override onMatrixReleased(msg: MidiMessage): void {
-
-  }
 
   active = false;
   //interval: number;
@@ -32,19 +25,32 @@ class SmileySurface extends Surface {
       const b = this.data.at(i);
       if (b) {
         const color = this.active ? 66 : b;
-        this.setI(i, {
+        this.matrixManager.setIColor(i, {
           "color": color,
           "lightMode": LightMode.Normal
         })
       } else {
-        this.setI(i, null);
+        this.matrixManager.setIColor(i, null);
       }
     }
   }
 
   constructor(caller: Launchpad) {
     super(caller);
-    /*this.loadSmiley()
+    this.loadSmiley()
+
+    this.events.addEventListener("matrix", (ev) => {
+      const evt = ev as CustomEvent;
+
+      console.log("matrix event", evt.detail);
+      this.caller.drawToLaunchpad(LaunchpadSurfaceStore.Session);
+    })
+    this.events.addEventListener("controls", (ev) => {
+      const evt = ev as CustomEvent;
+
+      console.log("controls event", evt.detail);
+    })
+    /*
 
     this.interval = setInterval(() => {
       this.active = !this.active;
@@ -52,76 +58,23 @@ class SmileySurface extends Surface {
       this.drawBufferToSession();
     }, 500)*/
 
-    this.setXY(0, 0, {
+    /*this.setXYColor(0, 0, {
       "color": 120,
       "lightMode": LightMode.Normal
-    })
-    this.setMatrixCallbackXY(0, 0, ((msg) => {
+    })*/
+    /*this.setMatrixCallbackXY(0, 0, ((msg) => {
       console.log("tap");
-    }));
-  }
-}
+    }));*/
 
-class DemoSessionSurface extends Surface {
-  override onClose(): void {
-
-  }
-  override onMatrixPressed(msg: MidiMessage): void {
-
-  }
-  override onMatrixReleased(msg: MidiMessage): void {
-    //throw new Error("Method not implemented.");
-  }
-
-  constructor(caller: Launchpad) {
-    super(caller)
-
-    this.setXY(0, 0, {
-      "color": 110,
-      "lightMode": LightMode.Normal
-    })
-    this.setXY(1, 1, {
-      "color": 111,
-      "lightMode": LightMode.Normal
-    })
-    this.setXY(2, 2, {
-      "color": 112,
-      "lightMode": LightMode.Normal
-    })
-    this.setXY(3, 3, {
-      "color": 113,
-      "lightMode": LightMode.Normal
-    })
-    this.setXY(4, 4, {
-      "color": 114,
-      "lightMode": LightMode.Normal
-    })
-    this.setXY(5, 5, {
-      "color": 115,
-      "lightMode": LightMode.Normal
-    })
-    this.setXY(6, 6, {
-      "color": 116,
-      "lightMode": LightMode.Normal
-    })
-    this.setXY(7, 7, {
-      "color": 117,
-      "lightMode": LightMode.Normal
-    })
-
-    /*setInterval(() => {
-      this.drawBuffer((msg) => {
-        this.caller.sendSessionMidi(msg);
-      });
-    }, 100);*/
-
-
+    /*this.controlpixelsActions.set(BUTTON_DEF.RecArm, (msg) => {
+      console.log("test", msg);
+    })*/
   }
 }
 
 const launchpad = new Launchpad();
+launchpad.loadSurface(LaunchpadSurfaceStore.Session, new SmileySurface(launchpad));
 launchpad.switchToDawMode();
-launchpad.loadSessionSurface(new SmileySurface(launchpad));
 
 //switch to session view
 launchpad.switchInbuiltLayout(0, 0);

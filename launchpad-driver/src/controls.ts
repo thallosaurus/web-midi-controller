@@ -1,9 +1,7 @@
 import { type MidiMessage } from "@driver";
 import { Launchpad } from "./launchpad.ts";
+import { Pixel } from "./surface.ts";
 
-/**
- * @deprecated
- */
 export enum BUTTON_DEF {
     LeftArrow = 91,
     RightArrow = 92,
@@ -50,91 +48,29 @@ export enum BUTTON_DEF {
 }
 
 
-export abstract class ControlButtons {
+export class ControlButtons {
     static LP_PRO_CC_MAP = new Map<number, keyof typeof BUTTON_DEF>(
         Object.entries(BUTTON_DEF)
             .filter(([key]) => !isNaN(Number(key)))
             .map(([key, value]) => [Number(key), value as keyof typeof BUTTON_DEF])
     );
 
-    state = new Map<number, number>(
+    private _state = new Map<number, number>(
         Object.entries(BUTTON_DEF)
             .filter(([key]) => !isNaN(Number(key)))
             .map(([key]) => [Number(key), 0])
     )
 
-    get reverse() {
-        return new Map<number, string>(
-            Object.entries(BUTTON_DEF)
-                .filter(([key]) => !isNaN(Number(key)))
-                .map(([key, value]) => [Number(key), value as string])
-        )
+    colorState = new Map<BUTTON_DEF, Pixel>();
+
+    public get renderState() {
+        return Array.from(this.colorState.entries())
     }
 
-    private caller: Launchpad;
-
-    constructor(caller: Launchpad) {
-        this.caller = caller;
-    }
-
-    setButtonState(button: BUTTON_DEF, value: number) {
-        this.setCCState(button, value);
-    }
-
-    private setCCState(cc: number, value: number) {
-        this.state.set(cc, value);
-        console.log(this.reverse.get(cc) + ": " + this.state.get(cc));
-
-        this.caller.sendMidi({
-            type: "ControlChange",
-            cc: cc,
-            value: value,
-            channel: 1
-        })
-    }
-
-    /*onInput(msg: MidiMessage) {
-        switch (msg.type) {
-            case "ControlChange":
-                {
-                    //this.setCCState(msg.cc, msg.value);
-                }
-                break;
-        }
-    }*/
-
-    processMidiMessage(msg: MidiMessage) {
-        switch (msg.type) {
-            case "ControlChange":
-                {
-                    let r = this.reverse.get(msg.cc);
-                    console.log(r);
-                    return r;
-                }
-
-            default:
-                break;
-        }
-    }
-}
-
-export class LaunchpadControlButtons extends ControlButtons {
-
-    constructor(caller: Launchpad) {
-        super(caller);
-    }
-
-    onInput(msg: MidiMessage) {
-        switch (msg.type) {
-            case "ControlChange":
-                {
-                    //this.setCCState(msg.cc, msg.value);
-                    console.log("launchpad control buttons", msg);
-                    return true;
-                }
-        }
-
-        return false;
+    processValueChange(cc: number, value: number, events: EventTarget) {
+        this._state.set(cc, value);
+        events.dispatchEvent(new CustomEvent("controls", { detail: { pressed: value > 64, state: this._state.get(cc) }}))
+        //console.log(BUTTON_DEF[cc] + ": " + this.state.get(cc));
     }
 }
 
