@@ -76,9 +76,7 @@ class Deck {
     surface: TraktorSurface
 
     state = new Map<number, number>(Object.values(DeckActions).filter((v, i) => !isNaN(Number(v))).map((v, i) => {
-        return [
-            Number(v), 0
-        ]
+        return [Number(v), 0]
     }));
 
     constructor(channel: number, surface: TraktorSurface) {
