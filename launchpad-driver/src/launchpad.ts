@@ -5,38 +5,9 @@ import { ControlButtons } from "./controls.ts";
 
 export const NOVATION_SYSEX_HEADER = [0xF0, 0x00, 0x20, 0x29, 0x02, 0x0E];
 
-/*export enum FaderOrientation {
-    Vertical = 0,
-    Horizontal = 1
-}
-
-export enum FaderBank {
-    Volumes = 0,
-    Pans = 1,
-    Sends = 2,
-    Devices = 3
-}
-
-export enum FaderType {
-    Unipolar = 0,
-    Bipolar = 1
-}
-
-export interface Fader {
-    index: number,
-    type: FaderType,
-    controlchange: number,
-    color: number
-}*/
-
 export enum LaunchpadSurfaceStore {
     Session,
     Custom
-}
-
-interface LaunchpadHandler {
-    onMidiMessage: (msg: MidiMessage) => void;
-    draw: () => void
 }
 
 export class Launchpad {
@@ -60,12 +31,6 @@ export class Launchpad {
         this.control.ignore(["TimingClock", "Unknown"])
         this.midi.ignore(["TimingClock", "Unknown"])
         MidiDriver.initLogging();
-
-        //this.controlButtons.setButtonState(BUTTON_DEF.LED, 64)
-
-
-        // events from the outer control buttons
-
     }
 
     processSysexMessage(msg: MidiMessage) {
@@ -166,10 +131,9 @@ export class Launchpad {
     }
 
     drawToLaunchpad(store: LaunchpadSurfaceStore) {
-
         const dest = store == LaunchpadSurfaceStore.Session ? this.control : this.midi
         const buffer = this.surface?.renderState();
-        console.log("digga", buffer);
+        //console.log("digga", buffer);
 
         for (const [v, i] of buffer?.matrix!) {
             this.sendMidi(dest, {
@@ -184,13 +148,16 @@ export class Launchpad {
     loadSurface(store: LaunchpadSurfaceStore, surface: Surface) {
         this.clearLaunchpad(LaunchpadSurfaceStore.Session);
         this.clearLaunchpad(LaunchpadSurfaceStore.Custom);
+        surface.setRedraw(() => {
+            this.drawToLaunchpad(this.surfaceStorage!);
+        })
         switch (store) {
             case LaunchpadSurfaceStore.Session:
 
                 this.control.emitter.addEventListener("data", (ev) => {
                     const evt = ev as CustomEvent;
 
-                    console.log("DAW")
+                    //console.log("DAW", evt.detail)
                     // process sysex message
                     if (!this.processSysexMessage(evt.detail)) {
                         //was not a sysex message
@@ -223,10 +190,6 @@ export class Launchpad {
         //this.midi.sendMidi(msg)
 
         destination.sendMidi(msg);
-    }
-
-    sendSessionMidi(msg: MidiMessage) {
-        this.control.sendMidi(msg)
     }
 
     clear(sender: (msg: MidiMessage) => void) {

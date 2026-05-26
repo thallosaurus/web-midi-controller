@@ -49,6 +49,9 @@ export enum BUTTON_DEF {
 
 
 export class ControlButtons {
+    /**
+     * @deprecated
+     */
     static LP_PRO_CC_MAP = new Map<number, keyof typeof BUTTON_DEF>(
         Object.entries(BUTTON_DEF)
             .filter(([key]) => !isNaN(Number(key)))
@@ -69,7 +72,7 @@ export class ControlButtons {
 
     processValueChange(cc: number, value: number, events: EventTarget) {
         this._state.set(cc, value);
-        events.dispatchEvent(new CustomEvent("controls", { detail: { pressed: value > 64, state: this._state.get(cc) }}))
+        events.dispatchEvent(new CustomEvent("controls", { detail: { pressed: value > 64, cc: cc, state: this._state.get(cc) } }))
         //console.log(BUTTON_DEF[cc] + ": " + this.state.get(cc));
     }
 }

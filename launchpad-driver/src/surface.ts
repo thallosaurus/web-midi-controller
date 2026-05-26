@@ -1,6 +1,6 @@
 import { MidiMessage } from "@driver";
 import { Launchpad } from "./launchpad.ts";
-import { ControlButtons } from "./controls.ts";
+import { BUTTON_DEF, ControlButtons } from "./controls.ts";
 import { mkdtempSync } from "node:fs";
 import { MidiDriver } from "@driver-deno";
 import { threadId } from "node:worker_threads";
@@ -55,23 +55,31 @@ class MatrixManager {
         }))
     }
 
-    setXYColor(x: number, y: number, pixel: Pixel | null) {
+    setXYColor(x: number, y: number, pixel: Pixel) {
         const i = (y * 8) + x;
         if (i >= 0 && i < 64) {
             this.setIColor(i, pixel);
         } else return;
     }
 
-    setIColor(i: number, pixel: Pixel | null) {
-        if (pixel !== null) {
-
-            this.pixels.set(i, pixel);
-            //console.debug(this.pixels);
-        } else {
-            this.pixels.delete(i);
-            //console.debug(this.pixels);
-        }
+    setIColor(i: number, pixel: Pixel) {
+        //console.debug("setting", i, "to", pixel)
+        this.pixels.set(LaunchpadProMap().at(i)!, pixel);
+        //console.debug(this.pixels);
         //const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
+    }
+
+    setPattern(data: number[]) {
+        for (let i = 0; i < 64; i++) {
+            const b = data.at(i);
+            if (b) {
+                //const color = this.active ? 66 : b;
+                this.setIColor(i, {
+                    "color": b,
+                    "lightMode": LightMode.Normal
+                })
+            }
+        }
     }
 
     processValue(note: number, velocity: number) {
@@ -119,150 +127,78 @@ export abstract class Surface {
     public controlButtons = new ControlButtons();
     public matrixManager = new MatrixManager();
 
+    controlMapping = new Map<number, (pressed: boolean, cc: number) => void>()
+    matrixMapping = new Map<number, (pressed: boolean, note: number, velocity: number) => void>()
+
     public renderState() {
         return {
             matrix: this.matrixManager.renderState,
             controls: this.controlButtons.renderState
         }
     }
+
+    redraw: (() => void) | null = null
     //    private controlpixels = new Map<BUTTON_DEF, Pixel>();
 
     /*    public controlpixelsActions = new Map<number, (msg: MidiMessage) => void>();*/
-    protected caller: Launchpad;
+    //protected caller: Launchpad;
 
-    constructor(caller: Launchpad) {
-        this.caller = caller;
+    constructor() {
+        //this.caller = caller;
 
-        this.matrixManager.setIColor(81, {
-            "color": 127,
-            "lightMode": LightMode.Normal
+        this.events.addEventListener("controls", (ev) => {
+            const evt = ev as CustomEvent;
+            const b = this.controlMapping.get(evt.detail.cc);
+            if (b) b(evt.detail.state > 64, evt.detail.cc);
+            if (this.redraw) this.redraw();
+        })
+
+        this.events.addEventListener("matrix", (ev) => {
+            const evt = ev as CustomEvent;
+            const b = this.matrixMapping.get(evt.detail.note);
+            if (b) b(evt.detail.pressed, evt.detail.note, evt.detail.velocity)
+            if (this.redraw) this.redraw();
         })
     }
 
-
-
-    /*setMatrixCallbackXY(x: number, y: number, onTap: ((pressed: boolean, msg: MidiMessage) => void) | null) {
-        const i = (y * 8) + x;
-        if (i >= 0 && i < 64) {
-            this.setMatrixCallbackI(i, onTap);
-        } else return;
+    /**
+     * Gets typically set by Launchpad Class
+     * @param cb 
+     */
+    setRedraw(cb: () => void) {
+        this.redraw = cb;
     }
 
-    setMatrixCallbackI(i: number, onTap: ((pressed: boolean, msg: MidiMessage) => void) | null) {
-        if (onTap) {
-            if (onTap !== null) {
-                this.pixelsCallback.set(i, onTap);
-            } else {
-                this.pixelsCallback.delete(i);
-            }
-        }
-    }*/
+    setMatrixMappingXY(x: number, y: number, cb: (pressed: boolean, note: number, velocity: number) => void) {
+        const i = (y * 8) + x;
 
-    loadMatrix(pixels: Map<number, Pixel>) {
-        //this.pixels = pixels;
+        this.matrixMapping.set(i, cb);
+    }
+
+    setMatrixColorXY(x: number, y: number, pixel: Pixel) {
+        this.matrixManager.setXYColor(x, y, pixel);
+    }
+
+    deleteMatrixColorXY(x: number, y: number, pixel: Pixel) {
+        this.matrixManager.setXYColor(x, y, {
+            "color": 0,
+            lightMode: LightMode.Normal
+        });
+    }
+
+    loadMatrixPattern(pat: number[]) {
+        //console.log("loading", pat)
+        this.matrixManager.setPattern(pat);
+        if (this.redraw) this.redraw();
+    }
+
+    setControlMapping(button: BUTTON_DEF, cb: (pressed: boolean, cc: number) => void) {
+        this.controlMapping.set(button, cb);
     }
 
     clearMatrix() {
         this.matrixManager.clear();
         //this.pixelsCallback.delete();
-    }
-
-    /*clearControlButtons() {
-        this.controlpixels.clear();
-    }*/
-
-    /*setControlButton(i: BUTTON_DEF, pixel: Pixel | null) {
-        if (pixel !== null) {
-            this.controlpixels.set(i, pixel);
-        } else {
-            this.controlpixels.delete(i);
-        }
-    }*/
-
-    public drawBufferToSession() {
-        this.drawBuffer((p) => {
-            this.caller.sendSessionMidi(p);
-        })
-    }
-
-    private drawBuffer(sender: (msg: MidiMessage) => void) {
-        //console.log(this.pixels);
-        //console.log(this.controlpixels);
-        //this.clearMatrix();
-
-        const buf = this.renderState();
-
-        for (const p in buf.matrix) {
-            console.log(p);
-        }
-        // matrix
-        /*for (let i = 0; i < 8 * 8; i++) {
-
-            const pixel = this.pixels.get(i);
-            if (pixel) {
-                //console.log("drawing", Surface.LAUNCHPAD_PROGRAMMER_MAP[i], pixel)
-
-                //for (const [i, pixel] of this.pixels) {
-                sender({
-                    type: "NoteOn",
-                    note: LaunchpadProMap()[i],
-                    channel: pixel.lightMode,
-                    velocity: pixel.color
-                })
-            } else {
-                sender({
-                    type: "NoteOff",
-                    note: LaunchpadProMap()[i],
-                    channel: 1,
-                    velocity: 0
-                })
-
-            }
-        }*/
-        /*for (const [midi, pixel] of this.controlButtons.getCCFrameBuffer()) {
-
-            //const pixel = this.controlpixels.get(k as BUTTON_DEF);
-            //console.log(k, pixel);
-            if (pixel) {
-                sender({
-                    type: "ControlChange",
-                    cc: Number(midi),
-                    channel: pixel.lightMode,
-                    value: pixel.color
-                })
-            } else {
-                sender({
-                    type: "ControlChange",
-                    cc: Number(midi),
-                    channel: 1,
-                    value: 0
-                })
-            }
-        }*/
-        //controlbuttons
-        //for 
-    }
-
-    /**
-     * @deprecated
-     * @param sender
-     */
-    clear(sender: (msg: MidiMessage) => void) {
-        //this.pixels.clear();
-        for (const note of LaunchpadProMap()) {
-            /*this.caller.sendMidi({
-                type: "NoteOff",
-                note: note,
-                velocity: 0,
-                channel: 1
-            })*/
-            sender({
-                type: "NoteOff",
-                note: note,
-                velocity: 0,
-                channel: 1
-            })
-        }
     }
 
     processInput(msg: MidiMessage) {
@@ -271,7 +207,7 @@ export abstract class Surface {
             case "NoteOn":
                 //this.onMatrixPressed(msg);
                 this.matrixManager.processValue(msg.note, msg.velocity);
-                this.events.dispatchEvent(new CustomEvent("matrix", { detail: { pressed: msg.type == "NoteOn", state: this.matrixManager.pixels.get(msg.note) } }))
+                this.events.dispatchEvent(new CustomEvent("matrix", { detail: { pressed: msg.type == "NoteOn", note: LaunchpadProMap().findIndex((v) => v == msg.note), velocity: msg.velocity } }))
                 break;
             case "ControlChange":
                 this.controlButtons.processValueChange(msg.cc, msg.value, this.events)
@@ -280,6 +216,9 @@ export abstract class Surface {
     }
 
     close() {
+        this.clearMatrix();
+        this.controlMapping.clear();
+        this.matrixMapping.clear();
         this.onClose();
     }
 
