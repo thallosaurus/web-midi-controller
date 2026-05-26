@@ -43,7 +43,7 @@ class SmileySurface extends Surface {
     this.loadMatrixPattern(SmileySurface.getData(this.active ? 120 : 66));
 
     this.setControlMapping(BUTTON_DEF.Shift, (p, cc) => {
-      console.log("shift", p ? "pressed" : "released");
+      //console.log("shift", p ? "pressed" : "released");
       this.currentColor = p ? 69 : 66;
       this.loadMatrixPattern(SmileySurface.getData(this.currentColor));
 
