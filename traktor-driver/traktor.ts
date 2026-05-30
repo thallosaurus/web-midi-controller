@@ -1,7 +1,7 @@
 import { channel } from "node:diagnostics_channel";
-import { MidiDriver } from "../../midi-driver/ffi.ts";
-import { Launchpad, LaunchpadSurfaceStore } from "../src/launchpad.ts";
-import { LightMode, Pixel, Surface } from "../src/surface.ts";
+import { MidiDriver } from "../midi-driver/ffi.ts";
+import { Launchpad, LaunchpadSurfaceStore } from "../launchpad-driver/src/launchpad.ts";
+import { LightMode, Pixel, Surface } from "../launchpad-driver/src/surface.ts";
 import { MidiMessage } from "@driver-deno";
 
 const PlayColor = 64
@@ -10,6 +10,9 @@ const BkwdFwdColor = 28
 const KillColor = 106
 const CueColor = 56
 const LoopColor = 67
+
+const LoopCC = 2
+const VolumeCC = 0
 
 enum DeckActions {
     PlayPause = 1,
@@ -37,7 +40,8 @@ class DeckButton {
     action: DeckActions
     color: number
 
-    constructor(action: DeckActions, color: number) {
+    constructor(
+        action: DeckActions, color: number) {
         this.action = action;
         this.color = color;
     }
@@ -60,6 +64,9 @@ const Loop8Button = new DeckButton(DeckActions.Loop8, LoopColor)
 const Loop16Button = new DeckButton(DeckActions.Loop16, LoopColor)
 const Loop32Button = new DeckButton(DeckActions.Loop32, LoopColor)
 
+/**
+ * Assignment for the Actions per Deck
+ */
 const MAP: DeckButton[][] = [
     [],
     [],
@@ -74,10 +81,6 @@ const MAP: DeckButton[][] = [
 class Deck {
     channel: number
     surface: TraktorSurface
-
-    state = new Map<number, number>(Object.values(DeckActions).filter((v, i) => !isNaN(Number(v))).map((v, i) => {
-        return [Number(v), 0]
-    }));
 
     constructor(channel: number, surface: TraktorSurface) {
         this.channel = channel;
@@ -145,7 +148,7 @@ class Deck {
 
     processTraktorInput(note: number, velocity: number) {
         console.log("setting", note, "to", velocity)
-        this.state.set(note, velocity);
+        //this.state.set(note, velocity);
         this.updateMatrix();
         //console.log(this.state);
         //this.surface.redraw!();
@@ -156,23 +159,104 @@ class Deck {
             for (let x = 0; x < MAP[y].length; x++) {
                 const { action, color } = MAP[y][x]
 
-                const inState = this.state.get(action)!;
+                //const inState = this.state.get(action)!;
 
-                if (inState > 0) {
+                //if (inState > 0) {
 
-                    this.setMatrixDeckXY(x, y, {
-                        color: inState,
-                        lightMode: LightMode.Normal
-                    }, action)
-                } else {
+                this.setMatrixDeckXY(x, y, {
+                    color: color,
+                    lightMode: LightMode.Normal
+                }, action)
+                /*} else {
                     this.setMatrixDeckXY(x, y, {
                         color: color,
                         lightMode: LightMode.Normal
                     }, action)
 
-                }
+                }*/
             }
         }
+    }
+}
+
+enum LoopStates {
+    NoLoop = -1,
+    Loop16th = 22,
+    Loop8th = 33,
+    Loop4th = 44,
+    Loop2nd = 55,
+    Loop1 = 66,
+    Loop2 = 77,
+    Loop4 = 88,
+    Loop8 = 99,
+    Loop16 = 110,
+    Loop32 = 121,
+}
+
+class TraktorState {
+    /*state = new Map<number, number>(Object.values(DeckActions).filter((v, i) => !isNaN(Number(v))).map((v, i) => {
+        return [Number(v), 0]
+    }));*/
+    currentLoop = LoopStates.NoLoop
+    playing = false
+    volume = 0
+
+    //loopState: LoopStates
+
+    private traktorport: MidiDriver
+
+    private events = new EventTarget();
+    private channel: number;
+
+    get addEventListener() {
+        return this.events.addEventListener
+    }
+
+    constructor(channel: number, port: MidiDriver) {
+        this.traktorport = port;
+        this.channel = channel;
+
+        this.traktorport.emitter.addEventListener("data", (ev) => {
+            const evt = ev as CustomEvent;
+            console.log(evt);
+
+            if (evt.detail.channel === this.channel) {
+                
+            }
+
+            //this.decks[evt.detail.channel - 1].processTraktorInput(evt.detail.note, evt.detail.velocity);
+        })
+    }
+
+    set loop (loop: LoopStates) {
+        this.currentLoop = loop;
+
+        if (loop !== LoopStates.NoLoop) {
+            this.traktorport.sendMidi({
+                type: "ControlChange",
+                "cc": LoopCC,
+                "value": loop,
+                "channel": this.channel
+            })
+        } else {
+            //TODO implement turn off
+        }
+        this.sendUpdate();
+    }
+
+    set play (state: boolean) {
+        this.playing = state;
+        this.traktorport.sendMidi({
+            "type": 
+        })
+        this.sendUpdate();
+    }
+
+    private sendUpdateToTraktor() {
+        //this.traktorport.
+    }
+    private sendUpdate() {
+        this.events.dispatchEvent(new CustomEvent("update", { detail: this.state }));
     }
 }
 
@@ -195,6 +279,7 @@ class TraktorSurface extends Surface {
     constructor() {
         super();
 
+        // events that get sent on the traktor port
         this.traktorOutput.emitter.addEventListener("data", (ev) => {
             const evt = ev as CustomEvent;
 
