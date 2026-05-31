@@ -168,9 +168,6 @@ export class MidiDriver {
   }
 
   constructor(options: MidiDriverOptions) {
-    //if (MidiDriver.dylib) throw new Error("midi driver is already loaded");
-
-
     const virt = Deno.build.os == "windows" ? false : options.useVirtual
 
     const encoder = new TextEncoder();
@@ -184,9 +181,25 @@ export class MidiDriver {
     this.pollLoop();
   }
 
+  /**
+   * global channel listener
+   * listens to all channels
+   */
   get addEventListener() {
     return (ev: EventListener) => {
       this.emitter.addEventListener("data", ev);
+    }
+  }
+
+  /**
+   * listens to specific channel
+   */
+  get addEventListenerChannel() {
+    return (channel: number, listener: (event: CustomEvent<MidiMessage>) => void) => {
+      this.emitter.addEventListener("data", (origEv) => {
+        const ee = origEv as CustomEvent;
+        if (ee.detail.channel === channel) listener(ee);
+      })
     }
   }
 

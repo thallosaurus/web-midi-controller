@@ -1,34 +1,16 @@
 import { LightMode, Pixel, Surface } from "../launchpad-driver/src/surface.ts";
 import { MidiDriver } from "@driver-deno";
 import { DeckActionsCC, DeckActionsMidi, TraktorState } from "./state.ts";
+import { Button, DECK_MAP } from "./button.ts";
 
-
-const PlayColor = 64
-const SyncColor = 61
-const BkwdFwdColor = 28
-const KillColor = 106
-const CueColor = 56
-const LoopColor = 67
-
-class DeckButton {
-    action: DeckActionsMidi | DeckActionsCC
-    color: number
-
-    constructor(
-        action: DeckActionsMidi | DeckActionsCC, color: number) {
-        this.action = action;
-        this.color = color;
-    }
-}
-
-const PlayButton = new DeckButton(DeckActionsMidi.PlayPause, PlayColor);
+/*const PlayButton = new DeckButton(DeckActionsMidi.PlayPause, PlayColor);
 const SyncButton = new DeckButton(DeckActionsMidi.Sync, SyncColor);
 const BkwdButton = new DeckButton(DeckActionsMidi.Bkwd, BkwdFwdColor);
 const FwdButton = new DeckButton(DeckActionsMidi.Fwd, BkwdFwdColor);
 const LowKillButton = new DeckButton(DeckActionsMidi.LowKill, KillColor)
 const MidKillButton = new DeckButton(DeckActionsMidi.MidKill, KillColor)
 const HiKillButton = new DeckButton(DeckActionsMidi.HiKill, KillColor)
-const CueButton = new DeckButton(DeckActionsMidi.MixerCue, CueColor)
+const CueButton = new DeckButton(DeckActionsMidi.MixerCue, CueColor)*/
 /*const Loop4thButton = new DeckButton(DeckActions.Loop4th, LoopColor)
 const Loop2ndButton = new DeckButton(DeckActions.Loop2nd, LoopColor)
 const Loop1Button = new DeckButton(DeckActions.Loop1, LoopColor)
@@ -38,19 +20,6 @@ const Loop8Button = new DeckButton(DeckActions.Loop8, LoopColor)
 const Loop16Button = new DeckButton(DeckActions.Loop16, LoopColor)
 const Loop32Button = new DeckButton(DeckActions.Loop32, LoopColor)*/
 
-const MAP: DeckButton[][] = [
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    //    [Loop4thButton, Loop2ndButton, Loop1Button, Loop2Button],
-    //    [Loop4Button, Loop8Button, Loop16Button, Loop32Button],
-    [LowKillButton, MidKillButton, HiKillButton, CueButton],
-    [PlayButton, SyncButton, BkwdButton, FwdButton]
-]
-
 class Deck {
     channel: number
     surface: TraktorSurface
@@ -59,43 +28,48 @@ class Deck {
     constructor(channel: number, surface: TraktorSurface) {
         this.channel = channel;
         this.surface = surface;
-        this.state = surface.traktorState;
+        //this.state = surface.traktorState;
+        this.state = new TraktorState(this.channel, surface.traktorDriver)
 
+        //this.state.addStateListener("volume", (ev) => console.log("volume triggered"))
+        this.state.addCCStateListener(DeckActionsCC.Volume, (val) => console.log("volume triggered", val))
+        this.state.addNoteStateListener(DeckActionsMidi.PlayPause, (val) => console.log("playpause triggered", val))
         this.setMatrixMappings()
     }
 
-    private setMatrixDeckXY(x: number, y: number, p: Pixel, action: DeckActions) {
+    private setMatrixDeckXY(x: number, y: number, b: Button) {
         if (x > 4 || x < 0) throw new Error("out of bounds");
-        const offset = this.channel * 4;
+        const offset = (this.channel - 1) * 4;
+        const p = b.pixel;
         this.surface.setMatrixColorXY(offset + x, y, p)
         this.surface.setMatrixMappingXY(offset + x, y, (pp) => {
-            this.sendAction(action, pp);
+            //this.sendAction(action, pp);
+            //b.onInput(this.state, pp)
+            b.handler(b, this.state, pp);
         })
     }
 
-    updateMatrixDeckColorXY(x: number, y: number, color: number) {
+    /*updateMatrixDeckColorXY(x: number, y: number, color: number) {
         if (x > 4 || x < 0) throw new Error("out of bounds");
         this.surface.setMatrixColorXY(x, y, {
             color,
             lightMode: LightMode.Normal
         })
-    }
+    }*/
 
     private setMatrixMappings() {
-        for (let y = 0; y < MAP.length; y++) {
-            for (let x = 0; x < MAP[y].length; x++) {
-                const { action, color } = MAP[y][x]
+        for (let y = 0; y < DECK_MAP.length; y++) {
+            for (let x = 0; x < DECK_MAP[y].length; x++) {
+                //const { action, pixel } = DECK_MAP[y][x]
+                const btn = DECK_MAP[y][x];
 
-                this.setMatrixDeckXY(x, y, {
-                    color: color,
-                    lightMode: LightMode.Normal
-                }, action)
+                this.setMatrixDeckXY(x, y, btn /* action */)
             }
         }
     }
 
     private sendNoteOff(note: number) {
-        this.surface.sendMidiOut({
+        this.surface.traktorDriver.sendMidi({
             type: "NoteOff",
             channel: (this.channel + 1),
             note: note,
@@ -104,7 +78,7 @@ class Deck {
     }
 
     private sendNoteOn(note: number) {
-        this.surface.sendMidiOut({
+        this.surface.traktorDriver.sendMidi({
             type: "NoteOn",
             channel: (this.channel + 1),
             note: note,
@@ -112,14 +86,14 @@ class Deck {
         })
     }
 
-    sendAction(action: DeckActions, p: boolean) {
+    /*sendAction(action: DeckActions, p: boolean) {
         console.log("sending action", DeckActions[action], action, p ? "pressed" : "released")
         if (p) {
             this.sendNoteOn(action)
         } else {
             this.sendNoteOff(action)
         }
-    }
+    }*/
 
     processTraktorInput(note: number, velocity: number) {
         console.log("setting", note, "to", velocity)
@@ -130,18 +104,16 @@ class Deck {
     }
 
     updateMatrix() {
-        for (let y = 0; y < MAP.length; y++) {
-            for (let x = 0; x < MAP[y].length; x++) {
-                const { action, color } = MAP[y][x]
+        for (let y = 0; y < DECK_MAP.length; y++) {
+            for (let x = 0; x < DECK_MAP[y].length; x++) {
+                //const { action, color } = DECK_MAP[y][x]
+                const btn = DECK_MAP[y][x];
 
                 //const inState = this.state.get(action)!;
 
                 //if (inState > 0) {
 
-                this.setMatrixDeckXY(x, y, {
-                    color: color,
-                    lightMode: LightMode.Normal
-                }, action)
+                this.setMatrixDeckXY(x, y, btn);
                 /*} else {
                     this.setMatrixDeckXY(x, y, {
                         color: color,
@@ -159,12 +131,9 @@ export class TraktorSurface extends Surface {
         //throw new Error("Method not implemented.");
     }
 
-    traktorState: TraktorState;
+    //traktorState: TraktorState;
 
-    decks = [
-        new Deck(0, this),
-        new Deck(1, this)
-    ];
+    decks: Deck[]
 
     traktorDriver = new MidiDriver({
         "inputName": "test virtual input",
@@ -175,7 +144,12 @@ export class TraktorSurface extends Surface {
     constructor() {
         super();
 
-        this.traktorState = new TraktorState(1, this.traktorDriver)
+        this.decks = [
+            new Deck(1, this),
+            new Deck(2, this)
+        ];
+
+        //        this.traktorState = new TraktorState(1, this.traktorDriver)
 
         // events that get sent on the traktor port
         /*        this.traktorOutput.emitter.addEventListener("data", (ev) => {

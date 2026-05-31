@@ -105,6 +105,17 @@ class MatrixManager {
     //load()
 }
 
+interface MatrixEvent {
+    pressed: boolean,
+    note: number,
+    velocity: number
+}
+
+interface ControlEvent {
+    cc: number,
+    state: number
+}
+
 export abstract class Surface {
     /*static LAUNCHPAD_PROGRAMMER_MAP = [
         81, 82, 83, 84, 85, 86, 87, 88,
@@ -146,14 +157,18 @@ export abstract class Surface {
     //protected caller: Launchpad;
 
     get addControlListener() {
-        return (ev: EventListener) => {
-            this.events.addEventListener("controls", ev)
+        return (listener: (event: CustomEvent<ControlEvent>) => void) => {
+            this.events.addEventListener("controls", (ev) => {
+                listener(ev as CustomEvent<ControlEvent>)
+            })
         }
     }
 
     get addMatrixListener() {
-        return (ev: EventListener) => {
-            this.events.addEventListener("matrix", ev);
+        return (listener: (event: CustomEvent<MatrixEvent>) => void) => {
+            this.events.addEventListener("matrix", (ev) => {
+                listener(ev as CustomEvent<MatrixEvent>)
+            });
         }
     }
 
@@ -161,17 +176,15 @@ export abstract class Surface {
         //this.caller = caller;
         this.width = width;
 
-        this.addControlListener((ev) => {
-            const evt = ev as CustomEvent;
+        this.addControlListener((evt) => {
             const b = this.controlMapping.get(evt.detail.cc);
             if (b) b(evt.detail.state > 64, evt.detail.cc);
             if (this.redraw) this.redraw();
         })
 
         this.addMatrixListener((ev) => {
-            const evt = ev as CustomEvent;
-            const b = this.matrixMapping.get(evt.detail.note);
-            if (b) b(evt.detail.pressed, evt.detail.note, evt.detail.velocity)
+            const b = this.matrixMapping.get(ev.detail.note);
+            if (b) b(ev.detail.pressed, ev.detail.note, ev.detail.velocity)
             if (this.redraw) this.redraw();
         })
     }

@@ -52,15 +52,20 @@ export class TraktorState {
         return [Number(v), 0]
     }));*/
 
-    state = new Map<string, number>([
+    notestate = new Map<string, number>([
         ["mixercue", 0],
         ["loop", 0],
-        ["volume", 0],
         ["playing", 0],
+        ["sync", 0],
         ["hikill", 0],
         ["midkill", 0],
         ["lowkill", 0],
     ]);
+    
+    ccstate = new Map<string, number>([
+        ["volume", 0],
+    ]);
+
     currentLoop = LoopStates.NoLoop
 
     //loopState: LoopStates
@@ -71,25 +76,42 @@ export class TraktorState {
     private channel: number;
 
     get addEventListener() {
-        return ((listener: EventListener) => {
-            return this.events.addEventListener("update", listener);
+        return ((listener: (event: CustomEvent<Map<string, number>>) => void) => {
+            return this.events.addEventListener("update", (ev) => {
+                listener(ev as CustomEvent)
+            });
         })
     }
 
+    get addCCStateListener() {
+        return (key: DeckActionsCC, listener: (value: number) => void) => {
+            return this.events.addEventListener(DeckActionsCC[key], (ev) => {
+                listener((ev as CustomEvent).detail)
+            })
+        }
+    }
+
+    get addNoteStateListener() {
+        return (key: DeckActionsMidi, listener: (value: number) => void) => {
+            return this.events.addEventListener(DeckActionsMidi[key], (ev) => {
+                listener((ev as CustomEvent).detail)
+            })
+        }
+    }
+
     constructor(channel: number, port: MidiDriver) {
-        this.traktorport = port;
         this.channel = channel;
 
-        this.traktorport.addEventListener((ev) => {
+        port.addEventListener((ev) => {
             const evt = ev as CustomEvent;
             if (evt.detail.channel !== this.channel) return;
-            console.log("------")
+            //console.log("------")
 
             switch (evt.detail.type) {
                 case "NoteOn":
                 case "NoteOff":
                     {
-                        console.log(evt.detail, DeckActionsMidi[evt.detail.note]);
+                        console.log("Traktor Input", evt.detail, DeckActionsMidi[evt.detail.note]);
                         this.processMidi(evt.detail);
                     }
                     break;
@@ -97,14 +119,17 @@ export class TraktorState {
                 case "ControlChange":
                     {
                         //   console.log(DeckActionsCC[evt.detail.cc])
-                        console.log(evt.detail, DeckActionsCC[evt.detail.cc]);
+                        //console.log(evt.detail, DeckActionsCC[evt.detail.cc]);
+                        console.log("Traktor Input", evt.detail, DeckActionsCC[evt.detail.cc]);
                         this.processCC(evt.detail);
                     }
                     break;
             }
             //this.decks[evt.detail.channel - 1].processTraktorInput(evt.detail.note, evt.detail.velocity);
-            this.sendUpdate();
+            this.sendGlobalUpdate();
         })
+
+        this.traktorport = port;
     }
 
     forward() {
@@ -120,17 +145,28 @@ export class TraktorState {
             case DeckActionsCC.Volume:
                 {
                     //this.volume = evt.detail.value
-                    this.state.set("volume", msg.value);
+                    //this.state.set("volume", msg.value);
+                    this.setCCState(msg.cc, msg.value);
                 }
                 break;
 
             case DeckActionsCC.LoopSetSelect:
                 {
                     //this.
-                    this.state.set("loop", msg.value)
+                    this.setCCState(msg.cc, msg.value);
                 }
                 break;
         }
+    }
+
+    private setNoteState(key: DeckActionsMidi, value: number) {
+        this.notestate.set(DeckActionsMidi[key], value)
+        this.events.dispatchEvent(new CustomEvent(DeckActionsMidi[key], { detail: value }))
+    }
+
+    private setCCState(key: DeckActionsCC, value: number) {
+        this.ccstate.set(DeckActionsCC[key], value)
+        this.events.dispatchEvent(new CustomEvent(DeckActionsCC[key], { detail: value }))
     }
 
     private processMidi(msg: { note: DeckActionsMidi, velocity: number }) {
@@ -138,30 +174,36 @@ export class TraktorState {
         switch (msg.note) {
             case DeckActionsMidi.PlayPause:
                 //this.playing = evt.detail.velocity > 64;
-                this.state.set("playing", msg.velocity)
+                //this.state.set("playing", msg.velocity)
+                this.setNoteState(DeckActionsMidi.PlayPause, msg.velocity)
                 break;
 
             case DeckActionsMidi.LowKill:
                 //this._lowkill = evt.detail.velocity > 64;
-                this.state.set("lowkill", msg.velocity);
+                //this.state.set("lowkill", msg.velocity);
+                this.setNoteState(DeckActionsMidi.LowKill, msg.velocity);
                 break;
 
             case DeckActionsMidi.MidKill:
                 //this._midkill = evt.detail.velocity > 64;
-                this.state.set("midkill", msg.velocity);
+                //this.state.set("midkill", msg.velocity);
+                this.setNoteState(DeckActionsMidi.MidKill, msg.velocity);
                 break;
 
             case DeckActionsMidi.HiKill:
                 //this._hikill = evt.detail.velocity > 64;
-                this.state.set("hikill", msg.velocity);
+                //this.state.set("hikill", msg.velocity);
+                this.setNoteState(DeckActionsMidi.HiKill, msg.velocity);
                 break;
 
             case DeckActionsMidi.Sync:
-                this.state.set("sync", msg.velocity);
+                //this.state.set("sync", msg.velocity);
+                this.setNoteState(DeckActionsMidi.Sync, msg.velocity);
                 break;
 
             case DeckActionsMidi.MixerCue:
-                this.state.set("mixercue", msg.velocity);
+                //this.state.set("mixercue", msg.velocity);
+                this.setNoteState(DeckActionsMidi.MixerCue, msg.velocity);
                 break;
 
             default:
@@ -215,6 +257,10 @@ export class TraktorState {
         this.sendTraktorMidi(DeckActionsMidi.PlayPause, state);
     }
 
+    set sync(state: boolean) {
+        this.sendTraktorMidi(DeckActionsMidi.Sync, state);
+    }
+
     set vol(vol: number) {
         this.sendTraktorCC(VolumeCC, vol)
 
@@ -261,8 +307,8 @@ export class TraktorState {
         }
     }
 
-    private sendUpdate() {
-        this.events.dispatchEvent(new CustomEvent("update", { detail: this.state }));
+    private sendGlobalUpdate() {
+        this.events.dispatchEvent(new CustomEvent("update", { detail: { cc: this.ccstate, note: this.notestate } }));
     }
 }
 
