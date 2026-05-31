@@ -119,6 +119,8 @@ export abstract class Surface {
 
     public events = new EventTarget();
 
+    private width;
+
     /*private colorState = new Map<number, number>(LaunchpadProMap().map((v, i) => {
         return [v, 0]
         }));*/
@@ -143,17 +145,30 @@ export abstract class Surface {
     /*    public controlpixelsActions = new Map<number, (msg: MidiMessage) => void>();*/
     //protected caller: Launchpad;
 
-    constructor() {
-        //this.caller = caller;
+    get addControlListener() {
+        return (ev: EventListener) => {
+            this.events.addEventListener("controls", ev)
+        }
+    }
 
-        this.events.addEventListener("controls", (ev) => {
+    get addMatrixListener() {
+        return (ev: EventListener) => {
+            this.events.addEventListener("matrix", ev);
+        }
+    }
+
+    constructor(width = 8) {
+        //this.caller = caller;
+        this.width = width;
+
+        this.addControlListener((ev) => {
             const evt = ev as CustomEvent;
             const b = this.controlMapping.get(evt.detail.cc);
             if (b) b(evt.detail.state > 64, evt.detail.cc);
             if (this.redraw) this.redraw();
         })
 
-        this.events.addEventListener("matrix", (ev) => {
+        this.addMatrixListener((ev) => {
             const evt = ev as CustomEvent;
             const b = this.matrixMapping.get(evt.detail.note);
             if (b) b(evt.detail.pressed, evt.detail.note, evt.detail.velocity)
@@ -170,7 +185,7 @@ export abstract class Surface {
     }
 
     setMatrixMappingXY(x: number, y: number, cb: (pressed: boolean, note: number, velocity: number) => void) {
-        const i = (y * 8) + x;
+        const i = (y * this.width) + x;
 
         this.matrixMapping.set(i, cb);
     }

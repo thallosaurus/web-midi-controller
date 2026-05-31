@@ -184,6 +184,12 @@ export class MidiDriver {
     this.pollLoop();
   }
 
+  get addEventListener() {
+    return (ev: EventListener) => {
+      this.emitter.addEventListener("data", ev);
+    }
+  }
+
   customEventHandler(ev: Event): void {
     const e = ev as CustomEvent;
     console.log(e.detail);

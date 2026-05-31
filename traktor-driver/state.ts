@@ -6,12 +6,12 @@ import { threadId } from "node:worker_threads";
 const LoopCC = 2
 const VolumeCC = 0
 
-enum DeckActionsCC {
+export enum DeckActionsCC {
     Volume = 0,
     LoopSetSelect = 2
 }
 
-enum DeckActionsMidi {
+export enum DeckActionsMidi {
     PlayPause = 1,
     Sync = 2,
     Fwd = 3,
@@ -63,7 +63,6 @@ export class TraktorState {
     ]);
     currentLoop = LoopStates.NoLoop
 
-
     //loopState: LoopStates
 
     private traktorport: MidiDriver
@@ -81,8 +80,9 @@ export class TraktorState {
         this.traktorport = port;
         this.channel = channel;
 
-        this.traktorport.emitter.addEventListener("data", (ev) => {
+        this.traktorport.addEventListener((ev) => {
             const evt = ev as CustomEvent;
+            if (evt.detail.channel !== this.channel) return;
             console.log("------")
 
             switch (evt.detail.type) {
@@ -224,7 +224,9 @@ export class TraktorState {
     private get triggerMidi() {
         return (action: DeckActionsMidi) => {
             this.sendTraktorMidi(action, true);
-            this.sendTraktorMidi(action, false);
+            setTimeout(() => {
+                this.sendTraktorMidi(action, false);
+            }, 10)
         }
     }
 
