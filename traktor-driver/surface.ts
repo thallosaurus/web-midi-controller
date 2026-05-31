@@ -1,7 +1,7 @@
 import { LightMode, Pixel, Surface } from "../launchpad-driver/src/surface.ts";
 import { MidiDriver } from "@driver-deno";
 import { DeckActionsCC, DeckActionsMidi, TraktorState } from "./state.ts";
-import { Button, DECK_MAP } from "./button.ts";
+import { Button, DeckMap } from "./button.ts";
 
 /*const PlayButton = new DeckButton(DeckActionsMidi.PlayPause, PlayColor);
 const SyncButton = new DeckButton(DeckActionsMidi.Sync, SyncColor);
@@ -25,6 +25,8 @@ class Deck {
     surface: TraktorSurface
     state: TraktorState
 
+    mapping: Button[][]=[]
+
     constructor(channel: number, surface: TraktorSurface) {
         this.channel = channel;
         this.surface = surface;
@@ -32,9 +34,9 @@ class Deck {
         this.state = new TraktorState(this.channel, surface.traktorDriver)
 
         //this.state.addStateListener("volume", (ev) => console.log("volume triggered"))
-        this.state.addCCStateListener(DeckActionsCC.Volume, (val) => console.log("volume triggered", val))
-        this.state.addNoteStateListener(DeckActionsMidi.PlayPause, (val) => console.log("playpause triggered", val))
-        this.setMatrixMappings()
+        //this.state.addCCStateListener(DeckActionsCC.Volume, (val) => console.log("volume triggered", val))
+        //this.state.addNoteStateListener(DeckActionsMidi.PlayPause, (val) => console.log("playpause triggered", val))
+        this.setMatrixMappings(DeckMap())
     }
 
     private setMatrixDeckXY(x: number, y: number, b: Button) {
@@ -57,15 +59,16 @@ class Deck {
         })
     }*/
 
-    private setMatrixMappings() {
-        for (let y = 0; y < DECK_MAP.length; y++) {
-            for (let x = 0; x < DECK_MAP[y].length; x++) {
+    private setMatrixMappings(map: Button[][]) {
+        for (let y = 0; y < map.length; y++) {
+            for (let x = 0; x < map[y].length; x++) {
                 //const { action, pixel } = DECK_MAP[y][x]
-                const btn = DECK_MAP[y][x];
+                const btn = map[y][x];
 
                 this.setMatrixDeckXY(x, y, btn /* action */)
             }
         }
+        this.mapping = map
     }
 
     /*sendAction(action: DeckActions, p: boolean) {
@@ -86,10 +89,10 @@ class Deck {
     }
 
     updateMatrix() {
-        for (let y = 0; y < DECK_MAP.length; y++) {
-            for (let x = 0; x < DECK_MAP[y].length; x++) {
+        for (let y = 0; y < this.mapping.length; y++) {
+            for (let x = 0; x < this.mapping[y].length; x++) {
                 //const { action, color } = DECK_MAP[y][x]
-                const btn = DECK_MAP[y][x];
+                const btn = this.mapping[y][x];
 
                 //const inState = this.state.get(action)!;
 

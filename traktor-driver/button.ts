@@ -12,38 +12,36 @@ const LoopColor = 67
 
 type OnInputHandler = (button: Button, state: TraktorState, inputState: boolean) => void;
 
-export class Button {
+export abstract class Button {
     pixel: Pixel
     action: number
-    handler: OnInputHandler
+    //handler: OnInputHandler
 
     lastState: boolean = false;
 
-    constructor(action: number, color: number, onInput: OnInputHandler) {
+    constructor(action: number, color: number) {
         //this.color = color;
         this.pixel = {
             color,
             lightMode: LightMode.Normal
         }
         this.action = action;
-        this.handler = onInput;
+        //this.handler = onInput;
     }
+
+    abstract handler(button: Button, state: TraktorState, inputState: boolean): void;
 }
 
-const PlayButton = new Button(DeckActionsMidi.PlayPause, PlayColor, (btn: Button, state: TraktorState, input: boolean) => {
-    console.log(btn, input)
-    if (btn.lastState != input) {
-        
+export class NoteButton extends Button {
+    override handler(button: Button, state: TraktorState, inputState: boolean): void {
+        state.sendTraktorMidi(this.action, inputState)
+        this.pixel.color = inputState ? 127 : PlayColor
     }
-    state.play = input;
 
-    //btn.pixel.color = input ? 127 : 0
-});
-
-const SyncButton = new Button(DeckActionsMidi.Sync, SyncColor, (b, s, i) => {
-    console.log(b, s, i)
-    s.sync = i
-})
+    constructor(action: DeckActionsMidi, color: number) {
+        super(action, color)
+    }
+}
 
 /*export const SyncButton = new MidiButton(DeckActionsMidi.Sync, SyncColor);
 export const BkwdButton = new MidiButton(DeckActionsMidi.Bkwd, BkwdFwdColor);
@@ -66,6 +64,19 @@ export const DECK_MAP_: Button[][] = [
     [PlayButton, SyncButton, BkwdButton, FwdButton]
 ]
 */
+
+export function DeckMap() {
+    return [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [new NoteButton(DeckActionsMidi.PlayPause, PlayColor), new NoteButton(DeckActionsMidi.Sync, SyncColor)],
+    ]
+}
 export const DECK_MAP: Button[][] = [
     [],
     [],
@@ -74,5 +85,5 @@ export const DECK_MAP: Button[][] = [
     [],
     [],
     [],
-    [PlayButton, SyncButton],
+    [new NoteButton(DeckActionsMidi.PlayPause, PlayColor), new NoteButton(DeckActionsMidi.Sync, SyncColor)],
 ];

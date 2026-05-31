@@ -61,7 +61,7 @@ export class TraktorState {
         ["midkill", 0],
         ["lowkill", 0],
     ]);
-    
+
     ccstate = new Map<string, number>([
         ["volume", 0],
     ]);
@@ -104,7 +104,7 @@ export class TraktorState {
 
         port.addEventListenerChannel(channel, (ev) => {
             const evt = ev as CustomEvent;
-            if (evt.detail.channel !== this.channel) return;
+            //if (evt.detail.channel !== this.channel) return;
             //console.log("------")
 
             switch (evt.detail.type) {
@@ -276,34 +276,31 @@ export class TraktorState {
         }
     }
 
-    private get sendTraktorCC() {
-        return (cc: DeckActionsCC, value: number) => {
-            return this.traktorport.sendMidi({
-                type: "ControlChange",
-                cc,
-                value,
-                channel: this.channel
-            })
-        }
+    sendTraktorCC(cc: DeckActionsCC, value: number) {
+        return this.traktorport.sendMidi({
+            type: "ControlChange",
+            cc,
+            value,
+            channel: this.channel
+        })
+
     }
 
-    private get sendTraktorMidi() {
-        return (note: DeckActionsMidi, value: boolean) => {
-            if (value) {
-                return this.traktorport.sendMidi({
-                    type: "NoteOn",
-                    note,
-                    velocity: 127,
-                    channel: this.channel
-                })
-            } else {
-                return this.traktorport.sendMidi({
-                    type: "NoteOff",
-                    note,
-                    velocity: 0,
-                    channel: this.channel
-                })
-            }
+    sendTraktorMidi(note: DeckActionsMidi, value: boolean) {
+        if (value) {
+            return this.traktorport.sendMidi({
+                type: "NoteOn",
+                note,
+                velocity: 127,
+                channel: this.channel
+            })
+        } else {
+            return this.traktorport.sendMidi({
+                type: "NoteOff",
+                note,
+                velocity: 0,
+                channel: this.channel
+            })
         }
     }
 
