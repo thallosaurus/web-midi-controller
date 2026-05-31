@@ -102,7 +102,7 @@ export class TraktorState {
     constructor(channel: number, port: MidiDriver) {
         this.channel = channel;
 
-        port.addEventListener((ev) => {
+        port.addEventListenerChannel(channel, (ev) => {
             const evt = ev as CustomEvent;
             if (evt.detail.channel !== this.channel) return;
             //console.log("------")
