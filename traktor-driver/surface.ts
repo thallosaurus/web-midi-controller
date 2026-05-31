@@ -80,13 +80,13 @@ class Deck {
         }
     }*/
 
-    processTraktorInput(note: number, velocity: number) {
+    /*processTraktorInput(note: number, velocity: number) {
         console.log("setting", note, "to", velocity)
         //this.state.set(note, velocity);
         this.updateMatrix();
         //console.log(this.state);
         //this.surface.redraw!();
-    }
+    }*/
 
     updateMatrix() {
         for (let y = 0; y < this.mapping.length; y++) {

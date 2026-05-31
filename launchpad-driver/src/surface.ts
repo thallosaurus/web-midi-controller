@@ -13,6 +13,8 @@ export enum LightMode {
 
 export interface Pixel {
     color: number,
+    colorOff: number,
+    colorOn: number,
     lightMode: LightMode,
     //    onTap?: (msg: MidiMessage) => void
 }
@@ -39,6 +41,8 @@ class MatrixManager {
         this.pixels = new Map<number, Pixel>(LaunchpadProMap().map((v) => {
             return [v, {
                 "color": 0,
+                "colorOn": 0,
+                "colorOff": 0,
                 "lightMode": LightMode.Normal
             }]
         }))
@@ -76,6 +80,8 @@ class MatrixManager {
                 //const color = this.active ? 66 : b;
                 this.setIColor(i, {
                     "color": b,
+                    "colorOn": b,
+                    "colorOff": b,
                     "lightMode": LightMode.Normal
                 })
             }
@@ -210,6 +216,8 @@ export abstract class Surface {
     deleteMatrixColorXY(x: number, y: number) {
         this.matrixManager.setXYColor(x, y, {
             "color": 0,
+            "colorOn": 0,
+            "colorOff": 0,
             lightMode: LightMode.Normal
         });
     }

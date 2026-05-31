@@ -1,5 +1,4 @@
 import { MidiDriver, MidiMessage } from "@driver-deno";
-import { threadId } from "node:worker_threads";
 
 // rename to state.ts if done
 
