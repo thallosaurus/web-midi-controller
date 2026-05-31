@@ -16,6 +16,9 @@ export class Button {
     pixel: Pixel
     action: number
     handler: OnInputHandler
+
+    lastState: boolean = false;
+
     constructor(action: number, color: number, onInput: OnInputHandler) {
         //this.color = color;
         this.pixel = {
@@ -29,7 +32,12 @@ export class Button {
 
 const PlayButton = new Button(DeckActionsMidi.PlayPause, PlayColor, (btn: Button, state: TraktorState, input: boolean) => {
     console.log(btn, input)
+    if (btn.lastState != input) {
+        
+    }
     state.play = input;
+
+    //btn.pixel.color = input ? 127 : 0
 });
 
 const SyncButton = new Button(DeckActionsMidi.Sync, SyncColor, (b, s, i) => {

@@ -68,24 +68,6 @@ class Deck {
         }
     }
 
-    private sendNoteOff(note: number) {
-        this.surface.traktorDriver.sendMidi({
-            type: "NoteOff",
-            channel: (this.channel + 1),
-            note: note,
-            velocity: 0
-        })
-    }
-
-    private sendNoteOn(note: number) {
-        this.surface.traktorDriver.sendMidi({
-            type: "NoteOn",
-            channel: (this.channel + 1),
-            note: note,
-            velocity: 127
-        })
-    }
-
     /*sendAction(action: DeckActions, p: boolean) {
         console.log("sending action", DeckActions[action], action, p ? "pressed" : "released")
         if (p) {
