@@ -186,8 +186,10 @@ export class MidiDriver {
    * listens to all channels
    */
   get addEventListener() {
-    return (ev: EventListener) => {
-      this.emitter.addEventListener("data", ev);
+    return (listener: (event: CustomEvent<MidiMessage>) => void) => {
+      this.emitter.addEventListener("data", (ev) => {
+        listener(ev as CustomEvent)
+      });
     }
   }
 

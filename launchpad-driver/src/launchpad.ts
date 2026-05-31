@@ -10,30 +10,34 @@ export enum LaunchpadSurfaceStore {
     Custom
 }
 
-export class Launchpad {
-    private control = new MidiDriver({
-        inputName: "Launchpad Pro MK3 LPProMK3 DAW",
-        outputName: "Launchpad Pro MK3 LPProMK3 DAW",
-        useVirtual: false
-    })
 
-    private midi = new MidiDriver({
-        inputName: "Launchpad Pro MK3 LPProMK3 MIDI",
-        outputName: "Launchpad Pro MK3 LPProMK3 MIDI",
-        useVirtual: false
-    })
+
+export class Launchpad {
+    private control: MidiDriver;
+    private midi: MidiDriver;
 
     //private surface: Surface | null = null;
     private surface: Surface | null = null;
     private surfaceStorage: LaunchpadSurfaceStore | null = null
 
-    constructor() {
-        this.control.ignore(["TimingClock", "Unknown"])
+    constructor(midi = new MidiDriver({
+        inputName: "Launchpad Pro MK3 LPProMK3 MIDI",
+        outputName: "Launchpad Pro MK3 LPProMK3 MIDI",
+        useVirtual: false
+    }), control = new MidiDriver({
+        inputName: "Launchpad Pro MK3 LPProMK3 DAW",
+        outputName: "Launchpad Pro MK3 LPProMK3 DAW",
+        useVirtual: false
+    })) {
+        this.midi = midi;
         this.midi.ignore(["TimingClock", "Unknown"])
+
+        this.control = control;
+        this.control.ignore(["TimingClock", "Unknown"])
         MidiDriver.initLogging();
     }
 
-    processSysexMessage(msg: MidiMessage) {
+    private processSysexMessage(msg: MidiMessage) {
         if (msg.type == "SysEx") {
             //const set = new Set(msg.data);
             //const diff = set.difference(new Set(NOVATION_SYSEX_HEADER));
@@ -154,8 +158,7 @@ export class Launchpad {
         switch (store) {
             case LaunchpadSurfaceStore.Session:
 
-                this.control.emitter.addEventListener("data", (ev) => {
-                    const evt = ev as CustomEvent;
+                this.control.addEventListener((evt) => {
 
                     //console.log("DAW", evt.detail)
                     // process sysex message
@@ -173,9 +176,8 @@ export class Launchpad {
                 break;
 
             case LaunchpadSurfaceStore.Custom:
-                this.midi.emitter.addEventListener("data", (ev) => {
+                this.midi.addEventListener((evt) => {
                     //switch ((ev as CustomEvent).detail)
-                    const evt = ev as CustomEvent;
                     console.log(evt.detail)
                     this.surface?.processInput(evt.detail)
                 });
@@ -186,13 +188,13 @@ export class Launchpad {
         this.surfaceStorage = store;
     }
 
-    sendMidi(destination: MidiDriver, msg: MidiMessage) {
+    private sendMidi(destination: MidiDriver, msg: MidiMessage) {
         //this.midi.sendMidi(msg)
 
         destination.sendMidi(msg);
     }
 
-    clear(sender: (msg: MidiMessage) => void) {
+    clear(destination: (msg: MidiMessage) => void) {
         //this.pixels.clear();
         for (const note of LaunchpadProMap()) {
             /*this.caller.sendMidi({
@@ -201,7 +203,7 @@ export class Launchpad {
                 velocity: 0,
                 channel: 1
             })*/
-            sender({
+            destination({
                 type: "NoteOff",
                 note: note,
                 velocity: 0,

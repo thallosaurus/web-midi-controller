@@ -32,11 +32,15 @@ class Deck {
         this.surface = surface;
         //this.state = surface.traktorState;
         this.state = new TraktorState(this.channel, surface.traktorDriver)
+        this.setMatrixMappings(DeckMap(this.state))
 
-        //this.state.addStateListener("volume", (ev) => console.log("volume triggered"))
-        //this.state.addCCStateListener(DeckActionsCC.Volume, (val) => console.log("volume triggered", val))
-        //this.state.addNoteStateListener(DeckActionsMidi.PlayPause, (val) => console.log("playpause triggered", val))
-        this.setMatrixMappings(DeckMap())
+        this.state.addEventListener((ev) => {
+            //console.log("deck", ev);
+            if (this.surface.redraw) {
+                console.log("redraw");
+                this.surface.redraw();
+            }
+        })
     }
 
     private setMatrixDeckXY(x: number, y: number, b: Button) {
@@ -47,7 +51,8 @@ class Deck {
         this.surface.setMatrixMappingXY(offset + x, y, (pp) => {
             //this.sendAction(action, pp);
             //b.onInput(this.state, pp)
-            b.handler(b, this.state, pp);
+            b.handler(this.state, pp);
+            //this.redraw()
         })
     }
 

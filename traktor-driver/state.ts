@@ -52,17 +52,17 @@ export class TraktorState {
     }));*/
 
     notestate = new Map<string, number>([
-        ["mixercue", 0],
-        ["loop", 0],
-        ["playing", 0],
-        ["sync", 0],
-        ["hikill", 0],
-        ["midkill", 0],
-        ["lowkill", 0],
+        [DeckActionsMidi[DeckActionsMidi.MixerCue], 0],
+        //["loop", 0],
+        [DeckActionsMidi[DeckActionsMidi.PlayPause], 0],
+        [DeckActionsMidi[DeckActionsMidi.Sync], 0],
+        [DeckActionsMidi[DeckActionsMidi.HiKill], 0],
+        [DeckActionsMidi[DeckActionsMidi.MidKill], 0],
+        [DeckActionsMidi[DeckActionsMidi.LowKill], 0],
     ]);
 
     ccstate = new Map<string, number>([
-        ["volume", 0],
+        [DeckActionsCC[DeckActionsCC.Volume], 0],
     ]);
 
     currentLoop = LoopStates.NoLoop

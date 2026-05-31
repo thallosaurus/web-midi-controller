@@ -17,21 +17,22 @@ export abstract class Button {
     action: number
     //handler: OnInputHandler
 
-    lastState: boolean = false;
+    colorOff: number = 0;
+    colorOn: number = 0;
 
     constructor(action: number) {
         //this.color = color;
         this.pixel = {
             color: 0,
-            colorOff: 0,
-            colorOn: 0,
+            //colorOff: 0,
+            //colorOn: 0,
             lightMode: LightMode.Normal
         }
         this.action = action;
         //this.handler = onInput;
     }
 
-    abstract handler(button: Button, state: TraktorState, inputState: any): void;
+    abstract handler(state: TraktorState, inputState: any): void;
 }
 
 enum TriggerMode {
@@ -43,111 +44,116 @@ class NoteButton extends Button {
     mode: TriggerMode
     private internalState = false;
 
-    override handler(button: Button, state: TraktorState, inputState: any): void {
+    override handler(state: TraktorState, inputState: any): void {
+        console.log(inputState)
         switch (this.mode) {
             case TriggerMode.Direct:
-                state.sendTraktorMidi(this.action, inputState)
-                this.pixel.color = inputState ? this.pixel.colorOn : this.pixel.colorOff
+                state.sendTraktorMidi(this.action, inputState.pressed)
+                this.pixel.color = inputState ? this.colorOn : this.colorOff
                 break;
             case TriggerMode.Latch:
-                if (inputState) {
+                if (inputState.pressed) {
                     this.internalState = !this.internalState;
                     state.sendTraktorMidi(this.action, this.internalState);
-                    this.pixel.color = this.internalState ? this.pixel.colorOn : this.pixel.colorOff
+                    this.pixel.color = this.internalState ? this.colorOn : this.colorOff
                 }
                 break;
         }
         //this.pixel.color = inputState ? 127 : PlayColor
     }
 
-    constructor(action: DeckActionsMidi, mode: TriggerMode) {
+    constructor(action: DeckActionsMidi, mode: TriggerMode, state: TraktorState) {
         super(action)
         this.mode = mode;
+
+        state.addNoteStateListener(action, (value) => {
+            this.internalState = value > 64
+        })
     }
 }
 
 class CCButton extends Button {
-    override handler(button: Button, state: TraktorState, inputState: any): void {
+    override handler(state: TraktorState, inputState: any): void {
         state.sendTraktorCC(this.action, inputState)
     }
 }
 
 class PlayPauseButton extends NoteButton {
-    constructor() {
-        super(DeckActionsMidi.PlayPause, TriggerMode.Latch)
+    constructor(state: TraktorState) {
+        super(DeckActionsMidi.PlayPause, TriggerMode.Latch, state)
         this.pixel.color = 127
-        this.pixel.colorOn = PlayColor
-        this.pixel.colorOff = 127
+        this.colorOn = PlayColor
+        this.colorOff = 127
     }
 }
 
 class SyncButton extends NoteButton {
-    constructor() {
-        super(DeckActionsMidi.Sync, TriggerMode.Latch)
+    constructor(state: TraktorState) {
+        super(DeckActionsMidi.Sync, TriggerMode.Latch, state)
         this.pixel.color = SyncColor
-        this.pixel.colorOff = SyncColor
-        this.pixel.colorOn = 127
+        this.colorOff = SyncColor
+        this.colorOn = 127
     }
 }
 
 class FwdButton extends NoteButton {
-    constructor() {
-        super(DeckActionsMidi.Fwd, TriggerMode.Direct)
+    constructor(state: TraktorState) {
+        super(DeckActionsMidi.Fwd, TriggerMode.Direct, state)
         this.pixel.color = BkwdFwdColor
-        this.pixel.colorOff = BkwdFwdColor
-        this.pixel.colorOn = 127
+        this.colorOff = BkwdFwdColor
+        this.colorOn = 127
     }
 }
 
 class BkwdButton extends NoteButton {
-    constructor() {
-        super(DeckActionsMidi.Bkwd, TriggerMode.Direct)
+    constructor(state: TraktorState) {
+        super(DeckActionsMidi.Bkwd, TriggerMode.Direct, state)
         this.pixel.color = BkwdFwdColor
-        this.pixel.colorOff = BkwdFwdColor
-        this.pixel.colorOn = 127
+        this.colorOff = BkwdFwdColor
+        this.colorOn = 127
     }
 }
 
 class LowKillButton extends NoteButton {
-    constructor() {
-        super(DeckActionsMidi.LowKill, TriggerMode.Direct)
+    constructor(state: TraktorState) {
+        super(DeckActionsMidi.LowKill, TriggerMode.Direct, state)
         this.pixel.color = KillColor
-        this.pixel.colorOff = KillColor
-        this.pixel.colorOn = KillColor
+        this.colorOff = KillColor
+        this.colorOn = KillColor
     }
 }
 
 class MidKillButton extends NoteButton {
-    constructor() {
-        super(DeckActionsMidi.MidKill, TriggerMode.Direct)
+    constructor(state: TraktorState) {
+        super(DeckActionsMidi.MidKill, TriggerMode.Direct, state)
         this.pixel.color = KillColor
-        this.pixel.colorOff = KillColor
-        this.pixel.colorOn = KillColor
+        this.colorOff = KillColor
+        this.colorOn = KillColor
     }
 }
 
 class HiKillButton extends NoteButton {
-    constructor() {
-        super(DeckActionsMidi.HiKill, TriggerMode.Direct)
+    constructor(state: TraktorState) {
+        super(DeckActionsMidi.HiKill, TriggerMode.Direct, state)
         this.pixel.color = KillColor
-        this.pixel.colorOff = KillColor
-        this.pixel.colorOn = KillColor
+        this.colorOff = KillColor
+        this.colorOn = KillColor
     }
 }
 
 class MixerCueButton extends NoteButton {
-    constructor() {
-        super(DeckActionsMidi.MixerCue, TriggerMode.Direct)
+    constructor(state: TraktorState) {
+        super(DeckActionsMidi.MixerCue, TriggerMode.Direct,state)
         this.pixel.color = CueColor
-        this.pixel.colorOff = CueColor
-        this.pixel.colorOn = CueColor
+        this.colorOff = CueColor
+        this.colorOn = CueColor
     }
 }
 
 //    [Loop4thButton, Loop2ndButton, Loop1Button, Loop2Button],
 //    [Loop4Button, Loop8Button, Loop16Button, Loop32Button],
 
-export function DeckMap() {
+export function DeckMap(state: TraktorState) {
     return [
         [],
         [],
@@ -155,7 +161,7 @@ export function DeckMap() {
         [],
         [],
         [],
-        [new LowKillButton(), new MidKillButton(), new HiKillButton(), new MixerCueButton()],
-        [new PlayPauseButton(), new SyncButton(), new BkwdButton(), new FwdButton()],
+        [new LowKillButton(state), new MidKillButton(state), new HiKillButton(state), new MixerCueButton(state)],
+        [new PlayPauseButton(state), new SyncButton(state), new BkwdButton(state), new FwdButton(state)],
     ]
 }
