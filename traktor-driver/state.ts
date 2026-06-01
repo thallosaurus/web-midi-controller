@@ -141,7 +141,8 @@ export class TraktorState {
     }
 
     private processCC(msg: { cc: DeckActionsCC, value: number }) {
-        switch (msg.cc) {
+        this.setCCState(msg.cc, msg.value);
+        /*switch (msg.cc) {
             case DeckActionsCC.Volume:
                 {
                     //this.volume = evt.detail.value
@@ -160,7 +161,7 @@ export class TraktorState {
                 {
                     this.setCCState(msg.cc, msg.value)
                 }
-        }
+        }*/
     }
 
     private setNoteState(key: DeckActionsMidi, value: number) {
@@ -179,8 +180,9 @@ export class TraktorState {
     }
 
     private processMidi(msg: { note: DeckActionsMidi, velocity: number }) {
+        this.setNoteState(msg.note, msg.velocity)
 
-        switch (msg.note) {
+        /*switch (msg.note) {
             case DeckActionsMidi.PlayPause:
                 //this.playing = evt.detail.velocity > 64;
                 //this.state.set("playing", msg.velocity)
@@ -229,7 +231,7 @@ export class TraktorState {
             case DeckActionsMidi.Loop16:
             case DeckActionsMidi.Loop32:
                 
-        }
+        }*/
     }
 
     set lowkill(state: boolean) {

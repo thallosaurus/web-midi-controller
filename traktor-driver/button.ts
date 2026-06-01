@@ -187,20 +187,42 @@ class MixerCueButton extends NoteButton {
 }
 
 class LoopButton extends NoteButton {
+
+    isLoopOn: boolean
+    loopIndex: number;
+    currentLoopIndex: number;
+
+    override internalHandler(inputState: any): void {
+        if ((this.loopIndex == this.currentLoopIndex) && this.isLoopOn) {
+            this.pixel.color = this.colorOn
+            // : this.colorOff
+        } else {
+            this.pixel.color = this.colorOff
+        }
+    }
+
     constructor(loop: DeckActionsMidi, state: TraktorState) {
         super(loop as number, 0, state)
+
+        this.loopIndex = this.action - DeckActionsMidi.Loop16th + 1
+        this.currentLoopIndex = 0;
+
+        this.isLoopOn = false;
 
         this.pixel.color = 66;
         this.colorOn = 66;
         this.colorOff = 60;
         state.addCCStateListener(DeckActionsCC.LoopSetFeedback, (val) => {
-            const calc = (this.action - DeckActionsMidi.Loop16th + 1)
-            console.log(val, calc)
+            //console.log(val, calc)
+            this.currentLoopIndex = val;
 
-            this.internalHandler(val == calc ? 127 : 0)
+            this.internalHandler((this.loopIndex == val) && this.isLoopOn ? 127 : 0)
+            this.internalHandler(null)
         })
+
         state.addNoteStateListener(DeckActionsMidi.LoopStatus, (v) => {
-            console.log("loop status", v);
+            this.isLoopOn = v != 0;
+            this.internalHandler(null)
         })
     }
 
@@ -208,10 +230,10 @@ class LoopButton extends NoteButton {
         console.log(inputState)
 
         if (inputState.pressed) {
-//            this.internalState = !this.internalState;
+            //            this.internalState = !this.internalState;
             state.sendTraktorMidi(this.action, true);
             //this.pixel.color = this.internalState ? this.colorOn : this.colorOff
-//            this.internalHandler(this.internalState);
+            //            this.internalHandler(this.internalState);
         }
 
         //this.pixel.color = inputState ? 127 : PlayColor
