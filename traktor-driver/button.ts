@@ -188,11 +188,33 @@ class MixerCueButton extends NoteButton {
 
 class LoopButton extends NoteButton {
     constructor(loop: DeckActionsMidi, state: TraktorState) {
-        super(loop as number, TriggerMode.Direct, state)
+        super(loop as number, 0, state)
 
         this.pixel.color = 66;
         this.colorOn = 66;
         this.colorOff = 60;
+        state.addCCStateListener(DeckActionsCC.LoopSetFeedback, (val) => {
+            const calc = (this.action - DeckActionsMidi.Loop16th + 1)
+            console.log(val, calc)
+
+            this.internalHandler(val == calc ? 127 : 0)
+        })
+        state.addNoteStateListener(DeckActionsMidi.LoopStatus, (v) => {
+            console.log("loop status", v);
+        })
+    }
+
+    override handler(state: TraktorState, inputState: any): void {
+        console.log(inputState)
+
+        if (inputState.pressed) {
+//            this.internalState = !this.internalState;
+            state.sendTraktorMidi(this.action, true);
+            //this.pixel.color = this.internalState ? this.colorOn : this.colorOff
+//            this.internalHandler(this.internalState);
+        }
+
+        //this.pixel.color = inputState ? 127 : PlayColor
     }
 }
 
@@ -214,7 +236,7 @@ export function DeckMap(state: TraktorState) {
         [],
         [],
         [new LoopButton(DeckActionsMidi.Loop8th, state), new LoopButton(DeckActionsMidi.Loop4th, state), new LoopButton(DeckActionsMidi.Loop2nd, state), new LoopButton(DeckActionsMidi.Loop1, state)],
-        [new LoopButton(DeckActionsMidi.Loop2, state), new LoopButton(DeckActionsMidi.Loop4, state),new LoopButton(DeckActionsMidi.Loop8, state), new LoopButton(DeckActionsMidi.Loop16, state)],
+        [new LoopButton(DeckActionsMidi.Loop2, state), new LoopButton(DeckActionsMidi.Loop4, state), new LoopButton(DeckActionsMidi.Loop8, state), new LoopButton(DeckActionsMidi.Loop16, state)],
         //[new LoopButton(LoopStates.Loop16th, state), new LoopButton(LoopStates.Loop8th, state), new LoopButton(LoopStates.Loop4th, state), new LoopButton(LoopStates.Loop2nd, state)],
         //[new LoopButton(LoopStates.Loop1, state), new LoopButton(LoopStates.Loop2, state), new LoopButton(LoopStates.Loop4, state), new LoopButton(LoopStates.Loop16, state)],
         [new LowKillButton(state), new MidKillButton(state), new HiKillButton(state)],

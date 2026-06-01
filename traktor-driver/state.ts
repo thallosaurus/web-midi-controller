@@ -31,6 +31,7 @@ export enum DeckActionsMidi {
     Loop8 = 16,
     Loop16 = 17,
     Loop32 = 18,
+    LoopStatus = 19
 }
 
 export enum LoopFeedbackStates {
@@ -155,6 +156,10 @@ export class TraktorState {
                     this.setCCState(msg.cc, msg.value);
                 }
                 break;
+            case DeckActionsCC.LoopSetFeedback:
+                {
+                    this.setCCState(msg.cc, msg.value)
+                }
         }
     }
 
@@ -163,6 +168,11 @@ export class TraktorState {
         this.events.dispatchEvent(new CustomEvent(DeckActionsMidi[key], { detail: value }))
     }
 
+    /**
+     * Set State and fire an event
+     * @param key 
+     * @param value 
+     */
     private setCCState(key: DeckActionsCC, value: number) {
         this.ccstate.set(DeckActionsCC[key], value)
         this.events.dispatchEvent(new CustomEvent(DeckActionsCC[key], { detail: value }))
@@ -218,6 +228,7 @@ export class TraktorState {
             case DeckActionsMidi.Loop8:
             case DeckActionsMidi.Loop16:
             case DeckActionsMidi.Loop32:
+                
         }
     }
 
