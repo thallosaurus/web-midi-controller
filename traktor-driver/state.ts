@@ -32,7 +32,7 @@ export enum DeckActionsMidi {
     Loop32 = 18,
 }
 
-enum LoopStates {
+export enum LoopStates {
     NoLoop = -1,
     Loop16th = 22,
     Loop8th = 33,
@@ -43,7 +43,7 @@ enum LoopStates {
     Loop4 = 88,
     Loop8 = 99,
     Loop16 = 110,
-    Loop32 = 121,
+    Loop32 = 122,
 }
 
 export class TraktorState {

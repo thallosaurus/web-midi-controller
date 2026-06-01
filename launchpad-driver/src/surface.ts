@@ -255,14 +255,27 @@ export abstract class Surface {
         //const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
     }
 
-    setMatrixMappingXY(x: number, y: number, cb: MatrixHandler) {
+    private setMatrixMappingXY(x: number, y: number, cb: MatrixHandler) {
         const i = (y * this.width) + x;
 
         this.matrixMapping.set(i, cb);
     }
 
-    setMatrixColorXY(x: number, y: number, pixel: Pixel) {
+    private setMatrixColorXY(x: number, y: number, pixel: Pixel) {
         this.setXYColor(x, y, pixel);
+    }
+
+    setMatrixXY(
+        x: number,
+        y: number,
+        pixel: Pixel,
+        handler: MatrixHandler
+    ) {
+        //if (x > 4 || x < 0) throw new Error("out of bounds");
+        //const offset = (this.channel - 1) * 4;
+        const p = pixel;
+        this.setMatrixColorXY(x, y, p)
+        this.setMatrixMappingXY(x, y, handler)
     }
 
     private deleteMatrixColorXY(x: number, y: number) {

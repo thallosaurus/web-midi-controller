@@ -38,13 +38,14 @@ class Deck {
         if (x > 4 || x < 0) throw new Error("out of bounds");
         const offset = (this.channel - 1) * 4;
         const p = b.pixel;
-        this.surface.setMatrixColorXY(offset + x, y, p)
-        this.surface.setMatrixMappingXY(offset + x, y, (pp) => {
+        this.surface.setMatrixXY(offset + x, y, b.pixel, (pp) => {
             //this.sendAction(action, pp);
             //b.onInput(this.state, pp)
             b.handler(this.state, pp);
             //this.redraw()
-        })
+        });
+        //this.surface.setMatrixColorXY(offset + x, y, p)
+        //this.surface.setMatrixMappingXY(offset + x, y, )
     }
 
     private setMatrixMappings(map: Button[][]) {
