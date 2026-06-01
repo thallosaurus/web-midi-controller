@@ -33,6 +33,7 @@ export abstract class Button {
     }
 
     abstract handler(state: TraktorState, inputState: any): void;
+    abstract internalHandler(state: TraktorState, inputState: any): void;
 }
 
 enum TriggerMode {
@@ -41,6 +42,9 @@ enum TriggerMode {
 }
 
 class NoteButton extends Button {
+    override internalHandler(inputState: any): void {
+        this.pixel.color = inputState ? this.colorOn : this.colorOff
+    }
     mode: TriggerMode
     private internalState = false;
 
@@ -49,13 +53,16 @@ class NoteButton extends Button {
         switch (this.mode) {
             case TriggerMode.Direct:
                 state.sendTraktorMidi(this.action, inputState.pressed)
-                this.pixel.color = inputState ? this.colorOn : this.colorOff
+                //this.pixel.color = inputState ? this.colorOn : this.colorOff
+                this.internalState = inputState.pressed;
+                this.internalHandler(inputState);
                 break;
             case TriggerMode.Latch:
                 if (inputState.pressed) {
                     this.internalState = !this.internalState;
                     state.sendTraktorMidi(this.action, this.internalState);
-                    this.pixel.color = this.internalState ? this.colorOn : this.colorOff
+                    this.internalHandler(inputState);
+                    //this.pixel.color = this.internalState ? this.colorOn : this.colorOff
                 }
                 break;
         }
@@ -73,7 +80,10 @@ class NoteButton extends Button {
 }
 
 class CCButton extends Button {
-    override handler(state: TraktorState, inputState: any): void {
+    override internalHandler(inputState: any): void {
+        throw new Error("Method not implemented.");
+    }
+    override handler(state: TraktorState, inputState: number): void {
         state.sendTraktorCC(this.action, inputState)
     }
 }
@@ -143,7 +153,7 @@ class HiKillButton extends NoteButton {
 
 class MixerCueButton extends NoteButton {
     constructor(state: TraktorState) {
-        super(DeckActionsMidi.MixerCue, TriggerMode.Direct,state)
+        super(DeckActionsMidi.MixerCue, TriggerMode.Direct, state)
         this.pixel.color = CueColor
         this.colorOff = CueColor
         this.colorOn = CueColor

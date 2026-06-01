@@ -159,8 +159,8 @@ export abstract class Surface {
         }));*/
     //private pixels = new Map<number, Pixel>();
     //private pixelsCallback = new Map<number, (pressed: boolean, msg: MidiMessage) => void>();
-    public controlButtons = new ControlButtons();
-    public matrixManager = new MatrixManager();
+    //public controlButtons = new ControlButtons();
+    //public matrixManager = new MatrixManager();
 
     //public matrixState = new Map<number, ;
 
@@ -175,8 +175,12 @@ export abstract class Surface {
 
     public renderState() {
         return {
-            matrix: this.matrixManager.renderState,
-            controls: this.controlButtons.renderState
+            matrix: Array.from(this.matrixPixels.entries().map(([n, p], i) => {
+                return [n, p.color]
+            })),
+            controls: Array.from(this.controlPixels.entries().map(([n, p], i) => {
+                return p
+            }))
         }
     }
 
@@ -186,7 +190,9 @@ export abstract class Surface {
     /*    public controlpixelsActions = new Map<number, (msg: MidiMessage) => void>();*/
     //protected caller: Launchpad;
 
-    // register handler for when the control buttons receive an event
+    /**
+     * register handler for when the control buttons receive an event
+     */
     get addControlListener() {
         return (listener: (event: CustomEvent<ControlEvent>) => void) => {
             this.events.addEventListener("controls", (ev) => {
@@ -195,7 +201,9 @@ export abstract class Surface {
         }
     }
 
-    // register handler for when the matrix receives an event
+    /**
+     * register handler for when the matrix receives an event
+     */
     get addMatrixListener() {
         return (listener: (event: CustomEvent<MatrixEvent>) => void) => {
             this.events.addEventListener("matrix", (ev) => {
@@ -254,11 +262,11 @@ export abstract class Surface {
     }
 
     setMatrixColorXY(x: number, y: number, pixel: Pixel) {
-        this.matrixManager.setXYColor(x, y, pixel);
+        this.setXYColor(x, y, pixel);
     }
 
     private deleteMatrixColorXY(x: number, y: number) {
-        this.matrixManager.setXYColor(x, y, {
+        this.setXYColor(x, y, {
             "color": 0,
             lightMode: LightMode.Normal
         });
