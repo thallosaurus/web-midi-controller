@@ -43,7 +43,7 @@ enum TriggerMode {
 
 class NoteButton extends Button {
     override internalHandler(inputState: any): void {
-        this.pixel.color = inputState ? this.colorOn : this.colorOff
+        this.pixel.color = inputState > 64 ? this.colorOn : this.colorOff
     }
     mode: TriggerMode
     private internalState = false;
@@ -61,11 +61,11 @@ class NoteButton extends Button {
                 if (inputState.pressed) {
                     this.internalState = !this.internalState;
                     state.sendTraktorMidi(this.action, this.internalState);
-                    this.internalHandler(inputState);
                     //this.pixel.color = this.internalState ? this.colorOn : this.colorOff
+                    this.internalHandler(this.internalState);
                 }
                 break;
-        }
+            }
         //this.pixel.color = inputState ? 127 : PlayColor
     }
 
@@ -74,7 +74,9 @@ class NoteButton extends Button {
         this.mode = mode;
 
         state.addNoteStateListener(action, (value) => {
-            this.internalState = value > 64
+            console.log("note button event", value)
+            //this.internalState = value > 64
+            this.internalHandler(value);
         })
     }
 }
