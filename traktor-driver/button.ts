@@ -1,7 +1,7 @@
 import { StatementSync } from "node:sqlite";
 import { LightMode, Pixel } from "../launchpad-driver/src/surface.ts";
 import { TraktorState } from "./main.ts";
-import { DeckActionsCC, DeckActionsMidi, LoopStates } from "./state.ts";
+import { DeckActionsCC, DeckActionsMidi, LoopFeedbackStates } from "./state.ts";
 
 const PlayColor = 64
 const SyncColor = 61
@@ -75,7 +75,7 @@ class NoteButton extends Button {
                     this.internalHandler(this.internalState);
                 }
                 break;
-            }
+        }
         //this.pixel.color = inputState ? 127 : PlayColor
     }
 
@@ -84,7 +84,7 @@ class NoteButton extends Button {
         this.mode = mode;
 
         state.addNoteStateListener(action, (value) => {
-            console.log("note button event", value)
+            //console.log("note button event", value)
             //this.internalState = value > 64
             this.internalHandler(value);
         })
@@ -98,7 +98,7 @@ class CCButton extends Button {
     }
     override handler(state: TraktorState, inputState: any): void {
         if (inputState.pressed) {
-            console.log("cc triggered", inputState)
+            //console.log("cc triggered", inputState)
             state.sendTraktorCC(this.action, this.target)
         }
     }
@@ -108,7 +108,7 @@ class CCButton extends Button {
         this.target = target;
         state.addCCStateListener(action, (value) => {
             if (value == target) {
-                console.log("triggered ", action)
+                console.log("update from traktor", action)
             }
         })
     }
@@ -186,15 +186,24 @@ class MixerCueButton extends NoteButton {
     }
 }
 
-class LoopButton extends CCButton {
-    constructor(loop: LoopStates, state: TraktorState) {
-        super(DeckActionsCC.LoopSetSelect, loop, state)
+class LoopButton extends NoteButton {
+    constructor(loop: DeckActionsMidi, state: TraktorState) {
+        super(loop as number, TriggerMode.Direct, state)
 
         this.pixel.color = 66;
         this.colorOn = 66;
         this.colorOff = 60;
     }
 }
+
+/*class LoopButtonFeedback extends NoteButton {
+    internalLoop: number
+
+    constructor(state: TraktorState) {
+        super(DeckActionsCC.LoopSetFeedback, 0, state)
+        this.internalLoop = 0
+    }
+}*/
 
 //    [Loop4thButton, Loop2ndButton, Loop1Button, Loop2Button],
 //    [Loop4Button, Loop8Button, Loop16Button, Loop32Button],
@@ -204,8 +213,10 @@ export function DeckMap(state: TraktorState) {
         [],
         [],
         [],
-        [new LoopButton(LoopStates.Loop16th, state), new LoopButton(LoopStates.Loop8th, state), new LoopButton(LoopStates.Loop4th, state), new LoopButton(LoopStates.Loop2nd, state)],
-        [new LoopButton(LoopStates.Loop1, state), new LoopButton(LoopStates.Loop2, state), new LoopButton(LoopStates.Loop4, state), new LoopButton(LoopStates.Loop16, state)],
+        [new LoopButton(DeckActionsMidi.Loop8th, state), new LoopButton(DeckActionsMidi.Loop4th, state), new LoopButton(DeckActionsMidi.Loop2nd, state), new LoopButton(DeckActionsMidi.Loop1, state)],
+        [new LoopButton(DeckActionsMidi.Loop2, state), new LoopButton(DeckActionsMidi.Loop4, state),new LoopButton(DeckActionsMidi.Loop8, state), new LoopButton(DeckActionsMidi.Loop16, state)],
+        //[new LoopButton(LoopStates.Loop16th, state), new LoopButton(LoopStates.Loop8th, state), new LoopButton(LoopStates.Loop4th, state), new LoopButton(LoopStates.Loop2nd, state)],
+        //[new LoopButton(LoopStates.Loop1, state), new LoopButton(LoopStates.Loop2, state), new LoopButton(LoopStates.Loop4, state), new LoopButton(LoopStates.Loop16, state)],
         [new LowKillButton(state), new MidKillButton(state), new HiKillButton(state)],
         [new LowKillButton(state, TriggerMode.Latch), new MidKillButton(state, TriggerMode.Latch), new HiKillButton(state, TriggerMode.Latch), new MixerCueButton(state)],
         [new PlayPauseButton(state), new SyncButton(state), new BkwdButton(state), new FwdButton(state)],

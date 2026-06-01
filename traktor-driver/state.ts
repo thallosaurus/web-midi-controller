@@ -7,7 +7,8 @@ const VolumeCC = 0
 
 export enum DeckActionsCC {
     Volume = 0,
-    LoopSetSelect = 2
+    LoopSetSelect = 2,
+    LoopSetFeedback = 3
 }
 
 export enum DeckActionsMidi {
@@ -32,18 +33,18 @@ export enum DeckActionsMidi {
     Loop32 = 18,
 }
 
-export enum LoopStates {
-    NoLoop = -1,
-    Loop16th = 22,
-    Loop8th = 33,
-    Loop4th = 44,
-    Loop2nd = 55,
-    Loop1 = 66,
-    Loop2 = 77,
-    Loop4 = 88,
-    Loop8 = 99,
-    Loop16 = 110,
-    Loop32 = 122,
+export enum LoopFeedbackStates {
+    NoLoop = 0,
+    Loop16th = 1,
+    Loop8th = 2,
+    Loop4th = 3,
+    Loop2nd = 4,
+    Loop1 = 5,
+    Loop2 = 6,
+    Loop4 = 7,
+    Loop8 = 8,
+    Loop16 = 9,
+    Loop32 = 10,
 }
 
 export class TraktorState {
@@ -63,9 +64,10 @@ export class TraktorState {
 
     ccstate = new Map<string, number>([
         [DeckActionsCC[DeckActionsCC.Volume], 0],
+        [DeckActionsCC[DeckActionsCC.LoopSetSelect], 0],
     ]);
 
-    currentLoop = LoopStates.NoLoop
+    currentLoop = LoopFeedbackStates.NoLoop
 
     //loopState: LoopStates
 
@@ -82,20 +84,18 @@ export class TraktorState {
         })
     }
 
-    get addCCStateListener() {
-        return (key: DeckActionsCC, listener: (value: number) => void) => {
-            return this.events.addEventListener(DeckActionsCC[key], (ev) => {
-                listener((ev as CustomEvent).detail)
-            })
-        }
+    addCCStateListener(key: DeckActionsCC, listener: (value: number) => void) {
+        return this.events.addEventListener(DeckActionsCC[key], (ev) => {
+            listener((ev as CustomEvent).detail)
+        })
     }
 
-    get addNoteStateListener() {
-        return (key: DeckActionsMidi, listener: (value: number) => void) => {
-            return this.events.addEventListener(DeckActionsMidi[key], (ev) => {
-                listener((ev as CustomEvent).detail)
-            })
-        }
+
+    addNoteStateListener(key: DeckActionsMidi, listener: (value: number) => void) {
+        return this.events.addEventListener(DeckActionsMidi[key], (ev) => {
+            listener((ev as CustomEvent).detail)
+        })
+
     }
 
     constructor(channel: number, port: MidiDriver) {
@@ -235,7 +235,7 @@ export class TraktorState {
         this.sendTraktorMidi(DeckActionsMidi.HiKill, state);
     }
 
-    set loop(loop: LoopStates) {
+    /*set loop(loop: LoopStates) {
         this.currentLoop = loop;
 
         if (loop !== LoopStates.NoLoop) {
@@ -249,7 +249,7 @@ export class TraktorState {
             //TODO implement turn off
         }
         //        this.sendUpdate();
-    }
+    }*/
 
     set play(state: boolean) {
         //this.playing = state;

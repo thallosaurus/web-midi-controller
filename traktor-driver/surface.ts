@@ -18,9 +18,9 @@ class Deck {
         this.setMatrixMappings(DeckMap(this.state))
 
         this.state.addEventListener((ev) => {
-            console.log("deck", ev);
+            //console.log("deck", ev);
             if (this.surface.redraw) {
-                console.log("redraw");
+                //console.log("redraw");
 
                 this.surface.redraw();
                 //this.updateMatrix()
