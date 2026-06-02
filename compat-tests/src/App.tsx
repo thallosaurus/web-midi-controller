@@ -3,12 +3,9 @@ import './App.css'
 import { useWebsocket } from './websocket/client.tsx'
 import { useEventBus } from './eventbus/client.tsx'
 import { useOverlays } from './ui/overlay.tsx';
-import { LegacyOverlay, RenderOverlayShim } from './widgets/legacy.tsx';
-import { AppSidemenu, useMenuContext } from './ui/sidemenu.tsx';
 import { WebsocketWorkerEvent } from './websocket/events.ts';
-import { WebAudioSynthView } from './synth/synth.tsx';
-import { LoadedWidget } from 'midi-controller';
 import { MainView } from './ui/main_view.tsx';
+import { useMenuContext } from './ui/sidemenu.tsx';
 
 const App = () => {
   const eventbus = useEventBus();

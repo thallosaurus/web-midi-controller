@@ -105,23 +105,20 @@ export class TraktorSurface extends Surface {
 
     shift: boolean = false;
 
-    traktorDriver = new MidiDriver({
+    traktorDriver: MidiDriver
+
+    constructor(driver = new MidiDriver({
         "inputName": "test virtual input",
         "outputName": "test virtual output",
         useVirtual: true
-    });
-
-    constructor() {
+    })) {
         super();
+        this.traktorDriver = driver;
 
         this.decks = [
             new Deck(1, this),
             new Deck(2, this)
         ];
-
-        /*this.addControlListener((ev) => {
-            //console.log("global", ev.detail)
-        })*/
 
         this.addControlListenerForKey(BUTTON_DEF.Shift, (ev) => {
             this.shift = ev.detail.state > 64;

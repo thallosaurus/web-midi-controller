@@ -1,7 +1,7 @@
-import { type MidiMessage } from "midi-driver";
-import { CoreWorkerClient } from "../coreworker/worker";
-import { WebsocketWorkerEvent } from "./events";
-import { createContext, useContext, useRef, useState } from "react";
+import { type MidiMessage } from "@midi-driver";
+import { CoreWorkerClient } from "../coreworker/worker.ts";
+import { WebsocketWorkerEvent } from "./events.ts";
+//import { createContext, useContext, useRef, useState } from "react";
 
 export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent, WebsocketWorkerEvent> {
     connected = false;
@@ -114,7 +114,7 @@ export class WebsocketWorkerClient extends CoreWorkerClient<WebsocketWorkerEvent
 
 // MARK: - React Extension
 
-const WsContext = createContext(null);
+/*const WsContext = createContext(null);
 export function WsProvider({ children }) {
     const wsRef = useRef<WebsocketWorkerClient | null>(null);
     const [connected, setConnected] = useState(false);
@@ -159,4 +159,4 @@ export function useWebsocket() {
     }
 
     return ctx;
-}
+}*/

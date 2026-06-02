@@ -9,7 +9,6 @@ launchpad.switchToDawMode();
 //switch to session view
 launchpad.switchInbuiltLayout(0, 0);
 
-
 Deno.addSignalListener("SIGINT", () => {
     launchpad.switchToStandaloneMode();
     launchpad.close();

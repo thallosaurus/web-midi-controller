@@ -1,4 +1,4 @@
-import { CoreWorkerMessage } from "../coreworker/worker";
+import { CoreWorkerMessage } from "../coreworker/worker.ts";
 //import { MidiMessage } from "../../../midi-driver/bindings/MidiPayload";
 //import type { MidiMessage } from "midi-driver";
 

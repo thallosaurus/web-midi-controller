@@ -2,7 +2,7 @@ import { Cipheriv } from "node:crypto";
 import { MidiMessage } from "../../midi-driver/deno_mod.ts";
 import { Launchpad, LaunchpadSurfaceStore } from "../src/launchpad.ts";
 import { LaunchpadProMap, LightMode, Surface } from "../src/surface.ts";
-import { BUTTON_DEF } from "../src/controls.ts";
+import { BUTTON_DEF } from "../src/launchpad.ts";
 
 class SmileySurface extends Surface {
   static getData(col: number) {

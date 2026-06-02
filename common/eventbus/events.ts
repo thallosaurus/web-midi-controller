@@ -1,5 +1,5 @@
-import { type MidiMessage } from "../../../midi-driver/bindings/MidiPayload";
-import { CoreWorkerMessage } from "../coreworker/worker";
+import { type MidiMessage } from "@midi-driver"; //"../../../midi-driver/bindings/MidiPayload";
+import { CoreWorkerMessage } from "../coreworker/worker.ts";
 //import { MidiMessage } from "server-ts/messages";
 
 export type EventBusWorkerEvent =
