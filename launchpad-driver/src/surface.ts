@@ -1,5 +1,5 @@
 import { MidiMessage } from "@driver";
-import { BUTTON_DEF, ControlButtons } from "./controls.ts";
+import { BUTTON_DEF } from "./launchpad.ts";
 
 export enum LightMode {
     Normal = 1,
@@ -43,85 +43,6 @@ function EmptyControlPixels() {
     return LaunchpadProMap().map((v, i) => {
         return [v, 0]
     })
-}
-
-class MatrixManager {
-    public pixels;
-
-    private _state;
-
-    constructor() {
-        this.pixels = new Map<number, Pixel>(LaunchpadProMap().map((v) => {
-            return [v, {
-                "color": 0,
-                "colorOn": 0,
-                "colorOff": 0,
-                "lightMode": LightMode.Normal
-            }]
-        }))
-
-        this._state = new Map<number, number>(LaunchpadProMap().map((v, i) => {
-            return [v, 0]
-        }))
-    }
-
-    public get renderState() {
-        return Array.from(LaunchpadProMap().map((note) => {
-            const pixel = this.pixels.get(note)?.color ?? 0;
-            return [note, pixel]
-        }))
-    }
-
-    setXYColor(x: number, y: number, pixel: Pixel) {
-        const i = (y * 8) + x;
-        if (i >= 0 && i < 64) {
-            this.setIColor(i, pixel);
-        } else return;
-    }
-
-    setIColor(i: number, pixel: Pixel) {
-        //console.debug("setting", i, "to", pixel)
-        this.pixels.set(LaunchpadProMap().at(i)!, pixel);
-        //console.debug(this.pixels);
-        //const note = Surface.LAUNCHPAD_PROGRAMMER_MAP[i];
-    }
-
-    setPattern(data: number[]) {
-        for (let i = 0; i < 64; i++) {
-            const b = data.at(i);
-            if (b) {
-                //const color = this.active ? 66 : b;
-                this.setIColor(i, {
-                    "color": b,
-                    //"colorOn": b,
-                    //"colorOff": b,
-                    "lightMode": LightMode.Normal
-                })
-            }
-        }
-    }
-
-    processValue(note: number, velocity: number) {
-        //const p = this.pixels.get(note);
-        this._state.set(note, velocity);
-        //console.log("processValue", this._state)
-        //p?.
-        //this.pixels.set(note, velocity);
-    }
-
-    clear() {
-        this.pixels.clear();
-        //this.pixelsCallback.delete();
-    }
-
-    /*getStateI(i: number) {
-        //console.log("i", i)
-        const p = this.pixels.get(i);
-        console.log(this.pixels, p, i);
-        return p;
-    }*/
-
-    //load()
 }
 
 type MatrixHandler = (event: MatrixEvent) => void;

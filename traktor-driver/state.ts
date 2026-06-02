@@ -54,10 +54,6 @@ export enum LoopFeedbackStates {
 }
 
 export class TraktorState {
-    /*state = new Map<number, number>(Object.values(DeckActions).filter((v, i) => !isNaN(Number(v))).map((v, i) => {
-        return [Number(v), 0]
-    }));*/
-
     notestate = new Map<string, number>([
         [DeckActionsMidi[DeckActionsMidi.MixerCue], 0],
         //["loop", 0],

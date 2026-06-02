@@ -2,7 +2,7 @@ import { LightMode, Pixel, Surface } from "../launchpad-driver/src/surface.ts";
 import { MidiDriver } from "@driver-deno";
 import { DeckActionsCC, DeckActionsMidi, TraktorState } from "./state.ts";
 import { Button, DeckMap, ShiftDeckMap } from "./button.ts";
-import { BUTTON_DEF } from "../launchpad-driver/src/controls.ts";
+import { BUTTON_DEF } from "../launchpad-driver/src/launchpad.ts";
 
 enum GlobalTraktorActions {
     BrowserTreeUp = 1,
@@ -119,9 +119,9 @@ export class TraktorSurface extends Surface {
             new Deck(2, this)
         ];
 
-        this.addControlListener((ev) => {
-            console.log("global", ev.detail)
-        })
+        /*this.addControlListener((ev) => {
+            //console.log("global", ev.detail)
+        })*/
 
         this.addControlListenerForKey(BUTTON_DEF.Shift, (ev) => {
             this.shift = ev.detail.state > 64;

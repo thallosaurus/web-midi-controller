@@ -1,7 +1,5 @@
 import { MidiDriver, type MidiMessage } from "@driver-deno";
 import { LaunchpadProMap, LightMode, Surface } from "./surface.ts";
-import { ControlButtons } from "./controls.ts";
-//import { BUTTON_DEF, LaunchpadControlButtons } from "./controls.ts";
 
 export const NOVATION_SYSEX_HEADER = [0xF0, 0x00, 0x20, 0x29, 0x02, 0x0E];
 
@@ -10,7 +8,50 @@ export enum LaunchpadSurfaceStore {
     Custom
 }
 
-
+export enum BUTTON_DEF {
+    LeftArrow = 91,
+    RightArrow = 92,
+    Session = 93,
+    Note = 94,
+    Chord = 95,
+    Custom = 96,
+    Sequencer = 97,
+    Projects = 98,
+    LED = 99,
+    Shift = 90,
+    UpArrow = 80,
+    DownArrow = 70,
+    Clear = 60,
+    Duplicate = 50,
+    Quantise = 40,
+    FixedLength = 30,
+    Play = 20,
+    Rec = 10,
+    RecArm = 1,
+    Mute = 2,
+    Solo = 3,
+    Volume = 4,
+    Pan = 5,
+    Sends = 6,
+    DeviceTempo = 7,
+    StopClip = 8,
+    Col1Sub = 101,
+    Col2Sub = 102,
+    Col3Sub = 103,
+    Col4Sub = 104,
+    Col5Sub = 105,
+    Col6Sub = 106,
+    Col7Sub = 107,
+    Col8Sub = 108,
+    Patterns = 89,
+    Steps = 79,
+    PatternSettings = 69,
+    Velocity = 59,
+    Probability = 49,
+    Mutation = 39,
+    MicroStep = 29,
+    PrintToClip = 19,
+}
 
 export class Launchpad {
     private control: MidiDriver;
