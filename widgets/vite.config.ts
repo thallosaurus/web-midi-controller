@@ -6,13 +6,15 @@ import { resolve } from "node:path";
 export default defineConfig({
   plugins: [
     react(),
-    dts(),
+    dts({
+      entryRoot: "src",
+    })
   ],
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "MyReactLib",
-      formats: ["es", "cjs"],
+      formats: ["es"],
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {

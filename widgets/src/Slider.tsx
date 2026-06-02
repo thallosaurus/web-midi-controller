@@ -1,7 +1,8 @@
 import { CCSliderProperties } from "widget-definitions";
 import { useEffect } from "react";
+import { WidgetProperties } from "./parser.tsx";
 
-export function CCSlider(props: CCSliderProperties) {
-    useEffect(() => console.log(props.cc, props.label, props.mode));
+export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
+    useEffect(() => console.log(def.cc, def.label, def.mode));
     return <></>
 }
