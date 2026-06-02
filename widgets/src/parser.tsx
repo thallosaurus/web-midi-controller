@@ -1,8 +1,8 @@
-import { Overlay, Widget } from "widget-definitions"
-import { createContext } from 'react';
+import { Overlay, Widget } from "definitions"
+import { createContext, useState } from 'react';
 import { CCButton, NoteButton } from "./Button.tsx";
 import { CCSlider } from "./Slider.tsx";
-import { Grid, Horizontal, Vertical } from "./Layout";
+import { Grid, Horizontal, Vertical } from "./Layout.tsx";
 
 const WidgetContext = createContext(null);
 export function WidgetProvider({ children }) {
@@ -41,6 +41,8 @@ export function WidgetProvider({ children }) {
   )
   */
 
+  const [overlay, setOverlay] = useState<Overlay | null>(null);
+
   return (
     <WidgetContext.Provider value={{
 
@@ -54,22 +56,20 @@ export interface WidgetProperties<T> {
   def: T
 }
 
-function parseWidget(def: Widget) {
+function parseWidget(def: Widget, k: number) {
   switch (def.type) {
     case 'notebutton':
-      //return <NoteButton note={def.note} id={def.id} channel={def.channel} label={def.label} mode={def.mode} />
-      return <NoteButton def={def} />
+      return <NoteButton def={def} key={k} />
     case 'ccslider':
-      //return <CCSlider label={def.label} mode={def.mode} vertical={def.vertical} id={def.id} channel={def.channel} cc={def.cc} value={def.value} value_off={def.value_off} default_value={def.default_value} />
-      return <CCSlider def={def} />
+      return <CCSlider def={def} key={k} />
     case 'horiz-mixer':
-      return <Horizontal def={def} />
+      return <Horizontal def={def} key={k} />
     case 'vert-mixer':
-      return <Vertical def={def} />
+      return <Vertical def={def} key={k} />
     case 'grid-mixer':
-      return <Grid def={def} />
+      return <Grid def={def} key={k} />
     case 'ccbutton':
-      return <CCButton def={def} />
+      return <CCButton def={def} key={k} />
     case 'rotary':
     case 'jogwheel':
     case 'xypad':
@@ -79,18 +79,16 @@ function parseWidget(def: Widget) {
   }
 }
 
-export function Layout(children: Widget[]) {
+export function Layout({ children }: { children: Widget[] }) {
   return <>
-    {children.map((v) => parseWidget(v))}
+    {children.map((v, i) => parseWidget(v, i))}
   </>
 }
 
 export function parseOverlay(o: Overlay) {
   return (
-    <WidgetProvider>
-      <div>
-        {Layout(o.cells)}
-      </div>
-    </WidgetProvider>
+    <div className="overlay">
+      <Layout children={o.cells} />
+    </div>
   )
 }

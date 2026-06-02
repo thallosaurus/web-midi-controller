@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
     "widget-definitions": "file:../definitions",
     "widgets": "file:../widgets"
   },
   "devDependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",

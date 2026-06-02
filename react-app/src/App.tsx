@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Suspense, use, useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
@@ -7,27 +7,36 @@ import './App.css'
 import { parseOverlay } from "widgets";
 import type { Overlay } from "widget-definitions";
 
-async function loadOverlay() {
+import TEST_OVERLAY from "../public/overlay_ableton.json"
+
+/*async function loadOverlay(): Promise<Overlay> {
   const req = await fetch("/overlay.json")
   const j = req.json();
   return j;
-}
+}*/
 
 function App() {
-  const [overlay, setOverlay] = useState<Overlay | null>(null)
+  //const [overlay, setOverlay] = useState<Overlay | null>(null);
+  
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      {parseOverlay(TEST_OVERLAY)}
+    </Suspense>
+  )
 
-  useEffect(() => {
+  /*useffect(() => {
 /*    const req = fetch("/overlay.json").then(e => {
       return e.json()
     }).then(setOverlay)*/
-    loadOverlay().then((e) => {
+    /*loadOverlay().then((e) => {
+      console.log(e);
       setOverlay(e);
-    })
-  })
-  
-  return (
-    <>{parseOverlay(overlay)}</>
-  )
+    })*
+  })*/
+}
+
+const Loading = () => {
+
 }
 
 function App_() {

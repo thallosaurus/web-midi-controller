@@ -1,0 +1,97 @@
+{
+  "id": "ableton_performance",
+  "name": "Ableton Performance",
+  "cells": [
+    {
+      "type": "horiz-mixer",
+      "horiz": [
+        {
+          "cc": 10,
+          "channel": 1,
+          "label": "Volume 1",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 20,
+          "channel": 1,
+          "label": "Volume 2",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 30,
+          "channel": 1,
+          "label": "Volume 3",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 40,
+          "channel": 1,
+          "label": "Volume 4",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 50,
+          "channel": 1,
+          "label": "Volume 5",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 60,
+          "channel": 1,
+          "label": "Volume 6",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 70,
+          "channel": 1,
+          "label": "Volume 7",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 80,
+          "channel": 1,
+          "label": "Volume 8",
+          "mode": "relative",
+          "type": "ccslider"
+        }
+      ]
+    },
+    {
+      "id": "returns",
+      "type": "vert-mixer",
+      "vert": [
+        {
+          "cc": 90,
+          "channel": 1,
+          "label": "Reverb",
+          "mode": "snapback",
+          "type": "ccslider",
+          "vertical": true
+        },
+        {
+          "cc": 91,
+          "channel": 1,
+          "label": "Filter",
+          "mode": "snapback",
+          "type": "ccslider",
+          "vertical": true
+        },
+        {
+          "cc": 92,
+          "channel": 1,
+          "label": "Test",
+          "mode": "absolute",
+          "type": "ccslider",
+          "vertical": true
+        }
+      ]
+    }
+  ]
+}

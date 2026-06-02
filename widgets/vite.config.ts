@@ -6,9 +6,7 @@ import { resolve } from "node:path";
 export default defineConfig({
   plugins: [
     react(),
-    dts({
-      entryRoot: "src",
-    })
+    dts({ tsconfigPath: './tsconfig.app.json' })
   ],
   build: {
     lib: {
@@ -21,6 +19,8 @@ export default defineConfig({
       external: [
         "react",
         "react-dom",
+        "react/jsx-runtime",
+        "react/jsx-dev-runtime",
       ],
     },
   },
