@@ -10,8 +10,6 @@ const KillColor = 106
 const CueColor = 56
 const LoopColor = 67
 
-type OnInputHandler = (button: Button, state: TraktorState, inputState: boolean) => void;
-
 export abstract class Button {
     pixel: Pixel
     action: number
@@ -38,6 +36,8 @@ export abstract class Button {
      */
     abstract handler(state: TraktorState, inputState: any): void;
 
+    shiftHandler?(state: TraktorState, inputState: any): void;
+
     /**
      * only updates the internal ui states, doesnt send to traktor
      * @param state 
@@ -51,28 +51,37 @@ enum TriggerMode {
     Latch
 }
 
-class NoteButton extends Button {
+class NoteButton extends Button {    
+    private internalState = false;
+    mode: TriggerMode
+
     override internalHandler(inputState: any): void {
         this.pixel.color = inputState > 64 ? this.colorOn : this.colorOff
     }
-    mode: TriggerMode
-    private internalState = false;
 
     override handler(state: TraktorState, inputState: any): void {
         console.log(inputState)
         switch (this.mode) {
             case TriggerMode.Direct:
-                state.sendTraktorMidi(this.action, inputState.pressed)
                 //this.pixel.color = inputState ? this.colorOn : this.colorOff
-                this.internalState = inputState.pressed;
-                this.internalHandler(inputState.velocity);
+                if (state.internalShiftState && this.shiftHandler) {
+                        this.shiftHandler(state, inputState);
+                } else {
+                    this.internalState = inputState.pressed;
+                    state.sendTraktorMidi(this.action, inputState.pressed)
+                    this.internalHandler(inputState.velocity);
+                }
                 break;
             case TriggerMode.Latch:
                 if (inputState.pressed) {
-                    this.internalState = !this.internalState;
-                    state.sendTraktorMidi(this.action, this.internalState);
-                    //this.pixel.color = this.internalState ? this.colorOn : this.colorOff
-                    this.internalHandler(this.internalState);
+                    if (state.internalShiftState && this.shiftHandler) {
+                        this.shiftHandler(state, inputState);
+                    } else {
+                        this.internalState = !this.internalState;
+                        state.sendTraktorMidi(this.action, this.internalState);
+                        //this.pixel.color = this.internalState ? this.colorOn : this.colorOff
+                        this.internalHandler(this.internalState);
+                    }
                 }
                 break;
         }
@@ -92,6 +101,9 @@ class NoteButton extends Button {
 }
 
 class CCButton extends Button {
+    override shiftHandler(state: TraktorState, inputState: any): void {
+        throw new Error("Method not implemented.");
+    }
     target: number;
     override internalHandler(inputState: any): void {
         this.pixel.color = inputState > 64 ? this.colorOn : this.colorOff
@@ -115,6 +127,9 @@ class CCButton extends Button {
 }
 
 class PlayPauseButton extends NoteButton {
+    override shiftHandler(state: TraktorState, inputState: any): void {
+        state.sendTraktorMidi(DeckActionsMidi.LoadSelectedTrack, inputState.pressed)
+    }
     constructor(state: TraktorState) {
         super(DeckActionsMidi.PlayPause, TriggerMode.Latch, state)
         this.pixel.color = 127
@@ -133,47 +148,33 @@ class SyncButton extends NoteButton {
 }
 
 class FwdButton extends NoteButton {
+    override shiftHandler(state: TraktorState, inputState: any): void {
+        state.sendTraktorMidi(DeckActionsMidi.SkipFwd, inputState.pressed)
+    }
     constructor(state: TraktorState) {
         super(DeckActionsMidi.Fwd, TriggerMode.Direct, state)
         this.pixel.color = BkwdFwdColor
         this.colorOff = BkwdFwdColor
         this.colorOn = 127
     }
-
-    override handler(state: TraktorState, inputState: any): void {
-        if (state.internalShiftState) {
-            state.sendTraktorMidi(DeckActionsMidi.SkipFwd, inputState.pressed)
-        } else {
-            super.handler(state, inputState);
-            //state.sendTraktorMidi(this.action, inputState.pressed)
-            //this.pixel.color = inputState ? this.colorOn : this.colorOff
-            //this.internalHandler(inputState.velocity);
-        }
-    }
 }
 
 class BkwdButton extends NoteButton {
+    override shiftHandler(state: TraktorState, inputState: any): void {
+        state.sendTraktorMidi(DeckActionsMidi.SkipBkwd, inputState.pressed)
+    }
     constructor(state: TraktorState) {
         super(DeckActionsMidi.Bkwd, TriggerMode.Direct, state)
         this.pixel.color = BkwdFwdColor
         this.colorOff = BkwdFwdColor
         this.colorOn = 127
     }
-
-    override handler(state: TraktorState, inputState: any): void {
-        if (state.internalShiftState) {
-            console.log(state);
-            state.sendTraktorMidi(DeckActionsMidi.SkipBkwd, inputState.pressed)
-        } else {
-            super.handler(state, inputState);
-            //state.sendTraktorMidi(this.action, inputState.pressed)
-            //this.pixel.color = inputState ? this.colorOn : this.colorOff
-            //this.internalHandler(inputState.velocity);
-        }
-    }
 }
 
 class LowKillButton extends NoteButton {
+    override shiftHandler(state: TraktorState, inputState: any): void {
+        throw new Error("Method not implemented.");
+    }
     constructor(state: TraktorState, mode = TriggerMode.Direct) {
         super(DeckActionsMidi.LowKill, mode, state)
         this.pixel.color = KillColor
@@ -210,7 +211,6 @@ class MixerCueButton extends NoteButton {
 }
 
 class LoopButton extends NoteButton {
-
     isLoopOn: boolean
     loopIndex: number;
     currentLoopIndex: number;

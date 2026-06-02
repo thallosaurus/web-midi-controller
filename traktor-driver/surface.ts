@@ -4,6 +4,13 @@ import { DeckActionsCC, DeckActionsMidi, TraktorState } from "./state.ts";
 import { Button, DeckMap, ShiftDeckMap } from "./button.ts";
 import { BUTTON_DEF } from "../launchpad-driver/src/controls.ts";
 
+enum GlobalTraktorActions {
+    BrowserTreeUp = 1,
+    BrowserTreeDown = 0,
+    BrowserListUp = 3,
+    BrowserListDown = 2,
+}
+
 class Deck {
     channel: number
     surface: TraktorSurface
@@ -22,7 +29,7 @@ class Deck {
         this.shiftMapping = ShiftDeckMap(this.traktorstate)
 
         this.updateMatrix(this.mapping)
-        
+
         this.surface.addControlListenerForKey(BUTTON_DEF.Shift, (ev) => {
             this.traktorstate.internalShiftState = ev.detail.state > 64;
             //this.surface.clearMatrix();
@@ -96,6 +103,8 @@ export class TraktorSurface extends Surface {
 
     decks: Deck[]
 
+    shift: boolean = false;
+
     traktorDriver = new MidiDriver({
         "inputName": "test virtual input",
         "outputName": "test virtual output",
@@ -112,6 +121,55 @@ export class TraktorSurface extends Surface {
 
         this.addControlListener((ev) => {
             console.log("global", ev.detail)
+        })
+
+        this.addControlListenerForKey(BUTTON_DEF.Shift, (ev) => {
+            this.shift = ev.detail.state > 64;
+        })
+
+        this.addControlListenerForKey(BUTTON_DEF.UpArrow, (ev) => {
+            console.log("Up Arrow");
+            //this.traktorstate.sendTraktorMidi()
+            if (this.shift) {
+                this.sendBrowserUp(ev.detail.state > 64);
+            } else {
+                this.sendListUp(ev.detail.state > 64)
+            }
+        })
+
+        this.addControlListenerForKey(BUTTON_DEF.DownArrow, (ev) => {
+            console.log("Down Arrow");
+            //this.traktorstate.sendTraktorMidi()
+            if (this.shift) {
+                this.sendBrowserDown(ev.detail.state > 64);
+            } else {
+                this.sendListDown(ev.detail.state > 64)
+            }
+        })
+    }
+
+    sendBrowserUp(state: boolean) {
+        this.sendGlobalCommand(GlobalTraktorActions.BrowserTreeUp, state)
+    }
+
+    sendBrowserDown(state: boolean) {
+        this.sendGlobalCommand(GlobalTraktorActions.BrowserTreeDown, state)
+    }
+
+    sendListUp(state: boolean) {
+        this.sendGlobalCommand(GlobalTraktorActions.BrowserListUp, state)
+    }
+
+    sendListDown(state: boolean) {
+        this.sendGlobalCommand(GlobalTraktorActions.BrowserListDown, state)
+    }
+
+    sendGlobalCommand(note: GlobalTraktorActions, state: boolean) {
+        this.traktorDriver.sendMidi({
+            type: state ? "NoteOn" : "NoteOff",
+            note,
+            velocity: state ? 127 : 0,
+            channel: 16
         })
     }
 }

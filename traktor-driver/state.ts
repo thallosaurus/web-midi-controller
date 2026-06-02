@@ -35,7 +35,8 @@ export enum DeckActionsMidi {
     LoopStatus = 20,
 
     SkipBkwd = 21,
-    SkipFwd = 22
+    SkipFwd = 22,
+    LoadSelectedTrack = 23
 }
 
 export enum LoopFeedbackStates {
