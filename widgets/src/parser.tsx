@@ -52,8 +52,11 @@ export function WidgetProvider({ children }) {
   )
 }
 
+export type UpdateCallback<T> = (def: T, value: number) => void;
+
 export interface WidgetProperties<T> {
-  def: T
+  def: T,
+  callback?: UpdateCallback<T>
 }
 
 function parseWidget(def: Widget, k: number) {
@@ -79,13 +82,38 @@ function parseWidget(def: Widget, k: number) {
   }
 }
 
-export function Layout({ children }: { children: Widget[] }) {
+export function Layout({ children, callback }: { children: Widget[], callback: UpdateCallback<any> }) {
   return <>
-    {children.map((v, i) => parseWidget(v, i))}
+    {children.map((def, k) => {
+      switch (def.type) {
+        case 'notebutton':
+          return <NoteButton def={def} key={k} callback={callback}/>
+        case 'ccslider':
+          return <CCSlider def={def} key={k} callback={callback} />
+        case 'horiz-mixer':
+          return <Horizontal def={def} key={k} callback={callback} />
+        case 'vert-mixer':
+          return <Vertical def={def} key={k} callback={callback} />
+        case 'grid-mixer':
+          return <Grid def={def} key={k} callback={callback} />
+        case 'ccbutton':
+          return <CCButton def={def} key={k} callback={callback} />
+        case 'rotary':
+        case 'jogwheel':
+        case 'xypad':
+        case 'shift':
+        case 'empty':
+        default:
+      }
+    })}
   </>
 }
 
-export function parseOverlay(o: Overlay) {
+function testCallback(def: any, v: number) {
+  console.log(def, v);
+}
+
+export function parseOverlay<T>(o: Overlay, callback: UpdateCallback<T>) {
   return (
     <div className="overlay" style={{
       width: "calc(100% - 1em)",
@@ -94,7 +122,7 @@ export function parseOverlay(o: Overlay) {
       gap: "1em",
       justifyContent: "center"
     }}>
-      <Layout children={o.cells} />
+      <Layout children={o.cells} callback={callback}/>
     </div>
   )
 }

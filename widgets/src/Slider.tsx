@@ -1,6 +1,7 @@
 import { CCSliderProperties, SliderMode } from "definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { useEffect, useRef, useState } from "react";
+import { vibrate } from "./utils.ts";
 
 const MAX_LEVEL = 127;
 
@@ -42,7 +43,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
+export function CCSlider({ def, callback }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);
@@ -50,32 +51,32 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
     const baseY = useRef<number>(0);
     const activePointer = useRef<number | null>(null);
 
-    const start = (e: PointerEvent) => {
-        e.preventDefault();
+    const start = ({ currentTarget, pointerId, clientX, clientY }) => {
+        //preventDefault();
         vibrate();
-        const el = e.currentTarget as HTMLElement;
+        const el = currentTarget as HTMLElement;
 
-        activePointer.current = e.pointerId;
-        el.setPointerCapture(e.pointerId);
+        activePointer.current = pointerId;
+        el.setPointerCapture(pointerId);
 
         baseValue.current = value;
 
-        this.state.baseY = e.clientY;
-        this.state.baseX = e.clientX;
+        baseY.current = clientY;
+        baseX.current = clientX;
 
-        update(e);
+        update({ target: el, clientY, clientX });
     };
 
-    const move = (e: PointerEvent) => {
-        if (e.pointerId !== activePointer.current) return;
-        update(e);
+    const move = ({ target, clientY, clientX, pointerId }) => {
+        if (pointerId !== activePointer.current) return;
+        update({ target, clientY, clientX });
     };
 
-    const end = (e: PointerEvent) => {
-        if (e.pointerId !== activePointer.current) return;
+    const end = ({ target, pointerId }) => {
+        if (pointerId !== activePointer.current) return;
 
-        const el = e.target as HTMLElement;
-        el.releasePointerCapture(e.pointerId);
+        const el = target as HTMLElement;
+        el.releasePointerCapture(pointerId);
         activePointer.current = null;
 
         if (def.mode == "snapback") {
@@ -88,8 +89,8 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
         //this.eventbus!.updateCC(this.prop.channel, this.prop.cc, def.default_value ?? 0);
     };
 
-    const update = (e: PointerEvent) => {
-        const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const update = ({ target, clientY, clientX }) => {
+        const rect = (target as HTMLElement).getBoundingClientRect();
         //const y = rect.bottom - e.clientY;
 
         switch (def.mode) {
@@ -98,7 +99,7 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
                 {
                     let v;
                     if (!def.vertical) {
-                        const n = rect.bottom - e.clientY;
+                        const n = rect.bottom - clientY;
                         v = Math.floor(
                             Math.max(
                                 0,
@@ -109,7 +110,7 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
                             ),
                         );
                     } else {
-                        const n = e.clientX - rect.left;
+                        const n = clientX - rect.left;
                         v = Math.floor(
                             Math.max(
                                 0,
@@ -122,9 +123,11 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
                     }
                     if (v != value) {
                         //update_value(v);
-                        console.log(rect);
-                        console.log(v);
+                        //console.log(rect);
+                        //console.log(v);
                         //this.sendValue(v);
+                        setValue(v)
+                        if (callback) callback(def, v);
                     }
                 }
                 break;
@@ -133,7 +136,7 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
                 {
                     let v;
                     if (!def.vertical) {
-                        const n = baseY.current - e.clientY;
+                        const n = baseY.current - clientY;
                         const sensitivity = MAX_LEVEL / (rect.height);
                         const next = baseValue.current + n * sensitivity;
                         //(options.vertical ? (rect.width) : (rect.height));
@@ -141,7 +144,7 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
                             Math.max(0, Math.min(MAX_LEVEL, next)),
                         );
                     } else {
-                        const delta = e.clientX - baseX.current;
+                        const delta = clientX - baseX.current;
                         const sensitivity = MAX_LEVEL / rect.width;
                         const next = baseValue.current + delta * sensitivity;
 
@@ -152,6 +155,8 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
 
                     if (v != value) {
                         //this.sendValue(v);
+                        setValue(v)
+                        if (callback) callback(def, v);
                     }
                 }
 
@@ -161,9 +166,15 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
     };
 
 
-    useEffect(() => console.log(def.cc, def.label, def.mode, def.vertical));
+    //useEffect(() => console.log(def.cc, def.label, def.mode, value));
     return <div className="ccslider" style={def.vertical ? verticalCCSliderStyle() : horizontalCCSliderStyle()}>
-        <div className="slider" style={def.vertical ? verticalSliderStyle() : horizontalSliderStyle()}>
+        <div className="slider"
+            style={def.vertical ? verticalSliderStyle() : horizontalSliderStyle()}
+            onPointerDown={start}
+            onPointerMove={move}
+            onPointerUp={end}
+            onPointerCancel={end}
+        >
             <div className="fill" style={def.vertical ? verticalFillStyle(value, def.mode) : horizontalFillStyle(value, def.mode)}>
 
             </div>
@@ -178,7 +189,8 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
             border: "none",
             whiteSpace: "nowrap"
         }}>
-            {def.label}
+            <div>{value}</div>
+            <div>{def.label}</div>
         </button>
     </div >
 }

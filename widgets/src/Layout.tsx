@@ -1,7 +1,7 @@
 import { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties } from "definitions";
 import { Layout, WidgetProperties } from "./Parser.tsx";
 
-export function Vertical({ def }: WidgetProperties<VerticalMixerProperties>) {
+export function Vertical({ def, callback }: WidgetProperties<VerticalMixerProperties>) {
     //return (<div>{Layout(def.vert)}</div>)
     return <div style={{
         display: "flex",
@@ -10,11 +10,11 @@ export function Vertical({ def }: WidgetProperties<VerticalMixerProperties>) {
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.vert} />
+        <Layout children={def.vert} callback={callback}/>
     </div>
 }
 
-export function Horizontal({ def }: WidgetProperties<HorizontalMixerProperties>) {
+export function Horizontal({ def, callback }: WidgetProperties<HorizontalMixerProperties>) {
     return (<div style={{
         display: "flex",
         flexDirection: "row",
@@ -22,13 +22,13 @@ export function Horizontal({ def }: WidgetProperties<HorizontalMixerProperties>)
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.horiz} />
+        <Layout children={def.horiz} callback={callback} />
     </div>)
 
 }
 
-export function Grid({ def }: WidgetProperties<GridMixerProperties>) {
+export function Grid({ def, callback }: WidgetProperties<GridMixerProperties>) {
     return (<div className="grid">
-        <Layout children={def.grid} />
+        <Layout children={def.grid} callback={callback} />
     </div>)
 }

@@ -1,22 +1,21 @@
 import { Suspense, use, useEffect, useState } from 'react'
 
 import { parseOverlay } from "widgets";
-import type { Overlay } from "widget-definitions";
+//import type { Overlay } from "definitions";
 
-import TEST_OVERLAY from "../public/overlay_ableton.json"
+import TEST_OVERLAY from "../public/overlay.json"
 import "./index.css"
 
-async function loadOverlay(): Promise<Overlay> {
-  const req = await fetch("/overlay.json")
-  const j = req.json();
-  return j;
-}
-
 function App() {
+  const callback = (t: any, v: number) => {
+    console.log(t, v);
+  }
+
   return (
-    <Suspense fallback={<p>Loading...</p>}>
-      {parseOverlay(TEST_OVERLAY)}
-    </Suspense>
+    <>
+      {parseOverlay(TEST_OVERLAY, callback)}
+    </>
+
   )
 }
 
