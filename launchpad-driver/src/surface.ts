@@ -201,15 +201,19 @@ export abstract class Surface {
         }
     }
 
+    addControlListenerForKey(cc: BUTTON_DEF, listener: ((event: CustomEvent<ControlEvent>) => void)) {
+        return this.events.addEventListener(BUTTON_DEF[cc], (ev) => {
+            listener(ev as CustomEvent);
+        })
+    }
+
     /**
      * register handler for when the matrix receives an event
      */
-    get addMatrixListener() {
-        return (listener: (event: CustomEvent<MatrixEvent>) => void) => {
-            this.events.addEventListener("matrix", (ev) => {
-                listener(ev as CustomEvent)
-            });
-        }
+    addMatrixListener(listener: (event: CustomEvent<MatrixEvent>) => void) {
+        this.events.addEventListener("matrix", (ev) => {
+            listener(ev as CustomEvent)
+        });
     }
 
     constructor(width = 8) {
@@ -327,6 +331,7 @@ export abstract class Surface {
                 //this.con.set(msg.cc, msg.value);
                 this.controlState.set(msg.cc, msg.value);
                 this.events.dispatchEvent(new CustomEvent("controls", { detail: { pressed: msg.value > 64, cc: msg.cc } }))
+                this.events.dispatchEvent(new CustomEvent(BUTTON_DEF[msg.cc], { detail: { state: msg.value, cc: msg.cc } }))
                 break;
         }
     }

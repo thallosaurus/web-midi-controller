@@ -139,6 +139,17 @@ class FwdButton extends NoteButton {
         this.colorOff = BkwdFwdColor
         this.colorOn = 127
     }
+
+    override handler(state: TraktorState, inputState: any): void {
+        if (state.internalShiftState) {
+            state.sendTraktorMidi(DeckActionsMidi.SkipFwd, inputState.pressed)
+        } else {
+            super.handler(state, inputState);
+            //state.sendTraktorMidi(this.action, inputState.pressed)
+            //this.pixel.color = inputState ? this.colorOn : this.colorOff
+            //this.internalHandler(inputState.velocity);
+        }
+    }
 }
 
 class BkwdButton extends NoteButton {
@@ -147,6 +158,18 @@ class BkwdButton extends NoteButton {
         this.pixel.color = BkwdFwdColor
         this.colorOff = BkwdFwdColor
         this.colorOn = 127
+    }
+
+    override handler(state: TraktorState, inputState: any): void {
+        if (state.internalShiftState) {
+            console.log(state);
+            state.sendTraktorMidi(DeckActionsMidi.SkipBkwd, inputState.pressed)
+        } else {
+            super.handler(state, inputState);
+            //state.sendTraktorMidi(this.action, inputState.pressed)
+            //this.pixel.color = inputState ? this.colorOn : this.colorOff
+            //this.internalHandler(inputState.velocity);
+        }
     }
 }
 
@@ -204,7 +227,7 @@ class LoopButton extends NoteButton {
     constructor(loop: DeckActionsMidi, state: TraktorState) {
         super(loop as number, 0, state)
 
-        this.loopIndex = this.action - DeckActionsMidi.Loop16th + 1
+        this.loopIndex = this.action - DeckActionsMidi.Loop32th
         this.currentLoopIndex = 0;
 
         this.isLoopOn = false;
@@ -216,7 +239,7 @@ class LoopButton extends NoteButton {
             //console.log(val, calc)
             this.currentLoopIndex = val;
 
-            this.internalHandler((this.loopIndex == val) && this.isLoopOn ? 127 : 0)
+            //this.internalHandler((this.loopIndex == val) && this.isLoopOn ? 127 : 0)
             this.internalHandler(null)
         })
 
@@ -252,6 +275,18 @@ class LoopButton extends NoteButton {
 //    [Loop4thButton, Loop2ndButton, Loop1Button, Loop2Button],
 //    [Loop4Button, Loop8Button, Loop16Button, Loop32Button],
 
+export function ShiftDeckMap(state: TraktorState) {
+    return [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+    ]
+}
 export function DeckMap(state: TraktorState) {
     return [
         [],

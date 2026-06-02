@@ -21,17 +21,21 @@ export enum DeckActionsMidi {
     HiKill = 7,
     MixerCue = 8,
 
-    Loop16th = 9,
-    Loop8th = 10,
-    Loop4th = 11,
-    Loop2nd = 12,
-    Loop1 = 13,
-    Loop2 = 14,
-    Loop4 = 15,
-    Loop8 = 16,
-    Loop16 = 17,
-    Loop32 = 18,
-    LoopStatus = 19
+    Loop32th = 9,
+    Loop16th = 10,
+    Loop8th = 11,
+    Loop4th = 12,
+    Loop2nd = 13,
+    Loop1 = 14,
+    Loop2 = 15,
+    Loop4 = 16,
+    Loop8 = 17,
+    Loop16 = 18,
+    Loop32 = 19,
+    LoopStatus = 20,
+
+    SkipBkwd = 21,
+    SkipFwd = 22
 }
 
 export enum LoopFeedbackStates {
@@ -69,6 +73,7 @@ export class TraktorState {
     ]);
 
     currentLoop = LoopFeedbackStates.NoLoop
+    internalShiftState = false;
 
     //loopState: LoopStates
 
