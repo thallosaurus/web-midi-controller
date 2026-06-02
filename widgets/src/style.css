@@ -1,0 +1,11 @@
+@import url(./css/button.css);
+@import url(./css/jogwheel.css);
+@import url(./css/rotary.css);
+@import url(./css/slider.css);
+@import url(./css/xypad.css);
+
+:root {
+    --relative: green;
+    --absolute: orange;
+    --snapback: red;
+}

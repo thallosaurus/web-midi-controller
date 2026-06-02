@@ -87,7 +87,13 @@ export function Layout({ children }: { children: Widget[] }) {
 
 export function parseOverlay(o: Overlay) {
   return (
-    <div className="overlay">
+    <div className="overlay" style={{
+      width: "calc(100% - 1em)",
+      height: "calc(100% - 1em)",
+      display: "flex",
+      gap: "1em",
+      justifyContent: "center"
+    }}>
       <Layout children={o.cells} />
     </div>
   )
