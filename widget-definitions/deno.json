@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "build": "cargo test export_bindings"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1",
+    "@driver": "../midi-driver/index.ts",
+    "@driver-deno": "../midi-driver/deno_mod.ts",
+    "@traktor": "../traktor-driver/deno_mod.ts"
+  }
+}

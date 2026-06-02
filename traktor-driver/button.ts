@@ -51,7 +51,7 @@ enum TriggerMode {
     Latch
 }
 
-class NoteButton extends Button {    
+class NoteButton extends Button {
     private internalState = false;
     mode: TriggerMode
 
@@ -65,7 +65,7 @@ class NoteButton extends Button {
             case TriggerMode.Direct:
                 //this.pixel.color = inputState ? this.colorOn : this.colorOff
                 if (state.internalShiftState && this.shiftHandler) {
-                        this.shiftHandler(state, inputState);
+                    this.shiftHandler(state, inputState);
                 } else {
                     this.internalState = inputState.pressed;
                     state.sendTraktorMidi(this.action, inputState.pressed)
@@ -144,6 +144,10 @@ class SyncButton extends NoteButton {
         this.pixel.color = SyncColor
         this.colorOff = SyncColor
         this.colorOn = 127
+    }
+
+    override shiftHandler(state: TraktorState, inputState: any): void {
+        state.sendTraktorMidi(DeckActionsMidi.MasterSync, true);
     }
 }
 
@@ -262,18 +266,6 @@ class LoopButton extends NoteButton {
         //this.pixel.color = inputState ? 127 : PlayColor
     }
 }
-
-/*class LoopButtonFeedback extends NoteButton {
-    internalLoop: number
-
-    constructor(state: TraktorState) {
-        super(DeckActionsCC.LoopSetFeedback, 0, state)
-        this.internalLoop = 0
-    }
-}*/
-
-//    [Loop4thButton, Loop2ndButton, Loop1Button, Loop2Button],
-//    [Loop4Button, Loop8Button, Loop16Button, Loop32Button],
 
 export function ShiftDeckMap(state: TraktorState) {
     return [

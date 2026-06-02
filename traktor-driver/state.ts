@@ -1,9 +1,4 @@
-import { MidiDriver, MidiMessage } from "@driver-deno";
-
-// rename to state.ts if done
-
-const LoopCC = 2
-const VolumeCC = 0
+import { MidiDriver } from "@driver-deno";
 
 export enum DeckActionsCC {
     Volume = 0,
@@ -36,7 +31,8 @@ export enum DeckActionsMidi {
 
     SkipBkwd = 21,
     SkipFwd = 22,
-    LoadSelectedTrack = 23
+    LoadSelectedTrack = 23,
+    MasterSync = 24
 }
 
 export enum LoopFeedbackStates {
@@ -183,105 +179,9 @@ export class TraktorState {
 
     private processMidi(msg: { note: DeckActionsMidi, velocity: number }) {
         this.setNoteState(msg.note, msg.velocity)
-
-        /*switch (msg.note) {
-            case DeckActionsMidi.PlayPause:
-                //this.playing = evt.detail.velocity > 64;
-                //this.state.set("playing", msg.velocity)
-                this.setNoteState(DeckActionsMidi.PlayPause, msg.velocity)
-                break;
-
-            case DeckActionsMidi.LowKill:
-                //this._lowkill = evt.detail.velocity > 64;
-                //this.state.set("lowkill", msg.velocity);
-                this.setNoteState(DeckActionsMidi.LowKill, msg.velocity);
-                break;
-
-            case DeckActionsMidi.MidKill:
-                //this._midkill = evt.detail.velocity > 64;
-                //this.state.set("midkill", msg.velocity);
-                this.setNoteState(DeckActionsMidi.MidKill, msg.velocity);
-                break;
-
-            case DeckActionsMidi.HiKill:
-                //this._hikill = evt.detail.velocity > 64;
-                //this.state.set("hikill", msg.velocity);
-                this.setNoteState(DeckActionsMidi.HiKill, msg.velocity);
-                break;
-
-            case DeckActionsMidi.Sync:
-                //this.state.set("sync", msg.velocity);
-                this.setNoteState(DeckActionsMidi.Sync, msg.velocity);
-                break;
-
-            case DeckActionsMidi.MixerCue:
-                //this.state.set("mixercue", msg.velocity);
-                this.setNoteState(DeckActionsMidi.MixerCue, msg.velocity);
-                break;
-
-            default:
-            case DeckActionsMidi.Fwd:
-            case DeckActionsMidi.Bkwd:
-            case DeckActionsMidi.Loop16th:
-            case DeckActionsMidi.Loop8th:
-            case DeckActionsMidi.Loop4th:
-            case DeckActionsMidi.Loop2nd:
-            case DeckActionsMidi.Loop1:
-            case DeckActionsMidi.Loop2:
-            case DeckActionsMidi.Loop4:
-            case DeckActionsMidi.Loop8:
-            case DeckActionsMidi.Loop16:
-            case DeckActionsMidi.Loop32:
-                
-        }*/
     }
 
-    set lowkill(state: boolean) {
-        //this.lowkill = state;
-        this.sendTraktorMidi(DeckActionsMidi.LowKill, state)
-    }
-
-    set midkill(state: boolean) {
-        //this.lowkill = state;
-        this.sendTraktorMidi(DeckActionsMidi.MidKill, state)
-    }
-    set hikill(state: boolean) {
-        //this.lowkill = state;
-        this.sendTraktorMidi(DeckActionsMidi.HiKill, state);
-    }
-
-    /*set loop(loop: LoopStates) {
-        this.currentLoop = loop;
-
-        if (loop !== LoopStates.NoLoop) {
-            this.traktorport.sendMidi({
-                type: "ControlChange",
-                cc: LoopCC,
-                value: loop,
-                channel: this.channel
-            })
-        } else {
-            //TODO implement turn off
-        }
-        //        this.sendUpdate();
-    }*/
-
-    set play(state: boolean) {
-        //this.playing = state;
-        this.sendTraktorMidi(DeckActionsMidi.PlayPause, state);
-    }
-
-    set sync(state: boolean) {
-        this.sendTraktorMidi(DeckActionsMidi.Sync, state);
-    }
-
-    set vol(vol: number) {
-        this.sendTraktorCC(VolumeCC, vol)
-
-        //this.sendUpdate();
-    }
-
-    private get triggerMidi() {
+    get triggerMidi() {
         return (action: DeckActionsMidi) => {
             this.sendTraktorMidi(action, true);
             setTimeout(() => {

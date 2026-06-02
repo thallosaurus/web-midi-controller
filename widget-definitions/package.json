@@ -1,0 +1,5 @@
+{
+  "name": "widget-definitions",
+  "type": "module",
+  "main": "main.ts"
+}
