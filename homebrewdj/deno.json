@@ -1,12 +1,15 @@
 {
   "tasks": {
-    "dev": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib deno run -A main.ts"
+    "dev": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib deno run -A main.ts",
+    "build-client": "deno bundle --sourcemap --outdir dist ./client/index.ts"
   },
   "imports": {
+    "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
     "@std/assert": "jsr:@std/assert@1",
     "@traktor": "../traktor-driver/main.ts",
     "@launchpad": "../launchpad-driver/main.ts",
     "@driver": "../midi-driver/index.ts",
-    "@driver-deno": "../midi-driver/deno_mod.ts"
+    "@driver-deno": "../midi-driver/deno_mod.ts",
+    "oak": "https://deno.land/x/oak/mod.ts"
   }
 }

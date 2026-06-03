@@ -2,7 +2,8 @@
   "tasks": {
     "dev": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib deno run -A bin/surface_test.ts",
     "debug": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A --inspect-wait bin/surface_test.ts",
-    "state": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A bin/state_test.ts"
+    "state": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A bin/state_test.ts",
+    "build": "deno bundle --outdir main.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",

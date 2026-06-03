@@ -1,5 +1,9 @@
 import { parseOverlay } from "widgets";
 import type { Overlay } from "definitions";
+import { WebsocketClient } from "homebrewdj-web-client";
+import { useEffect, useRef } from "react";
+
+//import { WebsocketClient } from "homebrewdj-web-client/client";
 
 //import TEST_OVERLAY from "../public/overlay_traktor.json"
 const OVERLAY: Overlay = {
@@ -37,7 +41,23 @@ const OVERLAY: Overlay = {
   }]
 };
 
+function OverlayView() {
+  return (
+    <>
+      {parseOverlay(OVERLAY as any, {
+        sendNote: noteCallback, sendCC: ccCallback
+      })}
+    </>
+  )
+}
+
 function App() {
+  const client = useRef<WebsocketClient | null>();
+
+  useEffect(() => {
+    client.current = new WebsocketClient();
+  })
+
   const ccCallback = (channel: number, cc: number, value: number) => {
     console.log("cc", channel, cc, value);
   }

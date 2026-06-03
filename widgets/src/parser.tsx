@@ -55,17 +55,33 @@ export function WidgetProvider({ children }) {
 
 export type SendNoteCallback = (channel: number, note: number, velocity: number, on: boolean) => void;
 export type SendCCCallback = (channel: number, cc: number, value: number) => void;
+export type RegisterCCCallback = (channel: number, cc: number) => void;
+export type RegisterNoteCallback = (channel: number, cc: number) => void;
 
 export interface WidgetProperties<T> {
   def: T,
   callbacks: WidgetCallbacks
-/*  sendNoteCallback?: SendNoteCallback
-  sendCCCallback?: SendCCCallback*/
 }
 
 export interface WidgetCallbacks {
+  /**
+   * Sends out Note Data
+   */
   sendNote?: SendNoteCallback
+  /**
+   * registers this widget for input Note Data
+   */
+  registerNote?: RegisterNoteCallback
+
+  /**
+   * Sends out CC Data
+   */
   sendCC?: SendCCCallback
+
+  /**
+   * registers this widget for input CC Data
+   */
+  registerCC?: RegisterCCCallback
 }
 
 export function Layout({ children, callbacks }: { children: Widget[], callbacks: WidgetCallbacks }) {
