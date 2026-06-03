@@ -1,11 +1,11 @@
 // ex. scripts/build_npm.ts
 import { build, emptyDir } from "@deno/dnt";
 
-await emptyDir("./dist");
+await emptyDir("./dist/client");
 
 await build({
   entryPoints: ["./client/index.ts"],
-  outDir: "./dist",
+  outDir: "./dist/client",
   shims: {
     // see JS docs for overview and more options
     deno: true,

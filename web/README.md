@@ -1,5 +1,8 @@
 # MIDI-Controller
 
+# !!! DEPRECATED !!!
+See [react-app](../react-app) for the current version
+
 ## Installation
 ### Prebuilt Release
 Download and run the latest Release from the "Releases" Tab or [click here](/releases/latest). Download the executable for your OS and the `overlay.zip` file which contains prebuilt mappings

@@ -12,7 +12,7 @@
   "dependencies": {
     "widget-definitions": "file:../definitions",
     "widgets": "file:../widgets",
-    "homebrewdj-web-client": "file:../homebrewdj/dist"
+    "homebrewdj-web-client": "file:../homebrewdj/dist/client"
   },
   "devDependencies": {
     "terser": "^5.47.1",

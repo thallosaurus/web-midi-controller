@@ -1563,7 +1563,7 @@ hermes-parser@^0.25.1:
   dependencies:
     hermes-estree "0.25.1"
 
-"homebrewdj-web-client@file:../homebrewdj/dist":
+"homebrewdj-web-client@file:../homebrewdj/dist/client":
   version "0.1.0"
 
 ignore@^5.2.0:
@@ -2113,7 +2113,7 @@ which@^2.0.1:
 "widgets@file:../widgets":
   version "1.0.0"
   dependencies:
-    definitions "file:../../../../Library/Caches/Yarn/v6/npm-widgets-1.0.0-dabafa8d-e80d-4d70-87ca-d8fd364e2daf-1780499085320/node_modules/definitions"
+    definitions "file:../../../../Library/Caches/Yarn/v6/npm-widgets-1.0.0-58992acf-3a2d-4d4b-b37f-1456a075e275-1780510185811/node_modules/definitions"
 
 word-wrap@^1.2.5:
   version "1.2.5"
