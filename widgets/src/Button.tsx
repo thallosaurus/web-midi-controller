@@ -17,7 +17,14 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
     const latchOn = useRef(false);
 
 //    useEffect(() => { console.log(callbacks) })
-
+    useEffect(() => {
+        const id = callbacks.registerNote(def.channel, def.note, (v) => {
+            setOn(v > 64);
+        })
+        return () => {
+            callbacks.unregisterNote(def.channel, def.note, id)
+        }
+    })
     const start = ({ currentTarget, pointerId }) => {
         vibrate();
         const el = currentTarget as HTMLElement;
@@ -70,6 +77,15 @@ export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties
     const [on, setOn] = useState(false);
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef<boolean>(false);
+
+    useEffect(() => {
+        const id = callbacks.registerCC(def.channel, def.cc, (v) => {
+            setOn(v > 64);
+        });
+        return () => {
+            callbacks.unregisterCC(def.channel, def.cc, id);
+        }
+    })
 
     const touch_start = ({ currentTarget, pointerId }) => {
         vibrate();

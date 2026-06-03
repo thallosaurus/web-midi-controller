@@ -1,5 +1,3 @@
-//import { AllowedPayloads } from "../server";
-
 import { AllowedPayloads } from "./protocol.ts";
 
 type WebsocketMessageCallback<T> = (msg: T) => void;

@@ -2,13 +2,11 @@ import { randomUUID, UUID } from "node:crypto";
 import { Router, Context, Application } from "oak";
 import { AllowedPayloads } from "./client/protocol.ts";
 
-
 type HandlerCallback<T> = (msg: T) => void;
 
 const StaticHandler = async (context: Context) => {
     console.log(new URL("../react-app/dist/", import.meta.url).pathname)
     await context.send({
-//        root: `${Deno.cwd()}`,
         root: new URL("../react-app/dist/", import.meta.url).pathname,
         index: "index.html",
     })
@@ -80,6 +78,12 @@ export class Server<T = AllowedPayloads> {
             signal: this.controller.signal,
             ...listenOptions
         })
+    }
+
+    broadcast(msg: T) {
+        this.clients.forEach(client => {
+            client.send(JSON.stringify(msg))
+        });
     }
 
     close() {

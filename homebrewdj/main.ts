@@ -31,7 +31,7 @@ const server = new Server((msg: AllowedPayloads) => {
           deckBAux.sendTraktorCC(cc, value);
         }
       }
-    break;
+      break;
     case "note":
       {
         const { note, channel, velocity, on } = msg;
@@ -46,6 +46,32 @@ const server = new Server((msg: AllowedPayloads) => {
 }, {
   hostname: "0.0.0.0"
 });
+
+traktorDriver.addEventListener((ev) => {
+  const t = ev.detail;
+
+  switch (t.type) {
+    case "NoteOn":
+    case "NoteOff":
+      server.broadcast({
+        type: "note",
+        channel: t.channel,
+        note: t.note,
+        on: t.type == "NoteOn",
+        velocity: t.velocity
+      });
+
+      break;
+    case "ControlChange":
+      server.broadcast({
+        type: "cc",
+        channel: t.channel,
+        cc: t.cc,
+        value: t.value
+      });
+      break;
+  }
+})
 
 
 Deno.addSignalListener("SIGINT", () => {

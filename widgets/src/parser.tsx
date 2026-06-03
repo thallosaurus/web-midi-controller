@@ -1,62 +1,19 @@
 import { Overlay, Widget } from "definitions"
-import { createContext, useState } from 'react';
 import { CCButton, NoteButton } from "./Button.tsx";
 import { CCSlider } from "./Slider.tsx";
-import { Grid, Horizontal, Vertical } from "./Layout.tsx";
+import { Grid, Horizontal, ShiftArea, Vertical } from "./Layout.tsx";
 import { Rotary } from "./Rotary.tsx";
+import { XYPad } from "./XYPad.tsx";
 
-const WidgetContext = createContext(null);
-export function WidgetProvider({ children }) {
-  /*const wsRef = useRef<WebsocketWorkerClient | null>(null);
-  const [connected, setConnected] = useState(false);
-
-  const onConnect = () => {
-      setConnected(true);
-  }
-
-  const onDisconnect = () => {
-      //   unloadOverlays();
-      setConnected(false);
-  }
-
-  if (!wsRef.current) {
-      const ws = new WebsocketWorkerClient();
-      wsRef.current = ws;
-  }
-  
-  return (
-    <WsContext.Provider value={{
-      ws: wsRef.current,
-      connected,
-      loadWebsocket: () => {
-        wsRef.current.events.addEventListener("connect", onConnect);
-        wsRef.current.events.addEventListener("disconnect", onDisconnect);
-      },
-      unloadWebsocket: () => {
-        wsRef.current.events.removeEventListener("connect", onConnect);
-        wsRef.current.events.removeEventListener("disconnect", onDisconnect);
-      }
-    }}>
-    {children}
-    </WsContext.Provider>
-  )
-  */
-
-  const [overlay, setOverlay] = useState<Overlay | null>(null);
-
-  return (
-    <WidgetContext.Provider value={{
-
-    }}>
-      {children}
-    </WidgetContext.Provider>
-  )
-}
+type ReceiveDataCallback = (v: number) => void;
 
 export type SendNoteCallback = (channel: number, note: number, velocity: number, on: boolean) => void;
 export type SendCCCallback = (channel: number, cc: number, value: number) => void;
-export type RegisterCCCallback = (channel: number, cc: number) => void;
-export type RegisterNoteCallback = (channel: number, cc: number) => void;
+export type RegisterCCCallback = (channel: number, cc: number, cb: ReceiveDataCallback) => string;
+export type RegisterNoteCallback = (channel: number, note: number, cb: ReceiveDataCallback) => string;
+
+export type UnregisterNoteCallback = (channel: number, note: number, id: string) => void;
+export type UnregisterCCCallback = (channel: number, cc: number, id: string) => void;
 
 export interface WidgetProperties<T> {
   def: T,
@@ -82,6 +39,16 @@ export interface WidgetCallbacks {
    * registers this widget for input CC Data
    */
   registerCC?: RegisterCCCallback
+
+  /**
+   * Unregisters this widget from input CC Data
+   */
+  unregisterCC?: UnregisterCCCallback
+
+  /**
+   * Unregisters this widget from input Note Data
+   */
+  unregisterNote?: UnregisterNoteCallback
 }
 
 export function Layout({ children, callbacks }: { children: Widget[], callbacks: WidgetCallbacks }) {
@@ -102,11 +69,14 @@ export function Layout({ children, callbacks }: { children: Widget[], callbacks:
           return <CCButton def={def} key={k} callbacks={callbacks} />
         case 'rotary':
           return <Rotary def={def} key={k} callbacks={callbacks} />
-        case 'jogwheel':
         case 'xypad':
-        case 'shift':
+          return <XYPad def={def} key={k} callbacks={callbacks} />
+          case 'shift':
+            return <ShiftArea def={def} key={k} callbacks={callbacks} />
+        case 'jogwheel':
         case 'empty':
         default:
+          return <div className="empty"></div>
       }
     })}
   </>

@@ -1,0 +1,23 @@
+{
+  "id": "fullscreen-xy-pad",
+  "name": "Fullscreen XY Pad",
+  "program": 0,
+  "cells": [
+    {
+      "type": "vert-mixer",
+      "vert": [
+        {
+          "channel": 2,
+          "label": "XY Pad",
+          "type": "xypad",
+          "x": {
+            "cc": 4
+          },
+          "y": {
+            "cc": 5
+          }
+        }
+      ]
+    }
+  ]
+}

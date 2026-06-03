@@ -51,6 +51,14 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
     const baseY = useRef<number>(0);
     const activePointer = useRef<number | null>(null);
 
+    useEffect(() => {
+        const id = callbacks.registerCC(def.channel, def.cc, setValue)
+        return () => {
+            callbacks.unregisterCC(def.channel, def.cc, id)
+        }
+        //  callbacks.registerCC(def.channel, def.y.cc, (v) => setValueY)
+    })
+
     const start = ({ currentTarget, pointerId, clientX, clientY }) => {
         //preventDefault();
         vibrate();

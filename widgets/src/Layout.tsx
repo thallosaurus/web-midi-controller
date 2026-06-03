@@ -1,5 +1,6 @@
-import { GridMixerProperties, HorizontalMixerProperties, VerticalMixerProperties } from "definitions";
+import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "definitions";
 import { Layout, WidgetProperties } from "./Parser.tsx";
+import { useEffect, useState } from "react";
 
 export function Vertical({ def, callbacks }: WidgetProperties<VerticalMixerProperties>) {
     //return (<div>{Layout(def.vert)}</div>)
@@ -10,7 +11,7 @@ export function Vertical({ def, callbacks }: WidgetProperties<VerticalMixerPrope
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.vert} callbacks={callbacks}/>
+        <Layout children={def.vert} callbacks={callbacks} />
     </div>
 }
 
@@ -36,5 +37,26 @@ export function Grid({ def, callbacks }: WidgetProperties<GridMixerProperties>) 
         height: "100%"
     }}>
         <Layout children={def.grid} callbacks={callbacks} />
+    </div>)
+}
+
+export function ShiftArea({ def, callbacks }: WidgetProperties<ShiftAreaProperties>) {
+    const [shift, setShift] = useState(false);
+    useEffect(() => {
+        callbacks.registerNote(def.channel, def.note, (v) => {
+            setShift(v > 64);
+        })
+    })
+    return (<div className="shift">
+        <div className="panel a" style={{
+            display: shift ? "none": "block"
+        }}>
+            <Layout children={def.a} callbacks={callbacks} />
+        </div>
+        <div className="panel b" style={{
+            display: shift ? "block": "none"
+        }}>
+            <Layout children={def.b} callbacks={callbacks} />
+        </div>
     </div>)
 }
