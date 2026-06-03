@@ -1,7 +1,7 @@
 {
   "tasks": {
     "dev": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib deno run -A main.ts",
-    "build-client": "deno bundle --sourcemap --outdir dist ./client/index.ts"
+    "build-client": "deno run -A scripts/build_npm.ts 0.1.0"
   },
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",

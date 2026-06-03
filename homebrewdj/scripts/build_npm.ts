@@ -1,18 +1,18 @@
 // ex. scripts/build_npm.ts
 import { build, emptyDir } from "@deno/dnt";
 
-await emptyDir("./npm");
+await emptyDir("./dist");
 
 await build({
-  entryPoints: ["./mod.ts"],
-  outDir: "./npm",
+  entryPoints: ["./client/index.ts"],
+  outDir: "./dist",
   shims: {
     // see JS docs for overview and more options
     deno: true,
   },
   package: {
     // package.json properties
-    name: "your-package",
+    name: "homebrewdj-web-client",
     version: Deno.args[0],
     description: "Your package.",
     license: "MIT",
@@ -26,7 +26,7 @@ await build({
   },
   postBuild() {
     // steps to run after building and before running the tests
-    Deno.copyFileSync("LICENSE", "npm/LICENSE");
-    Deno.copyFileSync("README.md", "npm/README.md");
+    //Deno.copyFileSync("LICENSE", "npm/LICENSE");
+    //Deno.copyFileSync("README.md", "npm/README.md");
   },
 });
