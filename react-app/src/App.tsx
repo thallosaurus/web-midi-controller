@@ -52,7 +52,7 @@ function OverlayView() {
 }
 
 function App() {
-  const client = useRef<WebsocketClient | null>();
+  const client = useRef<WebsocketClient | null>(null);
 
   useEffect(() => {
     client.current = new WebsocketClient();
