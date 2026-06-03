@@ -1,4 +1,4 @@
-interface ConnectedPayload {
+export interface ConnectedPayload {
     type: "connection",
     id: string
 }
