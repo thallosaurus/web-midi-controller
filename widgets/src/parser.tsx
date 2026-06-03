@@ -52,11 +52,13 @@ export function WidgetProvider({ children }) {
   )
 }
 
-export type UpdateCallback<T> = (def: T, value: number) => void;
+export type SendNoteCallback = (channel: number, note: number, velocity: number, on: boolean) => void;
+export type SendCCCallback = (channel: number, cc: number, value: number) => void;
 
 export interface WidgetProperties<T> {
   def: T,
-  callback?: UpdateCallback<T>
+  sendNoteCallback?: SendNoteCallback
+  sendCCCallback?: SendCCCallback
 }
 
 function parseWidget(def: Widget, k: number) {
@@ -82,22 +84,22 @@ function parseWidget(def: Widget, k: number) {
   }
 }
 
-export function Layout({ children, callback }: { children: Widget[], callback: UpdateCallback<any> }) {
+export function Layout({ children, sendCCCallback, sendNoteCallback }: { children: Widget[], sendCCCallback: SendCCCallback, sendNoteCallback: SendNoteCallback}) {
   return <>
     {children.map((def, k) => {
       switch (def.type) {
         case 'notebutton':
-          return <NoteButton def={def} key={k} callback={callback}/>
+          return <NoteButton def={def} key={k} sendNoteCallback={sendNoteCallback}/>
         case 'ccslider':
-          return <CCSlider def={def} key={k} callback={callback} />
+          return <CCSlider def={def} key={k} sendCCCallback={sendCCCallback} />
         case 'horiz-mixer':
-          return <Horizontal def={def} key={k} callback={callback} />
+          return <Horizontal def={def} key={k} sendCCCallback={sendCCCallback} sendNoteCallback={sendNoteCallback} />
         case 'vert-mixer':
-          return <Vertical def={def} key={k} callback={callback} />
+          return <Vertical def={def} key={k} sendCCCallback={sendCCCallback} sendNoteCallback={sendNoteCallback} />
         case 'grid-mixer':
-          return <Grid def={def} key={k} callback={callback} />
+          return <Grid def={def} key={k} sendCCCallback={sendCCCallback} sendNoteCallback={sendNoteCallback} />
         case 'ccbutton':
-          return <CCButton def={def} key={k} callback={callback} />
+          return <CCButton def={def} key={k} sendCCCallback={sendCCCallback} />
         case 'rotary':
         case 'jogwheel':
         case 'xypad':
@@ -113,7 +115,7 @@ function testCallback(def: any, v: number) {
   console.log(def, v);
 }
 
-export function parseOverlay<T>(o: Overlay, callback: UpdateCallback<T>) {
+export function parseOverlay<T>(o: Overlay, sendNoteCallback: SendNoteCallback, sendCCCallback: SendCCCallback) {
   return (
     <div className="overlay" style={{
       width: "calc(100% - 1em)",
@@ -122,7 +124,7 @@ export function parseOverlay<T>(o: Overlay, callback: UpdateCallback<T>) {
       gap: "1em",
       justifyContent: "center"
     }}>
-      <Layout children={o.cells} callback={callback}/>
+      <Layout children={o.cells} sendCCCallback={sendCCCallback} sendNoteCallback={sendNoteCallback} />
     </div>
   )
 }

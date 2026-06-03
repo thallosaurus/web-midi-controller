@@ -43,7 +43,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def, callback }: WidgetProperties<CCSliderProperties>) {
+export function CCSlider({ def, sendCCCallback }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);
@@ -91,7 +91,6 @@ export function CCSlider({ def, callback }: WidgetProperties<CCSliderProperties>
 
     const update = ({ target, clientY, clientX }) => {
         const rect = (target as HTMLElement).getBoundingClientRect();
-        //const y = rect.bottom - e.clientY;
 
         switch (def.mode) {
             case "snapback":
@@ -127,7 +126,7 @@ export function CCSlider({ def, callback }: WidgetProperties<CCSliderProperties>
                         //console.log(v);
                         //this.sendValue(v);
                         setValue(v)
-                        if (callback) callback(def, v);
+                        if (sendCCCallback) sendCCCallback(def.channel, def.cc, value);
                     }
                 }
                 break;
@@ -156,7 +155,7 @@ export function CCSlider({ def, callback }: WidgetProperties<CCSliderProperties>
                     if (v != value) {
                         //this.sendValue(v);
                         setValue(v)
-                        if (callback) callback(def, v);
+                        if (sendCCCallback) sendCCCallback(def.channel, def.cc, value);
                     }
                 }
 
@@ -165,16 +164,15 @@ export function CCSlider({ def, callback }: WidgetProperties<CCSliderProperties>
         //if ()
     };
 
-
-    //useEffect(() => console.log(def.cc, def.label, def.mode, value));
     return <div className="ccslider" style={def.vertical ? verticalCCSliderStyle() : horizontalCCSliderStyle()}>
         <div className="slider"
             style={def.vertical ? verticalSliderStyle() : horizontalSliderStyle()}
+
             onPointerDown={start}
             onPointerMove={move}
             onPointerUp={end}
-            onPointerCancel={end}
-        >
+            onPointerCancel={end}>
+
             <div className="fill" style={def.vertical ? verticalFillStyle(value, def.mode) : horizontalFillStyle(value, def.mode)}>
 
             </div>
