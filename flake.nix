@@ -11,7 +11,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         midi-driver = pkgs.callPackage ./midi-driver {};
-        definitions = pkgs.callPackage ./definitons {};
+        definitions = pkgs.callPackage ./definitions {};
 
         frontend = pkgs.callPackage ./react-app {
           inherit definitions;
