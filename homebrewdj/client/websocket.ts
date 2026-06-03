@@ -1,6 +1,6 @@
-import { AllowedPayloads, ConnectedPayload } from "./protocol.ts";
+import { ConnectedPayload } from "./protocol.ts";
 
-type WebsocketMessageCallback<T> = (msg: T) => void;
+type WebsocketMessageCallback<T> = (id: string, msg: T) => void;
 
 export function asyncWebsocketClient<T>(endpoint: URL, handler: WebsocketMessageCallback<T>) {
     return new Promise((res, rej) => {
@@ -37,7 +37,7 @@ export class WebsocketClient<T = ConnectedPayload> {
         })
 
         ws.addEventListener("message", (ev) => {
-            handler(JSON.parse(ev.data))
+            handler(this.id!, JSON.parse(ev.data))
         })
 
         ws.addEventListener("error", (ev) => {

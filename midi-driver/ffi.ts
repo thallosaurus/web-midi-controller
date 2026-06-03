@@ -102,9 +102,9 @@ interface MidiDriverOptions {
   outputName: string
 }
 
-function loadDylib(): Deno.DynamicLibrary<MidiDriverFFI> {
+function loadDylib(libPath = getLibraryPath()): Deno.DynamicLibrary<MidiDriverFFI> {
   return Deno.dlopen<MidiDriverFFI>(
-    getLibraryPath(),
+    libPath,
     {
       init_logging: {
         parameters: [],
