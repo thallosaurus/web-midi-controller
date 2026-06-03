@@ -8,7 +8,7 @@ export function asyncWebsocketClient<T>(endpoint: URL, handler: WebsocketMessage
     })
 }
 
-export class WebsocketClient<T = AllowedPayloads> {
+export class WebsocketClient<T = ConnectedPayload> {
     private ws: WebSocket
     private id: string | null = null
 
@@ -22,7 +22,9 @@ export class WebsocketClient<T = AllowedPayloads> {
 
         ws.addEventListener("open", (ev) => {
             console.log(ev);
-            const evt = (ev as CustomEvent<ConnectedPayload>).detail;
+
+            // huh?
+            const evt = (ev as CustomEvent<T>).detail as any;
             if (evt.type == "connection") {
                 this.id = evt.id
                 if (open) open(evt.id)
