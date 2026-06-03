@@ -16,7 +16,7 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef(false);
 
-    useEffect(() => {console.log(callbacks)})
+    useEffect(() => { console.log(callbacks) })
 
     const currentValue = () => latchOn.current ? 127 : 0
 
@@ -30,9 +30,9 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
             //this.state.latch_on = true;
             latchOn.current = true;
             setOn(latchOn.current)
-            if (callbacks.sendNote){
+            if (callbacks.sendNote) {
                 callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
-            } 
+            }
         }
 
     }
@@ -65,10 +65,57 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
 
 }
 
-export function CCButton({ def }: WidgetProperties<CCButtonProperties>) {
+export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties>) {
     const [on, setOn] = useState(false);
-    return (<div className="ccbutton">
+    const activePointer = useRef<number | null>(null);
+    const latchOn = useRef<boolean>(false);
 
+    const touch_start = ({ currentTarget, pointerId}) => {
+        vibrate();
+        const el = currentTarget as HTMLElement;
+        activePointer.current = pointerId;
+        el.setPointerCapture(pointerId);
+
+        if (def.mode == "trigger") {
+            latchOn.current = true;
+            touch_update();
+        }
+    };
+
+    const touch_end = ({ pointerId, currentTarget }) => {
+        if (pointerId !== activePointer.current) return;
+
+        const el = currentTarget as HTMLElement;
+        el.releasePointerCapture(pointerId);
+        activePointer.current = null;
+
+        //el.classList.remove("press");
+        setOn(false)
+
+        if (def.mode == "trigger") {
+            latchOn.current = false;
+        } else if (def.mode == "latch") {
+            latchOn.current = !this.state.latch_on;
+        }
+
+        touch_update();
+    };
+    const touch_update = () => {
+        //console.log(this.state.latch_on);
+        if (latchOn.current) {
+            callbacks.sendCC(def.channel, def.cc, def.default_value);
+        } else {
+            callbacks.sendCC(def.channel, def.cc, def.value_off ?? 0);
+            this.sendValue(def.value_off ?? 0);
+        }
+    };
+
+    return (<div className="ccbutton"
+    
+    onPointerDown={touch_start}
+    onPointerUp={touch_end}
+    onPointerCancel={touch_end}
+    >
         <Button label={def.label} on={on} />
     </div>)
 }
