@@ -75,14 +75,19 @@ export class TraktorState {
     private events = new EventTarget();
     private channel: number;
 
-    get addEventListener() {
-        return ((listener: (event: CustomEvent<Map<string, number>>) => void) => {
-            return this.events.addEventListener("update", (ev) => {
-                listener(ev as CustomEvent)
-            });
-        })
+    addEventListener(listener: (event: CustomEvent<Map<string, number>>) => void) {
+        return this.events.addEventListener("update", (ev) => {
+            listener(ev as CustomEvent)
+        });
     }
 
+
+    /**
+     * adds a listener for a specific cc number
+     * @param key 
+     * @param listener 
+     * @returns 
+     */
     addCCStateListener(key: DeckActionsCC, listener: (value: number) => void) {
         return this.events.addEventListener(DeckActionsCC[key], (ev) => {
             listener((ev as CustomEvent).detail)
@@ -90,6 +95,12 @@ export class TraktorState {
     }
 
 
+    /**
+     * add a listener for a note action
+     * @param key 
+     * @param listener 
+     * @returns 
+     */
     addNoteStateListener(key: DeckActionsMidi, listener: (value: number) => void) {
         return this.events.addEventListener(DeckActionsMidi[key], (ev) => {
             listener((ev as CustomEvent).detail)
@@ -102,9 +113,6 @@ export class TraktorState {
 
         port.addEventListenerChannel(channel, (ev) => {
             const evt = ev as CustomEvent;
-            //if (evt.detail.channel !== this.channel) return;
-            //console.log("------")
-
             switch (evt.detail.type) {
                 case "NoteOn":
                 case "NoteOff":
@@ -123,7 +131,6 @@ export class TraktorState {
                     }
                     break;
             }
-            //this.decks[evt.detail.channel - 1].processTraktorInput(evt.detail.note, evt.detail.velocity);
             this.sendGlobalUpdate();
         })
 
@@ -140,26 +147,6 @@ export class TraktorState {
 
     private processCC(msg: { cc: DeckActionsCC, value: number }) {
         this.setCCState(msg.cc, msg.value);
-        /*switch (msg.cc) {
-            case DeckActionsCC.Volume:
-                {
-                    //this.volume = evt.detail.value
-                    //this.state.set("volume", msg.value);
-                    this.setCCState(msg.cc, msg.value);
-                }
-                break;
-
-            case DeckActionsCC.LoopSetSelect:
-                {
-                    //this.
-                    this.setCCState(msg.cc, msg.value);
-                }
-                break;
-            case DeckActionsCC.LoopSetFeedback:
-                {
-                    this.setCCState(msg.cc, msg.value)
-                }
-        }*/
     }
 
     private setNoteState(key: DeckActionsMidi, value: number) {
