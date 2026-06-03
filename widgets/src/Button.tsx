@@ -96,7 +96,7 @@ export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties
         if (def.mode == "trigger") {
             latchOn.current = false;
         } else if (def.mode == "latch") {
-            latchOn.current = !this.state.latch_on;
+            latchOn.current = !latchOn.current;
         }
 
         touch_update();
