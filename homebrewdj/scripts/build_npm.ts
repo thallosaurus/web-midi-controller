@@ -18,10 +18,10 @@ await build({
     license: "MIT",
     repository: {
       type: "git",
-      url: "git+https://github.com/username/repo.git",
+      url: "git+https://github.com/thallosaurus/web-midi-controller.git",
     },
     bugs: {
-      url: "https://github.com/username/repo/issues",
+      url: "https://github.com/thallosaurus/web-midi-controller/issues",
     },
   },
   postBuild() {

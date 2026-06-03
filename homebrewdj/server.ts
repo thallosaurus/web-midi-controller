@@ -1,36 +1,16 @@
 import { randomUUID, UUID } from "node:crypto";
 import { Router, Context, Application } from "oak";
+import { AllowedPayloads } from "./client/protocol.ts";
 
-interface ConnectedPayload {
-    type: "connection",
-    id: string
-}
 
-interface NoteMessagePayload {
-    type: "note",
-    channel: number,
-    note: number,
-    velocity: number,
-    on: boolean
-}
-
-interface CCMessagePayload {
-    type: "cc",
-    channel: number,
-    cc: number,
-    value: number
-}
-
-export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | ConnectedPayload;
-
-//export type SendNoteCallback = (payload: NoteMessagePayload) => void;
-//export type SendCCCallback = (payload: CCMessagePayload) => void;
 type HandlerCallback<T> = (msg: T) => void;
 
 const StaticHandler = async (context: Context) => {
+    console.log(new URL("../react-app/dist/", import.meta.url).pathname)
     await context.send({
-        root: `${Deno.cwd()}`,
-        index: "index.html"
+//        root: `${Deno.cwd()}`,
+        root: new URL("../react-app/dist/", import.meta.url).pathname,
+        index: "index.html",
     })
 }
 
@@ -76,6 +56,8 @@ export const WebsocketRouter = <T>(clients: Map<UUID, WebSocket>, callback: Hand
         clients.set(id, ws);
     })
     router.get("/", StaticHandler)
+    router.get("/manifest.json", StaticHandler)
+    router.get("/assets/:file", StaticHandler)
 
     return router;
 }
@@ -85,7 +67,7 @@ export class Server<T = AllowedPayloads> {
     app: Application;
     clients = new Map();
 
-    constructor(callback: HandlerCallback<T>, app = new Application(), controller = new AbortController()) {
+    constructor(callback: HandlerCallback<T>, listenOptions = {}, app = new Application(), controller = new AbortController()) {
         this.app = app;
         this.controller = controller;
 
@@ -95,7 +77,8 @@ export class Server<T = AllowedPayloads> {
         this.app.listen({
             hostname: "127.0.0.1",
             port: 8080,
-            signal: this.controller.signal
+            signal: this.controller.signal,
+            ...listenOptions
         })
     }
 

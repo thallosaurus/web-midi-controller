@@ -1,10 +1,12 @@
-import { AllowedPayloads } from "../server";
+//import { AllowedPayloads } from "../server";
+
+import { AllowedPayloads } from "./protocol.ts";
 
 type WebsocketMessageCallback<T> = (msg: T) => void;
 
 export class WebsocketClient<T = AllowedPayloads> {
     private ws: WebSocket
-    constructor(endpoint: string, handler: WebsocketMessageCallback<T> = console.log) {
+    constructor(endpoint: URL, handler: WebsocketMessageCallback<T> = console.log) {
         const ws = new WebSocket(endpoint);
         //handler(ws);
 

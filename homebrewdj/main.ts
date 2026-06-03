@@ -2,7 +2,8 @@ import { TraktorSurface, TraktorState } from "@traktor"
 import { Launchpad, LaunchpadSurfaceStore } from "@launchpad";
 import { MidiDriver } from "@driver-deno";
 
-import { AllowedPayloads, Server } from "./server.ts";
+import { Server } from "./server.ts";
+import { AllowedPayloads } from "./client/protocol.ts";
 
 const traktorDriver = new MidiDriver({
   inputName: "test virtual input",
@@ -11,7 +12,7 @@ const traktorDriver = new MidiDriver({
 })
 
 const launchpad = new Launchpad();
-//launchpad.loadSurface(LaunchpadSurfaceStore.Session, new SmileySurface(launchpad));
+
 launchpad.loadSurface(LaunchpadSurfaceStore.Session, new TraktorSurface(traktorDriver));
 launchpad.switchToDawMode();
 
@@ -42,6 +43,8 @@ const server = new Server((msg: AllowedPayloads) => {
       }
       break;
   }
+}, {
+  hostname: "0.0.0.0"
 });
 
 

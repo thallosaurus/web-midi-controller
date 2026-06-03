@@ -3,9 +3,6 @@ import type { Overlay } from "definitions";
 import { WebsocketClient } from "homebrewdj-web-client";
 import { useEffect, useRef } from "react";
 
-//import { WebsocketClient } from "homebrewdj-web-client/client";
-
-//import TEST_OVERLAY from "../public/overlay_traktor.json"
 const OVERLAY: Overlay = {
   name: "Volume Sliders",
   channel: null,
@@ -41,48 +38,36 @@ const OVERLAY: Overlay = {
   }]
 };
 
-function OverlayView() {
-  return (
-    <>
-      {parseOverlay(OVERLAY as any, {
-        sendNote: noteCallback, sendCC: ccCallback
-      })}
-    </>
-  )
-}
-
 function App() {
   const client = useRef<WebsocketClient | null>(null);
 
   useEffect(() => {
-    client.current = new WebsocketClient("http://localhost:8080/ws");
+    const url = new URL("/ws", location.href);
+    url.protocol = "ws";
+    client.current = new WebsocketClient(url);
   })
-
-  const ccCallback = (channel: number, cc: number, value: number) => {
-    console.log("cc", channel, cc, value);
-    if (client.current) client.current.send({
-      type: "cc",
-      channel,
-      cc,
-      value
-    })
-  }
-
-  const noteCallback = (channel: number, note: number, velocity: number, on: boolean) => {
-    console.log("note", channel, note, velocity, on);
-    if (client.current) client.current.send({
-      type: "note",
-      channel,
-      note,
-      velocity,
-      on
-    })
-  }
 
   return (
     <>
-      {parseOverlay(OVERLAY as any, {
-        sendNote: noteCallback, sendCC: ccCallback
+      {parseOverlay(OVERLAY, {
+        sendNote: (channel: number, note: number, velocity: number, on: boolean) => {
+          console.log("note", channel, note, velocity, on);
+          if (client.current) client.current.send({
+            type: "note",
+            channel,
+            note,
+            velocity,
+            on
+          })
+        }, sendCC: (channel: number, cc: number, value: number) => {
+          console.log("cc", channel, cc, value);
+          if (client.current) client.current.send({
+            type: "cc",
+            channel,
+            cc,
+            value
+          })
+        }
       })}
     </>
   )
