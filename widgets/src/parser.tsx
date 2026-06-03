@@ -3,6 +3,7 @@ import { createContext, useState } from 'react';
 import { CCButton, NoteButton } from "./Button.tsx";
 import { CCSlider } from "./Slider.tsx";
 import { Grid, Horizontal, Vertical } from "./Layout.tsx";
+import { Rotary } from "./Rotary.tsx";
 
 const WidgetContext = createContext(null);
 export function WidgetProvider({ children }) {
@@ -84,6 +85,7 @@ export function Layout({ children, callbacks }: { children: Widget[], callbacks:
         case 'ccbutton':
           return <CCButton def={def} key={k} callbacks={callbacks} />
         case 'rotary':
+          return <Rotary def={def} key={k} callbacks={callbacks} />
         case 'jogwheel':
         case 'xypad':
         case 'shift':

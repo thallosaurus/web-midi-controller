@@ -16,9 +16,7 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef(false);
 
-    useEffect(() => { console.log(callbacks) })
-
-    const currentValue = () => latchOn.current ? 127 : 0
+//    useEffect(() => { console.log(callbacks) })
 
     const start = ({ currentTarget, pointerId }) => {
         vibrate();
@@ -56,8 +54,11 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
         if (callbacks.sendNote) callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
     };
 
-    return <div className="notebutton"
-        onPointerDown={start} onPointerUp={end} onPointerCancel={end}>
+    return <div
+        onPointerDown={start}
+        onPointerUp={end}
+        onPointerCancel={end}
+        className="notebutton">
 
         <Button label={def.label} on={on} />
 
@@ -70,7 +71,7 @@ export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef<boolean>(false);
 
-    const touch_start = ({ currentTarget, pointerId}) => {
+    const touch_start = ({ currentTarget, pointerId }) => {
         vibrate();
         const el = currentTarget as HTMLElement;
         activePointer.current = pointerId;
@@ -106,15 +107,14 @@ export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties
             callbacks.sendCC(def.channel, def.cc, def.default_value);
         } else {
             callbacks.sendCC(def.channel, def.cc, def.value_off ?? 0);
-            this.sendValue(def.value_off ?? 0);
         }
     };
 
     return (<div className="ccbutton"
-    
-    onPointerDown={touch_start}
-    onPointerUp={touch_end}
-    onPointerCancel={touch_end}
+
+        onPointerDown={touch_start}
+        onPointerUp={touch_end}
+        onPointerCancel={touch_end}
     >
         <Button label={def.label} on={on} />
     </div>)

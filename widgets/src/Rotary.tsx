@@ -1,0 +1,63 @@
+import { RotarySliderProperties } from "definitions";
+import { WidgetProperties } from "./Parser";
+import { vibrate } from "./utils";
+import { useRef, useState } from "react";
+
+const sensitivity = 0.5;    // px -> value
+const MIN_ANGLE = -135;
+const MAX_ANGLE = 135;
+
+export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperties>) {
+    const lastX = useRef<number>(0);
+    const active = useRef<boolean>(false);
+
+    const [value, setValue] = useState<number>(0);
+
+    const angle = () => MIN_ANGLE + (this.state.value / 127) * (MAX_ANGLE - MIN_ANGLE);
+
+    const touch_start = ({ target, pointerId, clientX }) => {
+        const el = target as HTMLElement;
+        //alert("touch");
+        //debugger;
+        //console.log(el);
+        el.setPointerCapture(pointerId);
+        vibrate();
+        //lastX = e.clientY;
+        lastX.current = clientX;
+        active.current = true;
+    };
+
+    const touch_move = ({ clientX }) => {
+        if (!active.current) return;
+
+        //const dy = state.lastX - e.clientX;
+        const dy = clientX - lastX.current;
+        lastX.current = clientX;
+
+        const new_value = Math.floor(Math.max(0, Math.min(127, value + (dy * sensitivity))));
+
+        if (new_value != this.state.value) {
+            callbacks.sendCC(def.channel, def.cc, new_value)
+        }
+    }
+
+    const touch_stop = ({ target, pointerId }) => {
+        this.state.active = false;
+        const el = target as HTMLElement;
+        el.releasePointerCapture(pointerId);
+
+        if (def.mode == "snapback") {
+            callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0)
+        }
+    }
+
+    const rotationStyle = (a) => { return {"--rotation": `${a}deg`} as React.CSSProperties }
+
+    return (<div className="rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
+        <div className="widget">
+            <div className="dial" style={rotationStyle(angle())}
+            ></div>
+        </div>
+        <div className="label">{def.label ?? ("CC" + def.cc + ":\n" + value)}</div>
+    </div>)
+}

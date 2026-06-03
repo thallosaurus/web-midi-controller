@@ -4,8 +4,6 @@ import { type CCButtonProperties, type NoteButtonProperties } from '../../bindin
 import { WidgetLifecycle, WidgetStateHandlers } from "../core/lifecycle";
 
 import { EventBusConsumer, EventbusWorkerClient } from "../eventbus/client";
-//import { App } from "../../app";
-
 
 /**
  * Holds the handlers the UI calls when an event occurs
