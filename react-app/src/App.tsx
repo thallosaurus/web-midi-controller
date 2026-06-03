@@ -3,7 +3,7 @@ import { parseOverlay, type WidgetCallbacks } from "widgets";
 
 import TEST_OVERLAY from "../public/overlay_8x8.json"
 import "./index.css"
-import { Suspense, useRef } from "react";
+import {  useRef } from "react";
 
 function App() {
   const ccCallback = (channel: number, cc: number, value: number) => {
@@ -21,7 +21,7 @@ function App() {
 
   return (
     <>
-      {parseOverlay(TEST_OVERLAY, callbacks.current)}
+      {parseOverlay(TEST_OVERLAY as any, callbacks.current)}
     </>
   )
 }

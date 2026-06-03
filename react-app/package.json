@@ -14,6 +14,7 @@
     "widgets": "file:../widgets"
   },
   "devDependencies": {
+    "terser": "^5.47.1",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",

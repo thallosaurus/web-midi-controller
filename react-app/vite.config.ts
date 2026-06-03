@@ -9,6 +9,6 @@ export default defineConfig({
     renderModernChunks: false,
   })],
   /*optimizeDeps: {
-    exclude: ["widgets"],
-  },*/
+    include: ["widgets"],
+  }*/
 })
