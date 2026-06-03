@@ -1,7 +1,7 @@
 import { parseOverlay, type WidgetCallbacks } from "widgets";
 //import type { Overlay } from "definitions";
 
-import TEST_OVERLAY from "../public/overlay_8x8.json"
+import TEST_OVERLAY from "../public/overlay_traktor.json"
 import "./index.css"
 import {  useRef } from "react";
 

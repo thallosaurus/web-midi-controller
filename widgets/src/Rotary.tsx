@@ -13,7 +13,7 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
 
     const [value, setValue] = useState<number>(0);
 
-    const angle = () => MIN_ANGLE + (this.state.value / 127) * (MAX_ANGLE - MIN_ANGLE);
+    const angle = () => MIN_ANGLE + (value / 127) * (MAX_ANGLE - MIN_ANGLE);
 
     const touch_start = ({ target, pointerId, clientX }) => {
         const el = target as HTMLElement;
@@ -36,13 +36,13 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
 
         const new_value = Math.floor(Math.max(0, Math.min(127, value + (dy * sensitivity))));
 
-        if (new_value != this.state.value) {
+        if (new_value != value) {
             callbacks.sendCC(def.channel, def.cc, new_value)
         }
     }
 
     const touch_stop = ({ target, pointerId }) => {
-        this.state.active = false;
+        active.current = false;
         const el = target as HTMLElement;
         el.releasePointerCapture(pointerId);
 

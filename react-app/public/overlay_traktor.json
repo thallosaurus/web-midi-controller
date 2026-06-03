@@ -1,0 +1,245 @@
+{
+  "id": "traktor_performance",
+  "name": "One-device Traktor 2.0",
+  "cells": [
+    {
+      "type": "vert-mixer",
+      "vert": [
+        {
+          "h": 2,
+          "id": "deck_a",
+          "type": "grid-mixer",
+          "w": 4,
+          "grid": [
+            {
+              "channel": 1,
+              "label": "1/4 Loop",
+              "mode": "trigger",
+              "note": 16,
+              "type": "notebutton"
+            },
+            {
+              "channel": 1,
+              "label": "1/2 Loop",
+              "mode": "trigger",
+              "note": 15,
+              "type": "notebutton"
+            },
+            {
+              "channel": 1,
+              "label": "1 Loop",
+              "mode": "trigger",
+              "note": 14,
+              "type": "notebutton"
+            },
+            {
+              "channel": 1,
+              "label": "2 Loop",
+              "mode": "trigger",
+              "note": 13,
+              "type": "notebutton"
+            },
+            {
+              "channel": 1,
+              "label": "4 Loop",
+              "mode": "trigger",
+              "note": 12,
+              "type": "notebutton"
+            },
+            {
+              "channel": 1,
+              "label": "8 Loop",
+              "mode": "trigger",
+              "note": 11,
+              "type": "notebutton"
+            },
+            {
+              "channel": 1,
+              "label": "16 Loop",
+              "mode": "trigger",
+              "note": 10,
+              "type": "notebutton"
+            },
+            {
+              "channel": 1,
+              "label": "32 Loop",
+              "mode": "trigger",
+              "note": 9,
+              "type": "notebutton"
+            }
+          ]
+        },
+        {
+          "type": "horiz-mixer",
+          "horiz": [
+            {
+              "cc": 17,
+              "channel": 1,
+              "default_value": 64,
+              "label": "Bass",
+              "mode": "snapback",
+              "type": "rotary"
+            },
+            {
+              "cc": 16,
+              "channel": 1,
+              "default_value": 64,
+              "label": "Mid",
+              "mode": "snapback",
+              "type": "rotary"
+            },
+            {
+              "cc": 15,
+              "channel": 1,
+              "default_value": 64,
+              "label": "Hi",
+              "mode": "snapback",
+              "type": "rotary"
+            }
+          ]
+        },
+        {
+          "type": "horiz-mixer",
+          "horiz": [
+            {
+              "channel": 1,
+              "label": "Play/Pause",
+              "mode": "trigger",
+              "note": 1,
+              "type": "notebutton"
+            },
+            {
+              "channel": 1,
+              "label": "Sync",
+              "mode": "trigger",
+              "note": 2,
+              "type": "notebutton"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "levels",
+      "type": "horiz-mixer",
+      "horiz": [
+        {
+          "cc": 0,
+          "channel": 1,
+          "label": "Test",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 1,
+          "channel": 1,
+          "label": "Test",
+          "mode": "relative",
+          "type": "ccslider"
+        }
+      ]
+    },
+    {
+      "h": 8,
+      "id": "deck_b",
+      "type": "grid-mixer",
+      "w": 4,
+      "grid": [
+        {
+          "channel": 1,
+          "label": "1/4 Loop",
+          "mode": "trigger",
+          "note": 36,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "1/2 Loop",
+          "mode": "trigger",
+          "note": 35,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "1 Loop",
+          "mode": "trigger",
+          "note": 34,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "2 Loop",
+          "mode": "trigger",
+          "note": 33,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "4 Loop",
+          "mode": "trigger",
+          "note": 32,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "8 Loop",
+          "mode": "trigger",
+          "note": 31,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "16 Loop",
+          "mode": "trigger",
+          "note": 30,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "32 Loop",
+          "mode": "trigger",
+          "note": 29,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "Kill Bass",
+          "mode": "trigger",
+          "note": 47,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "Kill Mid",
+          "mode": "trigger",
+          "note": 48,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "Kill Hi",
+          "mode": "trigger",
+          "note": 49,
+          "type": "notebutton"
+        },
+        {
+          "type": "empty"
+        },
+        {
+          "channel": 1,
+          "label": "Play/Pause",
+          "mode": "trigger",
+          "note": 21,
+          "type": "notebutton"
+        },
+        {
+          "channel": 1,
+          "label": "Sync",
+          "mode": "trigger",
+          "note": 22,
+          "type": "notebutton"
+        }
+      ]
+    }
+  ]
+}
