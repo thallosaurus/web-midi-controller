@@ -23,7 +23,7 @@ const OVERLAY: Overlay = {
       "vertical": false,
       "value": 0,
       "value_off": 0,
-      id: null,
+      "id": null,
       "default_value": 0
     },
     {
@@ -35,7 +35,7 @@ const OVERLAY: Overlay = {
       "vertical": false,
       "value": 0,
       "value_off": 0,
-      id: null,
+      "id": null,
       "default_value": 0
     }]
   }]
@@ -55,16 +55,28 @@ function App() {
   const client = useRef<WebsocketClient | null>(null);
 
   useEffect(() => {
-    client.current = new WebsocketClient();
+    client.current = new WebsocketClient("http://localhost:8080/ws");
   })
 
   const ccCallback = (channel: number, cc: number, value: number) => {
     console.log("cc", channel, cc, value);
+    if (client.current) client.current.send({
+      type: "cc",
+      channel,
+      cc,
+      value
+    })
   }
 
   const noteCallback = (channel: number, note: number, velocity: number, on: boolean) => {
     console.log("note", channel, note, velocity, on);
-
+    if (client.current) client.current.send({
+      type: "note",
+      channel,
+      note,
+      velocity,
+      on
+    })
   }
 
   return (

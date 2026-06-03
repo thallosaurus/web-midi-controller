@@ -2,8 +2,7 @@ import { TraktorSurface, TraktorState } from "@traktor"
 import { Launchpad, LaunchpadSurfaceStore } from "@launchpad";
 import { MidiDriver } from "@driver-deno";
 
-import { Application } from "oak";
-import { Server, WebsocketRouter } from "./server.ts";
+import { AllowedPayloads, Server } from "./server.ts";
 
 const traktorDriver = new MidiDriver({
   inputName: "test virtual input",
@@ -19,8 +18,30 @@ launchpad.switchToDawMode();
 const deckAAux = new TraktorState(1, traktorDriver);
 const deckBAux = new TraktorState(2, traktorDriver);
 
-const server = new Server((msg: any) => {
+const server = new Server((msg: AllowedPayloads) => {
   console.log(msg);
+  switch (msg.type) {
+    case "cc":
+      {
+        const { cc, channel, value } = msg;
+        if (channel == 1) {
+          deckAAux.sendTraktorCC(cc, value);
+        } else if (channel == 2) {
+          deckBAux.sendTraktorCC(cc, value);
+        }
+      }
+    break;
+    case "note":
+      {
+        const { note, channel, velocity, on } = msg;
+        if (channel == 1) {
+          deckAAux.sendTraktorMidi(note, on);
+        } else if (channel == 2) {
+          deckBAux.sendTraktorMidi(note, on)
+        }
+      }
+      break;
+  }
 });
 
 

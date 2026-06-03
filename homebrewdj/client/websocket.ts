@@ -1,26 +1,35 @@
-function WebsocketHandler(ws: WebSocket) {
-    ws.addEventListener("open", (ev) => {
-        console.log(ev);
-    })
+import { AllowedPayloads } from "../server";
 
-    ws.addEventListener("close", (ev) => {
-        console.log(ev);
-    })
+type WebsocketMessageCallback<T> = (msg: T) => void;
 
-    ws.addEventListener("message", (ev) => {
-        console.log(ev);
-    })
-
-    ws.addEventListener("error", (ev) => {
-        console.log(ev);
-    })
-}
-
-export class WebsocketClient {
+export class WebsocketClient<T = AllowedPayloads> {
     private ws: WebSocket
-    constructor(endpoint: string) {
+    constructor(endpoint: string, handler: WebsocketMessageCallback<T> = console.log) {
         const ws = new WebSocket(endpoint);
-        WebsocketHandler(ws);
+        //handler(ws);
+
+        ws.addEventListener("open", (ev) => {
+            console.log(ev);
+        })
+
+        ws.addEventListener("close", (ev) => {
+            console.log(ev);
+        })
+
+        ws.addEventListener("message", (ev) => {
+            //console.log(JSON.parse(ev.data) as T);
+            handler(JSON.parse(ev.data))
+        })
+
+        ws.addEventListener("error", (ev) => {
+            console.log(ev);
+        })
         this.ws = ws;
+    }
+
+    send(data: T) {
+        if (this.ws.readyState == this.ws.OPEN) {
+            this.ws.send(JSON.stringify({ ...data }))
+        }
     }
 }

@@ -1,7 +1,13 @@
 import { randomUUID, UUID } from "node:crypto";
 import { Router, Context, Application } from "oak";
 
+interface ConnectedPayload {
+    type: "connection",
+    id: string
+}
+
 interface NoteMessagePayload {
+    type: "note",
     channel: number,
     note: number,
     velocity: number,
@@ -9,13 +15,16 @@ interface NoteMessagePayload {
 }
 
 interface CCMessagePayload {
+    type: "cc",
     channel: number,
     cc: number,
     value: number
 }
 
-export type SendNoteCallback = (payload: NoteMessagePayload) => void;
-export type SendCCCallback = (payload: CCMessagePayload) => void;
+export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | ConnectedPayload;
+
+//export type SendNoteCallback = (payload: NoteMessagePayload) => void;
+//export type SendCCCallback = (payload: CCMessagePayload) => void;
 type HandlerCallback<T> = (msg: T) => void;
 
 const StaticHandler = async (context: Context) => {
@@ -23,10 +32,6 @@ const StaticHandler = async (context: Context) => {
         root: `${Deno.cwd()}`,
         index: "index.html"
     })
-}
-
-type ServerCallbacks = {
-    handleMessage: <T>(msg: T) => void;
 }
 
 const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callback: HandlerCallback<T>) => {
@@ -43,7 +48,7 @@ const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callb
 
     ws.addEventListener("message", (ev) => {
         //console.log("message", id, ev.data);
-        callback(ev.data);
+        callback(JSON.parse(ev.data));
     })
 
     ws.addEventListener("error", (ev) => {
@@ -75,7 +80,7 @@ export const WebsocketRouter = <T>(clients: Map<UUID, WebSocket>, callback: Hand
     return router;
 }
 
-export class Server<T> {
+export class Server<T = AllowedPayloads> {
     controller: AbortController;
     app: Application;
     clients = new Map();
