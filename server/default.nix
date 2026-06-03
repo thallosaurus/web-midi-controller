@@ -1,17 +1,15 @@
-{
-    stdenv,
-    pkgs,
-    deno,
-    ...
-}:
+{ pkgs }:
+pkgs.stdenv.mkDerivation {
+          name = "frontend";
+          src = ./react-app;
+          buildInputs = [pkgs.yarn pkgs.nodejs];
+          buildPhase = ''
+            yarn
+            yarn build
+          '';
 
-stdenv.mkDerivation {
-    name = "midi-server";
-    version = "0.1.12";
-    src = ./.;
-    buildInputs = [ deno ];
-
-    postUnpack = "deno cache $sourceRoot/main.ts";
-    buildPhase = "deno task run compile:linux:release";
-#    installPhase = "mkdir -p $out/bin";
-}
+          installPhase = ''
+            mkdir $out
+            cp dist $out
+          '';
+        };

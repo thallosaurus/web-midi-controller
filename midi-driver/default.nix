@@ -1,20 +1,17 @@
 { pkgs, rustPlatform, buildPackages, ... }:
 
-  rustPlatform.buildRustPackage {
-    pname = "midi-driver";
-    version = "0.1.12";
-    src = ./.;
+pkgs.rustPlatform.buildRustPackage {
+  pname = "midi-driver";
+  version = "0.1.13";
+  src = ./midi-driver;
 
-    #inherit cargoLock;
-
-    nativeBuildInputs = with pkgs; [
-      pkgconf
-      gcc
-    ];
+  nativeBuildInputs = with pkgs; [
+    pkgconf
+    gcc
+  ];
     buildInputs = with pkgs; [
-      alsa-lib.dev
-    ];
+    alsa-lib.dev
+  ];
 
-    cargoLock.lockFile = ./Cargo.lock;
-    
-  }
+  cargoLock.lockFile = ./Cargo.lock;
+}
