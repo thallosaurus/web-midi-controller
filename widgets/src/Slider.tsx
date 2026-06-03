@@ -43,7 +43,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def, sendCCCallback }: WidgetProperties<CCSliderProperties>) {
+export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);
@@ -126,7 +126,7 @@ export function CCSlider({ def, sendCCCallback }: WidgetProperties<CCSliderPrope
                         //console.log(v);
                         //this.sendValue(v);
                         setValue(v)
-                        if (sendCCCallback) sendCCCallback(def.channel, def.cc, value);
+                        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
                     }
                 }
                 break;
@@ -155,7 +155,7 @@ export function CCSlider({ def, sendCCCallback }: WidgetProperties<CCSliderPrope
                     if (v != value) {
                         //this.sendValue(v);
                         setValue(v)
-                        if (sendCCCallback) sendCCCallback(def.channel, def.cc, value);
+                        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
                     }
                 }
 

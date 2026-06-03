@@ -11,10 +11,12 @@ function Button(props: { label: string, on: boolean }) {
     </div >
 }
 
-export function NoteButton({ def, sendNoteCallback }: WidgetProperties<NoteButtonProperties>) {
+export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProperties>) {
     const [on, setOn] = useState(false);
     const activePointer = useRef<number | null>(null);
-    const latchOn = useRef<boolean>(false);
+    const latchOn = useRef(false);
+
+    useEffect(() => {console.log(callbacks)})
 
     const currentValue = () => latchOn.current ? 127 : 0
 
@@ -28,7 +30,9 @@ export function NoteButton({ def, sendNoteCallback }: WidgetProperties<NoteButto
             //this.state.latch_on = true;
             latchOn.current = true;
             setOn(latchOn.current)
-            sendNoteCallback(def.channel, def.note, currentValue(), latchOn.current)
+            if (callbacks.sendNote){
+                callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
+            } 
         }
 
     }
@@ -40,7 +44,7 @@ export function NoteButton({ def, sendNoteCallback }: WidgetProperties<NoteButto
         el.releasePointerCapture(pointerId);
         activePointer.current = null
 
-        el.classList.remove("press");
+        //el.classList.remove("press");
 
         if (def.mode == "trigger") {
             latchOn.current = false;
@@ -49,11 +53,11 @@ export function NoteButton({ def, sendNoteCallback }: WidgetProperties<NoteButto
         }
 
         setOn(latchOn.current)
-        sendNoteCallback(def.channel, def.note, currentValue(), latchOn.current)
+        if (callbacks.sendNote) callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
     };
 
     return <div className="notebutton"
-        onPointerDown={start} onPointerUp={end}>
+        onPointerDown={start} onPointerUp={end} onPointerCancel={end}>
 
         <Button label={def.label} on={on} />
 

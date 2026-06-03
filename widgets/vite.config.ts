@@ -6,9 +6,10 @@ import { resolve } from "node:path";
 export default defineConfig({
   plugins: [
     react(),
-    dts({ tsconfigPath: './tsconfig.app.json' })
+    dts({ tsconfigPath: './tsconfig.app.json' }),
   ],
   build: {
+    //minify: false,
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "MyReactLib",
