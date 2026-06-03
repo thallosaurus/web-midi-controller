@@ -3,10 +3,10 @@ import { Launchpad, LaunchpadSurfaceStore } from "@launchpad";
 import { MidiDriver } from "@driver-deno";
 
 const traktorDriver = new MidiDriver({
-        "inputName": "test virtual input",
-        "outputName": "test virtual output",
-        useVirtual: true
-    })
+  inputName: "test virtual input",
+  outputName: "test virtual output",
+  useVirtual: true
+})
 
 const launchpad = new Launchpad();
 //launchpad.loadSurface(LaunchpadSurfaceStore.Session, new SmileySurface(launchpad));
@@ -17,6 +17,6 @@ const deckAAux = new TraktorState(1, traktorDriver);
 const deckBAux = new TraktorState(2, traktorDriver);
 
 Deno.addSignalListener("SIGINT", () => {
-    launchpad.switchToStandaloneMode();
-    launchpad.close();
+  launchpad.switchToStandaloneMode();
+  launchpad.close();
 });

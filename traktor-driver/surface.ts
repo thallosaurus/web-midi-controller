@@ -1,6 +1,6 @@
-import { LightMode, Pixel, Surface } from "../launchpad-driver/src/surface.ts";
+import { Pixel, Surface } from "../launchpad-driver/src/surface.ts";
 import { MidiDriver } from "@driver-deno";
-import { DeckActionsCC, DeckActionsMidi, TraktorState } from "./state.ts";
+import { TraktorState } from "./state.ts";
 import { Button, DeckMap, ShiftDeckMap } from "./button.ts";
 import { BUTTON_DEF } from "../launchpad-driver/src/launchpad.ts";
 
@@ -108,8 +108,8 @@ export class TraktorSurface extends Surface {
     traktorDriver: MidiDriver
 
     constructor(driver = new MidiDriver({
-        "inputName": "test virtual input",
-        "outputName": "test virtual output",
+        inputName: "test virtual input",
+        outputName: "test virtual output",
         useVirtual: true
     })) {
         super();
