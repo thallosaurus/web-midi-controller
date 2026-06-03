@@ -1,9 +1,41 @@
-import { parseOverlay, type WidgetCallbacks } from "widgets";
-//import type { Overlay } from "definitions";
+import { parseOverlay } from "widgets";
+import type { Overlay } from "definitions";
 
-import TEST_OVERLAY from "../public/overlay_traktor.json"
-import "./index.css"
-import {  useRef } from "react";
+//import TEST_OVERLAY from "../public/overlay_traktor.json"
+const OVERLAY: Overlay = {
+  name: "Volume Sliders",
+  channel: null,
+  program: null,
+  id: null,
+  cells: [{
+    type: "horiz-mixer",
+    id: null,
+    horiz: [{
+      "type": "ccslider",
+      "cc": 0,
+      "channel": 1,
+      "label": "Deck A",
+      "mode": "absolute",
+      "vertical": false,
+      "value": 0,
+      "value_off": 0,
+      id: null,
+      "default_value": 0
+    },
+    {
+      "type": "ccslider",
+      "cc": 0,
+      "channel": 2,
+      "label": "Deck B",
+      "mode": "absolute",
+      "vertical": false,
+      "value": 0,
+      "value_off": 0,
+      id: null,
+      "default_value": 0
+    }]
+  }]
+};
 
 function App() {
   const ccCallback = (channel: number, cc: number, value: number) => {
@@ -15,13 +47,11 @@ function App() {
 
   }
 
-  const callbacks = useRef<WidgetCallbacks>({
-    sendNote: noteCallback, sendCC: ccCallback
-  })
-
   return (
     <>
-      {parseOverlay(TEST_OVERLAY as any, callbacks.current)}
+      {parseOverlay(OVERLAY as any, {
+        sendNote: noteCallback, sendCC: ccCallback
+      })}
     </>
   )
 }

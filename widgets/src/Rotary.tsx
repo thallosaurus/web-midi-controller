@@ -17,12 +17,8 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
 
     const touch_start = ({ target, pointerId, clientX }) => {
         const el = target as HTMLElement;
-        //alert("touch");
-        //debugger;
-        //console.log(el);
         el.setPointerCapture(pointerId);
         vibrate();
-        //lastX = e.clientY;
         lastX.current = clientX;
         active.current = true;
     };
@@ -30,23 +26,24 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
     const touch_move = ({ clientX }) => {
         if (!active.current) return;
 
-        //const dy = state.lastX - e.clientX;
         const dy = clientX - lastX.current;
         lastX.current = clientX;
 
         const new_value = Math.floor(Math.max(0, Math.min(127, value + (dy * sensitivity))));
 
         if (new_value != value) {
+            setValue(value)
             callbacks.sendCC(def.channel, def.cc, new_value)
         }
     }
-
+    
     const touch_stop = ({ target, pointerId }) => {
         active.current = false;
         const el = target as HTMLElement;
         el.releasePointerCapture(pointerId);
-
+        
         if (def.mode == "snapback") {
+            setValue(value)
             callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0)
         }
     }

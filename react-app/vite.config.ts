@@ -8,7 +8,7 @@ export default defineConfig({
     targets: ["Android >= 4"],
     renderModernChunks: false,
   })],
-  /*optimizeDeps: {
+  optimizeDeps: {
     include: ["widgets"],
-  }*/
+  }
 })
