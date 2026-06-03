@@ -34,7 +34,7 @@ const server = new Server((msg: AllowedPayloads) => {
       break;
     case "note":
       {
-        const { note, channel, velocity, on } = msg;
+        const { note, channel, on } = msg;
         if (channel == 1) {
           deckAAux.sendTraktorMidi(note, on);
         } else if (channel == 2) {
@@ -73,11 +73,9 @@ traktorDriver.addEventListener((ev) => {
   }
 })
 
-
 Deno.addSignalListener("SIGINT", () => {
   launchpad.switchToStandaloneMode();
   launchpad.close();
   traktorDriver.close();
   server.close();
 });
-
