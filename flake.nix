@@ -12,9 +12,11 @@
         pkgs = nixpkgs.legacyPackages.${system};
         midi-driver = pkgs.callPackage ./midi-driver {};
         definitions = pkgs.callPackage ./definitions {};
+        widgets = pkgs.callPackage ./widgets {};
 
         frontend = pkgs.callPackage ./react-app {
           inherit definitions;
+          inherit widgets;
         };
 
       in
@@ -25,6 +27,7 @@
             frontend = frontend;
             midi-driver = midi-driver;
             default = frontend;
+            widgets = widgets;
           };
         }
     );

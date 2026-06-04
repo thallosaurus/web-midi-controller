@@ -5,21 +5,22 @@
 pub mod widget;
 pub mod overlays;
 
+
 #[cfg(test)]
 mod tests {
     use crate::overlays::{Overlay};
 
-    const EIGHT_X_EIGHT: &'static str = include_str!("../../overlays/8x8-midi-grid.toml");
-    const FULLSCREEN_XY_NOTE: &'static str = include_str!("../../overlays/fullscreen-xypad-note.toml");
-    const FULLSCREEN_XY: &'static str = include_str!("../../overlays/fullscreen-xypad.toml");
-    const PHONE_DUAL_VOLUME: &'static str = include_str!("../../overlays/phone-dual-volume.toml");
-    const SHIFT_TEST: &'static str = include_str!("../../overlays/shift-test.toml");
-    const TEST: &'static str = include_str!("../../overlays/test.toml");
-    const TRAKTOR_DECK_A: &'static str = include_str!("../../overlays/traktor-deck-a.toml");
-    const TRAKTOR_DECK_B: &'static str = include_str!("../../overlays/traktor-deck-b.toml");
-    const TRAKTOR_DECK_ONE_DEVICE: &'static str = include_str!("../../overlays/traktor-one-device.toml");
+    const EIGHT_X_EIGHT: &'static str = include_str!("../overlays/8x8-midi-grid.toml");
+    const FULLSCREEN_XY_NOTE: &'static str = include_str!("../overlays/fullscreen-xypad-note.toml");
+    const FULLSCREEN_XY: &'static str = include_str!("../overlays/fullscreen-xypad.toml");
+    const PHONE_DUAL_VOLUME: &'static str = include_str!("../overlays/phone-dual-volume.toml");
+    const SHIFT_TEST: &'static str = include_str!("../overlays/shift-test.toml");
+    const TEST: &'static str = include_str!("../overlays/test.toml");
+    const TRAKTOR_DECK_A: &'static str = include_str!("../overlays/traktor-deck-a.toml");
+    const TRAKTOR_DECK_B: &'static str = include_str!("../overlays/traktor-deck-b.toml");
+    const TRAKTOR_DECK_ONE_DEVICE: &'static str = include_str!("../overlays/traktor-one-device.toml");
 
-    const ABLETON_OVERLAY: &'static str = include_str!("../../overlays/ableton-performance.toml");
+    const ABLETON_OVERLAY: &'static str = include_str!("../overlays/ableton-performance.toml");
 
     #[tokio::test]
     async fn test_new_cells() {

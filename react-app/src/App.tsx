@@ -1,5 +1,5 @@
 import { parseOverlay, WidgetCallbacks } from "widgets";
-import type { Overlay } from "definitions";
+import type { Overlay } from "widget-definitions";
 import { WebsocketClient } from "homebrewdj-web-client";
 import { useEffect, useRef } from "react";
 import { uuid } from "./utils";

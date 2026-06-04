@@ -1,7 +1,7 @@
 #with import <nixpkgs> {};
-{ pkgs, stdenv, definitions }:
+{ pkgs, stdenv, definitions, widgets }:
 stdenv.mkDerivation {
-  name = "react-bootstrap-shell";
+  name = "homebrewdj-overlay-host";
   buildInputs = with pkgs; [
 #    definitions
 #    nodePackages.create-react-app
@@ -11,14 +11,15 @@ stdenv.mkDerivation {
 
   src = ./.;
   buildPhase = ''
-    echo $out
-    mkdir -p $out/definitions
-    cp -r ${definitions} $out/definitions
+    ln -s ${definitions} node_modules/definitions
+    ln -s ${widgets} node_modules/widgets
+
     yarn
     yarn build
   '';
 
   installPhase = ''
+    mkdir -p $out
     cp dist $out/app
   '';
 }

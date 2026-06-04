@@ -1,23 +1,35 @@
 #with import <nixpkgs> {};
 { pkgs }:
-pkgs.stdenv.mkDerivation {
-  name = "react-bootstrap-shell";
-  buildInputs = with pkgs; [
+pkgs.rustPlatform.buildRustPackage {
+  pname = "widget-definitions";
+#  buildInputs = with pkgs; [
 #    nodePackages.create-react-app
-    deno
-    rustc
-    cargo
-  ];
+#    deno
+#    rustc
+#    cargo
+#  ];
   src = ./.;
-  
-  buildPhase = ''
-    mkdir -p $out
-    deno task build
-  '';
+  version = "0.1.0";
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+  };
 
-  installPhase = ''
-    cp -r bindings $out/bindings
-    cp -r main.ts $out/main.ts
-    cp -r package.json $out/package.json
+  postInstall = ''
+    cargo test export_bindings
+    mkdir -p $out/bindings
+    cp -r ./bindings $out/bindings
+    cp main.ts $out/main.ts
+    cp package.json $out/package.json
   '';
+  
+#  buildPhase = ''
+#    mkdir -p $out
+#    deno task build
+#  '';
+
+#  installPhase = ''
+#    cp -r bindings $out/bindings
+#    cp -r main.ts $out/main.ts
+#    cp -r package.json $out/package.json
+#  '';
 }
