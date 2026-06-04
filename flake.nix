@@ -4,9 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    deno2nix.url = "github:SnO2WMaN/deno2nix";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, deno2nix }:
     flake-utils.lib.eachDefaultSystem (system: 
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -21,6 +22,9 @@
           inherit widgets;
         };
 
+        homebrewdj = pkgs.callPackage ./homebrewdj {
+          inherit midi-driver;
+        };
       in
         {
           packages = {
@@ -28,7 +32,8 @@
             #default = frontend;
             frontend = frontend;
             midi-driver = midi-driver;
-            default = frontend;
+            homebrewdj = homebrewdj;
+            default = homebrewdj;
             widgets = widgets;
           };
         }
