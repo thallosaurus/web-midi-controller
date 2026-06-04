@@ -36,6 +36,7 @@
           inherit midi-driver;
         };
       in
+      with pkgs;
         {
           packages = {
             definitions = definitions;
@@ -45,6 +46,10 @@
             homebrewdj = homebrewdj;
             default = homebrewdj;
             widgets = widgets;
+          };
+
+          devShells.default = mkShell {
+            buildInputs = [ nodejs yarn pkgconf alsa-lib.dev deno rustc cargo ];
           };
         }
     );
