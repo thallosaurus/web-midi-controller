@@ -24,6 +24,16 @@
 
         homebrewdj = pkgs.callPackage ./homebrewdj {
           inherit midi-driver;
+          inherit traktor-driver;
+          inherit launchpad-driver;
+        };
+
+        traktor-driver = pkgs.callPackage ./traktor-driver {
+          inherit midi-driver;
+        };
+
+        launchpad-driver = pkgs.callPackage ./launchpad-driver {
+          inherit midi-driver;
         };
       in
         {

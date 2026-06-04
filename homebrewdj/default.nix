@@ -1,4 +1,4 @@
-{ pkgs, stdenv, midi-driver }:
+{ pkgs, stdenv, midi-driver, traktor-driver, launchpad-driver }:
 let
   dnt = builtins.fetchurl {
     url = "https://jsr.io/@deno/dnt/0.42.3/mod.ts";
@@ -16,8 +16,8 @@ let
     {
       "imports": {
         "@deno/dnt": "${dnt}",
-        "@traktor": "../traktor-driver/main.ts",
-        "@launchpad": "../launchpad-driver/main.ts",
+        "@traktor": "${traktor-driver}/main.ts",
+        "@launchpad": "${launchpad-driver}/main.ts",
         "@driver": "${midi-driver}/deno/index.ts",
         "@driver-deno": "${midi-driver}/deno/ffi.ts",
         "oak": "${oak}"
