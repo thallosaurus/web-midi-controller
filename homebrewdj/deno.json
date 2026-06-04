@@ -6,6 +6,11 @@
     "run:prod:mac": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib ./dist/homebrewdj.mac",
     "build-client": "deno run -A scripts/build_npm.ts 0.1.0"
   },
+  "links": [
+    "../traktor-driver",
+    "../midi-driver",
+    "../launchpad-driver"
+  ],
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
     "@std/assert": "jsr:@std/assert@1",

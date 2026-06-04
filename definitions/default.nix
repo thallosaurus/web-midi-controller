@@ -2,12 +2,7 @@
 { pkgs }:
 pkgs.rustPlatform.buildRustPackage {
   pname = "widget-definitions";
-#  buildInputs = with pkgs; [
-#    nodePackages.create-react-app
-#    deno
-#    rustc
-#    cargo
-#  ];
+    
   src = ./.;
   version = "0.1.0";
   cargoLock = {
@@ -17,7 +12,7 @@ pkgs.rustPlatform.buildRustPackage {
   postInstall = ''
     cargo test export_bindings
     mkdir -p $out/bindings
-    cp -r ./bindings $out/bindings
+    cp -r ./bindings $out/
     cp main.ts $out/main.ts
     cp package.json $out/package.json
   '';

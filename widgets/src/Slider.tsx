@@ -1,5 +1,5 @@
 import { CCSliderProperties, SliderMode } from "definitions";
-import { WidgetProperties } from "./Parser.tsx";
+import { WidgetProperties } from "./parser.tsx";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils.ts";
 
