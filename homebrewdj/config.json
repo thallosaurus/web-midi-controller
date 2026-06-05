@@ -1,0 +1,8 @@
+{
+    "midiInput": "Launchpad Pro MK3 LPProMK3 MIDI",
+    "midiOutput": "Launchpad Pro MK3 LPProMK3 MIDI",
+    "dawInput": "Launchpad Pro MK3 LPProMK3 DAW",
+    "dawOutput": "Launchpad Pro MK3 LPProMK3 DAW",
+    "traktorInput": "hdj traktor input",
+    "traktorOutput": "hdj traktor output"
+}
