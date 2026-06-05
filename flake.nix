@@ -52,6 +52,11 @@
           devShells.default = mkShell {
             buildInputs = [ nodejs yarn pkgconf alsa-lib.dev deno rustc cargo ];
           };
+
+	  apps.default = {
+	    type = "app";
+	    program = "${homebrewdj}/bin/homebrewdj";
+	  };
         }
     );
     #system = "x86_64-linux";
