@@ -5,22 +5,12 @@ let
     sha256 = "sha256:1ri5z1pb23kyrpy0j37s2kh95bk3r12jzscck4bigrsw9755iyai";
   };
 
-  #oak = builtins.fetchurl {
-  #  url = "https://deno.land/x/oak/mod.ts";
-  #  sha256 = "sha256:164fqqkpskpf1l4j7s6i2ww92ajdprr9p3kvmz70wc9qc4d38hhz";
-  #};
-  /*oak = stdenv.mkDerivation {
-    name = "oak-deno";
-    src = pkgs.fetchFromGitHub {
-      owner = "oakserver";
-      repo = "oak";
-      rev = "v17.2.0";
-      hash = "sha256-2fDXedLE5z7ZRT5H6kWEH6EehgoQQN5jrfPEMcWDrOs=";
-    };
-    installPhase = ''
-      cp -r . $out
-    '';
-  };*/
+  launcher = pkgs.writeShellScriptBin "homebrewdj" ''
+    SCRIPT_DIR="$(dirname "$0")/.."
+    LIBRARY=${midi-driver}/lib/libmidi_driver.so
+    RUST_LOG=debug
+    exec ${pkgs.deno}/bin/deno run -A ${./main.ts}
+  '';
 
   importmap = pkgs.writeTextFile {
     name = "deno.json";
@@ -55,7 +45,7 @@ stdenv.mkDerivation {
     cp *.ts $out/
     cp -r client $out/client
     ln -s ${importmap} $out/deno.json
-
-    cp ${midi-driver}/lib/libmidi_driver.so $out/libmidi_driver.so
+    ln -s ${launcher} $out/bin/homebrewdj
+    #cp ${midi-driver}/lib/libmidi_driver.so $out/libmidi_driver.so
   '';
 }
