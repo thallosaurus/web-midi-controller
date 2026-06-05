@@ -9,7 +9,7 @@ let
   #  url = "https://deno.land/x/oak/mod.ts";
   #  sha256 = "sha256:164fqqkpskpf1l4j7s6i2ww92ajdprr9p3kvmz70wc9qc4d38hhz";
   #};
-  oak = stdenv.mkDerivation {
+  /*oak = stdenv.mkDerivation {
     name = "oak-deno";
     src = pkgs.fetchFromGitHub {
       owner = "oakserver";
@@ -20,7 +20,7 @@ let
     installPhase = ''
       cp -r . $out
     '';
-  };
+  };*/
 
   importmap = pkgs.writeTextFile {
     name = "deno.json";
@@ -43,25 +43,15 @@ stdenv.mkDerivation {
   version = "0.1.0";
   src = ./.;
   buildInputs = [ pkgs.deno ];
-  postUnpack = ''
-    deno cache --import-map=${importmap} $sourceRoot/main.ts
-  '';
   buildPhase = ''
-    mkdir -p $out
-    export DENO_DIR=$out/.deno
-    cp main.ts $out/main.ts
-    cp main.ts $out/main.ts
-    cp server.ts $out/server.ts
-    cp -r client/ $out/client/
-    deno cache --import-map=${importmap} --lock=$sourceRoot/deno.lock main.ts
+    export DENO_DIR=$PWD/.deno
+    deno cache --frozen --import-map=${importmap} --lock=deno.lock $sourceRoot/main.ts
+    deno compile --frozen --lock=deno.lock --output homebrewdj main.ts
   '';
 
   installPhase = ''
+    mkdir -p $out/bin
+    cp homebrewdj $out/bin/homebrewdj
     cp ${midi-driver}/lib/libmidi_driver.so $out/libmidi_driver.so
   '';
-#    ln -s ${importmap} $out/deno.json
-#    deno cache --import-map ${importmap} --lock $out/deno.lock main.ts
-#  '';
-    #//deno cache --import-map ${deno-config} --lock deno.lock main.ts
-    #ln -s ${deno-config} deno.json
 }
