@@ -45,13 +45,17 @@ stdenv.mkDerivation {
   buildInputs = [ pkgs.deno ];
   buildPhase = ''
     export DENO_DIR=$PWD/.deno
-    deno cache --frozen --import-map=${importmap} --lock=deno.lock $sourceRoot/main.ts
-    deno compile --frozen --lock=deno.lock --output homebrewdj main.ts
+#    deno cache --frozen --import-map=${importmap} --lock=deno.lock main.ts
+#    deno compile --frozen --import-map=${importmap} --lock=deno.lock --output homebrewdj $sourceRoot/main.ts
   '';
 
   installPhase = ''
     mkdir -p $out/bin
-    cp homebrewdj $out/bin/homebrewdj
+ #   cp homebrewdj $out/bin/homebrewdj
+    cp *.ts $out/
+    cp -r client $out/client
+    ln -s ${importmap} $out/deno.json
+
     cp ${midi-driver}/lib/libmidi_driver.so $out/libmidi_driver.so
   '';
 }
