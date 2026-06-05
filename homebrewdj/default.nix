@@ -32,7 +32,7 @@ let
         "@launchpad": "${launchpad-driver}/main.ts",
         "@driver": "${midi-driver}/deno/index.ts",
         "@driver-deno": "${midi-driver}/deno/ffi.ts",
-        "oak": "https://deno.land/x/oak/"
+        "oak": "https://deno.land/x/oak/mod.ts"
       }
     }
   '';
@@ -43,6 +43,9 @@ stdenv.mkDerivation {
   version = "0.1.0";
   src = ./.;
   buildInputs = [ pkgs.deno ];
+  postUnpack = ''
+    deno cache $sourceRoot/main.ts
+  '';
   buildPhase = ''
     mkdir -p $out
     export DENO_DIR=$out/.deno
@@ -50,7 +53,7 @@ stdenv.mkDerivation {
     cp main.ts $out/main.ts
     cp server.ts $out/server.ts
     cp -r client/ $out/client/
-    deno cache --import-map=${importmap} --lock=$out/deno.lock main.ts
+    deno cache --import-map=${importmap} --lock=$sourceRoot/deno.lock main.ts
   '';
 
   installPhase = ''
