@@ -1,5 +1,5 @@
 import { StatementSync } from "node:sqlite";
-import { LightMode, Pixel } from "../launchpad-driver/src/surface.ts";
+import { LightMode, Pixel } from "@launchpad";
 import { TraktorState } from "./main.ts";
 import { DeckActionsCC, DeckActionsMidi, LoopFeedbackStates } from "./state.ts";
 

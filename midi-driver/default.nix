@@ -17,10 +17,12 @@ pkgs.rustPlatform.buildRustPackage {
   cargoLock.lockFile = ./Cargo.lock;
 
   postBuild = ''
+    cargo test export_bindings
     mkdir -p $out/npm
     mkdir -p $out/deno
     cp deno.json $out/deno/deno.json
     cp package.node.json $out/npm/package.json
+    cp -r bindings/ $out/deno/bindings
 
     cp index.ts $out/deno/index.ts    
     cp ffi.ts $out/deno/ffi.ts

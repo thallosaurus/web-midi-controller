@@ -1,4 +1,4 @@
-{ pkgs, stdenv, midi-driver }:
+{ pkgs, stdenv, midi-driver, launchpad-driver }:
 let
     importmap = pkgs.writeTextFile {
       name = "deno.json";
@@ -6,7 +6,8 @@ let
         {
           "imports": {
             "@driver": "${midi-driver}/index.ts",
-            "@driver-deno": "${midi-driver}/deno_mod.ts"
+            "@driver-deno": "${midi-driver}/deno_mod.ts",
+            "@launchpad": "${launchpad-driver}/main.ts"
           }
         }
       '';

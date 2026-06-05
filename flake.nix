@@ -7,7 +7,7 @@
     deno2nix.url = "github:SnO2WMaN/deno2nix";
   };
 
-  outputs = { self, nixpkgs, flake-utils, deno2nix }:
+  outputs = { self, nixpkgs, flake-utils, ... } @inputs :
     flake-utils.lib.eachDefaultSystem (system: 
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -26,10 +26,11 @@
           inherit midi-driver;
           inherit traktor-driver;
           inherit launchpad-driver;
+#          inherit deno2nix;
         };
 
         traktor-driver = pkgs.callPackage ./traktor-driver {
-          inherit midi-driver;
+          inherit midi-driver launchpad-driver;
         };
 
         launchpad-driver = pkgs.callPackage ./launchpad-driver {

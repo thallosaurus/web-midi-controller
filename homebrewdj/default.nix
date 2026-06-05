@@ -36,6 +36,7 @@ stdenv.mkDerivation {
     ln -s ${importmap} $out/deno.json
     cp main.ts $out/main.ts
     cp server.ts $out/server.ts
+    cp ${midi-driver}/lib/libmidi_driver.so $out/libmidi_driver.so
   '';
     #//deno cache --import-map ${deno-config} --lock deno.lock main.ts
     #ln -s ${deno-config} deno.json
