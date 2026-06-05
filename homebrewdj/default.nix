@@ -44,7 +44,7 @@ stdenv.mkDerivation {
   src = ./.;
   buildInputs = [ pkgs.deno ];
   postUnpack = ''
-    deno cache $sourceRoot/main.ts
+    deno cache --import-map=${importmap} $sourceRoot/main.ts
   '';
   buildPhase = ''
     mkdir -p $out
