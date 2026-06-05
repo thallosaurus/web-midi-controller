@@ -19,7 +19,7 @@ use crate::{
 };
 
 mod logging;
-mod midi;
+pub mod midi;
 
 //static OUTPUT_CHANNEL: Lazy<Mutex<Option<Receiver<Vec<u8>>>>> = Lazy::new(|| Mutex::new(None));
 //static INPUT_CHANNEL: Lazy<Mutex<Option<Sender<Vec<u8>>>>> = Lazy::new(|| Mutex::new(None));
@@ -245,7 +245,7 @@ pub extern "C" fn convert_bytes(ptr: *const u8, len: usize) -> *mut c_char {
 pub extern "C" fn list_devices() {
     let list = default_list().unwrap();
 
-    println!("{:?}", list);
+    println!("{:#?}", list);
 }
 
 /// frees the given bytes allocated by Rust
