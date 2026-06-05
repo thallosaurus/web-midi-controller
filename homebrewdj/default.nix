@@ -9,7 +9,7 @@ let
     SCRIPT_DIR="$(dirname "$0")/.."
     LIBRARY=${midi-driver}/lib/libmidi_driver.so
     RUST_LOG=debug
-    exec ${pkgs.deno}/bin/deno run -A ${./main.ts}
+    exec ${pkgs.deno}/bin/deno run --import-map=${importmap} -A ${./main.ts}
   '';
 
   importmap = pkgs.writeTextFile {
