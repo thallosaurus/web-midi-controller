@@ -8,3 +8,6 @@
 |[midi-driver](./midi-driver)|Platform Independent MIDI Driver|
 |[compat-tests](./compat-tests/)|Tests to shim the widget system with react|
 |[launchpad-driver](./launchpad-driver/)|Implementation of a Launchpad Driver with the included midi-driver|
+|[traktor-driver]()||
+|[homebrewdj]()||
+|[react-app]()||
