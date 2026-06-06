@@ -45,6 +45,7 @@ stdenv.mkDerivation {
     cp *.ts $out/
     cp -r client $out/client
     ln -s ${importmap} $out/deno.json
+    cp config.nix.json $out/config.json
     ln -s ${launcher} $out/bin/homebrewdj
     #cp ${midi-driver}/lib/libmidi_driver.so $out/libmidi_driver.so
   '';
