@@ -6,10 +6,8 @@ let
   };
 
   launcher = pkgs.writeShellScriptBin "homebrewdj" ''
-    SCRIPT_DIR="$(dirname "$0")/.."
-    LIBRARY=${midi-driver}/lib/libmidi_driver.so
-    RUST_LOG=debug
-    exec ${pkgs.deno}/bin/deno run --import-map=${importmap} -A ${./main.ts}
+    SCRIPT_DIR="$(dirname "$0")"
+    LIBRARY=${midi-driver}/lib/libmidi_driver.so RUST_LOG=debug ${pkgs.deno}/bin/deno run --no-lock --import-map=${importmap} -A "$SCRIPT_DIR/main.ts"
   '';
 
   importmap = pkgs.writeTextFile {
@@ -46,7 +44,7 @@ stdenv.mkDerivation {
     cp -r client $out/client
     ln -s ${importmap} $out/deno.json
     cp config.nix.json $out/config.json
-    ln -s ${launcher} $out/bin/homebrewdj
+    ln -s ${launcher}/bin/homebrewdj $out/homebrewdj
     #cp ${midi-driver}/lib/libmidi_driver.so $out/libmidi_driver.so
   '';
 }
