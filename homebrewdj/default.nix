@@ -7,7 +7,7 @@ let
 
   launcher = pkgs.writeShellScriptBin "homebrewdj" ''
     SCRIPT_DIR="$(dirname "$0")"
-    LIBRARY=${midi-driver}/lib/libmidi_driver.so RUST_LOG=debug ${pkgs.deno}/bin/deno run --no-lock --import-map=${importmap} -A "$SCRIPT_DIR/main.ts"
+    LIBRARY=${midi-driver}/lib/libmidi_driver.so RUST_LOG=trace ${pkgs.deno}/bin/deno run --no-lock --import-map=${importmap} -A "$SCRIPT_DIR/main.ts"
   '';
 
   importmap = pkgs.writeTextFile {

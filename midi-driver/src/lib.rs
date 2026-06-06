@@ -209,6 +209,8 @@ pub extern "C" fn send_midi(handle: u32, ptr: *const std::os::raw::c_char) {
     let cstr = unsafe { CStr::from_ptr(ptr) };
     let json = cstr.to_str().unwrap(); // now you have the JSON string
 
+    tracing::debug!("{:?}", json);
+
     if let Ok(msg) = serde_json::from_str::<MidiMessage>(json) {
         // sende in den Output-Thread
         //tracing::debug!("send midi: {:?}", msg);
