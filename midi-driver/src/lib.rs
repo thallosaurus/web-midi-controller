@@ -129,6 +129,12 @@ pub extern "C" fn init_logging() {
     init_tracing();
 }
 
+fn sanitize(s: &str) -> String {
+    s.chars()
+        .filter(|c| c.is_ascii_graphic() || c.is_ascii_whitespace())
+        .collect()
+}
+
 /// Starts a new Instance and returns the Handle ID
 #[unsafe(no_mangle)]
 pub extern "C" fn start_driver(
@@ -138,11 +144,11 @@ pub extern "C" fn start_driver(
 ) -> u32 {
     // Convert Input Name to native type
     let in_cstr = unsafe { CStr::from_ptr(input_name) };
-    let input_name = in_cstr.to_str().unwrap();
+    let input_name = sanitize(in_cstr.to_str().unwrap());
 
     // Convert Output Name to native type
     let out_cstr = unsafe { CStr::from_ptr(output_name) };
-    let output_name = out_cstr.to_str().unwrap();
+    let output_name = sanitize(out_cstr.to_str().unwrap());
 
     let mut host = DRIVERHOST.lock().unwrap();
     let id = host.add_driver(
