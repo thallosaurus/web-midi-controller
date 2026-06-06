@@ -1,4 +1,4 @@
-{ pkgs, stdenv, midi-driver, traktor-driver, launchpad-driver }:
+{ pkgs, stdenv, midi-driver, traktor-driver, launchpad-driver, frontend }:
 let
   dnt = builtins.fetchurl {
     url = "https://jsr.io/@deno/dnt/0.42.3/mod.ts";
@@ -25,6 +25,12 @@ let
     }
   '';
   };
+  statics = pkgs.writeTextFile {
+    name = "static.ts";
+    text = ''
+      export const StaticAssets = "${frontend}/app";
+    '';
+  };
 in
 stdenv.mkDerivation {
   name = "homebrewdj";
@@ -40,9 +46,11 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/bin
  #   cp homebrewdj $out/bin/homebrewdj
-    cp *.ts $out/
+    cp main.ts $out/
+    cp server.ts $out/
     cp -r client $out/client
     ln -s ${importmap} $out/deno.json
+    cp ${statics} $out/static.ts
     cp config.nix.json $out/config.json
     ln -s ${launcher}/bin/homebrewdj $out/homebrewdj
     #cp ${midi-driver}/lib/libmidi_driver.so $out/libmidi_driver.so

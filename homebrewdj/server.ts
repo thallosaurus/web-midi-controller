@@ -1,13 +1,14 @@
 import { randomUUID, UUID } from "node:crypto";
 import { Router, Context, Application } from "oak";
 import { AllowedPayloads } from "./client/protocol.ts";
+import { StaticAssets } from "./static.ts";
 
 type HandlerCallback<T> = (msg: T) => void;
 
 const StaticHandler = async (context: Context) => {
-    console.log(new URL("../react-app/dist/", import.meta.url).pathname)
+    console.log(new URL(StaticAssets, import.meta.url).pathname)
     await context.send({
-        root: new URL("../react-app/dist/", import.meta.url).pathname,
+        root: new URL(StaticAssets, import.meta.url).pathname,
         index: "index.html",
     })
 }

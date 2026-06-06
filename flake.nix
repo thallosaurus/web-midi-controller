@@ -27,6 +27,7 @@
           inherit traktor-driver;
           inherit launchpad-driver;
 #          inherit deno2nix;
+          inherit frontend;
         };
 
         traktor-driver = pkgs.callPackage ./traktor-driver {

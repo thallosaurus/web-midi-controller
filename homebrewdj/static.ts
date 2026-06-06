@@ -1,0 +1,1 @@
+export const StaticAssets = "../react-app/dist/";

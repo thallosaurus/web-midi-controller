@@ -1,25 +1,29 @@
 #with import <nixpkgs> {};
 { pkgs, stdenv, definitions, widgets }:
+let 
+  modules = pkgs.mkYarnPackage {
+    name = "modules";
+    src = ./.;
+  };
+in 
 stdenv.mkDerivation {
-  name = "homebrewdj-overlay-host";
-  buildInputs = with pkgs; [
-#    definitions
-#    nodePackages.create-react-app
-    nodejs
-    yarn
-  ];
-
+  name = "frontend";
+  version = "0.1.0";
   src = ./.;
-  buildPhase = ''
-    ln -s ${definitions} node_modules/definitions
-    ln -s ${widgets} node_modules/widgets
+  buildInputs = [pkgs.yarn modules];
 
-    yarn
-    yarn build
+  buildPhase = ''
+    export HOME=$PWD
+    export TMPDIR=$PWD/tmp
+    export npm_config_cache=$PWD/.npm-cache
+    export YARN_CACHE_FOLDER=$PWD/.yarn-cache
+
+    ${pkgs.yarn}/bin/yarn build --offline
+    ln -s ${modules}/libexec/react-app/node_modules node_modules
   '';
 
   installPhase = ''
     mkdir -p $out
-    cp dist $out/app
+    cp -r dist/* $out/
   '';
 }
