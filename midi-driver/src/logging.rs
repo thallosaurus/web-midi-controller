@@ -8,7 +8,7 @@ pub fn init_tracing() {
                 return format!("{}=trace", env!("CARGO_CRATE_NAME")).into();
 
                 #[cfg(not(debug_assertions))]
-                return format!("{}=info", env!("CARGO_CRATE_NAME")).into();
+                return format!("{}=debug", env!("CARGO_CRATE_NAME")).into();
             }),
         )
         .with(tracing_subscriber::fmt::layer())

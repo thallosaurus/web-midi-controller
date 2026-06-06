@@ -171,10 +171,10 @@ export class MidiDriver {
     const virt = Deno.build.os == "windows" ? false : options.useVirtual
 
     const encoder = new TextEncoder();
-    const input_name_bytes = encoder.encode(options.inputName)
+    const input_name_bytes = encoder.encode(options.inputName + "\0")
     const input_name = Deno.UnsafePointer.of(input_name_bytes)
 
-    const output_name_bytes = encoder.encode(options.outputName)
+    const output_name_bytes = encoder.encode(options.outputName + "\0")
     const output_name = Deno.UnsafePointer.of(output_name_bytes)
 
     if (MidiDriver.dylib) this.handle = MidiDriver.dylib.symbols.start_driver(Number(virt), input_name, output_name);
@@ -230,7 +230,7 @@ export class MidiDriver {
     if (MidiDriver.dylibLoaded) {
       const encoder = new TextEncoder();
       const json = JSON.stringify(event);
-      const bytes = encoder.encode(json);
+      const bytes = encoder.encode(json) + "\0";
 
       const ptr = Deno.UnsafePointer.of(new Uint8Array(bytes));
       MidiDriver.dylib!.symbols.send_midi(this.handle!, ptr);
