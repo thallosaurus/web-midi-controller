@@ -229,8 +229,8 @@ export class MidiDriver {
   sendMidi(event: MidiMessage) {
     if (MidiDriver.dylibLoaded) {
       const encoder = new TextEncoder();
-      const json = JSON.stringify(event);
-      const bytes = encoder.encode(json) + "\0";
+      const json = JSON.stringify(event) + "\0";
+      const bytes = encoder.encode(json);
 
       const ptr = Deno.UnsafePointer.of(new Uint8Array(bytes));
       MidiDriver.dylib!.symbols.send_midi(this.handle!, ptr);
