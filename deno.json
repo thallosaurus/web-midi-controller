@@ -1,0 +1,3 @@
+{
+    "workspace": ["./definitions", "./homebrewdj", "./launchpad-driver", "./midi-driver", "./traktor-driver"]
+}

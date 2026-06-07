@@ -1,4 +1,5 @@
 {
+  "name": "@hdj/definitions",
   "tasks": {
     "build": "cargo test export_bindings"
   },

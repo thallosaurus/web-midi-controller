@@ -1,4 +1,5 @@
 {
+  "name": "@hdj/homebrewdj",
   "tasks": {
     "dev": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A main.ts",
     "dev:linux": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.so deno run -A main.ts config.nix.json",
@@ -9,10 +10,6 @@
   },
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
-    "@traktor": "../traktor-driver/main.ts",
-    "@launchpad": "../launchpad-driver/main.ts",
-    "@driver": "../midi-driver/index.ts",
-    "@driver-deno": "../midi-driver/deno_mod.ts",
     "oak": "https://deno.land/x/oak/mod.ts"
   },
   "compile": {

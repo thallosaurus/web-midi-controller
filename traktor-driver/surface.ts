@@ -1,8 +1,7 @@
-import { Pixel, Surface } from "@launchpad";
-import { MidiDriver } from "@driver-deno";
+import { Pixel, Surface, BUTTON_DEF } from "@hdj/launchpad-driver";
+import { MidiDriver } from "@hdj/midi-driver/ffi.ts";
 import { TraktorState } from "./state.ts";
 import { Button, DeckMap, ShiftDeckMap } from "./button.ts";
-import { BUTTON_DEF } from "@launchpad";
 
 enum GlobalTraktorActions {
     BrowserTreeUp = 1,

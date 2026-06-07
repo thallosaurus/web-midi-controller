@@ -1,4 +1,4 @@
-import { MidiMessage } from "@driver";
+import { MidiMessage } from "@hdj/midi-driver";
 import { BUTTON_DEF } from "./launchpad.ts";
 
 export enum LightMode {

@@ -1,4 +1,5 @@
 {
+  "name": "@hdj/midi-driver",
   "exports": "./index.ts",
   "tasks": {
     "dev": "deno run -A --watch main.ts",

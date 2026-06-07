@@ -1,4 +1,5 @@
 {
+  "name": "@hdj/launchpad-driver",
   "tasks": {
     "dev": "deno run --watch -A main.ts",
     "launchpad_monitor": "RUST_LOG=info LIBRARY=../midi-driver/target/debug/libmidi_driver.dylib deno run -A bin/monitor.ts",

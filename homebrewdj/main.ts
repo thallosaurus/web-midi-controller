@@ -1,6 +1,6 @@
-import { TraktorSurface, TraktorState } from "@traktor"
-import { Launchpad, LaunchpadSurfaceStore } from "@launchpad";
-import { MidiDriver } from "@driver-deno";
+import { TraktorSurface, TraktorState } from "@hdj/traktor-driver"
+import { Launchpad, LaunchpadSurfaceStore } from "@hdj/launchpad-driver";
+import { MidiDriver } from "@hdj/midi-driver";
 
 import { Server } from "./server.ts";
 import { AllowedPayloads } from "./client/protocol.ts";

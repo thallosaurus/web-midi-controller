@@ -1,4 +1,4 @@
-import { MidiDriver, type MidiMessage } from "@driver-deno";
+import { MidiDriver, type MidiMessage } from "@hdj/midi-driver/ffi.ts";
 import { LaunchpadProMap, LightMode, Surface } from "./surface.ts";
 
 export const NOVATION_SYSEX_HEADER = [0xF0, 0x00, 0x20, 0x29, 0x02, 0x0E];
