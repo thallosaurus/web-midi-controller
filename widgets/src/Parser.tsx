@@ -86,11 +86,13 @@ function testCallback(def: any, v: number) {
   console.log(def, v);
 }
 
-export function parseOverlay<T>(o: Overlay, callbacks: WidgetCallbacks) {
+export function parseOverlay(o: Overlay, callbacks: WidgetCallbacks) {
   return (
     <div className="overlay" style={{
-      width: "calc(100% - 1em)",
-      height: "calc(100% - 1em)",
+      //width: "calc(100% - 1em)",
+      //height: "calc(100% - 1em)",
+      width: "100%",
+      height: "100%",
       display: "flex",
       gap: "1em",
       justifyContent: "center"

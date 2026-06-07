@@ -6,6 +6,7 @@
         "react-app",
         "homebrewdj/dist/client",
         "midi-driver",
-        "definitions"
+        "definitions",
+        "overlay-editor"
     ]
 }
