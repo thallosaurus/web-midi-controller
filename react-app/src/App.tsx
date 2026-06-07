@@ -68,7 +68,7 @@ function App() {
   const client = useRef<WebsocketClient<AllowedPayloads> | null>(null);
   //const ccCallbackMap = useRef<CallbackMap>(new Map())
   //const noteCallbackMap = useRef<CallbackMap>(new Map())
-  const eventbus = useRef<EventBus | null>(null);
+  const eventbus = useRef<EventBus>(new EventBus());
 
   useEffect(() => {
 
@@ -87,8 +87,9 @@ function App() {
 
     const url = new URL("/ws", location.href);
     url.protocol = "ws";
-    client.current = new WebsocketClient<CCMessagePayload | NoteMessagePayload>(url, process);
-    eventbus.current = new EventBus(client.current);
+    const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload>(url, process);
+    client.current = wsClient;
+    eventbus.current.setSender(wsClient);
   })
 
   return (

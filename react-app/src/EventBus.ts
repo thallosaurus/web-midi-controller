@@ -9,9 +9,13 @@ interface EventBusCallback {
 }
 
 export class EventBus implements WidgetCallbacks {
-    sender: EventBusCallback;
+    sender?: EventBusCallback;
     ccCallbackMap: CallbackMap = new Map();
     noteCallbackMap: CallbackMap = new Map();
+
+    setSender(sender: EventBusCallback) {
+        this.sender = sender;
+    }
 
     processNote({ channel, note, velocity, on }: NoteMessagePayload) {
         const c = this.noteCallbackMap.get(channel);
@@ -29,13 +33,9 @@ export class EventBus implements WidgetCallbacks {
         })
     }
 
-    constructor(sender: EventBusCallback) {
-        this.sender = sender;
-    }
-
     sendNote(channel: number, note: number, velocity: number, on: boolean) {
         console.log("note", channel, note, velocity, on);
-        this.sender.send({
+        if (this.sender) this.sender.send({
             type: "note",
             channel,
             note,
@@ -46,7 +46,7 @@ export class EventBus implements WidgetCallbacks {
 
     sendCC(channel: number, cc: number, value: number) {
         console.log("cc", channel, cc, value);
-        this.sender.send({
+        if (this.sender) this.sender.send({
             type: "cc",
             channel,
             cc,

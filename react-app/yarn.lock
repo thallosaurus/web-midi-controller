@@ -2104,6 +2104,9 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
+"widget-definitions@file:../definitions":
+  version "0.1.0"
+
 "widgets@file:../widgets":
   version "1.0.0"
 
