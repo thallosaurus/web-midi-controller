@@ -1,5 +1,5 @@
 import { XYPadProperties } from "definitions";
-import { WidgetProperties } from "./parser";
+import { WidgetProperties } from "./Parser.tsx";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils";
 

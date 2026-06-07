@@ -1,5 +1,5 @@
 import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "definitions";
-import { Layout, WidgetProperties } from "./parser.tsx";
+import { Layout, WidgetProperties } from "./Parser.tsx";
 import { useEffect, useState } from "react";
 
 export function Vertical({ def, callbacks }: WidgetProperties<VerticalMixerProperties>) {

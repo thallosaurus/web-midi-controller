@@ -3,7 +3,7 @@ export interface ConnectedPayload {
     id: string
 }
 
-interface NoteMessagePayload {
+export interface NoteMessagePayload {
     type: "note",
     channel: number,
     note: number,
@@ -11,7 +11,7 @@ interface NoteMessagePayload {
     on: boolean
 }
 
-interface CCMessagePayload {
+export interface CCMessagePayload {
     type: "cc",
     channel: number,
     cc: number,

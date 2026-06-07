@@ -1,5 +1,5 @@
 import { RotarySliderProperties } from "definitions";
-import { WidgetProperties } from "./parser";
+import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils";
 import { useRef, useState } from "react";
 

@@ -9,6 +9,11 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "homebrewdj-web-client": "file:../homebrewdj/dist/client",
+    "widgets": "file:../widgets",
+    "widget-definitions": "file:../definitions"
+  },
   "devDependencies": {
     "terser": "^5.47.1",
     "@eslint/js": "^10.0.1",

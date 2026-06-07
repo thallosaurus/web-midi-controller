@@ -5,7 +5,7 @@ import { Grid, Horizontal, ShiftArea, Vertical } from "./Layout.tsx";
 import { Rotary } from "./Rotary.tsx";
 import { XYPad } from "./XYPad.tsx";
 
-type ReceiveDataCallback = (v: number) => void;
+export type ReceiveDataCallback = (v: number) => void;
 
 export type SendNoteCallback = (channel: number, note: number, velocity: number, on: boolean) => void;
 export type SendCCCallback = (channel: number, cc: number, value: number) => void;
@@ -24,31 +24,31 @@ export interface WidgetCallbacks {
   /**
    * Sends out Note Data
    */
-  sendNote?: SendNoteCallback
+  sendNote: SendNoteCallback
   /**
    * registers this widget for input Note Data
    */
-  registerNote?: RegisterNoteCallback
+  registerNote: RegisterNoteCallback
 
   /**
    * Sends out CC Data
    */
-  sendCC?: SendCCCallback
+  sendCC: SendCCCallback
 
   /**
    * registers this widget for input CC Data
    */
-  registerCC?: RegisterCCCallback
+  registerCC: RegisterCCCallback
 
   /**
    * Unregisters this widget from input CC Data
    */
-  unregisterCC?: UnregisterCCCallback
+  unregisterCC: UnregisterCCCallback
 
   /**
    * Unregisters this widget from input Note Data
    */
-  unregisterNote?: UnregisterNoteCallback
+  unregisterNote: UnregisterNoteCallback
 }
 
 export function Layout({ children, callbacks }: { children: Widget[], callbacks: WidgetCallbacks }) {
