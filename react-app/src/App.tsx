@@ -1,8 +1,7 @@
-import { parseOverlay, RegisterCCCallback, RegisterNoteCallback, SendCCCallback, SendNoteCallback, UnregisterCCCallback, UnregisterNoteCallback, WidgetCallbacks } from "widgets";
+import { parseOverlay } from "widgets";
 import type { Overlay } from "widget-definitions";
 import { AllowedPayloads, CCMessagePayload, NoteMessagePayload, WebsocketClient } from "homebrewdj-web-client";
 import { useEffect, useRef } from "react";
-import { uuid } from "./utils";
 import { EventBus } from "./EventBus";
 
 const XYPAD = {
@@ -64,6 +63,12 @@ const OVERLAY: Overlay = {
   }]
 };
 
+function getEndpointUrl() {
+  const url = new URL("/ws", location.href);
+  url.protocol = "ws";
+  return url;
+}
+
 function App() {
   const client = useRef<WebsocketClient<AllowedPayloads> | null>(null);
   //const ccCallbackMap = useRef<CallbackMap>(new Map())
@@ -85,8 +90,7 @@ function App() {
       }
     }
 
-    const url = new URL("/ws", location.href);
-    url.protocol = "ws";
+    const url = getEndpointUrl();
     const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload>(url, process);
     client.current = wsClient;
     eventbus.current.setSender(wsClient);
