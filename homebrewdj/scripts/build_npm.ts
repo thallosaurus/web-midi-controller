@@ -12,7 +12,7 @@ await build({
   },
   package: {
     // package.json properties
-    name: "homebrewdj-web-client",
+    name: "@hdj/homebrewdj-web-client",
     version: Deno.args[0],
     description: "Your package.",
     license: "MIT",

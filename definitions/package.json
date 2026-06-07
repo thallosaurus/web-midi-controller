@@ -1,5 +1,5 @@
 {
-  "name": "widget-definitions",
+  "name": "@hdj/definitions",
   "type": "module",
   "main": "main.ts",
   "version": "0.1.0"

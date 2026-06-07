@@ -10,3 +10,4 @@ hdj-vue-shim
 result
 dist/
 doc/
+node_modules/

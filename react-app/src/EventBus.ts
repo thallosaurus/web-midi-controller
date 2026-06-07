@@ -1,5 +1,5 @@
-import { AllowedPayloads, CCMessagePayload, NoteMessagePayload } from "homebrewdj-web-client";
-import { WidgetCallbacks, ReceiveDataCallback, SendNoteCallback, RegisterNoteCallback, SendCCCallback, RegisterCCCallback, UnregisterCCCallback, UnregisterNoteCallback } from "widgets";
+import { AllowedPayloads, CCMessagePayload, NoteMessagePayload } from "@hdj/homebrewdj-web-client";
+import { WidgetCallbacks, ReceiveDataCallback, SendNoteCallback, RegisterNoteCallback, SendCCCallback, RegisterCCCallback, UnregisterCCCallback, UnregisterNoteCallback } from "@hdj/widgets";
 import { uuid } from "./utils";
 
 type CallbackMap = Map<number, Map<number, Map<string, ReceiveDataCallback>>>;

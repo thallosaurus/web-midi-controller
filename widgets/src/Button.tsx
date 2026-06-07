@@ -1,4 +1,4 @@
-import { NoteButtonProperties, CCButtonProperties, Widget } from "definitions";
+import { NoteButtonProperties, CCButtonProperties, Widget } from "@hdj/definitions";
 import { useEffect, useRef, useState } from "react";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils.ts";

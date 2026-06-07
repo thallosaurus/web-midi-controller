@@ -1,4 +1,4 @@
-import { XYPadProperties } from "definitions";
+import { XYPadProperties } from "@hdj/definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils";

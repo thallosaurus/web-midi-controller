@@ -1,4 +1,4 @@
-import { Overlay, Widget } from "definitions"
+import { Overlay, Widget } from "@hdj/definitions"
 import { CCButton, NoteButton } from "./Button.tsx";
 import { CCSlider } from "./Slider.tsx";
 import { Grid, Horizontal, ShiftArea, Vertical } from "./Layout.tsx";

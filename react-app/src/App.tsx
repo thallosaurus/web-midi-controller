@@ -1,6 +1,6 @@
-import { parseOverlay } from "widgets";
-import type { Overlay } from "widget-definitions";
-import { AllowedPayloads, CCMessagePayload, NoteMessagePayload, WebsocketClient } from "homebrewdj-web-client";
+import { parseOverlay } from "@hdj/widgets";
+import type { Overlay } from "@hdj/definitions";
+import { AllowedPayloads, CCMessagePayload, NoteMessagePayload, WebsocketClient } from "@hdj/homebrewdj-web-client";
 import { useEffect, useRef } from "react";
 import { EventBus } from "./EventBus";
 

@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import "./index.css"
-import "widgets/style.css"
+import "@hdj/widgets/style.css"
 
 /*window.addEventListener("error", (e) => {
     alert(e.message)

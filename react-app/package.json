@@ -1,5 +1,5 @@
 {
-  "name": "react-app",
+  "name": "@hdj/react-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "homebrewdj-web-client": "file:../homebrewdj/dist/client",
-    "widgets": "file:../widgets",
-    "widget-definitions": "file:../definitions"
+    "@hdj/homebrewdj-web-client": "*",
+    "@hdj/widgets": "*",
+    "@hdj/definitions": "*"
   },
   "devDependencies": {
     "terser": "^5.47.1",

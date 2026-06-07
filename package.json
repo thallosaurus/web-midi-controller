@@ -1,0 +1,11 @@
+{
+    "name": "web-midi-controller",
+    "private": true,
+    "workspaces": [
+        "widgets",
+        "react-app",
+        "homebrewdj/dist/client",
+        "midi-driver",
+        "definitions"
+    ]
+}

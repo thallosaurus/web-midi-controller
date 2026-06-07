@@ -1,5 +1,5 @@
 {
-  "name": "midi-driver",
+  "name": "@hdj/midi-driver",
   "version": "0.1.12",
   "main": "index.ts",
   "license": "MIT",

@@ -1,5 +1,5 @@
 {
-  "name": "overlay-editor",
+  "name": "@hdj/overlay-editor",
   "private": true,
   "version": "0.1.0",
   "type": "module",
