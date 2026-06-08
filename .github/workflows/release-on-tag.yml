@@ -24,7 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-env
-      - uses: ./.github/actions/build-bindings
       - uses: ./.github/actions/build-webui
         with:
           target: ${{ matrix.target }}

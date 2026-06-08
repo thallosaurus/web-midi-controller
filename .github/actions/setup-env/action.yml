@@ -27,6 +27,11 @@ runs:
             sudo apt update
             sudo apt install -y libjack-dev libasound-dev
 
+        - name: Export Bindings
+          shell: bash
+          working-directory: ./definitions
+          run: cargo test export_bindings
+
         - name: "Make WSClient"
           shell: bash
           working-directory: ./homebrewdj
