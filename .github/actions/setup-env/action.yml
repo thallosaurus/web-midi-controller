@@ -27,6 +27,11 @@ runs:
             sudo apt update
             sudo apt install -y libjack-dev libasound-dev
 
+        - name: Export Midi Bindings
+          shell: bash
+          working-directory: ./midi-driver
+          run: cargo test export_bindings
+
         - name: Export Bindings
           shell: bash
           working-directory: ./definitions
