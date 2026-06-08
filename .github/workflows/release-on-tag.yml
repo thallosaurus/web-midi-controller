@@ -46,6 +46,7 @@ jobs:
             server/**/homebrewdj.mac
             server/**/homebrewdj.exe
 
+            react-app/dist/*
             midi-driver/target/release/libmidi_driver.dylib
             midi-driver/target/release/libmidi_driver.so
             midi-driver/target/release/midi_driver.dll
