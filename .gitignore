@@ -11,3 +11,4 @@ dist/
 doc/
 node_modules/
 .yarn/
+!homebrewdj/dist/client/package.json
