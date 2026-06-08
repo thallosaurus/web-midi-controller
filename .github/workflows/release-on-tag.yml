@@ -38,13 +38,8 @@ jobs:
         with:
           name: build-${{ matrix.target }}
           path: |
-            web/bindings/*
-            web/dist/*
             midi-driver/bindings/*
             midi-driver/native/*
-            server/**/homebrewdj.linux
-            server/**/homebrewdj.mac
-            server/**/homebrewdj.exe
 
             react-app/dist/*
             midi-driver/target/release/libmidi_driver.dylib
