@@ -1,0 +1,29 @@
+{
+  "name": "@hdj/homebrewdj-web-client",
+  "version": "0.2.0",
+  "description": "Your package.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thallosaurus/web-midi-controller.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thallosaurus/web-midi-controller/issues"
+  },
+  "main": "./script/index.js",
+  "module": "./esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./script/index.js"
+    }
+  },
+  "scripts": {
+    "test": "node test_runner.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "picocolors": "^1.0.0"
+  },
+  "_generatedBy": "dnt@dev"
+}
