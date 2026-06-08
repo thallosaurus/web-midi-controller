@@ -18,16 +18,11 @@
         };
 
         frontend = pkgs.callPackage ./react-app {
-          inherit definitions;
-          inherit widgets;
+          inherit definitions widgets;
         };
 
         homebrewdj = pkgs.callPackage ./homebrewdj {
-          inherit midi-driver;
-          inherit traktor-driver;
-          inherit launchpad-driver;
-#          inherit deno2nix;
-          inherit frontend;
+          inherit midi-driver traktor-driver launchpad-driver frontend;
         };
 
         traktor-driver = pkgs.callPackage ./traktor-driver {

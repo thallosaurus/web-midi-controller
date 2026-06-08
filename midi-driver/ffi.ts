@@ -1,4 +1,4 @@
-import { type MidiMessage } from "./bindings/MidiPayload.ts";
+import { MidiMessage } from "./bindings/MidiPayload.ts";
 
 function getLibraryPath() {
   const override = Deno.env.get("LIBRARY");

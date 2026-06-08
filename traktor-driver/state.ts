@@ -49,6 +49,8 @@ export enum LoopFeedbackStates {
     Loop32 = 10,
 }
 
+export type TraktorEvent = CustomEvent<Map<string, number>>;
+
 export class TraktorState {
     notestate = new Map<string, number>([
         [DeckActionsMidi[DeckActionsMidi.MixerCue], 0],
@@ -75,7 +77,7 @@ export class TraktorState {
     private events = new EventTarget();
     private channel: number;
 
-    addEventListener(listener: (event: CustomEvent<Map<string, number>>) => void) {
+    addEventListener(listener: (event: TraktorEvent) => void) {
         return this.events.addEventListener("update", (ev) => {
             listener(ev as CustomEvent)
         });

@@ -3,11 +3,17 @@ import { LaunchpadProMap, LightMode, Surface } from "./surface.ts";
 
 export const NOVATION_SYSEX_HEADER = [0xF0, 0x00, 0x20, 0x29, 0x02, 0x0E];
 
+/**
+ * Selector Enum that describes where the surface will be loaded
+ */
 export enum LaunchpadSurfaceStore {
     Session,
     Custom
 }
 
+/**
+ * Enum that maps to the control buttons of the Launchpad Pro MK3
+ */
 export enum BUTTON_DEF {
     LeftArrow = 91,
     RightArrow = 92,
@@ -53,6 +59,12 @@ export enum BUTTON_DEF {
     PrintToClip = 19,
 }
 
+/**
+ * High-level controller for communicating with a Launchpad Pro MK3.
+ *
+ * Manages MIDI/DAW connections, mode switching, surface rendering,
+ * input event routing and SysEx communication.
+ */
 export class Launchpad {
     private control: MidiDriver;
     private midi: MidiDriver;
@@ -61,6 +73,12 @@ export class Launchpad {
     private surface: Surface | null = null;
     private surfaceStorage: LaunchpadSurfaceStore | null = null
 
+    /**
+     * Creates a new Launchpad controller instance.
+     *
+     * @param midi MIDI port used for the Launchpad MIDI interface.
+     * @param control MIDI port used for the Launchpad DAW/control interface.
+     */
     constructor(midi = new MidiDriver({
         inputName: "Launchpad Pro MK3 LPProMK3 MIDI",
         outputName: "Launchpad Pro MK3 LPProMK3 MIDI",
@@ -78,6 +96,13 @@ export class Launchpad {
         MidiDriver.initLogging();
     }
 
+    /**
+     * Processes incoming SysEx messages from the Launchpad.
+     *
+     * Handles device state changes and reacts to mode switches.
+     *
+     * @returns True if the message was recognized and handled.
+     */
     private processSysexMessage(msg: MidiMessage) {
         if (msg.type == "SysEx") {
             //const set = new Set(msg.data);
@@ -89,7 +114,7 @@ export class Launchpad {
                 return false;
             }
 
-            const c = msg.data.filter((v, i) => i > NOVATION_SYSEX_HEADER.length);
+            const c = msg.data.filter((_v, _i) => _i > NOVATION_SYSEX_HEADER.length);
             const [cmd, s] = c;
             const sub = s ?? null;
 
@@ -114,6 +139,9 @@ export class Launchpad {
         return false
     }
 
+    /**
+     * Closes all MIDI connections and releases Launchpad resources.
+     */
     close() {
         //this.surface?.clear();
         //this.sessionSurface?.clear();
@@ -122,18 +150,35 @@ export class Launchpad {
         this.control.close();
     }
 
+    /**
+     * Switches the device to one of the built-in layouts.
+     *
+     * @param layout Layout identifier defined by the Launchpad protocol.
+     * @param page Layout page index.
+     */
     switchInbuiltLayout(layout: number, page: number) {
         this.sendNovationMessage([0x00, layout, page, 0x00])
     }
 
+    /**
+     * Switches the Launchpad to a custom layout page.
+     *
+     * @param page Custom page index.
+     */
     switchToCustomMode(page: number) {
         this.switchInbuiltLayout(3, page)
     }
 
+    /**
+     * Switches the device back to its Live/session workflow mode.
+     */
     switchToLiveMode() {
         this.sendNovationMessage([0x0E, 0x00])
     }
 
+    /**
+     * Enables Programmer Mode, allowing direct LED and input control.
+     */
     switchToProgrammerMode() {
         this.control.sendMidi({
             type: "SysEx",
@@ -141,14 +186,25 @@ export class Launchpad {
         });
     }
 
+    /**
+     * Enables DAW integration mode on the Launchpad.
+     */
     switchToDawMode() {
         this.sendNovationMessage([0x10, 0x01])
     }
 
+    /**
+     * Disables DAW integration and returns the device to standalone operation.
+     */
     switchToStandaloneMode() {
         this.sendNovationMessage([0x10, 0x00])
     }
 
+    /**
+     * Sends a Novation-specific SysEx message.
+     *
+     * @param data SysEx payload excluding manufacturer header and terminator.
+     */
     private sendNovationMessage(data: number[]) {
         this.control.sendMidi({
             type: "SysEx",
@@ -156,6 +212,11 @@ export class Launchpad {
         })
     }
 
+    /**
+     * Clears all LEDs on the selected Launchpad surface.
+     *
+     * @param store Target surface storage location.
+     */
     private clearLaunchpad(store: LaunchpadSurfaceStore) {
         //this.pixels.clear();
         for (const note of LaunchpadProMap()) {
@@ -175,6 +236,11 @@ export class Launchpad {
         }
     }
 
+    /**
+     * Renders the currently loaded surface state to the Launchpad.
+     *
+     * @param store Target surface storage location.
+     */
     drawToLaunchpad(store: LaunchpadSurfaceStore) {
         const dest = store == LaunchpadSurfaceStore.Session ? this.control : this.midi
         const buffer = this.surface?.renderState();
@@ -189,7 +255,12 @@ export class Launchpad {
             })
         }
     }
-
+    /**
+     * Loads a surface implementation and connects it to Launchpad input/output.
+     *
+     * @param store Target Launchpad storage area.
+     * @param surface Surface implementation to render and receive input events.
+     */
     loadSurface(store: LaunchpadSurfaceStore, surface: Surface) {
         this.clearLaunchpad(LaunchpadSurfaceStore.Session);
         this.clearLaunchpad(LaunchpadSurfaceStore.Custom);
@@ -229,12 +300,20 @@ export class Launchpad {
         this.surfaceStorage = store;
     }
 
+    /**
+     * Sends a MIDI message to the specified destination.
+     */
     private sendMidi(destination: MidiDriver, msg: MidiMessage) {
         //this.midi.sendMidi(msg)
 
         destination.sendMidi(msg);
     }
 
+    /**
+     * Emits NoteOff messages for every pad in the Launchpad matrix.
+     *
+     * @param destination Callback that receives generated MIDI messages.
+     */
     clear(destination: (msg: MidiMessage) => void) {
         //this.pixels.clear();
         for (const note of LaunchpadProMap()) {
