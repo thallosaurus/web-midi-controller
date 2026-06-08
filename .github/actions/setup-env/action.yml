@@ -31,3 +31,8 @@ runs:
           shell: bash
           run: |
             yarn
+
+        - name: Install Deno Packages
+          shell: bash
+          run: |
+            deno install

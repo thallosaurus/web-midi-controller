@@ -10,5 +10,6 @@ runs:
     steps:
       - name: Build Server
         shell: bash
-        working-directory: ./server
-        run: deno task compile:${{ inputs.target }}:release
+        working-directory: ./homebrewdj
+        #run: deno task compile:${{ inputs.target }}:release
+        run: deno bundle main.ts > dist/bundled.js

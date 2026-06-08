@@ -47,6 +47,11 @@ jobs:
             server/**/homebrewdj.mac
             server/**/homebrewdj.exe
 
+            midi-driver/target/release/libmidi_driver.dylib
+            midi-driver/target/release/libmidi_driver.so
+            midi-driver/target/release/midi_driver.dll
+            homebrewdj/dist/bundled.js
+
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-latest'
         with:
