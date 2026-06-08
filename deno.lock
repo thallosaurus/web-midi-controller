@@ -2728,7 +2728,13 @@
       "homebrewdj": {
         "dependencies": [
           "jsr:@deno/dnt@~0.42.3"
-        ]
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@types/node@^20.9.0",
+            "npm:picocolors@1"
+          ]
+        }
       },
       "launchpad-driver": {
         "dependencies": [
