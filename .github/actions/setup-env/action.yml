@@ -27,16 +27,18 @@ runs:
             sudo apt update
             sudo apt install -y libjack-dev libasound-dev
 
+        - name: "Make WSClient"
+          shell: bash
+          working-directory: ./homebrewdj
+          run: |
+            deno install
+            deno task build-client
+
         - name: Install Deno Packages
           shell: bash
           run: |
             deno install
 
-        - name: "Make WSClient"
-          shell: bash
-          working-directory: ./homebrewdj
-          run: |
-            deno task build-client
 
 
         - name: Install NPM Packages
