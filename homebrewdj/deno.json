@@ -1,5 +1,6 @@
 {
   "name": "@hdj/homebrewdj",
+  "version": "0.2.0",
   "tasks": {
     "dev": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A main.ts",
     "dev:linux": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.so deno run -A main.ts config.nix.json",
