@@ -8,6 +8,11 @@ inputs:
 runs:
     using: "composite"
     steps:
+        - name: Build Widgets
+          shell: bash
+          working-directory: ./widgets
+          run: yarn build
+          
         - name: Build Web UI
           shell: bash
           working-directory: ./react-app
