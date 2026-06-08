@@ -8,8 +8,9 @@ inputs:
 runs:
     using: "composite"
     steps:
-      - name: Build MIDI Driver (Mac)
+      - name: Build MIDI Driver
         shell: bash
         working-directory: ./midi-driver
         #run: cargo build -p midi-driver --release
-        run: deno task compile:${{ inputs.target }}:release
+        #run: deno task compile:${{ inputs.target }}:release
+        run: cargo build --release

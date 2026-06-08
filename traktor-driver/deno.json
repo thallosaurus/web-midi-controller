@@ -1,6 +1,7 @@
 {
   "name": "@hdj/traktor-driver",
   "version": "0.2.0",
+  "exports": "./main.ts",
   "tasks": {
     "dev": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib deno run -A bin/surface_test.ts",
     "debug": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A --inspect-wait bin/surface_test.ts",

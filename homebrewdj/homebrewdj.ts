@@ -1,6 +1,6 @@
 import { TraktorSurface, TraktorState, TraktorEvent } from "@hdj/traktor-driver"
 import { Launchpad, LaunchpadSurfaceStore } from "@hdj/launchpad-driver";
-import { MidiDriver } from "@hdj/midi-driver";
+import { MidiDriver } from "@hdj/midi-driver/ffi.ts";
 
 import { Server } from "./server.ts";
 import { AllowedPayloads } from "./client/protocol.ts";
@@ -96,7 +96,7 @@ export class HomebrewDJ {
         this.deckAAux = new TraktorState(1, this.traktor);
         this.deckBAux = new TraktorState(2, this.traktor);
 
-        this.traktor.addEventListener((ev: TraktorEvent) => {
+        this.traktor.addEventListener((ev: CustomEvent) => {
             const t = ev.detail;
 
             switch (t.type) {

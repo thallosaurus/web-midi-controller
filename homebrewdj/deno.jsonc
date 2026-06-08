@@ -1,5 +1,6 @@
 {
   "name": "@hdj/homebrewdj",
+  "exports": "./homebrewdj.ts",
   "version": "0.2.0",
   "tasks": {
     "dev": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A main.ts",
@@ -12,8 +13,8 @@
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
     "oak": "https://deno.land/x/oak/mod.ts"
-  },
-  "compile": {
+  }
+  /*"compile": {
     "include": [
       "*.ts",
       "../react-app/dist",
@@ -23,5 +24,5 @@
     "exclude": [
       "dist/"
     ]
-  }
+  }*/
 }

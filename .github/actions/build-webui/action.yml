@@ -10,5 +10,5 @@ runs:
     steps:
         - name: Build Web UI
           shell: bash
-          working-directory: ./web
-          run: yarn && yarn build:release
+          working-directory: ./react-app
+          run: yarn build

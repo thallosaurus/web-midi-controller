@@ -1,6 +1,9 @@
 {
   "name": "@hdj/midi-driver",
-  "exports": "./index.ts",
+  "exports": [
+    "./index.ts",
+    "./ffi.ts"
+  ],
   "tasks": {
     "dev": "deno run -A --watch main.ts",
     "compile:mac:debug": "cargo build -p midi-driver && mkdir -p ./native/ && mv ../target/debug/libmidi_driver.dylib ./native/",

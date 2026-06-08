@@ -4,6 +4,7 @@ import { CCSlider } from "./Slider.tsx";
 import { Grid, Horizontal, ShiftArea, Vertical } from "./Layout.tsx";
 import { Rotary } from "./Rotary.tsx";
 import { XYPad } from "./XYPad.tsx";
+import { Jogwheel } from "./Jogwheel.tsx";
 
 export type ReceiveDataCallback = (v: number) => void;
 
@@ -74,6 +75,7 @@ export function Layout({ children, callbacks }: { children: Widget[], callbacks:
           case 'shift':
             return <ShiftArea def={def} key={k} callbacks={callbacks} />
         case 'jogwheel':
+          return <Jogwheel def={def} key={k} callbacks={callbacks} />
         case 'empty':
         default:
           return <div className="empty"></div>
