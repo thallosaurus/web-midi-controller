@@ -17,3 +17,8 @@ runs:
           shell: bash
           working-directory: ./react-app
           run: yarn build
+
+        - name: Copy to dist
+          shell: bash
+          working-directory: ./react-app
+          run: cp -r dist ../dist/react-app

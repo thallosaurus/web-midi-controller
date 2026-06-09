@@ -27,6 +27,10 @@ runs:
             sudo apt update
             sudo apt install -y libjack-dev libasound-dev
 
+        - name: Create Output Folder
+          shell: bash
+          run: mkdir -p dist
+
         - name: Export Midi Bindings
           shell: bash
           working-directory: ./midi-driver
@@ -48,8 +52,6 @@ runs:
           shell: bash
           run: |
             deno install
-
-
 
         - name: Install NPM Packages
           shell: bash

@@ -12,4 +12,4 @@ runs:
         shell: bash
         working-directory: ./homebrewdj
         #run: deno task compile:${{ inputs.target }}:release
-        run: deno bundle main.ts > dist/bundled.js
+        run: deno bundle --minify main.ts > ../dist/bundled.js

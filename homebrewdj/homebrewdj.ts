@@ -1,6 +1,6 @@
 import { TraktorSurface, TraktorState, TraktorEvent } from "@hdj/traktor-driver"
 import { Launchpad, LaunchpadSurfaceStore } from "@hdj/launchpad-driver";
-import { MidiDriver } from "@hdj/midi-driver/ffi.ts";
+import { MidiDriver } from "@hdj/midi-driver/ffi";
 
 import { Server } from "./server.ts";
 import { AllowedPayloads } from "./client/protocol.ts";

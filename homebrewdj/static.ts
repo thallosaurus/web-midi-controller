@@ -1,1 +1,1 @@
-export const StaticAssets = "../react-app/dist/";
+export const StaticAssets = "./react-app/";

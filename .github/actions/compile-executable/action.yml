@@ -1,0 +1,11 @@
+name: "Compile Executable"
+description: "Compile Executable"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Compile Deno Executable
+      shell: bash
+      working-directory: ./dist
+      run: |
+        ls -la

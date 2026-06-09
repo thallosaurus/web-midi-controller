@@ -1,4 +1,5 @@
-import { MidiDriver, type MidiMessage } from "@hdj/midi-driver/ffi.ts";
+import { MidiDriver } from "@hdj/midi-driver/ffi";
+import { type MidiMessage } from "@hdj/midi-driver";
 import { LaunchpadProMap, LightMode, Surface } from "./surface.ts";
 
 export const NOVATION_SYSEX_HEADER = [0xF0, 0x00, 0x20, 0x29, 0x02, 0x0E];

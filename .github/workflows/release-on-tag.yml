@@ -38,27 +38,24 @@ jobs:
         with:
           name: build-${{ matrix.target }}
           path: |
-            midi-driver/bindings/*
-            midi-driver/native/*
+            dist/*
+#          midi-driver/bindings/*
+#          midi-driver/native/*
+#
+#          react-app/dist/*
+#          midi-driver/target/release/libmidi_driver.dylib
+#          midi-driver/target/release/libmidi_driver.so
+#          midi-driver/target/release/midi_driver.dll
+#          homebrewdj/dist/bundled.js
 
-            react-app/dist/*
-            midi-driver/target/release/libmidi_driver.dylib
-            midi-driver/target/release/libmidi_driver.so
-            midi-driver/target/release/midi_driver.dll
-            homebrewdj/dist/bundled.js
-
-      - uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          name: overlays
-          path: |
-            overlays/*
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-latest'
         with:
           name: LICENSE
           path: |
             LICENSE
+            
+      - uses: ./.github/actions/compile-executable
               
   create-release:
       runs-on: ubuntu-latest
