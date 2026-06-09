@@ -1,1 +1,1 @@
-export const StaticAssets = "./react-app/";
+export const StaticAssets = "./webui/";

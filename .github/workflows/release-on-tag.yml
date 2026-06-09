@@ -72,7 +72,6 @@ jobs:
 #          homebrewdj/dist/bundled.js
 
       - uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest'
         with:
           name: LICENSE
           path: |
@@ -105,6 +104,7 @@ jobs:
         shell: bash
         run: |
           mkdir build
+          cp LICENSE build/LICENSE
           cp -r webui build/webui
           cp js/bundled.js build/bundled.js
           cp js/config.json build/config.json
@@ -112,29 +112,29 @@ jobs:
           cp native-mac/midi-driver/target/release/libmidi_driver.dylib build/libmidi_driver.dylib 2>/dev/null || true
           cp native-win/midi-driver/target/release/midi_driver.dll build/midi_driver.dll 2>/dev/null || true
 
-      - name: Inspect build folder
-        run: ls -R build
+      - name: Inspect workspace
+        run: ls -R .
 
       - name: Compile Deno Executable
         shell: bash
         working-directory: build
         run: |
           if [ "${{ matrix.target }}" = "linux" ]; then
-            deno compile \
+            deno compile -A \
               --include libmidi_driver.so \
               --include webui \
               --output homebrewdj \
               bundled.js
 
           elif [ "${{ matrix.target }}" = "mac" ]; then
-            deno compile \
+            deno compile -A \
               --include libmidi_driver.dylib \
               --include webui \
               --output homebrewdj \
               bundled.js
 
           elif [ "${{ matrix.target }}" = "win" ]; then
-            deno compile \
+            deno compile -A \
               --include midi_driver.dll \
               --include webui \
               --output homebrewdj.exe \
@@ -147,6 +147,8 @@ jobs:
           path: |
             build/homebrewdj.exe
             build/homebrewdj
+            build/config.json
+            build/LICENSE
               
   create-release:
       runs-on: ubuntu-latest
@@ -156,7 +158,7 @@ jobs:
           uses: actions/download-artifact@v4
 
         - name: Inspect dist
-          run: ls -R dist
+          run: ls -R .
           
         - name: Release (on tags only)
           uses: softprops/action-gh-release@master
@@ -166,10 +168,6 @@ jobs:
           with:
             draft: true
             files: |
-              dist/build-linux/**/homebrewdj.linux
-              dist/build-mac/**/homebrewdj.mac
-              dist/build-win/**/homebrewdj.exe
-              dist/build-mac/**/libmidi_driver.dylib
-              dist/build-linux/**/libmidi_driver.so
-              dist/build-win/**/midi_driver.dll
-              dist/**/LICENSE
+              homebrewdj-linux/*
+              homebrewdj-win/*
+              homebrewdj-mac/*
