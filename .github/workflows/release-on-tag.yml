@@ -96,9 +96,6 @@ jobs:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
 
-      - name: Inspect all
-        run: tree
-
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
@@ -114,6 +111,9 @@ jobs:
           cp native-linux/midi-driver/target/release/libmidi_driver.so build/libmidi_driver.so 2>/dev/null || true
           cp native-mac/midi-driver/target/release/libmidi_driver.dylib build/libmidi_driver.dylib 2>/dev/null || true
           cp native-win/midi-driver/target/release/midi_driver.dll build/midi_driver.dll 2>/dev/null || true
+
+      - name: Inspect build folder
+        run: ls -R build
 
       - name: Compile Deno Executable
         shell: bash
