@@ -1,5 +1,5 @@
-name: "Build Server"
-description: "Build Server"
+name: "Bundle Server"
+description: "Bundle Server"
 
 inputs:
     target:

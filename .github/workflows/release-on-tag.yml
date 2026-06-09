@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  driver:
     strategy:
       matrix:
         include:
@@ -18,29 +18,40 @@ jobs:
             target: mac
           - os: windows-latest
             target: win
-
+    
     runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          rustflags: ""
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install -y libjack-dev libasound-dev
+      - uses: ./.github/actions/build-driver
+        with:
+          target: ${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          path: |
+            ./native/*
+            ./midi-driver/target/release/*.dll
+            ./midi-driver/target/release/*.dylib
+            ./midi-driver/target/release/*.so
 
+  build:
+    runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-env
       - uses: ./.github/actions/build-webui
-        with:
-          target: ${{ matrix.target }}
-      - uses: ./.github/actions/build-driver
-        with:
-          target: ${{ matrix.target }}
       - uses: ./.github/actions/build-server
-        with:
-          target: ${{ matrix.target }}
-
-#      - uses: ./.github/actions/compile-executable
-#        with:
-#          target: ${{ matrix.target }}
-
       - uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.target }}
           path: |
             dist/*
 #          midi-driver/bindings/*
@@ -70,7 +81,9 @@ jobs:
           - os: windows-latest
             target: win
     runs-on: ${{ matrix.os }}
-    needs: build
+    needs: 
+      - build
+      - driver
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4

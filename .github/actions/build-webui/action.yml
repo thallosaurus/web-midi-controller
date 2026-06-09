@@ -1,10 +1,6 @@
 name: "Build Web Frontend"
 description: "Build Web Frontend"
 
-inputs:
-    target:
-        required: true
-
 runs:
     using: "composite"
     steps:
