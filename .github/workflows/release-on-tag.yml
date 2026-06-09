@@ -55,7 +55,8 @@ jobs:
         with:
           name: js
           path: |
-            dist/*
+            dist/bundled.js
+            dist/config.json
       - uses: actions/upload-artifact@v4
         with:
           name: webui
@@ -96,38 +97,56 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: Inspect all
-        run: ls -R .
+        run: tree
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.7.7
 
+      - name: Prepare Build Folder
+        shell: bash
+        run: |
+          mkdir build
+          cp -r webui build/webui
+          cp js/bundled.js build/bundled.js
+          cp js/config.json build/config.json
+          cp native-linux/midi-driver/target/release/libmidi_driver.so build/libmidi_driver.so 2>/dev/null || true
+          cp native-mac/midi-driver/target/release/libmidi_driver.dylib build/libmidi_driver.dylib 2>/dev/null || true
+          cp native-win/midi-driver/target/release/midi_driver.dll build/midi_driver.dll 2>/dev/null || true
+
       - name: Compile Deno Executable
         shell: bash
-        #working-directory: dist
+        working-directory: build
         run: |
           if [ "${{ matrix.target }}" = "linux" ]; then
             deno compile \
-              #--include libmidi_driver.so \
+              --include libmidi_driver.so \
               --include webui \
               --output homebrewdj \
               js/bundled.js
 
           elif [ "${{ matrix.target }}" = "mac" ]; then
             deno compile \
-              #--include libmidi_driver.dylib \
+              --include libmidi_driver.dylib \
               --include webui \
               --output homebrewdj \
               js/bundled.js
 
           elif [ "${{ matrix.target }}" = "win" ]; then
             deno compile \
-              #--include midi_driver.dll \
+              --include midi_driver.dll \
               --include webui \
               --output homebrewdj.exe \
               js/bundled.js
           fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: homebrewdj-${{ matrix.target }}
+          path: |
+            build/homebrewdj.exe
+            build/homebrewdj
               
   create-release:
       runs-on: ubuntu-latest
