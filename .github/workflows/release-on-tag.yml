@@ -104,7 +104,7 @@ jobs:
         shell: bash
         run: |
           mkdir build
-          cp LICENSE build/LICENSE
+          cp -r LICENSE/LICENSE build/LICENSE
           cp -r webui build/webui
           cp js/bundled.js build/bundled.js
           cp js/config.json build/config.json
