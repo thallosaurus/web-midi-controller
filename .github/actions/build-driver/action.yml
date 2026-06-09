@@ -22,3 +22,4 @@ runs:
           cp target/release/*.so ../dist/ 2>/dev/null || true
           cp target/release/*.dylib ../dist/ 2>/dev/null || true
           cp target/release/*.dll ../dist/ 2>/dev/null || true
+          cp native/* ../dist/ 2>/dev/null || true

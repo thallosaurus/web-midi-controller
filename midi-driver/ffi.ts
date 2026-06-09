@@ -28,9 +28,9 @@ function getDefaultLibraryPath() {
   }
 
   const path = {
-    windows: new URL("./native/midi_driver.dll", import.meta.url),
-    linux: new URL("./native/libmidi_driver.so", import.meta.url),
-    darwin: new URL("./native/libmidi_driver.dylib", import.meta.url),
+    windows: new URL("./midi_driver.dll", import.meta.url),
+    linux: new URL("./libmidi_driver.so", import.meta.url),
+    darwin: new URL("./libmidi_driver.dylib", import.meta.url),
     aix: null,
     netbsd: null,
     android: null,
