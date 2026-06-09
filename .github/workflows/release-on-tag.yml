@@ -80,6 +80,11 @@ jobs:
       - name: Inspect dist
         run: ls -R dist
 
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.7.7
+
       - name: Compile Deno Executable
         shell: bash
         working-directory: dist
