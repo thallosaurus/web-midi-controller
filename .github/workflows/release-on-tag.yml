@@ -60,6 +60,15 @@ jobs:
             LICENSE
 
   compile-executable:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+          - os: macos-latest
+            target: mac
+          - os: windows-latest
+            target: win
     runs-on: ${{ matrix.os }}
     needs: build
     steps:
@@ -77,12 +86,10 @@ jobs:
               
   create-release:
       runs-on: ubuntu-latest
-      needs: build
+      needs: compile-executable
       steps:
         - name: Download all build artifacts
           uses: actions/download-artifact@v4
-          with:
-            path: dist
 
         - name: Inspect dist
           run: ls -R dist
