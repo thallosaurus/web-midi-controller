@@ -37,6 +37,7 @@ jobs:
           target: ${{ matrix.target }}
       - uses: actions/upload-artifact@v4
         with:
+          name: "native-${{ matrix.target }}"
           path: |
             ./native/*
             ./midi-driver/target/release/*.dll
@@ -52,8 +53,14 @@ jobs:
       - uses: ./.github/actions/build-server
       - uses: actions/upload-artifact@v4
         with:
+          name: js
           path: |
             dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webui
+          path: |
+            dist/react-app/*
 #          midi-driver/bindings/*
 #          midi-driver/native/*
 #
@@ -87,11 +94,9 @@ jobs:
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
-        with:
-          path: dist
 
-      - name: Inspect dist
-        run: ls -R dist
+      - name: Inspect all
+        run: ls -R .
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -100,28 +105,28 @@ jobs:
 
       - name: Compile Deno Executable
         shell: bash
-        working-directory: dist
+        #working-directory: dist
         run: |
           if [ "${{ matrix.target }}" = "linux" ]; then
             deno compile \
-              --include libmidi_driver.so \
-              --include react-app \
+              #--include libmidi_driver.so \
+              --include webui \
               --output homebrewdj \
-              bundled.js
+              js/bundled.js
 
           elif [ "${{ matrix.target }}" = "mac" ]; then
             deno compile \
-              --include libmidi_driver.dylib \
-              --include react-app \
+              #--include libmidi_driver.dylib \
+              --include webui \
               --output homebrewdj \
-              bundled.js
+              js/bundled.js
 
           elif [ "${{ matrix.target }}" = "win" ]; then
             deno compile \
-              --include midi_driver.dll \
-              --include react-app \
+              #--include midi_driver.dll \
+              --include webui \
               --output homebrewdj.exe \
-              bundled.js
+              js/bundled.js
           fi
               
   create-release:
