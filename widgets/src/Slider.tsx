@@ -104,7 +104,7 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
             case "snapback":
             case "absolute":
                 {
-                    let v;
+                    let v: number;
                     if (!def.vertical) {
                         const n = rect.bottom - clientY;
                         v = Math.floor(

@@ -1,4 +1,4 @@
-import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, VerticalMixerProperties } from "@hdj/definitions";
+import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties } from "@hdj/definitions";
 import { Layout, WidgetProperties } from "./Parser.tsx";
 import { useEffect, useState } from "react";
 
@@ -59,4 +59,14 @@ export function ShiftArea({ def, callbacks }: WidgetProperties<ShiftAreaProperti
             <Layout children={def.b} callbacks={callbacks} />
         </div>
     </div>)
+}
+
+export function TabbedArea({ def, callbacks }: WidgetProperties<TabbedViewProperties>) {
+    const [tab, setCurrentTab] = useState(0);
+
+    return (
+        <div className="tab">
+            <Layout children={def.tabs} callbacks={callbacks} />
+        </div>
+    )
 }

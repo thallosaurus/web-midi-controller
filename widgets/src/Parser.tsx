@@ -1,7 +1,7 @@
 import { Overlay, Widget } from "@hdj/definitions"
 import { CCButton, NoteButton } from "./Button.tsx";
 import { CCSlider } from "./Slider.tsx";
-import { Grid, Horizontal, ShiftArea, Vertical } from "./Layout.tsx";
+import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout.tsx";
 import { Rotary } from "./Rotary.tsx";
 import { XYPad } from "./XYPad.tsx";
 import { Jogwheel } from "./Jogwheel.tsx";
@@ -72,10 +72,12 @@ export function Layout({ children, callbacks }: { children: Widget[], callbacks:
           return <Rotary def={def} key={k} callbacks={callbacks} />
         case 'xypad':
           return <XYPad def={def} key={k} callbacks={callbacks} />
-          case 'shift':
-            return <ShiftArea def={def} key={k} callbacks={callbacks} />
+        case 'shift':
+          return <ShiftArea def={def} key={k} callbacks={callbacks} />
         case 'jogwheel':
           return <Jogwheel def={def} key={k} callbacks={callbacks} />
+        case 'tab':
+          return <TabbedArea def={def} key={k} callbacks={callbacks} />
         case 'empty':
         default:
           return <div className="empty"></div>

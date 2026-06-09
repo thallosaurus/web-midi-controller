@@ -14,22 +14,26 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
     const targetRef = useRef<HTMLDivElement | null>(null);
 
     const sendUpdate = ({ valueX, valueY }) => {
-        callbacks.sendCC(def.channel, def.x.cc, valueX);
-        callbacks.sendCC(def.channel, def.y.cc, valueY);
+        //callbacks.sendCC(def.channel, def.x.cc, valueX);
+        //callbacks.sendCC(def.channel, def.y.cc, valueY);
     }
 
     const update = ({ clientX, clientY }) => {
         const rect = targetRef.current.getBoundingClientRect();
 
         const left = (clientX - rect.left)
-        const x = clamp(left / rect.width) * 127;
+        const x = Math.floor(clamp(left / rect.width) * 127);
 
         const bottom = clientY - rect.top
-        const y = (1 - clamp((bottom) / rect.height)) * 127;
-        setValueX(x)
-        setValueY(y)
-        callbacks.sendCC(def.channel, def.x.cc, x);
-        callbacks.sendCC(def.channel, def.y.cc, y);
+        const y = Math.floor((1 - clamp((bottom) / rect.height)) * 127);
+        if (valueX != x) {
+            setValueX(Math.floor(x))
+            callbacks.sendCC(def.channel, def.x.cc, x);
+        }
+        if (valueY != y) {
+            setValueY(Math.floor(y))
+            callbacks.sendCC(def.channel, def.y.cc, y);
+        }
     }
 
     const end = ({ pointerId, target, }) => {
@@ -41,7 +45,8 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
         setPressed(false);
         //this.target.classList.remove("pressed");
         //this.sendValue(0)
-        sendUpdate({ valueX: 0, valueY: 0})
+        // note update - kaoss like
+        //sendUpdate({ valueX: 0, valueY: 0})
         //callbacks.sendCC()
     }
 
@@ -57,7 +62,7 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
         //this.target.classList.add("pressed");
 
         //this.sendValue(def.velocity ?? 127)
-        sendUpdate({ valueX: def.velocity ?? 127, valueY: def.velocity ?? 127})
+        //sendUpdate({ valueX: def.velocity ?? 127, valueY: def.velocity ?? 127})
     };
 
     const move = ({ pointerId, clientX, clientY }) => {
