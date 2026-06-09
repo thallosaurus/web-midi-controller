@@ -10,7 +10,7 @@ runs:
   steps:
     - name: Compile Deno Executable
       shell: bash
-      working-directory: ./dist
+      working-directory: dist
       run: |
         if [ "${{ inputs.target }}" = "linux" ]; then
           deno compile \
