@@ -124,21 +124,21 @@ jobs:
               --include libmidi_driver.so \
               --include webui \
               --output homebrewdj \
-              js/bundled.js
+              bundled.js
 
           elif [ "${{ matrix.target }}" = "mac" ]; then
             deno compile \
               --include libmidi_driver.dylib \
               --include webui \
               --output homebrewdj \
-              js/bundled.js
+              bundled.js
 
           elif [ "${{ matrix.target }}" = "win" ]; then
             deno compile \
               --include midi_driver.dll \
               --include webui \
               --output homebrewdj.exe \
-              js/bundled.js
+              bundled.js
           fi
 
       - uses: actions/upload-artifact@v4
