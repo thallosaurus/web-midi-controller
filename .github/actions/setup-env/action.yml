@@ -21,7 +21,6 @@ runs:
             rustflags: ""
 
         - name: Install dependencies (Linux)
-          if: matrix.os == 'ubuntu-latest'
           shell: bash
           run: |
             sudo apt update
