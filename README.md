@@ -1,5 +1,8 @@
 # Workspace Repo for MIDI Shenanigans / homebrewDJ
 
+## About
+This code was primarily written without AI, but it was used in parts for the documentation and for research
+
 ## Content
 |-|-|
 |-|-|

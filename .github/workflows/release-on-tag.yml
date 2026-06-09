@@ -62,14 +62,6 @@ jobs:
           name: webui
           path: |
             dist/react-app/*
-#          midi-driver/bindings/*
-#          midi-driver/native/*
-#
-#          react-app/dist/*
-#          midi-driver/target/release/libmidi_driver.dylib
-#          midi-driver/target/release/libmidi_driver.so
-#          midi-driver/target/release/midi_driver.dll
-#          homebrewdj/dist/bundled.js
 
       - uses: actions/upload-artifact@v4
         with:
