@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --config vite.config.dev.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

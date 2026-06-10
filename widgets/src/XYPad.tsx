@@ -13,9 +13,13 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
     const activePointer = useRef<number | null>(null);
     const targetRef = useRef<HTMLDivElement | null>(null);
 
-    const sendUpdate = ({ valueX, valueY }) => {
+    const sendUpdate = (s: boolean) => {
         //callbacks.sendCC(def.channel, def.x.cc, valueX);
         //callbacks.sendCC(def.channel, def.y.cc, valueY);
+        if (def.note) {
+            callbacks.sendNote(def.channel, def.note, def.velocity, s);
+        }
+        setPressed(s);
     }
 
     const update = ({ clientX, clientY }) => {
@@ -47,6 +51,7 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
         //this.sendValue(0)
         // note update - kaoss like
         //sendUpdate({ valueX: 0, valueY: 0})
+        sendUpdate(false);
         //callbacks.sendCC()
     }
 
@@ -78,15 +83,33 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
 
     return (
         <div className="xypad">
-            <button type="button" className="label y-label">{valueY} - tap to assign</button>
             <div className="target"
                 ref={targetRef}
                 onPointerDown={start}
                 onPointerMove={move}
                 onPointerCancel={end}
                 onPointerUp={end}
-            >{def.label ?? "XY Pad"}</div>
-            <button type="button" className="label x-label">{valueX} - tap to assign</button>
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    userSelect: "none",
+                    touchAction: "none"
+                }}
+            >
+                <div style={{
+                    fontWeight: pressed ? "bold" : "normal",
+                    userSelect: "none",
+                    touchAction: "none"
+                }}>
+                    {def.label ?? "XY Pad"}{pressed ? "*" : ""}
+                </div>
+                <div style={{
+                    userSelect: "none",
+                    touchAction: "none"
+                }}>
+                    {valueX}/{valueY}
+                </div>
+            </div>
         </div>
     )
 }

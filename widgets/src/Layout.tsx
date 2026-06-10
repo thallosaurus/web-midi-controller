@@ -34,7 +34,8 @@ export function Grid({ def, callbacks }: WidgetProperties<GridMixerProperties>) 
         gridTemplateColumns: `repeat(${def.h}, 1fr)`,
         gridTemplateRows: `repeat(${def.h}, 1fr)`,
         width: "100%",
-        height: "100%"
+        height: "100%",
+        gap: "1em"
     }}>
         <Layout children={def.grid} callbacks={callbacks} />
     </div>)

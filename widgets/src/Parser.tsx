@@ -90,7 +90,7 @@ function testCallback(def: any, v: number) {
   console.log(def, v);
 }
 
-export function parseOverlay(o: Overlay, callbacks: WidgetCallbacks) {
+export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WidgetCallbacks, style?: React.CSSProperties }) {
   return (
     <div className="overlay" style={{
       //width: "calc(100% - 1em)",
@@ -99,7 +99,8 @@ export function parseOverlay(o: Overlay, callbacks: WidgetCallbacks) {
       height: "100%",
       display: "flex",
       gap: "1em",
-      justifyContent: "center"
+      justifyContent: "center",
+      ...style ?? {}
     }}>
       <Layout children={o.cells} callbacks={callbacks} />
     </div>
