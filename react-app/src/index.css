@@ -1,3 +1,5 @@
+@import url(./custom.css);
+
 #root {
     width: 100vw;
     height: 100vh; 
@@ -9,4 +11,22 @@ body {
     font-family: monospace;
     margin: 0;
     overflow: hidden;
+}
+
+#connection-status::before {
+    display: inline-block;
+    width: .5em;
+    height: .5em;
+    content: " ";
+    border-radius: 25px;
+    vertical-align: center;
+    margin-right: .5em;
+}
+
+#connection-status.disconnected::before {
+    background-color: red;
+}
+
+#connection-status.connected::before {
+    background-color: lightgreen;
 }

@@ -12,7 +12,7 @@ const deckA: Widget & VerticalMixerProperties = {
     "vertical": false,
     "value": 0,
     "value_off": 0,
-    "id": null,
+    "id": "volume_decka",
     "default_value": 0
   }, {
     "type": "notebutton",
@@ -36,12 +36,12 @@ const deckB: Widget & VerticalMixerProperties = {
     "vertical": false,
     "value": 0,
     "value_off": 0,
-    "id": null,
+    "id": "volume_deckb",
     "default_value": 0
   }, {
     "type": "notebutton",
     "mode": "latch",
-    "id": "mixercue_decka",
+    "id": "mixercue_deckb",
     "label": "Mixer Cue",
     "channel": 2,
     "note": 33
@@ -508,6 +508,104 @@ export const MATRIX_OVERLAY = {
           "mode": "trigger",
           "note": 119,
           "type": "notebutton"
+        }
+      ]
+    }
+  ]
+};
+
+export const ABLETON_OVERLAY = {
+  "id": "ableton_performance",
+  "name": "Ableton Performance",
+  "cells": [
+    {
+      "type": "horiz-mixer",
+      "horiz": [
+        {
+          "cc": 10,
+          "channel": 1,
+          "label": "Volume 1",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 20,
+          "channel": 1,
+          "label": "Volume 2",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 30,
+          "channel": 1,
+          "label": "Volume 3",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 40,
+          "channel": 1,
+          "label": "Volume 4",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 50,
+          "channel": 1,
+          "label": "Volume 5",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 60,
+          "channel": 1,
+          "label": "Volume 6",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 70,
+          "channel": 1,
+          "label": "Volume 7",
+          "mode": "relative",
+          "type": "ccslider"
+        },
+        {
+          "cc": 80,
+          "channel": 1,
+          "label": "Volume 8",
+          "mode": "relative",
+          "type": "ccslider"
+        }
+      ]
+    },
+    {
+      "id": "returns",
+      "type": "vert-mixer",
+      "vert": [
+        {
+          "cc": 90,
+          "channel": 1,
+          "label": "Reverb",
+          "mode": "snapback",
+          "type": "ccslider",
+          "vertical": true
+        },
+        {
+          "cc": 91,
+          "channel": 1,
+          "label": "Filter",
+          "mode": "snapback",
+          "type": "ccslider",
+          "vertical": true
+        },
+        {
+          "cc": 92,
+          "channel": 1,
+          "label": "Test",
+          "mode": "absolute",
+          "type": "ccslider",
+          "vertical": true
         }
       ]
     }

@@ -50,7 +50,7 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
 
     const rotationStyle = (a) => { return {"--rotation": `${a}deg`} as React.CSSProperties }
 
-    return (<div className="rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
+    return (<div id={def.id} className="rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
         <div className="widget">
             <div className="dial" style={rotationStyle(angle())}
             ></div>

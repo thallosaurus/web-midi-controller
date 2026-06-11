@@ -92,7 +92,7 @@ function testCallback(def: any, v: number) {
 
 export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WidgetCallbacks, style?: React.CSSProperties }) {
   return (
-    <div className="overlay" style={{
+    <div id={o.id} className="overlay" data-overlay="view" style={{
       //width: "calc(100% - 1em)",
       //height: "calc(100% - 1em)",
       width: "100%",

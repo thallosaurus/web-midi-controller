@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export function Vertical({ def, callbacks }: WidgetProperties<VerticalMixerProperties>) {
     //return (<div>{Layout(def.vert)}</div>)
-    return <div style={{
+    return <div id={def.id} className="vert-mixer" style={{
         display: "flex",
         flexDirection: "column",
         gap: "1em",
@@ -16,7 +16,7 @@ export function Vertical({ def, callbacks }: WidgetProperties<VerticalMixerPrope
 }
 
 export function Horizontal({ def, callbacks }: WidgetProperties<HorizontalMixerProperties>) {
-    return (<div style={{
+    return (<div id={def.id} className="horiz-mixer" style={{
         display: "flex",
         flexDirection: "row",
         gap: "1em",
@@ -29,7 +29,7 @@ export function Horizontal({ def, callbacks }: WidgetProperties<HorizontalMixerP
 }
 
 export function Grid({ def, callbacks }: WidgetProperties<GridMixerProperties>) {
-    return (<div className="grid" style={{
+    return (<div id={def.id} className="grid" style={{
         display: "grid",
         gridTemplateColumns: `repeat(${def.h}, 1fr)`,
         gridTemplateRows: `repeat(${def.h}, 1fr)`,
@@ -48,7 +48,7 @@ export function ShiftArea({ def, callbacks }: WidgetProperties<ShiftAreaProperti
             setShift(v > 64);
         })
     })
-    return (<div className="shift">
+    return (<div id={def.id} className="shift">
         <div className="panel a" style={{
             display: shift ? "none": "block"
         }}>
@@ -66,7 +66,7 @@ export function TabbedArea({ def, callbacks }: WidgetProperties<TabbedViewProper
     const [tab, setCurrentTab] = useState(0);
 
     return (
-        <div className="tab">
+        <div className="tab" id={def.id}>
             <Layout children={def.tabs} callbacks={callbacks} />
         </div>
     )

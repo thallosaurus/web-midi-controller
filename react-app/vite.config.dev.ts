@@ -9,8 +9,8 @@ export default defineConfig({
   plugins: [react(), legacy({
     targets: ["Android >= 4"],
     renderModernChunks: false,
-  })]/*,
+  })],
   optimizeDeps: {
-    include: ["@hdj/widgets"],
-  }*/
+    include: ["@hdj/homebrewdj-web-client"],
+  }
 })

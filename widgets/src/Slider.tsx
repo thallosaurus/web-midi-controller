@@ -19,25 +19,27 @@ const horizontalFillStyle = (value, type: SliderMode) => {
 
 const verticalSliderStyle = () => {
     return {
-        width: "100%"
+        width: "100%",
     }
 }
 
 const horizontalSliderStyle = () => {
     return {
-        height: "100%"
+        height: "100%",
     }
 }
 
 const verticalCCSliderStyle = () => {
     return {
-        width: "100%"
+        width: "100%",
+        alignItems: "center"
     }
 }
 
 const horizontalCCSliderStyle = () => {
     return {
-        height: "100%"
+        height: "100%",
+        alignItems: "center"
     }
 }
 
@@ -172,7 +174,7 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
         //if ()
     };
 
-    return <div className="ccslider" style={def.vertical ? verticalCCSliderStyle() : horizontalCCSliderStyle()}>
+    return <div id={def.id} className="ccslider" style={def.vertical ? verticalCCSliderStyle() : horizontalCCSliderStyle()}>
         <div className="slider"
             style={def.vertical ? verticalSliderStyle() : horizontalSliderStyle()}
 

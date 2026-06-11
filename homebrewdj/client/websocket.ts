@@ -12,7 +12,7 @@ export class WebsocketClient<T = ConnectedPayload> {
     private ws: WebSocket
     private id: string | null = null
 
-    constructor(endpoint: URL, 
+    constructor(endpoint: URL,
         handler: WebsocketMessageCallback<T>,
         open?: (id: string) => void,
         close?: (reason?: string) => void
@@ -21,14 +21,7 @@ export class WebsocketClient<T = ConnectedPayload> {
         //handler(ws);
 
         ws.addEventListener("open", (ev) => {
-            console.log(ev);
-
-            // huh?
-            const evt = (ev as CustomEvent<T>).detail as any;
-            if (evt.type == "connection") {
-                this.id = evt.id
-                if (open) open(evt.id)
-            }
+            console.log("connection established", ev);
         })
 
         ws.addEventListener("close", (ev) => {
@@ -37,7 +30,13 @@ export class WebsocketClient<T = ConnectedPayload> {
         })
 
         ws.addEventListener("message", (ev) => {
-            handler(this.id!, JSON.parse(ev.data))
+            const msg = JSON.parse(ev.data);
+            if (msg.type == "connection") {
+                this.id = msg.id
+                if (open) { open(msg.id) }
+            } else {
+                handler(this.id!, msg)
+            }
         })
 
         ws.addEventListener("error", (ev) => {
