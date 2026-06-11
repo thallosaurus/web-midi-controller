@@ -6,6 +6,7 @@
     "jsr:@oak/commons@1": "1.0.1",
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/bytes@1": "1.0.6",
+    "jsr:@std/cli@*": "1.0.26",
     "jsr:@std/crypto@1": "1.0.5",
     "jsr:@std/encoding@1": "1.0.10",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
@@ -87,6 +88,9 @@
     },
     "@std/bytes@1.0.6": {
       "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
+    },
+    "@std/cli@1.0.26": {
+      "integrity": "53679a2b041406f15c3ff193986852595f3d11ba7b9d4b0c71a42589662e8fb5"
     },
     "@std/crypto@1.0.5": {
       "integrity": "0dcfbb319fe0bba1bd3af904ceb4f948cde1b92979ec1614528380ed308a3b40"
@@ -2729,7 +2733,8 @@
       },
       "homebrewdj": {
         "dependencies": [
-          "jsr:@deno/dnt@~0.42.3"
+          "jsr:@deno/dnt@~0.42.3",
+          "jsr:@std/cli@*"
         ],
         "packageJson": {
           "dependencies": [

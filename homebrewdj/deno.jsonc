@@ -1,9 +1,10 @@
 {
   "name": "@hdj/homebrewdj",
   "exports": "./homebrewdj.ts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "tasks": {
-    "dev": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A main.ts",
+    "dev": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A bin/traktor_setup.ts",
+    "dev:web": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A bin/webui_only.ts",
     "dev:linux": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.so deno run -A main.ts config.nix.json",
     "compile:mac": "mkdir -p dist && deno compile -A --include ../react-app/dist --no-check --unstable-sloppy-imports --include ../midi-driver/target/debug/libmidi_driver.dylib --output dist/homebrewdj.mac main.ts",
     "compile": "mkdir -p dist && deno compile -A --no-check --unstable-sloppy-imports --output dist/homebrewdj.mac main.ts",
@@ -12,9 +13,9 @@
   },
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
-    "oak": "https://deno.land/x/oak/mod.ts"
-  },
-  "nodeModulesDir": "auto"
+    "oak": "https://deno.land/x/oak/mod.ts",
+    "parseArgs": "jsr:@std/cli/parse-args"
+  }
   /*"compile": {
     "include": [
       "*.ts",

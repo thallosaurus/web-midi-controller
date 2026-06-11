@@ -55,7 +55,8 @@ jobs:
         with:
           name: js
           path: |
-            dist/homebrewdj.js
+            dist/homebrewdj_traktor.js
+            dist/homebrewdj_controller.js
             dist/config.json
       - uses: actions/upload-artifact@v4
         with:
@@ -98,7 +99,8 @@ jobs:
           mkdir build
           cp -r LICENSE/LICENSE build/LICENSE
           cp -r webui build/webui
-          cp js/homebrewdj.js build/homebrewdj.js
+          cp js/homebrewdj_traktor.js build/homebrewdj_traktor.js
+          cp js/homebrewdj_controller.js build/homebrewdj_controller.js
           cp js/config.json build/config.json
           cp native-linux/midi-driver/target/release/libmidi_driver.so build/libmidi_driver.so 2>/dev/null || true
           cp native-mac/midi-driver/target/release/libmidi_driver.dylib build/libmidi_driver.dylib 2>/dev/null || true
@@ -116,21 +118,21 @@ jobs:
               --include libmidi_driver.so \
               --include webui \
               --output homebrewdj \
-              homebrewdj.js
+              homebrewdj_traktor.js
 
           elif [ "${{ matrix.target }}" = "mac" ]; then
             deno compile -A \
               --include libmidi_driver.dylib \
               --include webui \
               --output homebrewdj \
-              homebrewdj.js
+              homebrewdj_traktor.js
 
           elif [ "${{ matrix.target }}" = "win" ]; then
             deno compile -A \
               --include midi_driver.dll \
               --include webui \
               --output homebrewdj.exe \
-              homebrewdj.js
+              homebrewdj_traktor.js
           fi
 
       - uses: actions/upload-artifact@v4

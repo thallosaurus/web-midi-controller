@@ -24,7 +24,7 @@ interface HomebrewDJConfig {
  * Connects the Launchpad, Traktor integration layer and web server,
  * and routes MIDI events between all components.
  */
-export class HomebrewDJ {
+export class HomebrewDJTraktorSetup {
     launchpad: Launchpad
     traktor: MidiDriver
 
@@ -133,6 +133,81 @@ export class HomebrewDJ {
         this.launchpad.switchToStandaloneMode();
         this.launchpad.close();
         this.traktor.close();
+        this.server.close();
+    }
+}
+
+export class HomebrewDJControllerOnly {
+    server: Server;
+    midiPort = new MidiDriver({
+        inputName: "HomebrewDJ Controller Input",
+        outputName: "HomebrewDJ Controller Output",
+        useVirtual: true
+    });
+
+    constructor(config_path = "./config.json") {
+        const file = Deno.readTextFileSync(config_path);
+        const config: HomebrewDJConfig = JSON.parse(file);
+        this.server = new Server((msg: AllowedPayloads) => {
+            switch (msg.type) {
+                case "cc":
+                    this.midiPort.sendMidi({
+                        type: "ControlChange",
+                        cc: msg.cc,
+                        channel: msg.channel,
+                        value: msg.value
+                    })
+                    break;
+                case "note":
+                    if (msg.on) {
+                        this.midiPort.sendMidi({
+                            type: "NoteOn",
+                            channel: msg.channel,
+                            note: msg.note,
+                            velocity: msg.velocity
+                        });
+                    } else {
+                        this.midiPort.sendMidi({
+                            type: "NoteOff",
+                            channel: msg.channel,
+                            note: msg.note,
+                            velocity: msg.velocity
+                        });
+                    }
+                    break;
+            }
+        }, {
+            hostname: config.hostname
+        });
+
+        this.midiPort.addEventListener((ev: CustomEvent) => {
+            const t = ev.detail;
+
+            switch (t.type) {
+                case "NoteOn":
+                case "NoteOff":
+                    this.server.broadcast({
+                        type: "note",
+                        channel: t.channel,
+                        note: t.note,
+                        on: t.type == "NoteOn",
+                        velocity: t.velocity
+                    });
+                    break;
+                case "ControlChange":
+                    this.server.broadcast({
+                        type: "cc",
+                        channel: t.channel,
+                        cc: t.cc,
+                        value: t.value
+                    });
+                    break;
+            }
+        })
+    }
+
+    close() {
+        this.midiPort.close();
         this.server.close();
     }
 }

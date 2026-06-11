@@ -13,5 +13,6 @@ runs:
         working-directory: ./homebrewdj
         #run: deno task compile:${{ inputs.target }}:release
         run: |
-          deno bundle --minify main.ts > ../dist/homebrewdj.js
+          deno bundle --minify bin/traktor_setup.ts > ../dist/homebrewdj_traktor.js
+          deno bundle --minify bin/webui_only.ts > ../dist/homebrewdj_controller.js
           cp config.json ../dist/config.json
