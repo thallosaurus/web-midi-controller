@@ -3,8 +3,16 @@ import { Router, Context, Application } from "oak";
 import { AllowedPayloads } from "./client/protocol.ts";
 import { StaticAssets } from "./static.ts";
 
+/**
+ * Callback invoked when a message is received from a connected client.
+ */
 type HandlerCallback<T> = (msg: T) => void;
 
+/**
+ * Serves the web application's static assets.
+ *
+ * @param context Oak request context.
+ */
 const StaticHandler = async (context: Context) => {
     console.log(new URL(StaticAssets, import.meta.url).pathname)
     await context.send({
@@ -13,6 +21,14 @@ const StaticHandler = async (context: Context) => {
     })
 }
 
+/**
+ * Registers WebSocket event handlers for a newly connected client.
+ *
+ * @param clients Active client registry.
+ * @param ws Connected WebSocket instance.
+ * @param callback Message handler invoked for incoming payloads.
+ * @returns Unique identifier assigned to the connection.
+ */
 const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callback: HandlerCallback<T>) => {
     const id = randomUUID();
 
@@ -43,6 +59,12 @@ const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callb
     return id;
 }
 
+/**
+ * Creates a router that exposes static assets and a WebSocket endpoint.
+ *
+ * @param clients Active client registry.
+ * @param callback Message handler invoked for incoming payloads.
+ */
 export const WebsocketRouter = <T>(clients: Map<UUID, WebSocket>, callback: HandlerCallback<T>) => {
     const router = new Router();
     router.get("/ws", (ctx) => {
@@ -61,11 +83,25 @@ export const WebsocketRouter = <T>(clients: Map<UUID, WebSocket>, callback: Hand
     return router;
 }
 
+/**
+ * Lightweight HTTP and WebSocket server used by HomebrewDJ.
+ *
+ * Provides static file hosting, client connection management and
+ * message broadcasting facilities.
+ */
 export class Server<T = AllowedPayloads> {
     controller: AbortController;
     app: Application;
-    clients = new Map();
+    clients = new Map<UUID, WebSocket>();
 
+    /**
+     * Creates and starts a new server instance.
+     *
+     * @param callback Handler invoked for messages received from clients.
+     * @param listenOptions Additional application listen options.
+     * @param app Oak application instance.
+     * @param controller Abort controller used to stop the server.
+     */
     constructor(callback: HandlerCallback<T>, listenOptions = {}, app = new Application(), controller = new AbortController()) {
         this.app = app;
         this.controller = controller;
@@ -81,12 +117,20 @@ export class Server<T = AllowedPayloads> {
         })
     }
 
+    /**
+     * Sends a message to all connected WebSocket clients.
+     *
+     * @param msg Payload to broadcast.
+     */
     broadcast(msg: T) {
         this.clients.forEach(client => {
             client.send(JSON.stringify(msg))
         });
     }
 
+    /**
+     * Stops the server and terminates all active listeners.
+     */
     close() {
         this.controller.abort();
     }

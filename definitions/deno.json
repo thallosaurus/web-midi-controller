@@ -1,5 +1,6 @@
 {
   "name": "@hdj/definitions",
+  "version": "0.2.0",
   "tasks": {
     "build": "cargo test export_bindings"
   },
@@ -8,5 +9,6 @@
     "@driver": "../midi-driver/index.ts",
     "@driver-deno": "../midi-driver/deno_mod.ts",
     "@traktor": "../traktor-driver/deno_mod.ts"
-  }
+  },
+  "exports": "./main.ts"
 }

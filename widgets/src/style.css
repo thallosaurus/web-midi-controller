@@ -9,3 +9,7 @@
     --absolute: orange;
     --snapback: red;
 }
+
+.overlay[data-overlay="view"] > * {
+    align-items: center;
+}

@@ -1,9 +1,10 @@
 import { Overlay, Widget } from "@hdj/definitions"
 import { CCButton, NoteButton } from "./Button.tsx";
 import { CCSlider } from "./Slider.tsx";
-import { Grid, Horizontal, ShiftArea, Vertical } from "./Layout.tsx";
+import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout.tsx";
 import { Rotary } from "./Rotary.tsx";
 import { XYPad } from "./XYPad.tsx";
+import { Jogwheel } from "./Jogwheel.tsx";
 
 export type ReceiveDataCallback = (v: number) => void;
 
@@ -71,9 +72,12 @@ export function Layout({ children, callbacks }: { children: Widget[], callbacks:
           return <Rotary def={def} key={k} callbacks={callbacks} />
         case 'xypad':
           return <XYPad def={def} key={k} callbacks={callbacks} />
-          case 'shift':
-            return <ShiftArea def={def} key={k} callbacks={callbacks} />
+        case 'shift':
+          return <ShiftArea def={def} key={k} callbacks={callbacks} />
         case 'jogwheel':
+          return <Jogwheel def={def} key={k} callbacks={callbacks} />
+        case 'tab':
+          return <TabbedArea def={def} key={k} callbacks={callbacks} />
         case 'empty':
         default:
           return <div className="empty"></div>
@@ -86,16 +90,17 @@ function testCallback(def: any, v: number) {
   console.log(def, v);
 }
 
-export function parseOverlay(o: Overlay, callbacks: WidgetCallbacks) {
+export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WidgetCallbacks, style?: React.CSSProperties }) {
   return (
-    <div className="overlay" style={{
+    <div id={o.id} className="overlay" data-overlay="view" style={{
       //width: "calc(100% - 1em)",
       //height: "calc(100% - 1em)",
       width: "100%",
       height: "100%",
       display: "flex",
       gap: "1em",
-      justifyContent: "center"
+      justifyContent: "center",
+      ...style ?? {}
     }}>
       <Layout children={o.cells} callbacks={callbacks} />
     </div>

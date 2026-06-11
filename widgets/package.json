@@ -1,8 +1,8 @@
 {
   "name": "@hdj/widgets",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "license": "MIT",
-  "main": "./dist/index.cjs.js",
+  "main": "./dist/index.es.js",
   "module": "./dist/index.es.js",
   "types": "./dist/src/index.d.ts",
   "type": "module",
@@ -13,7 +13,6 @@
   "exports": {
     ".": {
       "import": "./dist/index.es.js",
-      "require": "./dist/index.cjs.js",
       "types": "./dist/src/index.d.ts"
     },
     "./style.css": "./src/style.css"

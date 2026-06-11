@@ -9,7 +9,8 @@
 }
 .ccbutton,
 .notebutton {
-
+    height: 100%;
+    width: 100%;
     touch-action: none;
     align-content: center;
     justify-content: center;
@@ -18,10 +19,9 @@
 .ccbutton .target,
 .notebutton .target {
     background-color: grey;
-    height: calc(100% - 1em);
-    width: calc(100% - 2em);
     display: grid;
-    margin: .5em 1em;
+    width: 100%;
+    height: 100%;
     
     text-align: center;
     align-items: center;

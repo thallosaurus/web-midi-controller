@@ -4,7 +4,7 @@
     "workspaces": [
         "widgets",
         "react-app",
-        "homebrewdj/dist/client",
+        "homebrewdj",
         "midi-driver",
         "definitions",
         "overlay-editor"

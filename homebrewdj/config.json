@@ -1,4 +1,5 @@
 {
+    "hostname": "0.0.0.0",
     "midiInput": "Launchpad Pro MK3 LPProMK3 MIDI",
     "midiOutput": "Launchpad Pro MK3 LPProMK3 MIDI",
     "dawInput": "Launchpad Pro MK3 LPProMK3 DAW",

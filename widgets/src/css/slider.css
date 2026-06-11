@@ -1,8 +1,8 @@
 .ccslider {
   display: flex;
   flex-direction: column;
-  width: calc(100% - 2em);
-  height: calc(100% - 1em);
+  width: 100%;
+  height: 100%;
 }
 
 .horiz-mixer .ccslider {

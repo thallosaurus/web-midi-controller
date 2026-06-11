@@ -1,20 +1,35 @@
 import { MidiMessage } from "@hdj/midi-driver";
 import { BUTTON_DEF } from "./launchpad.ts";
 
+/**
+ * LED animation modes supported by the Launchpad.
+ */
 export enum LightMode {
     Normal = 1,
     Flashing = 2,
     Pulsing = 3
 }
 
+/**
+ * Represents the visual state of a single Launchpad pad.
+ */
 export interface Pixel {
+
+    /**
+     * Number of the color, according to the Launchpad Manual
+     */
     color: number,
-    //colorOff: number,
-    //colorOn: number,
+
+    /**
+     * Which Light Mode to use for the Pixel
+     */
     lightMode: LightMode,
     //    onTap?: (msg: MidiMessage) => void
 }
 
+/**
+ * Returns the Launchpad Pro MK3 note mapping in matrix order.
+ */
 export function LaunchpadProMap() {
     return Array.from([
         81, 82, 83, 84, 85, 86, 87, 88,
@@ -48,42 +63,33 @@ function EmptyControlPixels() {
 type MatrixHandler = (event: MatrixEvent) => void;
 type ControlHandler = (event: ControlEvent) => void;
 
+/**
+ * Event emitted when a matrix pad is pressed or released.
+ */
 export interface MatrixEvent {
     pressed: boolean,
     note: number,
     velocity: number
 }
 
+/**
+ * Event emitted when a control button changes state.
+ */
 interface ControlEvent {
     cc: number,
     state: number
 }
 
+/**
+ * Base class for Launchpad surfaces.
+ *
+ * Provides pixel storage, input routing, event dispatching and
+ * rendering helpers for custom surface implementations.
+ */
 export abstract class Surface {
-    /*static LAUNCHPAD_PROGRAMMER_MAP = [
-        81, 82, 83, 84, 85, 86, 87, 88,
-        71, 72, 73, 74, 75, 76, 77, 78,
-        61, 62, 63, 64, 65, 66, 67, 68,
-        51, 52, 53, 54, 55, 56, 57, 58,
-        41, 42, 43, 44, 45, 46, 47, 48,
-        31, 32, 33, 34, 35, 36, 37, 38,
-        21, 22, 23, 24, 25, 26, 27, 28,
-        11, 12, 13, 14, 15, 16, 17, 18
-    ];*/
-
     public events = new EventTarget();
 
     private width;
-
-    /*private colorState = new Map<number, number>(LaunchpadProMap().map((v, i) => {
-        return [v, 0]
-        }));*/
-    //private pixels = new Map<number, Pixel>();
-    //private pixelsCallback = new Map<number, (pressed: boolean, msg: MidiMessage) => void>();
-    //public controlButtons = new ControlButtons();
-    //public matrixManager = new MatrixManager();
-
-    //public matrixState = new Map<number, ;
 
     public matrixPixels = EmptyMatrixPixels();
     public controlPixels = EmptyControlPixels();
@@ -94,6 +100,9 @@ export abstract class Surface {
     controlMapping = new Map<number, ControlHandler>()
     matrixMapping = new Map<number, MatrixHandler>()
 
+    /**
+     * Builds a serializable representation of the current surface state.
+     */
     public renderState() {
         return {
             matrix: Array.from(this.matrixPixels.entries().map(([n, p], i) => {
@@ -106,10 +115,6 @@ export abstract class Surface {
     }
 
     redraw: (() => void) | null = null
-    //    private controlpixels = new Map<BUTTON_DEF, Pixel>();
-
-    /*    public controlpixelsActions = new Map<number, (msg: MidiMessage) => void>();*/
-    //protected caller: Launchpad;
 
     /**
      * register handler for when the control buttons receive an event
@@ -122,6 +127,12 @@ export abstract class Surface {
         }
     }
 
+    /**
+     * Registers a listener for a specific control button.
+     *
+     * @param cc Control button identifier.
+     * @param listener Callback invoked when the button state changes.
+     */
     addControlListenerForKey(cc: BUTTON_DEF, listener: ((event: CustomEvent<ControlEvent>) => void)) {
         return this.events.addEventListener(BUTTON_DEF[cc], (ev) => {
             listener(ev as CustomEvent);
@@ -137,6 +148,11 @@ export abstract class Surface {
         });
     }
 
+    /**
+     * Creates a new surface instance.
+     *
+     * @param width Logical width of the matrix grid.
+     */
     constructor(width = 8) {
         //this.caller = caller;
         this.width = width;
@@ -159,13 +175,17 @@ export abstract class Surface {
     }
 
     /**
-     * Gets typically set by Launchpad Class
-     * @param cb 
+     * Registers a callback that is invoked whenever the surface should be redrawn.
+     *
+     * @param cb Redraw callback provided by the Launchpad controller.
      */
     setRedraw(cb: () => void) {
         this.redraw = cb;
     }
 
+    /**
+     * Sets the color of a matrix pad using X/Y coordinates.
+     */
     setXYColor(x: number, y: number, pixel: Pixel) {
         const i = (y * 8) + x;
         if (i >= 0 && i < 64) {
@@ -190,6 +210,14 @@ export abstract class Surface {
         this.setXYColor(x, y, pixel);
     }
 
+    /**
+     * Assigns a pixel state and input handler to a matrix position.
+     *
+     * @param x Horizontal matrix coordinate.
+     * @param y Vertical matrix coordinate.
+     * @param pixel Visual state to display.
+     * @param handler Callback invoked when the pad receives input.
+     */
     setMatrixXY(
         x: number,
         y: number,
@@ -210,6 +238,11 @@ export abstract class Surface {
         });
     }
 
+    /**
+     * Loads a color pattern into the matrix.
+     *
+     * @param pat Array of Launchpad color values.
+     */
     loadMatrixPattern(pat: number[]) {
         //console.log("loading", pat)
         //this.matrixManager.setPattern(pat);
@@ -228,6 +261,9 @@ export abstract class Surface {
         if (this.redraw) this.redraw();
     }
 
+    /**
+     * Associates a control button with a handler function.
+     */
     setControlMapping(button: BUTTON_DEF, cb: ControlHandler) {
         this.controlMapping.set(button, cb);
     }
@@ -237,6 +273,11 @@ export abstract class Surface {
         //this.pixelsCallback.delete();
     }
 
+    /**
+     * Processes incoming MIDI messages and dispatches surface events.
+     *
+     * @param msg Incoming MIDI message.
+     */
     processInput(msg: MidiMessage) {
         switch (msg.type) {
             case "NoteOff":
@@ -257,6 +298,9 @@ export abstract class Surface {
         }
     }
 
+    /**
+     * Releases all resources associated with the surface.
+     */
     close() {
         this.clearMatrix();
         this.controlMapping.clear();
@@ -264,5 +308,8 @@ export abstract class Surface {
         this.onClose();
     }
 
+    /**
+     * Called when the surface is being disposed.
+     */
     abstract onClose(): void;
 }

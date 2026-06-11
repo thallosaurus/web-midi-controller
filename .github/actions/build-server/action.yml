@@ -1,5 +1,5 @@
-name: "Build Server"
-description: "Build Server"
+name: "Bundle Server"
+description: "Bundle Server"
 
 inputs:
     target:
@@ -8,7 +8,10 @@ inputs:
 runs:
     using: "composite"
     steps:
-      - name: Build Server
+      - name: Bundle Server
         shell: bash
-        working-directory: ./server
-        run: deno task compile:${{ inputs.target }}:release
+        working-directory: ./homebrewdj
+        #run: deno task compile:${{ inputs.target }}:release
+        run: |
+          deno bundle --minify main.ts > ../dist/homebrewdj.js
+          cp config.json ../dist/config.json

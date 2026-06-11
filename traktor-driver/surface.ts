@@ -1,5 +1,5 @@
 import { Pixel, Surface, BUTTON_DEF } from "@hdj/launchpad-driver";
-import { MidiDriver } from "@hdj/midi-driver/ffi.ts";
+import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { TraktorState } from "./state.ts";
 import { Button, DeckMap, ShiftDeckMap } from "./button.ts";
 

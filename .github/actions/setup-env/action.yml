@@ -8,12 +8,12 @@ runs:
           uses: actions/setup-node@v4
           with:
             node-version: 24
-            cache-dependency-path: web/yarn.lock
+            cache-dependency-path: yarn.lock
 
         - name: Setup Deno
           uses: denoland/setup-deno@v2
           with:
-            deno-version: v2.4.0
+            deno-version: v2.7.7
 
         - name: Setup Rust
           uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -21,8 +21,38 @@ runs:
             rustflags: ""
 
         - name: Install dependencies (Linux)
-          if: matrix.os == 'ubuntu-latest'
           shell: bash
           run: |
             sudo apt update
             sudo apt install -y libjack-dev libasound-dev
+
+        - name: Create Output Folder
+          shell: bash
+          run: mkdir -p dist
+
+        - name: Export Midi Bindings
+          shell: bash
+          working-directory: ./midi-driver
+          run: cargo test export_bindings
+
+        - name: Export Bindings
+          shell: bash
+          working-directory: ./definitions
+          run: cargo test export_bindings
+
+        - name: "Make WSClient"
+          shell: bash
+          working-directory: ./homebrewdj
+          run: |
+            deno install
+            deno task build-client
+
+        - name: Install Deno Packages
+          shell: bash
+          run: |
+            deno install
+
+        - name: Install NPM Packages
+          shell: bash
+          run: |
+            yarn

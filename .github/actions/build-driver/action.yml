@@ -8,8 +8,18 @@ inputs:
 runs:
     using: "composite"
     steps:
-      - name: Build MIDI Driver (Mac)
+      - name: Build MIDI Driver
         shell: bash
         working-directory: ./midi-driver
         #run: cargo build -p midi-driver --release
-        run: deno task compile:${{ inputs.target }}:release
+        #run: deno task compile:${{ inputs.target }}:release
+        run: cargo build --release
+
+      #- name: Copy files to dist
+      #  shell: bash
+      #  working-directory: ./midi-driver
+      #  run: |
+      #    cp target/release/*.so ../dist/ 2>/dev/null || true
+      #    cp target/release/*.dylib ../dist/ 2>/dev/null || true
+      #    cp target/release/*.dll ../dist/ 2>/dev/null || true
+      #    cp native/* ../dist/ 2>/dev/null || true

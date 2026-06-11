@@ -1,104 +1,94 @@
-import { parseOverlay } from "@hdj/widgets";
+import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
-import { AllowedPayloads, CCMessagePayload, NoteMessagePayload, WebsocketClient } from "@hdj/homebrewdj-web-client";
-import { useEffect, useRef } from "react";
+import { AllowedPayloads, asyncWebsocketClient, CCMessagePayload, ConnectedPayload, NoteMessagePayload, WebsocketClient } from "@hdj/homebrewdj-web-client";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { EventBus } from "./EventBus";
-
-const XYPAD = {
-  "id": "fullscreen-xy-pad",
-  "name": "Fullscreen XY Pad",
-  "program": 0,
-  "cells": [
-    {
-      "type": "vert-mixer",
-      "vert": [
-        {
-          "channel": 2,
-          "label": "XY Pad",
-          "type": "xypad",
-          "x": {
-            "cc": 4
-          },
-          "y": {
-            "cc": 5
-          }
-        }
-      ]
-    }
-  ]
-}
-
-const OVERLAY: Overlay = {
-  name: "Volume Sliders",
-  channel: null,
-  program: null,
-  id: null,
-  cells: [{
-    type: "horiz-mixer",
-    id: null,
-    horiz: [{
-      "type": "ccslider",
-      "cc": 1,
-      "channel": 1,
-      "label": "Deck A",
-      "mode": "absolute",
-      "vertical": false,
-      "value": 0,
-      "value_off": 0,
-      "id": null,
-      "default_value": 0
-    },
-    {
-      "type": "ccslider",
-      "cc": 1,
-      "channel": 2,
-      "label": "Deck B",
-      "mode": "absolute",
-      "vertical": false,
-      "value": 0,
-      "value_off": 0,
-      "id": null,
-      "default_value": 0
-    }]
-  }]
-};
+import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
+import { OverlaySwitcher } from "./OverlaySwitcher";
 
 function getEndpointUrl() {
-  const url = new URL("/ws", location.href);
-  url.protocol = "ws";
+  let url;
+  try {
+    url = new URL(import.meta.env.VITE_BACKEND);
+  } catch (e) {
+    url = new URL("/ws", location.href);
+    url.protocol = "ws";
+  }
+  
+  console.log(url);
   return url;
 }
 
 function App() {
-  const client = useRef<WebsocketClient<AllowedPayloads> | null>(null);
-  //const ccCallbackMap = useRef<CallbackMap>(new Map())
-  //const noteCallbackMap = useRef<CallbackMap>(new Map())
-  const eventbus = useRef<EventBus>(new EventBus());
-
-  useEffect(() => {
-
-    const process = (msg: any) => {
-      if (eventbus.current) {
-        switch (msg.type) {
-          case "cc":
-            eventbus.current.processCC(msg);
-            break
-          case "note":
-            eventbus.current.processNote(msg);
-            break;
-        }
+  const process = (id: string, msg: CCMessagePayload | NoteMessagePayload | ConnectedPayload) => {
+    if (eventbus.current) {
+      switch (msg.type) {
+        case "connection":
+          setConnected(true)
+        break
+        case "cc":
+          eventbus.current.processCC(msg);
+          break
+        case "note":
+          eventbus.current.processNote(msg);
+          break;
       }
     }
+  }
 
+  const client = useRef<WebsocketClient<AllowedPayloads> | null>(null);
+  const eventbus = useRef<EventBus>(new EventBus());
+
+  const [connected, setConnected] = useState(false);
+
+  useEffect(() => {
     const url = getEndpointUrl();
-    const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload>(url, process);
+    const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload | ConnectedPayload>(url, process);
     client.current = wsClient;
     eventbus.current.setSender(wsClient);
   })
 
   return (
     <>
-      {parseOverlay(OVERLAY, eventbus.current!)}
+      <MainView connected={connected} defaultOverlay={VOLUME_SLIDER_OVERLAY_NEW} eventbus={eventbus.current} />
+    </>
+  )
+}
+
+function MainView({ defaultOverlay, eventbus, connected }: { defaultOverlay?: Overlay, eventbus: EventBus, connected: boolean }) {
+  const [showOverlayPicker, setOverlayPicker] = useState(false);
+  const [overlay, setOverlay] = useState<Overlay | null>(defaultOverlay ?? null)
+  return (
+    <>
+      <div style={{
+        display: "flex",
+        height: "100%",
+        width: "100%",
+        flexDirection: "column"
+      }}>
+        <header style={{
+          margin: "1em",
+          display: "flex",
+          justifyContent: "space-between",
+        }}>
+          <div style={{
+            fontWeight: "bold"
+          }}>HomebrewDJ</div>
+          <b onClick={() => setOverlayPicker(true)}>
+            {overlay?.name ?? "No overlay loaded"}
+          </b>
+          <div id="connection-status" className={connected?"connected":"disconnected"}>{connected?"connected":"disconnected"}</div>
+        </header>
+        {overlay ? <OverlayView o={overlay} callbacks={eventbus} style={{
+          width: "calc(100% - 2em)",
+          height: "calc(100% - 2em)",
+          padding: "1em"
+        }} /> : ""}
+      </div>
+      <OverlaySwitcher
+        showModal={showOverlayPicker}
+        closeSwitcher={() => setOverlayPicker(false)}
+        setOverlay={setOverlay}></OverlaySwitcher>
     </>
   )
 }

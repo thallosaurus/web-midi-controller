@@ -91,6 +91,9 @@ pub(super) enum Widget {
 
     #[serde(rename = "shift")]
     ShiftArea(ShiftAreaProperties),
+
+    #[serde(rename = "tab")]
+    TabbedView(TabbedViewProperties)
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -101,7 +104,7 @@ pub(super) struct HorizontalMixerProperties {
     base: BaseProperties,
 
     //#[serde(flatten)]
-    horiz: Vec<Widget>
+    horiz: Vec<Widget>,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -111,7 +114,7 @@ pub(super) struct VerticalMixerProperties {
     base: BaseProperties,
 
     //#[serde(flatten)]
-    vert: Vec<Widget>
+    vert: Vec<Widget>,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -148,12 +151,11 @@ pub(super) struct ShiftAreaProperties {
     #[serde(flatten)]
     midi: MidiProperties,
 
-    note: u8
-    // Columns of this grid
-    //w: u8,
+    note: u8, // Columns of this grid
+              //w: u8,
 
-    // Rows of this grid
-    //h: u8,
+              // Rows of this grid
+              //h: u8,
 }
 
 /// A single Notebutton. Sends out its defined Midi Note
@@ -289,4 +291,13 @@ pub(super) struct XYPadProperties {
 
     label: Option<String>,
     //mode: RotaryMode,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct TabbedViewProperties {
+    #[serde(flatten)]
+    base: BaseProperties,
+
+    tabs: Vec<Widget>
 }

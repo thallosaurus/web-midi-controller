@@ -11,7 +11,7 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
     const lastX = useRef<number>(0);
     const active = useRef<boolean>(false);
 
-    const [value, setValue] = useState<number>(0);
+    const [value, setValue] = useState<number>(def.default_value ?? 0);
 
     const angle = () => MIN_ANGLE + (value / 127) * (MAX_ANGLE - MIN_ANGLE);
 
@@ -26,13 +26,13 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
     const touch_move = ({ clientX }) => {
         if (!active.current) return;
 
-        const dy = clientX - lastX.current;
+        const dx = clientX - lastX.current;
         lastX.current = clientX;
 
-        const new_value = Math.floor(Math.max(0, Math.min(127, value + (dy * sensitivity))));
+        const new_value = Math.floor(Math.max(0, Math.min(127, value + (dx * sensitivity))));
 
         if (new_value != value) {
-            setValue(value)
+            setValue(new_value)
             callbacks.sendCC(def.channel, def.cc, new_value)
         }
     }
@@ -43,16 +43,18 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
         el.releasePointerCapture(pointerId);
         
         if (def.mode == "snapback") {
-            setValue(value)
+            setValue(def.default_value ?? 0)
             callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0)
         }
     }
 
     const rotationStyle = (a) => { return {"--rotation": `${a}deg`} as React.CSSProperties }
 
-    return (<div className="rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
+    return (<div id={def.id} className="rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
         <div className="widget">
-            <div className="dial" style={rotationStyle(angle())}
+            <div className="dial" style={{
+                transform: `translateX(-50%) rotate(${angle()}deg)`
+            }}
             ></div>
         </div>
         <div className="label">{def.label ?? ("CC" + def.cc + ":\n" + value)}</div>

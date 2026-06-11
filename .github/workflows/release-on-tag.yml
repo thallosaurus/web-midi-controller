@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  driver:
     strategy:
       matrix:
         include:
@@ -18,59 +18,147 @@ jobs:
             target: mac
           - os: windows-latest
             target: win
-
+    
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-env
-      - uses: ./.github/actions/build-bindings
-      - uses: ./.github/actions/build-webui
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          target: ${{ matrix.target }}
+          rustflags: ""
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install -y libjack-dev libasound-dev
       - uses: ./.github/actions/build-driver
         with:
           target: ${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "native-${{ matrix.target }}"
+          path: |
+            ./native/*
+            ./midi-driver/target/release/*.dll
+            ./midi-driver/target/release/*.dylib
+            ./midi-driver/target/release/*.so
+
+  build:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-env
+      - uses: ./.github/actions/build-webui
       - uses: ./.github/actions/build-server
+      - uses: actions/upload-artifact@v4
         with:
-          target: ${{ matrix.target }}
+          name: js
+          path: |
+            dist/homebrewdj.js
+            dist/config.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webui
+          path: |
+            dist/react-app/*
 
       - uses: actions/upload-artifact@v4
-        with:
-          name: build-${{ matrix.target }}
-          path: |
-            web/bindings/*
-            web/dist/*
-            midi-driver/bindings/*
-            midi-driver/native/*
-            server/**/homebrewdj.linux
-            server/**/homebrewdj.mac
-            server/**/homebrewdj.exe
-
-      - uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          name: overlays
-          path: |
-            overlays/*
-      - uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest'
         with:
           name: LICENSE
           path: |
             LICENSE
+
+  compile-executable:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+          - os: macos-latest
+            target: mac
+          - os: windows-latest
+            target: win
+    runs-on: ${{ matrix.os }}
+    needs: 
+      - build
+      - driver
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.7.7
+
+      - name: Prepare Build Folder
+        shell: bash
+        run: |
+          mkdir build
+          cp -r LICENSE/LICENSE build/LICENSE
+          cp -r webui build/webui
+          cp js/homebrewdj.js build/homebrewdj.js
+          cp js/config.json build/config.json
+          cp native-linux/midi-driver/target/release/libmidi_driver.so build/libmidi_driver.so 2>/dev/null || true
+          cp native-mac/midi-driver/target/release/libmidi_driver.dylib build/libmidi_driver.dylib 2>/dev/null || true
+          cp native-win/midi-driver/target/release/midi_driver.dll build/midi_driver.dll 2>/dev/null || true
+
+      - name: Inspect workspace
+        run: ls -R .
+
+      - name: Compile Deno Executable
+        shell: bash
+        working-directory: build
+        run: |
+          if [ "${{ matrix.target }}" = "linux" ]; then
+            deno compile -A \
+              --include libmidi_driver.so \
+              --include webui \
+              --output homebrewdj \
+              homebrewdj.js
+
+          elif [ "${{ matrix.target }}" = "mac" ]; then
+            deno compile -A \
+              --include libmidi_driver.dylib \
+              --include webui \
+              --output homebrewdj \
+              homebrewdj.js
+
+          elif [ "${{ matrix.target }}" = "win" ]; then
+            deno compile -A \
+              --include midi_driver.dll \
+              --include webui \
+              --output homebrewdj.exe \
+              homebrewdj.js
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: homebrewdj-${{ matrix.target }}
+          path: |
+            build/homebrewdj.exe
+            build/homebrewdj
+            build/config.json
+            build/LICENSE
               
   create-release:
       runs-on: ubuntu-latest
-      needs: build
+      needs:
+        - compile-executable
       steps:
         - name: Download all build artifacts
           uses: actions/download-artifact@v4
-          with:
-            path: dist
 
         - name: Inspect dist
-          run: ls -R dist
+          run: ls -R .
+
+        - name: Package releases
+          run: |
+            zip -r homebrewdj-linux.zip homebrewdj-linux
+            zip -r homebrewdj-win.zip homebrewdj-win
+            zip -r homebrewdj-mac.zip homebrewdj-mac
+            zip -r webui.zip webui
           
         - name: Release (on tags only)
           uses: softprops/action-gh-release@master
@@ -80,10 +168,12 @@ jobs:
           with:
             draft: true
             files: |
-              dist/build-linux/**/homebrewdj.linux
-              dist/build-mac/**/homebrewdj.mac
-              dist/build-win/**/homebrewdj.exe
-              dist/build-mac/**/libmidi_driver.dylib
-              dist/build-linux/**/libmidi_driver.so
-              dist/build-win/**/midi_driver.dll
-              dist/**/LICENSE
+              homebrewdj-linux.zip
+              homebrewdj-win.zip
+              homebrewdj-mac.zip
+              webui.zip
+              js/homebrewdj.js
+              js/config.json
+              native-win/midi-driver/target/release/*.dll
+              native-mac/midi-driver/target/release/*.dylib
+              native-linux/midi-driver/target/release/*.so

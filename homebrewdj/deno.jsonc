@@ -1,18 +1,21 @@
 {
   "name": "@hdj/homebrewdj",
+  "exports": "./homebrewdj.ts",
+  "version": "0.2.0",
   "tasks": {
     "dev": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A main.ts",
     "dev:linux": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.so deno run -A main.ts config.nix.json",
     "compile:mac": "mkdir -p dist && deno compile -A --include ../react-app/dist --no-check --unstable-sloppy-imports --include ../midi-driver/target/debug/libmidi_driver.dylib --output dist/homebrewdj.mac main.ts",
     "compile": "mkdir -p dist && deno compile -A --no-check --unstable-sloppy-imports --output dist/homebrewdj.mac main.ts",
     "run:prod:mac": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib ./dist/homebrewdj.mac",
-    "build-client": "deno run -A scripts/build_npm.ts 0.1.0"
+    "build-client": "deno run -A scripts/build_npm.ts 0.2.0"
   },
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
     "oak": "https://deno.land/x/oak/mod.ts"
   },
-  "compile": {
+  "nodeModulesDir": "auto"
+  /*"compile": {
     "include": [
       "*.ts",
       "../react-app/dist",
@@ -22,5 +25,5 @@
     "exclude": [
       "dist/"
     ]
-  }
+  }*/
 }

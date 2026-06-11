@@ -61,13 +61,13 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
         if (callbacks.sendNote) callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
     };
 
-    return <div
+    return <div id={def.id}
         onPointerDown={start}
         onPointerUp={end}
         onPointerCancel={end}
         className="notebutton">
 
-        <Button label={def.label} on={on} />
+        <Button label={def.label ?? String(def.note)} on={on} />
 
     </div>
 
@@ -126,7 +126,7 @@ export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties
         }
     };
 
-    return (<div className="ccbutton"
+    return (<div id={def.id} className="ccbutton"
 
         onPointerDown={touch_start}
         onPointerUp={touch_end}

@@ -1,14 +1,20 @@
 name: "Build Web Frontend"
 description: "Build Web Frontend"
 
-inputs:
-    target:
-        required: true
-
 runs:
     using: "composite"
     steps:
+        - name: Build Widgets
+          shell: bash
+          working-directory: ./widgets
+          run: yarn build
+          
         - name: Build Web UI
           shell: bash
-          working-directory: ./web
-          run: yarn && yarn build:release
+          working-directory: ./react-app
+          run: yarn build
+
+        - name: Copy to dist
+          shell: bash
+          working-directory: ./react-app
+          run: cp -r dist ../dist/react-app
