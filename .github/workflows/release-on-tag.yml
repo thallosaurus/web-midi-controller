@@ -176,7 +176,7 @@ jobs:
               homebrewdj-win.zip
               homebrewdj-mac.zip
               webui.zip
-              js/homebrewdj.js
+              js/homebrewdj*.js
               js/config.json
               native-win/midi-driver/target/release/*.dll
               native-mac/midi-driver/target/release/*.dylib
