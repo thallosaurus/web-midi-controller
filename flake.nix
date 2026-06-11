@@ -56,7 +56,7 @@
             ln -s ${src} $out/homebrewdj.js
             ln -s ${driver} $out/libmidi_driver.so
             ln -s ${config} $out/config.json
-            cp -r ${ui} $out/webui
+            cp -r ${ui}/webui $out/webui
             mkdir -p $out/bin
             cat > $out/bin/homebrewdj <<EOF
             #!/bin/sh
