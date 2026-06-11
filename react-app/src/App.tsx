@@ -3,7 +3,7 @@ import type { Overlay } from "@hdj/definitions";
 import { AllowedPayloads, asyncWebsocketClient, CCMessagePayload, ConnectedPayload, NoteMessagePayload, WebsocketClient } from "@hdj/homebrewdj-web-client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { EventBus } from "./EventBus";
-import { VOLUME_SLIDER_OVERLAY } from "./Overlays";
+import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
 
 function getEndpointUrl() {
@@ -50,7 +50,7 @@ function App() {
 
   return (
     <>
-      <MainView connected={connected} defaultOverlay={VOLUME_SLIDER_OVERLAY} eventbus={eventbus.current} />
+      <MainView connected={connected} defaultOverlay={VOLUME_SLIDER_OVERLAY_NEW} eventbus={eventbus.current} />
     </>
   )
 }

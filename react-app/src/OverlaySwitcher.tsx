@@ -4,12 +4,12 @@ import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW, XYPAD_OVERLAY, MATRIX
 
 export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { showModal: boolean, closeSwitcher: () => void, setOverlay: (o: Overlay) => void }) {
   const overlays = useRef([
-    VOLUME_SLIDER_OVERLAY,
     VOLUME_SLIDER_OVERLAY_NEW,
+    ABLETON_OVERLAY,
+    VOLUME_SLIDER_OVERLAY,
     XYPAD_OVERLAY,
     MATRIX_OVERLAY,
-    ABLETON_OVERLAY,
-    TRAKTOR_PERFORMANCE
+    //TRAKTOR_PERFORMANCE
   ])
 
   const dialogRef = useRef<HTMLDialogElement>(null);
