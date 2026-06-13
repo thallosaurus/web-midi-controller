@@ -123,7 +123,7 @@ jobs:
             deno compile -A \
               --include libmidi_driver.so \
               --include webui \
-              --output homebrewdj \
+              --output homebrewdj_controller \
               homebrewdj_controller.js
 
           elif [ "${{ matrix.target }}" = "mac" ]; then
@@ -136,7 +136,7 @@ jobs:
             deno compile -A \
               --include libmidi_driver.dylib \
               --include webui \
-              --output homebrewdj \
+              --output homebrewdj_controller \
               homebrewdj_controller.js
 
           elif [ "${{ matrix.target }}" = "win" ]; then
@@ -149,7 +149,7 @@ jobs:
             deno compile -A \
               --include midi_driver.dll \
               --include webui \
-              --output homebrewdj.exe \
+              --output homebrewdj_controller.exe \
               homebrewdj_controller.js
           fi
 
