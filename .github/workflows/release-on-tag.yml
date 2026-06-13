@@ -158,7 +158,9 @@ jobs:
           name: homebrewdj-${{ matrix.target }}
           path: |
             build/homebrewdj.exe
+            build/homebrewdj_controller.exe
             build/homebrewdj
+            build/homebrewdj_controller
             build/config.json
             build/LICENSE
               
