@@ -120,6 +120,12 @@ jobs:
               --output homebrewdj \
               homebrewdj_traktor.js
 
+            deno compile -A \
+              --include libmidi_driver.so \
+              --include webui \
+              --output homebrewdj \
+              homebrewdj_controller.js
+
           elif [ "${{ matrix.target }}" = "mac" ]; then
             deno compile -A \
               --include libmidi_driver.dylib \
@@ -127,12 +133,24 @@ jobs:
               --output homebrewdj \
               homebrewdj_traktor.js
 
+            deno compile -A \
+              --include libmidi_driver.dylib \
+              --include webui \
+              --output homebrewdj \
+              homebrewdj_controller.js
+
           elif [ "${{ matrix.target }}" = "win" ]; then
             deno compile -A \
               --include midi_driver.dll \
               --include webui \
               --output homebrewdj.exe \
               homebrewdj_traktor.js
+
+            deno compile -A \
+              --include midi_driver.dll \
+              --include webui \
+              --output homebrewdj.exe \
+              homebrewdj_controller.js
           fi
 
       - uses: actions/upload-artifact@v4
