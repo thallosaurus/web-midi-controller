@@ -91,11 +91,12 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
 
         if (def.mode == "snapback") {
             reset();
-        }
+        } 
     };
 
     const reset = () => {
         setValue(def.default_value ?? 0);
+        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0);
         //this.eventbus!.updateCC(this.prop.channel, this.prop.cc, def.default_value ?? 0);
     };
 
