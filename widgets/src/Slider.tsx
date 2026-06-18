@@ -82,7 +82,7 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
         update({ target, clientY, clientX });
     };
 
-    const end = ({ target, pointerId }) => {
+    const end = ({ target, pointerId, clientX, clientY }) => {
         if (pointerId !== activePointer.current) return;
 
         const el = target as HTMLElement;
@@ -91,7 +91,9 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
 
         if (def.mode == "snapback") {
             reset();
-        } 
+        } else {
+            update({ target, clientX, clientY })
+        }
     };
 
     const reset = () => {
