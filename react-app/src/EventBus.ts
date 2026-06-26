@@ -12,6 +12,11 @@ export class EventBus implements WidgetCallbacks {
     sender?: EventBusCallback;
     ccCallbackMap: CallbackMap = new Map();
     noteCallbackMap: CallbackMap = new Map();
+    next?: WidgetCallbacks
+    
+    setNext(w: WidgetCallbacks) {
+        this.next = w;
+    }
 
     setSender(sender: EventBusCallback) {
         this.sender = sender;
@@ -67,7 +72,7 @@ export class EventBus implements WidgetCallbacks {
         const ccMap = channelMap?.get(cc);
         const id = uuid()
         ccMap?.set(id, cb);
-
+        if (this.next) this.next.registerCC(channel, cc, cb);
         return id
     }
 
@@ -83,6 +88,7 @@ export class EventBus implements WidgetCallbacks {
         const noteMap = channelMap?.get(note);
         const id = uuid()
         noteMap?.set(id, cb);
+        if (this.next) this.next.registerNote(channel, note, cb)
         return id
     }
 
@@ -98,6 +104,7 @@ export class EventBus implements WidgetCallbacks {
 
         const noteMap = channelMap?.get(note);
         noteMap?.delete(id);
+        if (this.next) this.next.unregisterNote(channel, note, id);
     }
 
     unregisterCC(channel: number, cc: number, id: string) {
@@ -111,6 +118,7 @@ export class EventBus implements WidgetCallbacks {
         }
         const ccMap = channelMap?.get(cc);
         ccMap?.delete(id);
+        if (this.next) this.next.unregisterCC(channel, cc, id)
     }
 
 }
