@@ -21,7 +21,12 @@ export interface WidgetProperties<T> {
   callbacks: WidgetCallbacks
 }
 
-export interface WidgetCallbacks {
+enum SubsystemSelector {
+  MIDI,
+  OSC
+}
+
+export abstract class WidgetCallbacks {
   /**
    * Sends out Note Data
    */

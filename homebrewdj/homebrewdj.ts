@@ -4,6 +4,7 @@ import { MidiDriver } from "@hdj/midi-driver/ffi";
 
 import { Server } from "./server.ts";
 import { AllowedPayloads } from "./client/protocol.ts";
+import { OscDriver } from "./osc.ts";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
@@ -145,6 +146,8 @@ export class HomebrewDJControllerOnly {
         useVirtual: true
     });
 
+    oscPort = new OscDriver();
+
     constructor(config_path = "./config.json") {
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
@@ -207,6 +210,7 @@ export class HomebrewDJControllerOnly {
     }
 
     close() {
+        this.oscPort.stop();
         this.midiPort.close();
         this.server.close();
     }
