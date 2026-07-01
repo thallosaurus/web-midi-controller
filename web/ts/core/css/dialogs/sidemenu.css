@@ -1,0 +1,100 @@
+/* the dialog itself */
+dialog#sidemenu h1 {
+    padding: .5em .5em;
+}
+
+dialog#sidemenu {
+    
+}
+
+/* Container for the menu */
+dialog#sidemenu form#menuform {
+    height: 100%;
+    
+}
+
+/* The first layer list */
+dialog#sidemenu .layer-one {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+dialog#sidemenu {}
+
+dialog#sidemenu {
+  position: fixed;
+  left: 0;
+  margin: 0;
+  height: 100%;
+  border: 0;
+}
+
+dialog#sidemenu[open] {
+    display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0;
+}
+
+dialog#sidemenu form#menuform input[type=radio]:checked + .layer-two {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog#sidemenu input[type=radio] {
+    display: none;
+}
+
+dialog#sidemenu .layer-two {
+    display:none;
+    overflow:auto
+}
+
+/* fix both list layers */
+ul.layer-one, ul.layer-two {
+    margin-block: 0;
+    list-style-type: none;
+    padding-inline-start: 0;
+}
+
+/* layer one base button */
+dialog#sidemenu .layer-one label {
+    display: block;
+    padding: 1em .5em;
+    font-size: 1.2em;
+}
+dialog#sidemenu ul.layer-one li {
+    display: block;
+}
+
+/* layer one selected button */
+dialog#sidemenu ul.layer-two li.shown {
+    background-color: white;
+    color: black;
+    font-weight: bold;
+
+}
+dialog#sidemenu form#menuform label:has(+ input[type=radio]:checked) {
+    background-color: white;
+    color: black;
+    font-weight: bold;
+}
+
+
+dialog#sidemenu ul.layer-two li {
+    padding: 1em .5em;
+}
+
+dialog#sidemenu ul.layer-two {
+    margin: .5em 0;
+
+}
+dialog#sidemenu div.layer-two {
+    margin: .5em
+}
+
+dialog#sidemenu #overlay_selector:empty::after {
+  content: "no overlays available";
+  text-align: center;
+}

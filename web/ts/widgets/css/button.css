@@ -1,0 +1,35 @@
+.ccbutton {
+    touch-action: none;
+}
+
+.ccbutton .press {
+    font-weight: bold;
+    background-color: lightgrey !important;
+    color: black;
+}
+.ccbutton,
+.notebutton {
+
+    touch-action: none;
+    align-content: center;
+    justify-content: center;
+}
+
+.ccbutton .target,
+.notebutton .target {
+    background-color: grey;
+    height: calc(100% - 1em);
+    width: calc(100% - 2em);
+    display: grid;
+    margin: .5em 1em;
+    
+    text-align: center;
+    align-items: center;
+    font-family: monospace;
+}
+
+.notebutton .press {
+    font-weight: bold;
+    background-color: lightgrey;
+    color: black;
+}

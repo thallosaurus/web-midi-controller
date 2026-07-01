@@ -103,7 +103,7 @@ export abstract class Surface {
     /**
      * Builds a serializable representation of the current surface state.
      */
-    public serialize() {
+    public renderState() {
         return {
             matrix: Array.from(this.matrixPixels.entries().map(([n, p], i) => {
                 return [n, p.color]

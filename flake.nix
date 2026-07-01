@@ -13,8 +13,8 @@
         #midi-driver = pkgs.callPackage ./midi-driver {};
         version = "v0.2.0";
 
-        traktorController = builtins.fetchurl {
-          url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/homebrewdj_traktor.js";
+        src = builtins.fetchurl {
+          url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/homebrewdj.js";
           sha256 = "sha256:0dxssiz9kk79wxy2xz4v9z41wzzav3al1ymrzrgbrdc0kbhscgfr";
         };
 
@@ -41,7 +41,7 @@
           }
         '';
 
-        homebrewdj-traktor = pkgs.stdenvNoCC.mkDerivation {
+        homebrewdj = pkgs.stdenvNoCC.mkDerivation {
           pname = "homebrewdj";
           version = version;
           
@@ -53,7 +53,7 @@
 
           installPhase = ''
             mkdir -p $out
-            ln -s ${traktorController} $out/homebrewdj.js
+            ln -s ${src} $out/homebrewdj.js
             ln -s ${driver} $out/libmidi_driver.so
             ln -s ${config} $out/config.json
             cp -r ${ui}/webui $out/webui
@@ -79,7 +79,7 @@
 
 	        apps.default = {
 	          type = "app";
-	          program = "${homebrewdj-traktor}/bin/homebrewdj";
+	          program = "${homebrewdj}/bin/homebrewdj";
 	        };
         }
     );

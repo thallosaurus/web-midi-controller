@@ -6,7 +6,6 @@
       "type": "horiz-mixer",
       "horiz": [
         {
-          "output": "midi",
           "cc": 10,
           "channel": 1,
           "label": "Volume 1",
@@ -14,7 +13,6 @@
           "type": "ccslider"
         },
         {
-          "output": "midi",
           "cc": 20,
           "channel": 1,
           "label": "Volume 2",
@@ -22,7 +20,6 @@
           "type": "ccslider"
         },
         {
-          "output": "midi",
           "cc": 30,
           "channel": 1,
           "label": "Volume 3",
@@ -30,7 +27,6 @@
           "type": "ccslider"
         },
         {
-          "output": "midi",
           "cc": 40,
           "channel": 1,
           "label": "Volume 4",
@@ -38,7 +34,6 @@
           "type": "ccslider"
         },
         {
-          "output": "midi",
           "cc": 50,
           "channel": 1,
           "label": "Volume 5",
@@ -46,7 +41,6 @@
           "type": "ccslider"
         },
         {
-          "output": "midi",
           "cc": 60,
           "channel": 1,
           "label": "Volume 6",
@@ -54,7 +48,6 @@
           "type": "ccslider"
         },
         {
-          "output": "midi",
           "cc": 70,
           "channel": 1,
           "label": "Volume 7",
@@ -62,7 +55,6 @@
           "type": "ccslider"
         },
         {
-          "output": "midi",
           "cc": 80,
           "channel": 1,
           "label": "Volume 8",

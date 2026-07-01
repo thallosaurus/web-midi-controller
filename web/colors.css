@@ -1,0 +1,8 @@
+:root {
+    --bg: black;
+    --fg: white;
+    --error: red;
+    --ui-layer-one: #111;
+    --ui-layer-two: #222;
+    --ui-layer-three: #333;
+}

@@ -1,0 +1,47 @@
+<!-- new one -->
+<dialog id="sidemenu">
+    <h1>Menu</h1>
+    <main>
+        <form id="menuform">
+            <ul class="layer-one">
+                <li>
+                    <label for="overlay_sel">Overlays</label>
+                    <input type="radio" name="main_selection" id="overlay_sel" />
+                    <ul id="overlay_selector" class="layer-two"></ul>
+                </li>
+                <li>
+                    <label for="settings_sel">Settings</label>
+                    <input type="radio" name="main_selection" id="settings_sel" />
+                    <div class="layer-two">
+                        <div>settings</div>
+                    </div>
+                </li>
+                <li>
+                    <label for="connection_sel">Connection</label>
+                    <input type="radio" name="main_selection" id="connection_sel" />
+                    <div class="layer-two">
+                        <div>Connection Status:</div>
+                        <p>
+
+                            <span class="menu-connected-label">connected</span>
+                            <span class="menu-disconnected-label">disconnected</span>
+                        </p>
+                    </div>
+                </li>
+            </ul>
+            <!--<div class="menu-container">
+                <ul class="submenu">
+                    <li>
+                        <h2>Overlays</h2>
+                        <ul id="overlay_selector"></ul>
+                    </li>
+                </ul>
+            </div>-->
+        </form>
+
+        </main>
+        
+        <footer>    
+            <button type="button" class="shown" id="close" data-dialog-close="sidemenu">Close</button>
+        </footer>
+</dialog>

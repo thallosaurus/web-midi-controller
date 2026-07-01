@@ -1,0 +1,199 @@
+body,
+#app {
+  margin: 0;
+  color: var(--fg);
+  background-color: var(--bg);
+  font-family: monospace;
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  overflow: none;
+
+  touch-action: manipulation;
+}
+
+#app>header {
+  grid-area: header;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background-color: var(--ui-layer-one);
+  border-bottom: .1em solid #222;
+  padding: .5em 0;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+}
+
+#app>main {
+  padding: 1em 0;
+  grid-area: main;
+  align-self: stretch;
+  width: calc(100% - 2em);
+  height: 100%;
+  margin: 0 1em;
+}
+
+#app>footer {
+  /*border-top: .5em solid grey;*/
+  display: none;
+  grid-area: footer;
+}
+
+.bar-fixed-small {
+  width: 100px;
+}
+
+.bar-fixed-middle {
+  width: 200px;
+}
+
+.bar-fixed-large {
+  width: 300px;
+}
+
+#menu_container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: .5em;
+}
+
+#menu_container button {
+  height: 100%;
+  background-color: transparent;
+  color: var(--fg);
+  font-family: monospace;
+  font-size: 1.5em;
+  border: none;
+}
+
+/*#menu_container button {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  background-color: transparent;
+  font-family: monospace;
+}*/
+
+.title {
+  display: inline;
+}
+
+.title button {
+  height: 100%;
+  margin: 0;
+  background-color: transparent;
+  border: none;
+  color: white;
+}
+
+.title .name #app_version {
+  font-size: .5em;
+  justify-self: center;
+  vertical-align: middle;
+}
+
+.title .name {
+  font-size: 2em;
+  vertical-align: super;
+}
+
+#app.disconnected .online {
+  display: none;
+}
+
+#app:not(.disconnected).online {
+  display: block;
+}
+
+#app:not(.disconnected) .disconnect-fallback {
+  display: none !important;
+}
+
+.disconnect-fallback {
+  display: block;
+}
+
+
+.overlay-fallback {
+  display: none;
+}
+
+/* iPhone specifics */
+
+@media (min-device-width:320px) and (max-device-width:768px) {
+
+  #app>header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #app>header>#menu_controller {
+    display: none !important;
+  }
+
+  /*#app #menu_container .menu-connected-label {
+    display: none !important;
+  }
+  #app #menu_container .menu-disconnected-label {
+    display: none !important;
+  }*/
+  #menu_container>span {
+    display: none !important;
+  }
+  .iphone-only {
+    display: unset !important;
+  }
+  #overlay_name {
+    display: none !important;
+  }
+
+  #disconnect-fallback .container {
+    width: 100% !important;
+  }
+
+  dialog#menu {
+    width: 100vw;
+  }
+}
+
+.iphone-only {
+  display: none;
+}
+
+#app .menu-connected-label {
+  display: inline;
+}
+
+#app.disconnected .menu-connected-label {
+  display: none;
+}
+
+#app .menu-disconnected-label {
+  display: none;
+}
+
+#app.disconnected .menu-disconnected-label {
+  display: inline;
+}
+
+#menu_container>span {
+  padding: 0 1em;
+}
+
+.menu-disconnected-label {
+  display: none;
+  color: var(--error);
+}
+
+.menu-connected-label {
+  display: inline;
+  color: greenyellow;
+}
+
+/* Map Mode */
+:not(.mapmode) .map-only {
+  display: none;
+}

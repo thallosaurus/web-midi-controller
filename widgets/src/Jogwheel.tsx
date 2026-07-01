@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { WidgetProperties } from "./Parser";
-import { JogwheelProperties, midi as MidiProperties } from "@hdj/definitions";
+import { JogwheelProperties } from "@hdj/definitions";
 
 export interface JogwheelState {
 
@@ -57,19 +57,13 @@ export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties
     };
 
     useEffect(() => {
-        switch (def.output) {
-            case "midi":
-                const id = callbacks.registerCC(def.channel, def.cc, (v) => {
-                    // doesnt update ui
-                })
-                return () => {
-                    callbacks.unregisterCC(def.channel, def.cc, id)
-                }
-
-            case "osc":
-                break;
+        const id = callbacks.registerCC(def.channel, def.cc, (v) => {
+            // doesnt update ui
+        })
+        return () => {
+            callbacks.unregisterCC(def.channel, def.cc, id)
         }
-    }, [])
+    })
 
     return (
         <div className="jogwheel" id={def.id}

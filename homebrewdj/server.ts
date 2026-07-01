@@ -83,11 +83,6 @@ export const WebsocketRouter = <T>(clients: Map<UUID, WebSocket>, callback: Hand
     return router;
 }
 
-interface ListenOptions {
-    port?: number,
-    hostname?: string
-}
-
 /**
  * Lightweight HTTP and WebSocket server used by HomebrewDJ.
  *
@@ -107,24 +102,19 @@ export class Server<T = AllowedPayloads> {
      * @param app Oak application instance.
      * @param controller Abort controller used to stop the server.
      */
-    constructor(callback: HandlerCallback<T>, listenOptions: ListenOptions = {}, app = new Application(), controller = new AbortController()) {
+    constructor(callback: HandlerCallback<T>, listenOptions = {}, app = new Application(), controller = new AbortController()) {
         this.app = app;
         this.controller = controller;
 
         const ws = WebsocketRouter(this.clients, callback);
         this.app.use(ws.routes());
         this.app.use(ws.allowedMethods());
-        this.app.addEventListener("listen", (e) => {
-            console.log("listening to", listenOptions.port ?? 8080)
-        });
-        
         this.app.listen({
-            // default is localhost only for development, but can be overridden in listenOptions
             hostname: "127.0.0.1",
             port: 8080,
             signal: this.controller.signal,
             ...listenOptions
-        });
+        })
     }
 
     /**

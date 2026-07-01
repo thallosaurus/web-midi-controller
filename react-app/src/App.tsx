@@ -1,6 +1,6 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
-import { AllowedPayloads, asyncWebsocketClient, CCMessagePayload, ConnectedPayload, NoteMessagePayload, OscMessagePayload, WebsocketClient } from "@hdj/homebrewdj-web-client";
+import { AllowedPayloads, asyncWebsocketClient, CCMessagePayload, ConnectedPayload, NoteMessagePayload, WebsocketClient } from "@hdj/homebrewdj-web-client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { EventBus } from "./EventBus";
 import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
@@ -20,7 +20,7 @@ function getEndpointUrl() {
 }
 
 function App() {
-  const process = (id: string, msg: CCMessagePayload | NoteMessagePayload | ConnectedPayload | OscMessagePayload) => {
+  const process = (id: string, msg: CCMessagePayload | NoteMessagePayload | ConnectedPayload) => {
     if (eventbus.current) {
       switch (msg.type) {
         case "connection":
@@ -31,10 +31,6 @@ function App() {
           break
         case "note":
           eventbus.current.processNote(msg);
-          break;
-
-        case "oscmsg":
-          eventbus.current.processOSC(msg);
           break;
       }
     }
@@ -47,12 +43,10 @@ function App() {
 
   useEffect(() => {
     const url = getEndpointUrl();
-    const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload | ConnectedPayload>(url, process, (id) => {
-      setConnected(true);
-    });
+    const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload | ConnectedPayload>(url, process);
     client.current = wsClient;
     eventbus.current.setSender(wsClient);
-  });
+  })
 
   return (
     <>
