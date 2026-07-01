@@ -1,9 +1,10 @@
-import { TraktorSurface, TraktorState, TraktorEvent } from "@hdj/traktor-driver"
+import { TraktorSurface, TraktorState } from "@hdj/traktor-driver"
 import { Launchpad, LaunchpadSurfaceStore } from "@hdj/launchpad-driver";
 import { MidiDriver } from "@hdj/midi-driver/ffi";
 
 import { Server } from "./server.ts";
-import { AllowedPayloads } from "./client/protocol.ts";
+import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
+import { OscDriver } from "./osc.ts";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
@@ -24,7 +25,7 @@ interface HomebrewDJConfig {
  * Connects the Launchpad, Traktor integration layer and web server,
  * and routes MIDI events between all components.
  */
-export class HomebrewDJ {
+export class HomebrewDJTraktorSetup {
     launchpad: Launchpad
     traktor: MidiDriver
 
@@ -133,6 +134,93 @@ export class HomebrewDJ {
         this.launchpad.switchToStandaloneMode();
         this.launchpad.close();
         this.traktor.close();
+        this.server.close();
+    }
+}
+
+export class HomebrewDJControllerOnly {
+    server: Server;
+    midiPort = new MidiDriver({
+        inputName: "HomebrewDJ Controller Input",
+        outputName: "HomebrewDJ Controller Output",
+        useVirtual: true
+    });
+
+    oscPort = OscDriver.customHost("127.0.0.1", 8000);
+
+    constructor(config_path = "./config.json") {
+        const file = Deno.readTextFileSync(config_path);
+        const config: HomebrewDJConfig = JSON.parse(file);
+        this.server = new Server((msg: AllowedPayloads) => {
+            switch (msg.type) {
+                case "cc":
+                    this.midiPort.sendMidi({
+                        type: "ControlChange",
+                        cc: msg.cc,
+                        channel: msg.channel,
+                        value: msg.value
+                    })
+                    break;
+                case "note":
+                    if (msg.on) {
+                        this.midiPort.sendMidi({
+                            type: "NoteOn",
+                            channel: msg.channel,
+                            note: msg.note,
+                            velocity: msg.velocity
+                        });
+                    } else {
+                        this.midiPort.sendMidi({
+                            type: "NoteOff",
+                            channel: msg.channel,
+                            note: msg.note,
+                            velocity: msg.velocity
+                        });
+                    }
+                    break;
+
+                case "oscmsg":
+                    console.log(msg);
+                    this.oscPort.send(msg)
+                    break;
+            }
+        }, {
+            hostname: config.hostname
+        });
+
+        this.midiPort.addEventListener((ev: CustomEvent) => {
+            const t = ev.detail;
+
+            switch (t.type) {
+                case "NoteOn":
+                case "NoteOff":
+                    this.server.broadcast({
+                        type: "note",
+                        channel: t.channel,
+                        note: t.note,
+                        on: t.type == "NoteOn",
+                        velocity: t.velocity
+                    });
+                    break;
+                case "ControlChange":
+                    this.server.broadcast({
+                        type: "cc",
+                        channel: t.channel,
+                        cc: t.cc,
+                        value: t.value
+                    });
+                    break;
+            }
+        });
+        this.oscPort.addEventListener((msg: OscMessagePayload) => {
+            console.log("osc-port", msg);
+            this.server.broadcast(msg);
+        });
+    }
+
+    close() {
+        this.oscPort.stop();
+        this.midiPort.close();
         this.server.close();
     }
 }

@@ -244,7 +244,7 @@ export class Launchpad {
      */
     drawToLaunchpad(store: LaunchpadSurfaceStore) {
         const dest = store == LaunchpadSurfaceStore.Session ? this.control : this.midi
-        const buffer = this.surface?.renderState();
+        const buffer = this.surface?.serialize();
         //console.log("digga", buffer);
 
         for (const [v, i] of buffer?.matrix!) {

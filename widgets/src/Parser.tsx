@@ -6,50 +6,63 @@ import { Rotary } from "./Rotary.tsx";
 import { XYPad } from "./XYPad.tsx";
 import { Jogwheel } from "./Jogwheel.tsx";
 
-export type ReceiveDataCallback = (v: number) => void;
+export type MIDIReceiveDataCallback = (v: number) => void;
+export type OSCReceiveDataCallback = (v: number) => void;
 
-export type SendNoteCallback = (channel: number, note: number, velocity: number, on: boolean) => void;
-export type SendCCCallback = (channel: number, cc: number, value: number) => void;
-export type RegisterCCCallback = (channel: number, cc: number, cb: ReceiveDataCallback) => string;
-export type RegisterNoteCallback = (channel: number, note: number, cb: ReceiveDataCallback) => string;
+export type MIDISendNoteCallback = (channel: number, note: number, velocity: number, on: boolean) => void;
+export type MIDISendCCCallback = (channel: number, cc: number, value: number) => void;
+export type MIDIRegisterCCCallback = (channel: number, cc: number, cb: MIDIReceiveDataCallback) => string;
+export type MIDIRegisterNoteCallback = (channel: number, note: number, cb: MIDIReceiveDataCallback) => string;
 
-export type UnregisterNoteCallback = (channel: number, note: number, id: string) => void;
-export type UnregisterCCCallback = (channel: number, cc: number, id: string) => void;
+export type MIDIUnregisterNoteCallback = (channel: number, note: number, id: string) => void;
+export type MIDIUnregisterCCCallback = (channel: number, cc: number, id: string) => void;
+
+export type OSCRegister = (address: string, cb: OSCReceiveDataCallback) => string;
+export type OSCUnregister = (address: string, id: string) => void;
+export type OSCSend = (address: string, args: any[]) => void;
 
 export interface WidgetProperties<T> {
   def: T,
-  callbacks: WidgetCallbacks
+  callbacks: WidgetCallbacks,
 }
 
-export interface WidgetCallbacks {
+export type WidgetCallbacks = MIDIWidgetCallbacks & OSCWidgetCallbacks;
+
+export interface OSCWidgetCallbacks {
+  registerOSC: OSCRegister
+  unregisterOSC: OSCUnregister
+  sendOSC: OSCSend
+}
+
+export interface MIDIWidgetCallbacks {
   /**
    * Sends out Note Data
    */
-  sendNote: SendNoteCallback
+  sendNote: MIDISendNoteCallback
   /**
    * registers this widget for input Note Data
    */
-  registerNote: RegisterNoteCallback
+  registerNote: MIDIRegisterNoteCallback
 
   /**
    * Sends out CC Data
    */
-  sendCC: SendCCCallback
+  sendCC: MIDISendCCCallback
 
   /**
    * registers this widget for input CC Data
    */
-  registerCC: RegisterCCCallback
+  registerCC: MIDIRegisterCCCallback
 
   /**
    * Unregisters this widget from input CC Data
    */
-  unregisterCC: UnregisterCCCallback
+  unregisterCC: MIDIUnregisterCCCallback
 
   /**
    * Unregisters this widget from input Note Data
    */
-  unregisterNote: UnregisterNoteCallback
+  unregisterNote: MIDIUnregisterNoteCallback
 }
 
 export function Layout({ children, callbacks }: { children: Widget[], callbacks: WidgetCallbacks }) {

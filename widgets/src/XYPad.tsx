@@ -77,9 +77,12 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
 
 
     useEffect(() => {
-        callbacks.registerCC(def.channel, def.x.cc, setValueX)
-        callbacks.registerCC(def.channel, def.y.cc, setValueY)
-    })
+        switch (def.output) {
+            case "midi":
+                const id_x = callbacks.registerCC(def.channel, def.x.cc, setValueX)
+                const id_y = callbacks.registerCC(def.channel, def.y.cc, setValueY)
+            }
+    }, [])
 
     return (
         <div className="xypad" id={def.id}>

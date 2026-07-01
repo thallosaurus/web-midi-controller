@@ -1,4 +1,4 @@
-import { MidiDriver } from "@hdj/midi-driver/ffi.ts";
+import { MidiDriver } from "@hdj/midi-driver/ffi";
 
 export enum DeckActionsCC {
     Volume = 0,

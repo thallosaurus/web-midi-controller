@@ -1,4 +1,4 @@
-import { RotarySliderProperties } from "@hdj/definitions";
+import { midi as MidiProperties, RotarySliderProperties } from "@hdj/definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils";
 import { useRef, useState } from "react";
@@ -10,6 +10,16 @@ const MAX_ANGLE = 135;
 export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperties>) {
     const lastX = useRef<number>(0);
     const active = useRef<boolean>(false);
+
+    const send = (v: number) => {
+        switch (def.output) {
+            case "midi":
+                if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, v)
+                break;
+            case "osc":
+                break;
+        }
+    }
 
     const [value, setValue] = useState<number>(def.default_value ?? 0);
 
@@ -33,22 +43,23 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
 
         if (new_value != value) {
             setValue(new_value)
-            callbacks.sendCC(def.channel, def.cc, new_value)
+            send(new_value)
         }
     }
-    
+
     const touch_stop = ({ target, pointerId }) => {
         active.current = false;
         const el = target as HTMLElement;
         el.releasePointerCapture(pointerId);
-        
+
         if (def.mode == "snapback") {
             setValue(def.default_value ?? 0)
-            callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0)
+            //callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0)
+            send(def.default_value ?? 0)
         }
     }
 
-    const rotationStyle = (a) => { return {"--rotation": `${a}deg`} as React.CSSProperties }
+    const rotationStyle = (a) => { return { "--rotation": `${a}deg` } as React.CSSProperties }
 
     return (<div id={def.id} className="rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
         <div className="widget">

@@ -1,4 +1,5 @@
 {
+    "nodeModulesDir": "none",
     "workspace": [
         "./definitions",
         "./homebrewdj",

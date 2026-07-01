@@ -6,6 +6,7 @@
   "cells": [
     {
       "type": "notebutton",
+      "output": "midi",
       "note": 0,
       "channel": 1,
       "label": "test",
