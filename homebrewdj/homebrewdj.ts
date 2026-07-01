@@ -3,7 +3,7 @@ import { Launchpad, LaunchpadSurfaceStore } from "@hdj/launchpad-driver";
 import { MidiDriver } from "@hdj/midi-driver/ffi";
 
 import { Server } from "./server.ts";
-import type { AllowedPayloads } from "./client/protocol.ts";
+import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
 
 /**
@@ -211,7 +211,11 @@ export class HomebrewDJControllerOnly {
                     });
                     break;
             }
-        })
+        });
+        this.oscPort.addEventListener((msg: OscMessagePayload) => {
+            console.log(msg);
+            this.server.broadcast(msg);
+        });
     }
 
     close() {

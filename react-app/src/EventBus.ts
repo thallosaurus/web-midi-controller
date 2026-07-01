@@ -1,6 +1,7 @@
-import { AllowedPayloads, CCMessagePayload, NoteMessagePayload } from "@hdj/homebrewdj-web-client";
+import { AllowedPayloads, CCMessagePayload, NoteMessagePayload, OscMessagePayload } from "@hdj/homebrewdj-web-client";
 import { WidgetCallbacks, MIDIReceiveDataCallback, MIDISendNoteCallback, MIDIRegisterNoteCallback, MIDISendCCCallback, MIDIRegisterCCCallback, MIDIUnregisterCCCallback, MIDIUnregisterNoteCallback, OSCRegister, OSCUnregister, OSCReceiveDataCallback, OSCSend } from "@hdj/widgets";
 import { uuid } from "./utils";
+import { osc as OscProperties } from "../../definitions/bindings/Widget.ts";
 
 type MIDICallbackMap = Map<number, Map<number, Map<string, MIDIReceiveDataCallback>>>;
 type OSCCallbackMap = Map<string, Map<string, OSCReceiveDataCallback>>;
@@ -22,6 +23,13 @@ export class EventBus implements WidgetCallbacks {
     
     setSender(sender: EventBusCallback) {
         this.sender = sender;
+    }
+
+    processOSC({ address, args }: OscMessagePayload) {
+        const c = this.oscCallbackMap.get(address);
+        c?.forEach((cb) => {
+            cb(args[0])
+        });
     }
     
     processNote({ channel, note, velocity, on }: NoteMessagePayload) {
