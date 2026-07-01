@@ -26,13 +26,15 @@ const verticalSliderStyle = () => {
     //-moz-user-select: none;
 
     //-ms-user-select: none;
-    }
+    } as React.CSSProperties
 }
 
 const horizontalSliderStyle = () => {
     return {
         height: "100%",
-    }
+        "userSelect": "none",
+        "-webkit-user-select": "none"
+    } as React.CSSProperties
 }
 
 const verticalCCSliderStyle = () => {
