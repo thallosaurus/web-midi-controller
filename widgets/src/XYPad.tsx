@@ -85,7 +85,7 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
     }, [])
 
     return (
-        <div className="xypad" id={def.id}>
+        <div className="widget xypad" id={def.id}>
             <div className="target"
                 ref={targetRef}
                 onPointerDown={start}

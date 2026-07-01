@@ -1,8 +1,8 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
-import type { NoteButtonProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
-import { Layout, WidgetCallbacks } from "@hdj/widgets";
+import type { HorizontalMixerProperties, NoteButtonProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { ChildLayout, Layout, WidgetCallbacks } from "@hdj/widgets";
 import "./App.css";
 import "@hdj/widgets/style.css"
 
@@ -20,6 +20,12 @@ const DEFAULT_VPANEL: Widget & VerticalMixerProperties = {
   id: null,
   type: "vert-mixer",
   vert: []
+}
+
+const DEFAULT_HPANEL: Widget & HorizontalMixerProperties = {
+  id: null,
+  type: "horiz-mixer",
+  horiz: []
 }
 
 function App() {
@@ -56,6 +62,9 @@ function App() {
     },
     unregisterCC(id) {
 
+    },
+    sendUiEvent(def) {
+      console.log(def);
     }
   };
 
@@ -88,9 +97,14 @@ function App() {
               //setCells(cells)
               setCells([...cells, DEFAULT_VPANEL])
             }}>Add VPanel</button>
+
+            <button onClick={(ev) => {
+              //setCells(cells)
+              setCells([...cells, DEFAULT_HPANEL])
+            }}>Add VPanel</button>
           </div>
         </header>
-        <Layout children={cells} callbacks={cbs} aux={<span>after</span>}></Layout>
+        <ChildLayout childWidgets={cells} callbacks={cbs} aux={<button className="aux" type="submit">Edit</button>} />
       </div>
     </>
   )

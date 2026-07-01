@@ -207,7 +207,7 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
     };
 
     return <div id={def.id} className="ccslider" style={def.vertical ? verticalCCSliderStyle() : horizontalCCSliderStyle()}>
-        <div className="slider"
+        <div className="widget slider"
             style={def.vertical ? verticalSliderStyle() : horizontalSliderStyle()}
 
             onPointerDown={start}

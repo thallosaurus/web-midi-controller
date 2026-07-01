@@ -5,6 +5,7 @@ import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout.tsx"
 import { Rotary } from "./Rotary.tsx";
 import { XYPad } from "./XYPad.tsx";
 import { Jogwheel } from "./Jogwheel.tsx";
+import { ReactElement } from "react";
 
 export type MIDIReceiveDataCallback = (v: number) => void;
 export type OSCReceiveDataCallback = (v: number) => void;
@@ -26,7 +27,11 @@ export interface WidgetProperties<T> {
   callbacks: WidgetCallbacks,
 }
 
-export type WidgetCallbacks = MIDIWidgetCallbacks & OSCWidgetCallbacks;
+export type WidgetCallbacks = MIDIWidgetCallbacks & OSCWidgetCallbacks & UiEventCallbacks;
+
+export interface UiEventCallbacks {
+  sendUiEvent: (def: Widget) => void;
+}
 
 export interface OSCWidgetCallbacks {
   registerOSC: OSCRegister
@@ -65,10 +70,65 @@ export interface MIDIWidgetCallbacks {
   unregisterNote: MIDIUnregisterNoteCallback
 }
 
+export function ChildLayout({ childWidgets, callbacks, aux }: { childWidgets: Widget[], callbacks: WidgetCallbacks, aux?: React.ReactElement }) {
+    return <>{childWidgets.map((v, i) => <RichLayout key={i} def={v} callbacks={callbacks} aux={aux} />)}</>
+}
+
+export function RichLayout({ def, callbacks, aux }: { def: Widget, callbacks: WidgetCallbacks, aux?: ReactElement }) {
+  return <>
+    <form onSubmit={(ev) => {
+      ev.preventDefault();
+      callbacks.sendUiEvent(def)
+    }}>
+      {aux}
+    </form>
+      <SingleLayout def={def} callbacks={callbacks} />
+  </>
+}
+
+const stringToElement = (d, k, c, a) => {
+  switch (d.type) {
+    case 'notebutton':
+      return <NoteButton def={d} key={k} callbacks={c} />
+    case 'ccslider':
+      return <CCSlider def={d} key={k} callbacks={c} />
+    case 'horiz-mixer':
+      return <Horizontal def={d} key={k} callbacks={c} aux={a} />
+    case 'vert-mixer':
+      return <Vertical def={d} key={k} callbacks={c} aux={a} />
+    case 'grid-mixer':
+      return <Grid def={d} key={k} callbacks={c} aux={a} />
+    case 'ccbutton':
+      return <CCButton def={d} key={k} callbacks={c} />
+    case 'rotary':
+      return <Rotary def={d} key={k} callbacks={c} />
+    case 'xypad':
+      return <XYPad def={d} key={k} callbacks={c} />
+    case 'shift':
+      return <ShiftArea def={d} key={k} callbacks={c} />
+    case 'jogwheel':
+      return <Jogwheel def={d} key={k} callbacks={c} />
+    case 'tab':
+      return <TabbedArea def={d} key={k} callbacks={c} />
+    case 'empty':
+    default:
+      return <div className="empty"></div>
+  };
+
+}
+export function SingleLayout({ def, callbacks, aux }: { def: Widget, callbacks: WidgetCallbacks, aux?: ReactElement }) {
+
+  return <>
+    {stringToElement(def, 0, callbacks, aux)}
+  </>
+}
+
 export function Layout({ children, callbacks, aux }: { children: Widget[], callbacks: WidgetCallbacks, aux?: React.ReactElement }) {
   return <>
-    {children.map((def, k) => {
-      switch (def.type) {
+    {children.map((def, k) => 
+    {
+      stringToElement(def, k, callbacks, aux)
+/*      switch (def.type) {
         case 'notebutton':
           return <NoteButton def={def} key={k} callbacks={callbacks} />
         case 'ccslider':
@@ -94,9 +154,8 @@ export function Layout({ children, callbacks, aux }: { children: Widget[], callb
         case 'empty':
         default:
           return <div className="empty"></div>
-      }
+      }*/
     })}
-    {aux}
   </>
 }
 

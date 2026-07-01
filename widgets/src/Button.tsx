@@ -99,7 +99,7 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
         onPointerDown={start}
         onPointerUp={end}
         onPointerCancel={end}
-        className="notebutton">
+        className="widget notebutton">
 
         <Button label={def.label ?? String(def.note)} on={on} />
 
@@ -187,7 +187,7 @@ export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties
         }
     };
 
-    return (<div id={def.id} className="ccbutton"
+    return (<div id={def.id} className="widget ccbutton"
 
         onPointerDown={touch_start}
         onPointerUp={touch_end}

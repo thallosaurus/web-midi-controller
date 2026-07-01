@@ -11,3 +11,9 @@ body {
     margin: 0;
     overflow: hidden;
 }
+
+.aux {
+    position: relative;
+    top: 0;
+    right: 0;
+}
