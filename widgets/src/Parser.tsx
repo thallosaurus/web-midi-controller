@@ -76,12 +76,12 @@ export function ChildLayout({ childWidgets, callbacks, aux }: { childWidgets: Wi
 
 export function RichLayout({ def, callbacks, aux }: { def: Widget, callbacks: WidgetCallbacks, aux?: ReactElement }) {
   return <>
-    <form onSubmit={(ev) => {
+    {aux ? (<form onSubmit={(ev) => {
       ev.preventDefault();
       callbacks.sendUiEvent(def)
     }}>
       {aux}
-    </form>
+    </form>) : ""}
       <SingleLayout def={def} callbacks={callbacks} />
   </>
 }
@@ -127,8 +127,8 @@ export function Layout({ children, callbacks, aux }: { children: Widget[], callb
   return <>
     {children.map((def, k) => 
     {
-      stringToElement(def, k, callbacks, aux)
-/*      switch (def.type) {
+      //stringToElement(def, k, callbacks, aux)
+      switch (def.type) {
         case 'notebutton':
           return <NoteButton def={def} key={k} callbacks={callbacks} />
         case 'ccslider':
@@ -154,7 +154,7 @@ export function Layout({ children, callbacks, aux }: { children: Widget[], callb
         case 'empty':
         default:
           return <div className="empty"></div>
-      }*/
+      }
     })}
   </>
 }
@@ -175,7 +175,7 @@ export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: Wi
       justifyContent: "center",
       ...style ?? {}
     }}>
-      <Layout children={o.cells} callbacks={callbacks} aux={<></>} />
+      <Layout children={o.cells} callbacks={callbacks} aux={<></>}/>
     </div>
   )
 }
