@@ -213,7 +213,7 @@ export class HomebrewDJControllerOnly {
             }
         });
         this.oscPort.addEventListener((msg: OscMessagePayload) => {
-            console.log(msg);
+            console.log("osc-port", msg);
             this.server.broadcast(msg);
         });
     }

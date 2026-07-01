@@ -3,7 +3,7 @@ import { WidgetProperties } from "./Parser.tsx";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils.ts";
 
-const MAX_LEVEL = 127;
+const MAX_LEVEL = 1.0;
 
 const growFactor = (value) => {
     return (value / MAX_LEVEL) * 100 + "%";
@@ -56,7 +56,7 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
     const send = (v: number) => {
         switch (def.output) {
             case "midi":
-                if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, v);
+                if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, Math.round(v * 127));
                 break;
             case "osc":
                 if (callbacks.sendOSC) callbacks.sendOSC(def.address, [v])
@@ -135,27 +135,25 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
             case "snapback":
             case "absolute":
                 {
+                    debugger;
                     let v: number;
                     if (!def.vertical) {
                         const n = rect.bottom - clientY;
-                        v = Math.floor(
+                        v = 
                             Math.max(
                                 0,
                                 Math.min(
                                     MAX_LEVEL,
                                     (n / rect.height) * MAX_LEVEL,
                                 ),
-                            ),
                         );
                     } else {
                         const n = clientX - rect.left;
-                        v = Math.floor(
-                            Math.max(
-                                0,
-                                Math.min(
-                                    (n / rect.width) * MAX_LEVEL,
-                                    MAX_LEVEL,
-                                ),
+                        v = Math.max(
+                            0,
+                            Math.min(
+                                (n / rect.width) * MAX_LEVEL,
+                                MAX_LEVEL,
                             ),
                         );
                     }
@@ -179,17 +177,13 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
                         const sensitivity = MAX_LEVEL / (rect.height);
                         const next = baseValue.current + n * sensitivity;
                         //(options.vertical ? (rect.width) : (rect.height));
-                        v = Math.floor(
-                            Math.max(0, Math.min(MAX_LEVEL, next)),
-                        );
+                        v = Math.max(0, Math.min(MAX_LEVEL, next))
                     } else {
                         const delta = clientX - baseX.current;
                         const sensitivity = MAX_LEVEL / rect.width;
                         const next = baseValue.current + delta * sensitivity;
 
-                        v = Math.floor(
-                            Math.max(0, Math.min(MAX_LEVEL, next)),
-                        );
+                        v = Math.max(0, Math.min(MAX_LEVEL, next))
                     }
 
                     if (v != value) {
@@ -228,7 +222,7 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
             border: "none",
             whiteSpace: "nowrap"
         }}>
-            <div>{value}</div>
+            <div>{Math.round(value * 127)}</div>
             <div>{def.label}</div>
         </button>
     </div >

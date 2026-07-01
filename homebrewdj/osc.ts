@@ -12,8 +12,8 @@ function parse(msg: any[]): OscMessagePayload {
 }
 
 export class OscDriver {
-    sender: Client
-    receiver: Server
+    sender: Client | null
+    receiver: Server | null
     abort: AbortController
     events = new EventTarget();
 
@@ -27,8 +27,8 @@ export class OscDriver {
         abort = new AbortController()
     ) {
         abort.signal.onabort = (ev) => {
-            receiver.close();
-            sender.close();
+            if (this.receiver) this.receiver.close();
+            if (this.sender) sender.close();
         }
 
         receiver.on("message", (msg) => {
@@ -59,7 +59,7 @@ export class OscDriver {
     }
 
     async send(msg: OscMessagePayload) {
-        await this.sender.send(msg.address, ...msg.args)
+        if (this.sender) await this.sender.send(msg.address, ...msg.args)
     }
 
     stop() {
