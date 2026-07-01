@@ -19,6 +19,11 @@ pub(super) struct MidiProperties {
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
+pub(super) struct OscProperties {
+    address: String
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct ButtonProperties {
     label: Option<String>,
@@ -64,23 +69,23 @@ pub(super) enum Widget {
 
     /// A button that sends MIDI Notes
     #[serde(rename = "notebutton")]
-    NoteButton(NoteButtonProperties),
+    NoteButton(NoteButtonProperties<MidiProperties>),
 
     /// A slider that sends out CC values
     #[serde(rename = "ccslider")]
-    CCSlider(CCSliderProperties),
+    CCSlider(CCSliderProperties<MidiProperties>),
 
     /// A button that sends out CC values
     #[serde(rename = "ccbutton")]
-    CCButton(CCButtonProperties),
+    CCButton(CCButtonProperties<MidiProperties>),
 
     /// A rotary slider that sends out CC values
     #[serde(rename = "rotary")]
-    RotarySlider(RotarySliderProperties),
+    RotarySlider(RotarySliderProperties<MidiProperties>),
 
     /// An input that sends out relative CC values (3Fh/41h)
     #[serde(rename = "jogwheel")]
-    Jogwheel(JogwheelProperties),
+    Jogwheel(JogwheelProperties<MidiProperties>),
 
     #[serde(rename = "xypad")]
     XYPad(XYPadProperties),
@@ -161,12 +166,12 @@ pub(super) struct ShiftAreaProperties {
 /// A single Notebutton. Sends out its defined Midi Note
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct NoteButtonProperties {
+pub(super) struct NoteButtonProperties<OutputProperties> {
     #[serde(flatten)]
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    midi: OutputProperties,
 
     #[serde(flatten)]
     button: ButtonProperties,
@@ -176,12 +181,12 @@ pub(super) struct NoteButtonProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct CCSliderProperties {
+pub(super) struct CCSliderProperties<OutputProperties> {
     #[serde(flatten)]
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    properties: OutputProperties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
@@ -208,11 +213,11 @@ enum SliderMode {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct CCButtonProperties {
+pub(super) struct CCButtonProperties<OutputProperties> {
     #[serde(flatten)]
     base: BaseProperties,
     #[serde(flatten)]
-    midi: MidiProperties,
+    properties: OutputProperties,
 
     #[serde(flatten)]
     button: ButtonProperties,
@@ -223,12 +228,12 @@ pub(super) struct CCButtonProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct JogwheelProperties {
+pub(super) struct JogwheelProperties<OutputProperties> {
     #[serde(flatten)]
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    properties: OutputProperties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
@@ -236,12 +241,12 @@ pub(super) struct JogwheelProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct RotarySliderProperties {
+pub(super) struct RotarySliderProperties<OutputProperties> {
     #[serde(flatten)]
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    properties: OutputProperties,
 
     #[serde(flatten)]
     ccprop: CCProperties,

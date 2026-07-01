@@ -1,4 +1,4 @@
-import { CCSliderProperties, SliderMode } from "@hdj/definitions";
+import { CCSliderProperties, MidiProperties, SliderMode } from "@hdj/definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils.ts";
@@ -45,7 +45,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties>) {
+export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties<MidiProperties>>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);

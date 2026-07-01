@@ -1,4 +1,4 @@
-import { RotarySliderProperties } from "@hdj/definitions";
+import { MidiProperties, RotarySliderProperties } from "@hdj/definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils";
 import { useRef, useState } from "react";
@@ -7,7 +7,7 @@ const sensitivity = 0.5;    // px -> value
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
 
-export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperties>) {
+export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperties<MidiProperties>>) {
     const lastX = useRef<number>(0);
     const active = useRef<boolean>(false);
 

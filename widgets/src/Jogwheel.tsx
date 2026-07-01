@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import { WidgetProperties } from "./Parser";
-import { JogwheelProperties } from "@hdj/definitions";
+import { JogwheelProperties, MidiProperties } from "@hdj/definitions";
 
 export interface JogwheelState {
 
 }
 
-export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties>) {
+export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties<MidiProperties>>) {
     const active = useRef<boolean>(false);
     const lastX = useRef<number>(0);
     const lastTime = useRef<number>(0);

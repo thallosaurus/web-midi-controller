@@ -1,4 +1,4 @@
-import { NoteButtonProperties, CCButtonProperties, Widget } from "@hdj/definitions";
+import { NoteButtonProperties, CCButtonProperties, Widget, MidiProperties } from "@hdj/definitions";
 import { useEffect, useRef, useState } from "react";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils.ts";
@@ -11,7 +11,7 @@ function Button(props: { label: string, on: boolean }) {
     </div >
 }
 
-export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProperties>) {
+export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProperties<MidiProperties>>) {
     const [on, setOn] = useState(false);
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef(false);
@@ -73,7 +73,7 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
 
 }
 
-export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties>) {
+export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties<MidiProperties>>) {
     const [on, setOn] = useState(false);
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef<boolean>(false);
