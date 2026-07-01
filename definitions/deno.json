@@ -1,6 +1,6 @@
 {
   "name": "@hdj/definitions",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "tasks": {
     "build": "cargo test export_bindings"
   },

@@ -7,7 +7,6 @@
       "type": "vert-mixer",
       "vert": [
         {
-          "output": "midi",
           "channel": 2,
           "label": "XY Pad",
           "type": "xypad",

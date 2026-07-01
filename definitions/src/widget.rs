@@ -13,17 +13,9 @@ pub(super) struct BaseProperties {
 /// Shared Properties for all Midi Widgets
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-#[serde(tag = "output", rename = "midi")]
 pub(super) struct MidiProperties {
     /// The midi channel the widget sends on. 1 = Channel 1; 0 is Overlay Global Channel
     channel: u8,
-}
-
-#[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export, export_to = "Widget.ts")]
-#[serde(tag = "output", rename = "osc")]
-pub(super) struct OscProperties {
-    address: String
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -55,14 +47,6 @@ pub(super) struct ChildrenContainer {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-#[serde(untagged)]
-enum Properties {
-    Midi(MidiProperties),
-    Osc(OscProperties)
-}
-
-#[derive(Serialize, Deserialize, Debug, TS)]
-#[ts(export, export_to = "Widget.ts")]
 #[serde(tag = "type")]
 pub(super) enum Widget {
     /// Horizontal Flex
@@ -80,23 +64,23 @@ pub(super) enum Widget {
 
     /// A button that sends MIDI Notes
     #[serde(rename = "notebutton")]
-    MidiNoteButton(NoteButtonProperties),
+    NoteButton(NoteButtonProperties),
 
     /// A slider that sends out CC values
     #[serde(rename = "ccslider")]
-    MidiCCSlider(CCSliderProperties),
+    CCSlider(CCSliderProperties),
 
     /// A button that sends out CC values
     #[serde(rename = "ccbutton")]
-    MidiCCButton(CCButtonProperties),
+    CCButton(CCButtonProperties),
 
     /// A rotary slider that sends out CC values
     #[serde(rename = "rotary")]
-    MidiRotarySlider(RotarySliderProperties),
+    RotarySlider(RotarySliderProperties),
 
     /// An input that sends out relative CC values (3Fh/41h)
     #[serde(rename = "jogwheel")]
-    MidiJogwheel(JogwheelProperties),
+    Jogwheel(JogwheelProperties),
 
     #[serde(rename = "xypad")]
     XYPad(XYPadProperties),
@@ -182,7 +166,7 @@ pub(super) struct NoteButtonProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    output: Properties,
+    midi: MidiProperties,
 
     #[serde(flatten)]
     button: ButtonProperties,
@@ -197,7 +181,7 @@ pub(super) struct CCSliderProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    output: Properties,
+    midi: MidiProperties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
@@ -227,9 +211,8 @@ enum SliderMode {
 pub(super) struct CCButtonProperties {
     #[serde(flatten)]
     base: BaseProperties,
-
     #[serde(flatten)]
-    output: Properties,
+    midi: MidiProperties,
 
     #[serde(flatten)]
     button: ButtonProperties,
@@ -245,7 +228,7 @@ pub(super) struct JogwheelProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    output: Properties,
+    midi: MidiProperties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
@@ -258,7 +241,7 @@ pub(super) struct RotarySliderProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    output: Properties,
+    midi: MidiProperties,
 
     #[serde(flatten)]
     ccprop: CCProperties,

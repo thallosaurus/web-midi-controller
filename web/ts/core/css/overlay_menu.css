@@ -1,0 +1,92 @@
+dialog ul#overlay_selector:empty::after {
+  content: "no overlays available";
+  text-align: center;
+}
+
+dialog ul#overlay_selector {
+  margin-block-start: 0;
+  margin-block-end: 0;
+  list-style-type: none;
+  overflow-y: auto;
+  text-align: left;
+}
+
+dialog#menu button.shown,
+dialog ul#overlay_selector li.shown {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+}
+
+dialog ul#overlay_selector li {
+  list-style-type: none;
+  display: block;
+  width: calc(100% - 2em);
+  padding: 1em;
+}
+
+dialog#menu button {
+  display: block;
+  width: 100%;
+  padding: 1em;
+  margin-bottom: 2em;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  border: none;
+  font-family: monospace;
+  margin-top: auto;
+}
+
+dialog .menu-container {
+  width: 100%;
+  height: 100%;
+  color: var(--fg);
+  background-color: var(--ui-layer-one);
+}
+
+.menu-container .submenu {
+  list-style-type: none;
+  margin-block-start: 0;
+  padding-inline-start: 0;
+  margin-block: 0
+}
+
+.menu-container .submenu li {
+  background-color: var(--ui-layer-two);
+}
+
+.menu-container .submenu li h2 {
+  padding: 1em 1em;
+  margin-block: 0;
+  margin-inline-start: 0;
+}
+
+.menu-container .submenu ul {
+  list-style-type: none;
+  margin-block-start: 0;
+  background-color: var(--ui-layer-two);
+  padding: 1em 1em;
+}
+
+dialog#menu main .cancel {}
+
+dialog#menu main {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog#menu {
+  position: fixed;
+  left: 0;
+  margin: 0;
+  height: 100%;
+  border: 0;
+}
+
+dialog#menu[open] {
+    display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0;
+}
