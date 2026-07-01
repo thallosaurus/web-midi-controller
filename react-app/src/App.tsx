@@ -52,7 +52,7 @@ function App() {
     });
     client.current = wsClient;
     eventbus.current.setSender(wsClient);
-  });
+  }, []);
 
   return (
     <>
