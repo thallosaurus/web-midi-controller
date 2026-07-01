@@ -20,6 +20,12 @@ const horizontalFillStyle = (value, type: SliderMode) => {
 const verticalSliderStyle = () => {
     return {
         width: "100%",
+        "userSelect": "none",
+        "-webkit-user-select": "none",
+
+    //-moz-user-select: none;
+
+    //-ms-user-select: none;
     }
 }
 
@@ -68,7 +74,6 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
         switch (def.output) {
             case "midi":
                 {
-
                     const id = callbacks.registerCC(def.channel, def.cc, setValue)
                     return () => {
                         callbacks.unregisterCC(def.channel, def.cc, id)
@@ -220,7 +225,9 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
             margin: ".3em",
             fontFamily: "monospace",
             border: "none",
-            whiteSpace: "nowrap"
+            whiteSpace: "nowrap",
+            userSelect: "none",
+            pointerEvents: "none"
         }}>
             <div>{Math.round(value * 127)}</div>
             <div>{def.label}</div>
