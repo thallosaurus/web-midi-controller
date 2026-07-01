@@ -1,4 +1,4 @@
-import { CCSliderProperties, MidiProperties, SliderMode } from "@hdj/definitions";
+import { CCSliderProperties, midi as MidiProperties, osc as OscProperties, SliderMode } from "@hdj/definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils.ts";
@@ -45,7 +45,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties<MidiProperties>>) {
+export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);
@@ -53,13 +53,38 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
     const baseY = useRef<number>(0);
     const activePointer = useRef<number | null>(null);
 
-    useEffect(() => {
-        const id = callbacks.registerCC(def.channel, def.cc, setValue)
-        return () => {
-            callbacks.unregisterCC(def.channel, def.cc, id)
+    const send = (v: number) => {
+        switch (def.output) {
+            case "midi":
+                if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, v);
+                break;
+            case "osc":
+                if (callbacks.sendOSC) callbacks.sendOSC(def.address, [v])
+                break;
         }
+    }
+
+    useEffect(() => {
+        switch (def.output) {
+            case "midi":
+                {
+
+                    const id = callbacks.registerCC(def.channel, def.cc, setValue)
+                    return () => {
+                        callbacks.unregisterCC(def.channel, def.cc, id)
+                    }
+                }
+            case "osc":
+                {
+                    const id = callbacks.registerOSC(def.address, setValue);
+                    return () => {
+                        callbacks.unregisterOSC(def.address, id)
+                    }
+                }
+        }
+
         //  callbacks.registerCC(def.channel, def.y.cc, (v) => setValueY)
-    })
+    }, [])
 
     const start = ({ currentTarget, pointerId, clientX, clientY }) => {
         //preventDefault();
@@ -98,7 +123,8 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
 
     const reset = () => {
         setValue(def.default_value ?? 0);
-        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0);
+        send(def.default_value ?? 0);
+        //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0);
         //this.eventbus!.updateCC(this.prop.channel, this.prop.cc, def.default_value ?? 0);
     };
 
@@ -139,7 +165,8 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
                         //console.log(v);
                         //this.sendValue(v);
                         setValue(v)
-                        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
+                        //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
+                        send(v);
                     }
                 }
                 break;
@@ -168,7 +195,8 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
                     if (v != value) {
                         //this.sendValue(v);
                         setValue(v)
-                        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
+                        //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
+                        send(v);
                     }
                 }
 

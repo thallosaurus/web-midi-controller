@@ -146,7 +146,7 @@ export class HomebrewDJControllerOnly {
         useVirtual: true
     });
 
-    oscPort = new OscDriver();
+    oscPort = OscDriver.customHost("127.0.0.1", 8000);
 
     constructor(config_path = "./config.json") {
         const file = Deno.readTextFileSync(config_path);
@@ -177,6 +177,11 @@ export class HomebrewDJControllerOnly {
                             velocity: msg.velocity
                         });
                     }
+                    break;
+
+                case "oscmsg":
+                    console.log(msg);
+                    this.oscPort.send(msg)
                     break;
             }
         }, {

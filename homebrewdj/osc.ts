@@ -17,6 +17,10 @@ export class OscDriver {
     abort: AbortController
     events = new EventTarget();
 
+    static customHost(host: string, port: number) {
+        return new OscDriver(new Client(host, port))
+    }
+
     constructor(
         sender = new Client("127.0.0.1", 8000),
         receiver = new Server(3333, "0.0.0.0"),

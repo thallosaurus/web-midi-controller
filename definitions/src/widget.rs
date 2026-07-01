@@ -13,12 +13,15 @@ pub(super) struct BaseProperties {
 /// Shared Properties for all Midi Widgets
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
+#[serde(tag = "output", rename = "midi")]
 pub(super) struct MidiProperties {
     /// The midi channel the widget sends on. 1 = Channel 1; 0 is Overlay Global Channel
     channel: u8,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+#[serde(tag = "output", rename = "osc")]
 pub(super) struct OscProperties {
     address: String
 }
@@ -52,6 +55,14 @@ pub(super) struct ChildrenContainer {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
+#[serde(untagged)]
+enum Properties {
+    Midi(MidiProperties),
+    Osc(OscProperties)
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
 #[serde(tag = "type")]
 pub(super) enum Widget {
     /// Horizontal Flex
@@ -69,23 +80,23 @@ pub(super) enum Widget {
 
     /// A button that sends MIDI Notes
     #[serde(rename = "notebutton")]
-    NoteButton(NoteButtonProperties<MidiProperties>),
+    MidiNoteButton(NoteButtonProperties),
 
     /// A slider that sends out CC values
     #[serde(rename = "ccslider")]
-    CCSlider(CCSliderProperties<MidiProperties>),
+    MidiCCSlider(CCSliderProperties),
 
     /// A button that sends out CC values
     #[serde(rename = "ccbutton")]
-    CCButton(CCButtonProperties<MidiProperties>),
+    MidiCCButton(CCButtonProperties),
 
     /// A rotary slider that sends out CC values
     #[serde(rename = "rotary")]
-    RotarySlider(RotarySliderProperties<MidiProperties>),
+    MidiRotarySlider(RotarySliderProperties),
 
     /// An input that sends out relative CC values (3Fh/41h)
     #[serde(rename = "jogwheel")]
-    Jogwheel(JogwheelProperties<MidiProperties>),
+    MidiJogwheel(JogwheelProperties),
 
     #[serde(rename = "xypad")]
     XYPad(XYPadProperties),
@@ -166,12 +177,12 @@ pub(super) struct ShiftAreaProperties {
 /// A single Notebutton. Sends out its defined Midi Note
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct NoteButtonProperties<OutputProperties> {
+pub(super) struct NoteButtonProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: OutputProperties,
+    output: Properties,
 
     #[serde(flatten)]
     button: ButtonProperties,
@@ -181,12 +192,12 @@ pub(super) struct NoteButtonProperties<OutputProperties> {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct CCSliderProperties<OutputProperties> {
+pub(super) struct CCSliderProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
     #[serde(flatten)]
-    properties: OutputProperties,
+    output: Properties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
@@ -213,11 +224,12 @@ enum SliderMode {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct CCButtonProperties<OutputProperties> {
+pub(super) struct CCButtonProperties {
     #[serde(flatten)]
     base: BaseProperties,
+
     #[serde(flatten)]
-    properties: OutputProperties,
+    output: Properties,
 
     #[serde(flatten)]
     button: ButtonProperties,
@@ -228,12 +240,12 @@ pub(super) struct CCButtonProperties<OutputProperties> {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct JogwheelProperties<OutputProperties> {
+pub(super) struct JogwheelProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
     #[serde(flatten)]
-    properties: OutputProperties,
+    output: Properties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
@@ -241,12 +253,12 @@ pub(super) struct JogwheelProperties<OutputProperties> {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
-pub(super) struct RotarySliderProperties<OutputProperties> {
+pub(super) struct RotarySliderProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
     #[serde(flatten)]
-    properties: OutputProperties,
+    output: Properties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
