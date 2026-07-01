@@ -34,6 +34,7 @@
     "npm:@vitejs/plugin-react@^4.6.0": "4.7.0_vite@8.0.16__@types+node@24.13.1__terser@5.48.0",
     "npm:@vitejs/plugin-react@^6.0.1": "6.0.2_vite@8.0.16__@types+node@24.13.1__terser@5.48.0_@types+node@24.13.1_terser@5.48.0",
     "npm:@vitejs/plugin-react@^6.0.2": "6.0.2_vite@8.0.16__@types+node@24.13.1__terser@5.48.0_@types+node@24.13.1_terser@5.48.0",
+    "npm:dockview-react@^7.0.2": "7.0.2_react@19.2.7_react-dom@19.2.7__react@19.2.7",
     "npm:eslint-plugin-react-hooks@^7.1.1": "7.1.1_eslint@10.4.1",
     "npm:eslint-plugin-react-refresh@~0.5.2": "0.5.2_eslint@10.4.1",
     "npm:eslint@^10.3.0": "10.4.1",
@@ -1838,6 +1839,23 @@
     "detect-libc@2.1.2": {
       "integrity": "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="
     },
+    "dockview-core@7.0.2": {
+      "integrity": "sha512-i666ndkUdT4U+Bo2Yu3d6KwCJNqe21VJ0oschdgcXucZ5TquzBFX94zcUBEfg4IewTv2BuiPJ7r/2JTGLLv6ig=="
+    },
+    "dockview-react@7.0.2_react@19.2.7_react-dom@19.2.7__react@19.2.7": {
+      "integrity": "sha512-tnbRM1C/Ok1n/HXGMF0OWmc6Qlx5pbsSJucxX+3XcuNYkZgKiaNJX3BpdBlSxexjytTI/Xywh0ZNGF3/4Fa9LA==",
+      "dependencies": [
+        "dockview",
+        "react",
+        "react-dom"
+      ]
+    },
+    "dockview@7.0.2": {
+      "integrity": "sha512-QhgbJ7RTFsWvrs1lQZKPGCLTGjKU7kI5ZWX5lwU03arM9lIoQlbfv1b/uQ7V5zTkRw7JDndEqjKMgEFw2I8Kow==",
+      "dependencies": [
+        "dockview-core"
+      ]
+    },
     "electron-to-chromium@1.5.368": {
       "integrity": "sha512-7RckJJK4uESJF9PxvfMWd3TGqIiieUTG4HxnKaKuIpGbcr+r2ZEB3g2gAhCP3Fqm42vJSzLfgab9eva/C4/XVw=="
     },
@@ -2767,12 +2785,15 @@
       "overlay-editor": {
         "packageJson": {
           "dependencies": [
+            "npm:@hdj/definitions@*",
+            "npm:@hdj/widgets@*",
             "npm:@tauri-apps/api@2",
             "npm:@tauri-apps/cli@2",
             "npm:@tauri-apps/plugin-opener@2",
             "npm:@types/react-dom@^19.1.6",
             "npm:@types/react@^19.1.8",
             "npm:@vitejs/plugin-react@^4.6.0",
+            "npm:dockview-react@^7.0.2",
             "npm:react-dom@^19.1.0",
             "npm:react@^19.1.0",
             "npm:typescript@~5.8.3",

@@ -72,7 +72,7 @@ export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties
     }, [])
 
     return (
-        <div className="jogwheel" id={def.id}
+        <div className="widget jogwheel" id={def.id}
             onPointerDown={touch_start}
             onPointerMove={touch_move}
             onPointerUp={touch_stop}

@@ -1,9 +1,116 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
+import type { HorizontalMixerProperties, NoteButtonProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { ChildLayout, Layout, WidgetCallbacks } from "@hdj/widgets";
 import "./App.css";
+import "@hdj/widgets/style.css"
+
+const DEFAULT_BUTTON: Widget & NoteButtonProperties = {
+  "type": "notebutton",
+  "output": "midi",
+  "channel": 1,
+  "id": null,
+  "label": "test",
+  "note": 60,
+  "mode": "trigger"
+}
+
+const DEFAULT_VPANEL: Widget & VerticalMixerProperties = {
+  id: null,
+  type: "vert-mixer",
+  vert: []
+}
+
+const DEFAULT_HPANEL: Widget & HorizontalMixerProperties = {
+  id: null,
+  type: "horiz-mixer",
+  horiz: []
+}
 
 function App() {
+
+  const [cells, setCells] = useState<Widget[]>([
+    
+  ])
+  const cbs: WidgetCallbacks = {
+    sendNote(c, n, v, on) {
+      console.log(c, n, v, on)
+    },
+    sendCC(c, cc, v) {
+      console.log(c, cc, v);
+    },
+    sendOSC(a, args) {
+      console.log(a, args);
+    },
+    registerNote(c, n, cb) {
+      return crypto.randomUUID();
+    },
+    registerCC(c, n, cb) {
+      return crypto.randomUUID();
+    },
+    registerOSC(address, cb) {
+      return crypto.randomUUID();
+    },
+
+    unregisterNote(ch, n, id) {
+
+    },
+
+    unregisterOSC(a, id) {
+
+    },
+    unregisterCC(id) {
+
+    },
+    sendUiEvent(def) {
+      console.log(def);
+    }
+  };
+
+  return (
+    <>
+      <div style={{
+        display: "flex",
+        height: "100%",
+        width: "100%",
+        flexDirection: "column"
+      }}>
+        <header style={{
+          margin: "1em",
+          display: "flex",
+          justifyContent: "space-between"
+        }}>
+          <div style={{
+            fontWeight: "bold"
+          }}>Editor</div>
+          <b>
+            Overlay Name
+          </b>
+          <div>
+            <button onClick={(ev) => {
+              //setCells(cells)
+              setCells([...cells, DEFAULT_BUTTON])
+            }}>Add Button</button>
+
+            <button onClick={(ev) => {
+              //setCells(cells)
+              setCells([...cells, DEFAULT_VPANEL])
+            }}>Add VPanel</button>
+
+            <button onClick={(ev) => {
+              //setCells(cells)
+              setCells([...cells, DEFAULT_HPANEL])
+            }}>Add VPanel</button>
+          </div>
+        </header>
+        <ChildLayout childWidgets={cells} callbacks={cbs} aux={<button className="aux" type="submit">Edit</button>} />
+      </div>
+    </>
+  )
+}
+
+function AppOld() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
 
