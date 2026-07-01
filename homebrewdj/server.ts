@@ -115,7 +115,7 @@ export class Server<T = AllowedPayloads> {
         this.app.use(ws.routes());
         this.app.use(ws.allowedMethods());
         this.app.addEventListener("listen", (e) => {
-            console.log(e, "listening to ", listenOptions.port ?? 8080)
+            console.log("listening to", listenOptions.port ?? 8080)
         });
         
         this.app.listen({

@@ -1,9 +1,10 @@
-import { TraktorSurface, TraktorState, TraktorEvent } from "@hdj/traktor-driver"
+import { TraktorSurface, TraktorState } from "@hdj/traktor-driver"
 import { Launchpad, LaunchpadSurfaceStore } from "@hdj/launchpad-driver";
 import { MidiDriver } from "@hdj/midi-driver/ffi";
 
 import { Server } from "./server.ts";
-import { AllowedPayloads } from "./client/protocol.ts";
+import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
+import { OscDriver } from "./osc.ts";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
@@ -145,6 +146,8 @@ export class HomebrewDJControllerOnly {
         useVirtual: true
     });
 
+    oscPort = OscDriver.customHost("127.0.0.1", 8000);
+
     constructor(config_path = "./config.json") {
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
@@ -175,6 +178,11 @@ export class HomebrewDJControllerOnly {
                         });
                     }
                     break;
+
+                case "oscmsg":
+                    console.log(msg);
+                    this.oscPort.send(msg)
+                    break;
             }
         }, {
             hostname: config.hostname
@@ -203,10 +211,15 @@ export class HomebrewDJControllerOnly {
                     });
                     break;
             }
-        })
+        });
+        this.oscPort.addEventListener((msg: OscMessagePayload) => {
+            console.log("osc-port", msg);
+            this.server.broadcast(msg);
+        });
     }
 
     close() {
+        this.oscPort.stop();
         this.midiPort.close();
         this.server.close();
     }

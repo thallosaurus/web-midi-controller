@@ -1,4 +1,4 @@
-import { NoteButtonProperties, CCButtonProperties, Widget } from "@hdj/definitions";
+import { NoteButtonProperties, CCButtonProperties, midi as MidiProperties, osc as OscProperties } from "@hdj/definitions";
 import { useEffect, useRef, useState } from "react";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils.ts";
@@ -16,15 +16,47 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef(false);
 
-//    useEffect(() => { console.log(callbacks) })
-    useEffect(() => {
-        const id = callbacks.registerNote(def.channel, def.note, (v) => {
-            setOn(v > 64);
-        })
-        return () => {
-            callbacks.unregisterNote(def.channel, def.note, id)
+    const send = (v: number) => {
+        switch (def.output) {
+            case "midi":
+                if (callbacks.sendNote) {
+                    callbacks.sendNote(def.channel, def.note, v ? 127 : 0, v > 64)
+                }
+                break;
+            case "osc":
+                if (callbacks.sendOSC) {
+                    callbacks.sendOSC(def.address, [v])
+                }
+                break;
         }
-    })
+    }
+
+    //    useEffect(() => { console.log(callbacks) })
+    useEffect(() => {
+        switch (def.output) {
+            case "midi":
+                {
+
+                    const id = callbacks.registerNote(def.channel, def.note, (v) => {
+                        setOn(v > 64);
+                    })
+                    return () => {
+                        callbacks.unregisterNote(def.channel, def.note, id)
+                    }
+                }
+
+            case "osc":
+                {
+                    const id = callbacks.registerOSC(def.address, (v) => {
+                        setOn(v > 64);
+                    });
+
+                    return () => {
+                        callbacks.unregisterOSC(def.address, id)
+                    }
+                }
+        }
+    }, [])
     const start = ({ currentTarget, pointerId }) => {
         vibrate();
         const el = currentTarget as HTMLElement;
@@ -35,9 +67,10 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
             //this.state.latch_on = true;
             latchOn.current = true;
             setOn(latchOn.current)
-            if (callbacks.sendNote) {
+            /*if (callbacks.sendNote) {
                 callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
-            }
+            }*/
+            send(latchOn.current ? 127 : 0);
         }
 
     }
@@ -58,7 +91,8 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
         }
 
         setOn(latchOn.current)
-        if (callbacks.sendNote) callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
+        send(latchOn.current ? 127 : 0)
+        //if (callbacks.sendNote) callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
     };
 
     return <div id={def.id}
@@ -78,12 +112,38 @@ export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef<boolean>(false);
 
+    const send = (v: number) => {
+        switch (def.output) {
+            case "midi":
+                if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, v);
+                break;
+            case "osc":
+                if (callbacks.sendOSC) callbacks.sendOSC(def.address, [v])
+                break;
+        }
+    }
+
     useEffect(() => {
-        const id = callbacks.registerCC(def.channel, def.cc, (v) => {
-            setOn(v > 64);
-        });
-        return () => {
-            callbacks.unregisterCC(def.channel, def.cc, id);
+        switch (def.output) {
+            case "midi":
+                {
+                    const id = callbacks.registerCC(def.channel, def.cc, (v) => {
+                        setOn(v > 64);
+                    });
+                    return () => {
+                        callbacks.unregisterCC(def.channel, def.cc, id);
+                    }
+                }
+
+            case "osc":
+                {
+                    const id = callbacks.registerOSC(def.address, (v) => {
+                        setOn(v > 64);
+                    });
+                    return () => {
+                        callbacks.unregisterOSC(def.address, id);
+                    }
+                }
         }
     })
 
@@ -120,9 +180,10 @@ export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties
     const touch_update = () => {
         //console.log(this.state.latch_on);
         if (latchOn.current) {
-            callbacks.sendCC(def.channel, def.cc, def.default_value);
+            //callbacks.sendCC(def.channel, def.cc, def.default_value);
+            send(def.default_value);
         } else {
-            callbacks.sendCC(def.channel, def.cc, def.value_off ?? 0);
+            send(def.value_off ?? 0);
         }
     };
 

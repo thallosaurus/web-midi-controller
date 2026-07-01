@@ -12,6 +12,7 @@
           "w": 4,
           "grid": [
             {
+              "output": "midi",
               "channel": 1,
               "label": "1/4 Loop",
               "mode": "trigger",
@@ -19,6 +20,7 @@
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "1/2 Loop",
               "mode": "trigger",
@@ -26,6 +28,7 @@
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "1 Loop",
               "mode": "trigger",
@@ -33,6 +36,7 @@
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "2 Loop",
               "mode": "trigger",
@@ -40,6 +44,7 @@
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "4 Loop",
               "mode": "trigger",
@@ -47,6 +52,7 @@
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "8 Loop",
               "mode": "trigger",
@@ -54,6 +60,7 @@
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "16 Loop",
               "mode": "trigger",
@@ -61,6 +68,7 @@
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "32 Loop",
               "mode": "trigger",
@@ -73,6 +81,7 @@
           "type": "horiz-mixer",
           "horiz": [
             {
+              "output": "midi",
               "cc": 17,
               "channel": 1,
               "default_value": 64,
@@ -81,6 +90,7 @@
               "type": "rotary"
             },
             {
+              "output": "midi",
               "cc": 16,
               "channel": 1,
               "default_value": 64,
@@ -89,6 +99,7 @@
               "type": "rotary"
             },
             {
+              "output": "midi",
               "cc": 15,
               "channel": 1,
               "default_value": 64,
@@ -102,6 +113,7 @@
           "type": "horiz-mixer",
           "horiz": [
             {
+              "output": "midi",
               "channel": 1,
               "label": "Play/Pause",
               "mode": "trigger",
@@ -109,6 +121,7 @@
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "Sync",
               "mode": "trigger",
@@ -124,6 +137,7 @@
       "type": "horiz-mixer",
       "horiz": [
         {
+          "output": "midi",
           "cc": 0,
           "channel": 1,
           "label": "Test",
@@ -131,6 +145,7 @@
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 1,
           "channel": 1,
           "label": "Test",
@@ -146,6 +161,7 @@
       "w": 4,
       "grid": [
         {
+          "output": "midi",
           "channel": 1,
           "label": "1/4 Loop",
           "mode": "trigger",
@@ -153,6 +169,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "1/2 Loop",
           "mode": "trigger",
@@ -160,6 +177,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "1 Loop",
           "mode": "trigger",
@@ -167,6 +185,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "2 Loop",
           "mode": "trigger",
@@ -174,6 +193,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "4 Loop",
           "mode": "trigger",
@@ -181,6 +201,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "8 Loop",
           "mode": "trigger",
@@ -188,6 +209,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "16 Loop",
           "mode": "trigger",
@@ -195,6 +217,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "32 Loop",
           "mode": "trigger",
@@ -202,6 +225,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Kill Bass",
           "mode": "trigger",
@@ -209,6 +233,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Kill Mid",
           "mode": "trigger",
@@ -216,6 +241,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Kill Hi",
           "mode": "trigger",
@@ -226,6 +252,7 @@
           "type": "empty"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Play/Pause",
           "mode": "trigger",
@@ -233,6 +260,7 @@
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Sync",
           "mode": "trigger",

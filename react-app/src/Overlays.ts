@@ -1,4 +1,26 @@
-import { HorizontalMixerProperties, Overlay, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { CCSliderProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, VerticalMixerProperties, Widget } from "@hdj/definitions";
+
+const TestOscWidget: Widget & CCSliderProperties = {
+  output: "osc",
+  address: "/test",
+  label: "osc-test",
+  mode: "absolute",
+  type: "ccslider",
+  id: null,
+  vertical: false,
+  cc: 3,
+  value: 0,
+  value_off: 0,
+  default_value: 0
+}
+
+export const TestOscOverlay: Overlay = {
+  id: "test_osc",
+  name: "OSC Test Overlay",
+  channel: null,
+  program: null,
+  cells: [TestOscWidget]
+}
 
 const deckA: Widget & VerticalMixerProperties = {
   id: "deck_a",
@@ -6,6 +28,7 @@ const deckA: Widget & VerticalMixerProperties = {
   vert: [{
     "type": "ccslider",
     "cc": 1,
+    "output": "midi",
     "channel": 1,
     "label": "Deck A",
     "mode": "absolute",
@@ -15,6 +38,7 @@ const deckA: Widget & VerticalMixerProperties = {
     "id": "volume_decka",
     "default_value": 0
   }, {
+    "output": "midi",
     "type": "notebutton",
     "mode": "latch",
     "id": "mixercue_decka",
@@ -28,6 +52,7 @@ const deckB: Widget & VerticalMixerProperties = {
   id: "deck_b",
   type: "vert-mixer",
   vert: [{
+    "output": "midi",
     "type": "ccslider",
     "cc": 1,
     "channel": 2,
@@ -39,6 +64,7 @@ const deckB: Widget & VerticalMixerProperties = {
     "id": "volume_deckb",
     "default_value": 0
   }, {
+    "output": "midi",
     "type": "notebutton",
     "mode": "latch",
     "id": "mixercue_deckb",
@@ -65,6 +91,7 @@ export const VOLUME_SLIDER_OVERLAY: Overlay = {
     type: "horiz-mixer",
     id: null,
     horiz: [{
+      "output": "midi",
       "type": "ccslider",
       "cc": 1,
       "channel": 1,
@@ -77,6 +104,7 @@ export const VOLUME_SLIDER_OVERLAY: Overlay = {
       "default_value": 0
     },
     {
+      "output": "midi",
       "type": "ccslider",
       "cc": 1,
       "channel": 2,
@@ -127,383 +155,447 @@ export const MATRIX_OVERLAY = {
       "grid": [
         {
           "channel": 1,
+          "output": "midi",
           "mode": "trigger",
           "note": 0,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 1,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 2,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 3,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 4,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 5,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 6,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 16,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 17,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 18,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 19,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 20,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 21,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 22,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 23,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 24,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 32,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 33,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 34,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 35,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 36,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 37,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 38,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 39,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 48,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 49,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 50,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 51,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 52,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 53,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 54,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 55,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 64,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 65,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 66,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 67,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 68,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 69,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 70,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 71,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 80,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 81,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 82,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 83,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 84,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 85,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 86,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 87,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 96,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 97,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 98,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 99,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 100,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 101,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 102,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 103,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 112,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 113,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 114,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 115,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 116,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 117,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 118,
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "mode": "trigger",
           "note": 119,
@@ -522,6 +614,7 @@ export const ABLETON_OVERLAY = {
       "type": "horiz-mixer",
       "horiz": [
         {
+          "output": "midi",
           "cc": 10,
           "channel": 1,
           "label": "Volume 1",
@@ -529,6 +622,7 @@ export const ABLETON_OVERLAY = {
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 20,
           "channel": 1,
           "label": "Volume 2",
@@ -536,6 +630,7 @@ export const ABLETON_OVERLAY = {
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 30,
           "channel": 1,
           "label": "Volume 3",
@@ -550,6 +645,7 @@ export const ABLETON_OVERLAY = {
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 50,
           "channel": 1,
           "label": "Volume 5",
@@ -557,6 +653,7 @@ export const ABLETON_OVERLAY = {
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 60,
           "channel": 1,
           "label": "Volume 6",
@@ -564,6 +661,7 @@ export const ABLETON_OVERLAY = {
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 70,
           "channel": 1,
           "label": "Volume 7",
@@ -571,6 +669,7 @@ export const ABLETON_OVERLAY = {
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 80,
           "channel": 1,
           "label": "Volume 8",
@@ -584,6 +683,7 @@ export const ABLETON_OVERLAY = {
       "type": "vert-mixer",
       "vert": [
         {
+          "output": "midi",
           "cc": 90,
           "channel": 1,
           "label": "Reverb",
@@ -592,6 +692,7 @@ export const ABLETON_OVERLAY = {
           "vertical": true
         },
         {
+          "output": "midi",
           "cc": 91,
           "channel": 1,
           "label": "Filter",
@@ -600,6 +701,7 @@ export const ABLETON_OVERLAY = {
           "vertical": true
         },
         {
+          "output": "midi",
           "cc": 92,
           "channel": 1,
           "label": "Test",
@@ -626,6 +728,7 @@ export const TRAKTOR_PERFORMANCE = {
           "w": 4,
           "grid": [
             {
+              "output": "midi",
               "channel": 1,
               "label": "1/4 Loop",
               "mode": "trigger",
@@ -633,6 +736,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "1/2 Loop",
               "mode": "trigger",
@@ -640,6 +744,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "1 Loop",
               "mode": "trigger",
@@ -647,6 +752,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "2 Loop",
               "mode": "trigger",
@@ -654,6 +760,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "4 Loop",
               "mode": "trigger",
@@ -661,6 +768,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "8 Loop",
               "mode": "trigger",
@@ -668,6 +776,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "16 Loop",
               "mode": "trigger",
@@ -675,6 +784,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "32 Loop",
               "mode": "trigger",
@@ -687,6 +797,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "horiz-mixer",
           "horiz": [
             {
+              "output": "midi",
               "cc": 17,
               "channel": 1,
               "default_value": 64,
@@ -695,6 +806,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "rotary"
             },
             {
+              "output": "midi",
               "cc": 16,
               "channel": 1,
               "default_value": 64,
@@ -703,6 +815,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "rotary"
             },
             {
+              "output": "midi",
               "cc": 15,
               "channel": 1,
               "default_value": 64,
@@ -716,6 +829,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "horiz-mixer",
           "horiz": [
             {
+              "output": "midi",
               "channel": 1,
               "label": "Play/Pause",
               "mode": "trigger",
@@ -723,6 +837,7 @@ export const TRAKTOR_PERFORMANCE = {
               "type": "notebutton"
             },
             {
+              "output": "midi",
               "channel": 1,
               "label": "Sync",
               "mode": "trigger",
@@ -738,6 +853,7 @@ export const TRAKTOR_PERFORMANCE = {
       "type": "horiz-mixer",
       "horiz": [
         {
+          "output": "midi",
           "cc": 0,
           "channel": 1,
           "label": "Test",
@@ -745,6 +861,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 1,
           "channel": 1,
           "label": "Test",
@@ -760,6 +877,7 @@ export const TRAKTOR_PERFORMANCE = {
       "w": 4,
       "grid": [
         {
+          "output": "midi",
           "channel": 1,
           "label": "1/4 Loop",
           "mode": "trigger",
@@ -767,6 +885,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "1/2 Loop",
           "mode": "trigger",
@@ -774,6 +893,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "1 Loop",
           "mode": "trigger",
@@ -781,6 +901,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "2 Loop",
           "mode": "trigger",
@@ -788,6 +909,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "4 Loop",
           "mode": "trigger",
@@ -795,6 +917,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "8 Loop",
           "mode": "trigger",
@@ -802,6 +925,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "16 Loop",
           "mode": "trigger",
@@ -809,6 +933,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "32 Loop",
           "mode": "trigger",
@@ -816,6 +941,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Kill Bass",
           "mode": "trigger",
@@ -823,6 +949,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Kill Mid",
           "mode": "trigger",
@@ -830,6 +957,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Kill Hi",
           "mode": "trigger",
@@ -840,6 +968,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "empty"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Play/Pause",
           "mode": "trigger",
@@ -847,6 +976,7 @@ export const TRAKTOR_PERFORMANCE = {
           "type": "notebutton"
         },
         {
+          "output": "midi",
           "channel": 1,
           "label": "Sync",
           "mode": "trigger",

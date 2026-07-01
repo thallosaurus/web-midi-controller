@@ -18,4 +18,10 @@ export interface CCMessagePayload {
     value: number
 }
 
-export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | ConnectedPayload;
+export interface OscMessagePayload {
+    type: "oscmsg"
+    address: string,
+    args: Array<any>
+}
+
+export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | ConnectedPayload | OscMessagePayload;

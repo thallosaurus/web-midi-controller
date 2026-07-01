@@ -14,7 +14,8 @@
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
     "oak": "https://deno.land/x/oak/mod.ts",
-    "parseArgs": "jsr:@std/cli/parse-args"
+    "parseArgs": "jsr:@std/cli/parse-args",
+    "node-osc": "npm:node-osc"
   }
   /*"compile": {
     "include": [

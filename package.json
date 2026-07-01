@@ -8,5 +8,8 @@
         "midi-driver",
         "definitions",
         "overlay-editor"
-    ]
+    ],
+    "dependencies": {
+        "node-osc": "^11.6.0"
+    }
 }
