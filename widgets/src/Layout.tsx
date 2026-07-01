@@ -2,7 +2,7 @@ import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, Ta
 import { Layout, WidgetProperties } from "./Parser.tsx";
 import { useEffect, useState } from "react";
 
-export function Vertical({ def, callbacks }: WidgetProperties<VerticalMixerProperties>) {
+export function Vertical({ def, callbacks, aux }: WidgetProperties<VerticalMixerProperties> & { aux?: React.ReactElement }) {
     //return (<div>{Layout(def.vert)}</div>)
     return <div id={def.id} className="vert-mixer" style={{
         display: "flex",
@@ -11,11 +11,11 @@ export function Vertical({ def, callbacks }: WidgetProperties<VerticalMixerPrope
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.vert} callbacks={callbacks} />
+        <Layout children={def.vert} callbacks={callbacks} aux={aux} />
     </div>
 }
 
-export function Horizontal({ def, callbacks }: WidgetProperties<HorizontalMixerProperties>) {
+export function Horizontal({ def, callbacks, aux }: WidgetProperties<HorizontalMixerProperties> & { aux?: React.ReactElement }) {
     return (<div id={def.id} className="horiz-mixer" style={{
         display: "flex",
         flexDirection: "row",
@@ -23,12 +23,12 @@ export function Horizontal({ def, callbacks }: WidgetProperties<HorizontalMixerP
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.horiz} callbacks={callbacks} />
+        <Layout children={def.horiz} callbacks={callbacks} aux={aux} />
     </div>)
 
 }
 
-export function Grid({ def, callbacks }: WidgetProperties<GridMixerProperties>) {
+export function Grid({ def, callbacks, aux }: WidgetProperties<GridMixerProperties> & { aux?: React.ReactElement }) {
     return (<div id={def.id} className="grid" style={{
         display: "grid",
         gridTemplateColumns: `repeat(${def.h}, 1fr)`,
@@ -37,11 +37,11 @@ export function Grid({ def, callbacks }: WidgetProperties<GridMixerProperties>) 
         height: "100%",
         gap: "1em"
     }}>
-        <Layout children={def.grid} callbacks={callbacks} />
+        <Layout children={def.grid} callbacks={callbacks} aux={aux} />
     </div>)
 }
 
-export function ShiftArea({ def, callbacks }: WidgetProperties<ShiftAreaProperties>) {
+export function ShiftArea({ def, callbacks }: WidgetProperties<ShiftAreaProperties> & { aux?: React.ReactElement }) {
     const [shift, setShift] = useState(false);
     useEffect(() => {
         callbacks.registerNote(def.channel, def.note, (v) => {

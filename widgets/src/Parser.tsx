@@ -65,7 +65,7 @@ export interface MIDIWidgetCallbacks {
   unregisterNote: MIDIUnregisterNoteCallback
 }
 
-export function Layout({ children, callbacks }: { children: Widget[], callbacks: WidgetCallbacks }) {
+export function Layout({ children, callbacks, aux }: { children: Widget[], callbacks: WidgetCallbacks, aux?: React.ReactElement }) {
   return <>
     {children.map((def, k) => {
       switch (def.type) {
@@ -74,11 +74,11 @@ export function Layout({ children, callbacks }: { children: Widget[], callbacks:
         case 'ccslider':
           return <CCSlider def={def} key={k} callbacks={callbacks} />
         case 'horiz-mixer':
-          return <Horizontal def={def} key={k} callbacks={callbacks} />
+          return <Horizontal def={def} key={k} callbacks={callbacks} aux={aux} />
         case 'vert-mixer':
-          return <Vertical def={def} key={k} callbacks={callbacks} />
+          return <Vertical def={def} key={k} callbacks={callbacks} aux={aux} />
         case 'grid-mixer':
-          return <Grid def={def} key={k} callbacks={callbacks} />
+          return <Grid def={def} key={k} callbacks={callbacks} aux={aux} />
         case 'ccbutton':
           return <CCButton def={def} key={k} callbacks={callbacks} />
         case 'rotary':
@@ -96,6 +96,7 @@ export function Layout({ children, callbacks }: { children: Widget[], callbacks:
           return <div className="empty"></div>
       }
     })}
+    {aux}
   </>
 }
 
@@ -115,7 +116,7 @@ export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: Wi
       justifyContent: "center",
       ...style ?? {}
     }}>
-      <Layout children={o.cells} callbacks={callbacks} />
+      <Layout children={o.cells} callbacks={callbacks} aux={<></>} />
     </div>
   )
 }
