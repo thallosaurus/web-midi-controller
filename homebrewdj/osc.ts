@@ -23,7 +23,7 @@ export class OscDriver {
 
     constructor(
         sender = new Client("127.0.0.1", 8000),
-        receiver = new Server(3333, "0.0.0.0"),
+        receiver = new Server(3333, "127.0.0.1"),
         abort = new AbortController()
     ) {
         abort.signal.onabort = (ev) => {

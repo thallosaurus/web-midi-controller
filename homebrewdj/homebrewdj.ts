@@ -146,12 +146,13 @@ export class HomebrewDJControllerOnly {
         useVirtual: true
     });
 
-    oscPort = OscDriver.customHost("127.0.0.1", 8000);
-
+    oscPort: OscDriver;
+    
     constructor(config_path = "./config.json") {
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
         this.server = new Server((msg: AllowedPayloads) => {
+            console.debug("websocket payload", msg);
             switch (msg.type) {
                 case "cc":
                     this.midiPort.sendMidi({
@@ -190,6 +191,7 @@ export class HomebrewDJControllerOnly {
 
         this.midiPort.addEventListener((ev: CustomEvent) => {
             const t = ev.detail;
+            console.debug("midiport payload", t);
 
             switch (t.type) {
                 case "NoteOn":
@@ -212,8 +214,9 @@ export class HomebrewDJControllerOnly {
                     break;
             }
         });
+        this.oscPort = OscDriver.customHost(config.hostname, 8000);
         this.oscPort.addEventListener((msg: OscMessagePayload) => {
-            console.log("osc-port", msg);
+            console.log("osc payload", msg);
             this.server.broadcast(msg);
         });
     }
