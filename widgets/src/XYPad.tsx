@@ -2,22 +2,26 @@ import { XYPadProperties } from "@hdj/definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils";
+import { useWidgetAction } from "./Callbacks.tsx";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
-export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
+export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
     const [valueX, setValueX] = useState(0);
     const [valueY, setValueY] = useState(0);
     const [pressed, setPressed] = useState(false);
 
     const activePointer = useRef<number | null>(null);
     const targetRef = useRef<HTMLDivElement | null>(null);
+    const callbacks = useWidgetAction();
 
     const sendUpdate = (s: boolean) => {
         //callbacks.sendCC(def.channel, def.x.cc, valueX);
         //callbacks.sendCC(def.channel, def.y.cc, valueY);
-        if (def.note) {
-            callbacks.sendNote(def.channel, def.note, def.velocity, s);
+        if (def.output == "midi"){
+            if (def.note) {
+                //callbacks.sendNote(def.channel, def.note, def.velocity, s);
+            }
         }
         setPressed(s);
     }
@@ -32,11 +36,11 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
         const y = Math.floor((1 - clamp((bottom) / rect.height)) * 127);
         if (valueX != x) {
             setValueX(Math.floor(x))
-            callbacks.sendCC(def.channel, def.x.cc, x);
+            //callbacks.sendCC(def.channel, def.x.cc, x);
         }
         if (valueY != y) {
             setValueY(Math.floor(y))
-            callbacks.sendCC(def.channel, def.y.cc, y);
+            //callbacks.sendCC(def.channel, def.y.cc, y);
         }
     }
 
@@ -77,7 +81,7 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
 
 
     useEffect(() => {
-        switch (def.output) {
+        /*switch (def.output) {
             case "midi":
                 {
                     const id_x = callbacks.registerCC(def.channel, def.x.cc, setValueX)
@@ -100,7 +104,7 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
                         callbacks.unregisterOSC(def.address + "/y", id_y);
                     }
                 }
-        }
+        }*/
     }, [])
 
     return (

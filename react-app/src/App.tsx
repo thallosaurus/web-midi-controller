@@ -26,16 +26,9 @@ function App() {
         case "connection":
           setConnected(true)
         break
-        case "cc":
-          eventbus.current.processCC(msg);
-          break
-        case "note":
-          eventbus.current.processNote(msg);
-          break;
-
-        case "oscmsg":
-          eventbus.current.processOSC(msg);
-          break;
+        default:
+          
+        break;
       }
     }
   }

@@ -1,25 +1,31 @@
 import { useEffect, useRef } from "react";
 import { WidgetProperties } from "./Parser";
 import { JogwheelProperties, midi as MidiProperties } from "@hdj/definitions";
+import { useWidgetAction } from "./Callbacks.tsx";
 
 export interface JogwheelState {
 
 }
 
-export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties>) {
+export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
     const active = useRef<boolean>(false);
     const lastX = useRef<number>(0);
     const lastTime = useRef<number>(0);
+
+    const callbacks = useWidgetAction();
 
     const updateValue = (v: number) => {
         const abs = Math.abs(v);
 
         if (abs < 0.002) return; // deadzone
 
-        if (v > 0) {
-            callbacks.sendCC(this.prop.channel, this.prop.cc, 66)
-        } else {
-            callbacks.sendCC(this.prop.channel, this.prop.cc, 64)
+        if (def.output == "midi") {
+
+            if (v > 0) {
+                callbacks.send(def, 66)
+            } else {
+                callbacks.send(def, 64)
+            }
         }
     }
 
@@ -57,17 +63,11 @@ export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties
     };
 
     useEffect(() => {
-        switch (def.output) {
-            case "midi":
-                const id = callbacks.registerCC(def.channel, def.cc, (v) => {
-                    // doesnt update ui
-                })
-                return () => {
-                    callbacks.unregisterCC(def.channel, def.cc, id)
-                }
-
-            case "osc":
-                break;
+        const id = callbacks.register(def, (v) => {
+            // doesnt update ui
+        })
+        return () => {
+            callbacks.unregister(id, def)
         }
     }, [])
 

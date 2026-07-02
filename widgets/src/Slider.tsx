@@ -2,6 +2,7 @@ import { CCSliderProperties, midi as MidiProperties, osc as OscProperties, Slide
 import { WidgetProperties } from "./Parser.tsx";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils.ts";
+import { useWidgetAction } from "./Callbacks.tsx";
 
 const MAX_LEVEL = 1.0;
 
@@ -23,9 +24,9 @@ const verticalSliderStyle = () => {
         "userSelect": "none",
         "-webkit-user-select": "none",
 
-    //-moz-user-select: none;
+        //-moz-user-select: none;
 
-    //-ms-user-select: none;
+        //-ms-user-select: none;
     } as React.CSSProperties
 }
 
@@ -53,7 +54,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties>) {
+export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);
@@ -61,36 +62,17 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
     const baseY = useRef<number>(0);
     const activePointer = useRef<number | null>(null);
 
+    const callbacks = useWidgetAction();
+
     const send = (v: number) => {
-        switch (def.output) {
-            case "midi":
-                if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, Math.round(v * 127));
-                break;
-            case "osc":
-                if (callbacks.sendOSC) callbacks.sendOSC(def.address, [v])
-                break;
-        }
+        callbacks.send(def, v);
     }
 
     useEffect(() => {
-        switch (def.output) {
-            case "midi":
-                {
-                    const id = callbacks.registerCC(def.channel, def.cc, setValue)
-                    return () => {
-                        callbacks.unregisterCC(def.channel, def.cc, id)
-                    }
-                }
-            case "osc":
-                {
-                    const id = callbacks.registerOSC(def.address, setValue);
-                    return () => {
-                        callbacks.unregisterOSC(def.address, id)
-                    }
-                }
+        const id = callbacks.register(def, setValue);
+        return () => {
+            callbacks.unregister(id, def)
         }
-
-        //  callbacks.registerCC(def.channel, def.y.cc, (v) => setValueY)
     }, [])
 
     const start = ({ currentTarget, pointerId, clientX, clientY }) => {
@@ -146,14 +128,14 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
                     let v: number;
                     if (!def.vertical) {
                         const n = rect.bottom - clientY;
-                        v = 
+                        v =
                             Math.max(
                                 0,
                                 Math.min(
                                     MAX_LEVEL,
                                     (n / rect.height) * MAX_LEVEL,
                                 ),
-                        );
+                            );
                     } else {
                         const n = clientX - rect.left;
                         v = Math.max(

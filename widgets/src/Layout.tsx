@@ -1,8 +1,9 @@
 import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
-import { ChildLayout, Layout, RichLayout, WidgetCallbacks, WidgetProperties } from "./Parser.tsx";
+import { ChildLayout, Layout, RichLayout, WidgetProperties } from "./Parser.tsx";
 import { useEffect, useState } from "react";
+import { useWidgetAction } from "./Callbacks.tsx";
 
-export function Vertical({ def, callbacks, aux }: WidgetProperties<VerticalMixerProperties> & { aux?: React.ReactElement }) {
+export function Vertical({ def, aux }: WidgetProperties<VerticalMixerProperties> & { aux?: React.ReactElement }) {
     //return (<div>{Layout(def.vert)}</div>)
     return <div id={def.id} className="widget vert-mixer" style={{
         display: "flex",
@@ -11,11 +12,11 @@ export function Vertical({ def, callbacks, aux }: WidgetProperties<VerticalMixer
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.vert} callbacks={callbacks} aux={aux} />
+        <Layout children={def.vert} aux={aux} />
     </div>
 }
 
-export function Horizontal({ def, callbacks, aux }: WidgetProperties<HorizontalMixerProperties> & { aux?: React.ReactElement }) {
+export function Horizontal({ def, aux }: WidgetProperties<HorizontalMixerProperties> & { aux?: React.ReactElement }) {
     return (<div id={def.id} className="widget horiz-mixer" style={{
         display: "flex",
         flexDirection: "row",
@@ -23,12 +24,12 @@ export function Horizontal({ def, callbacks, aux }: WidgetProperties<HorizontalM
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.horiz} callbacks={callbacks} aux={aux} />
+        <Layout children={def.horiz} aux={aux} />
     </div>)
 
 }
 
-export function Grid({ def, callbacks, aux }: WidgetProperties<GridMixerProperties> & { aux?: React.ReactElement }) {
+export function Grid({ def, aux }: WidgetProperties<GridMixerProperties> & { aux?: React.ReactElement }) {
     return (<div id={def.id} className="widget grid" style={{
         display: "grid",
         gridTemplateColumns: `repeat(${def.h}, 1fr)`,
@@ -37,14 +38,15 @@ export function Grid({ def, callbacks, aux }: WidgetProperties<GridMixerProperti
         height: "100%",
         gap: "1em"
     }}>
-        <Layout children={def.grid} callbacks={callbacks} aux={aux} />
+        <Layout children={def.grid} aux={aux} />
     </div>)
 }
 
-export function ShiftArea({ def, callbacks }: WidgetProperties<ShiftAreaProperties> & { aux?: React.ReactElement }) {
+export function ShiftArea({ def }: WidgetProperties<ShiftAreaProperties> & { aux?: React.ReactElement }) {
     const [shift, setShift] = useState(false);
+    const callbacks = useWidgetAction();
     useEffect(() => {
-        callbacks.registerNote(def.channel, def.note, (v) => {
+        callbacks.register(def, (v) => {
             setShift(v > 64);
         })
     })
@@ -52,22 +54,22 @@ export function ShiftArea({ def, callbacks }: WidgetProperties<ShiftAreaProperti
         <div className="panel a" style={{
             display: shift ? "none": "block"
         }}>
-            <Layout children={def.a} callbacks={callbacks} />
+            <Layout children={def.a} />
         </div>
         <div className="panel b" style={{
             display: shift ? "block": "none"
         }}>
-            <Layout children={def.b} callbacks={callbacks} />
+            <Layout children={def.b} />
         </div>
     </div>)
 }
 
-export function TabbedArea({ def, callbacks }: WidgetProperties<TabbedViewProperties>) {
+export function TabbedArea({ def }: WidgetProperties<TabbedViewProperties>) {
     const [tab, setCurrentTab] = useState(0);
 
     return (
         <div className="tab" id={def.id}>
-            <Layout children={def.tabs} callbacks={callbacks} />
+            <Layout children={def.tabs} />
         </div>
     )
 }

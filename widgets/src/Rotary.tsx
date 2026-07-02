@@ -2,23 +2,20 @@ import { midi as MidiProperties, RotarySliderProperties } from "@hdj/definitions
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils";
 import { useRef, useState } from "react";
+import { useWidgetAction } from "./Callbacks.tsx";
 
 const sensitivity = 0.5;    // px -> value
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
 
-export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperties>) {
+export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
     const lastX = useRef<number>(0);
     const active = useRef<boolean>(false);
 
+    const callbacks = useWidgetAction();
+
     const send = (v: number) => {
-        switch (def.output) {
-            case "midi":
-                if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, v)
-                break;
-            case "osc":
-                break;
-        }
+        callbacks.send(def, v)
     }
 
     const [value, setValue] = useState<number>(def.default_value ?? 0);

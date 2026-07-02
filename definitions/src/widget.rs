@@ -21,9 +21,15 @@ pub(super) struct MidiProperties {
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
+pub(super) struct NoteProperties {
+    note: u8,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
 #[serde(tag = "output", rename = "osc")]
 pub(super) struct OscProperties {
-    address: String
+    address: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -58,7 +64,7 @@ pub(super) struct ChildrenContainer {
 #[serde(untagged)]
 enum Properties {
     Midi(MidiProperties),
-    Osc(OscProperties)
+    Osc(OscProperties),
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -109,7 +115,7 @@ pub(super) enum Widget {
     ShiftArea(ShiftAreaProperties),
 
     #[serde(rename = "tab")]
-    TabbedView(TabbedViewProperties)
+    TabbedView(TabbedViewProperties),
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -167,11 +173,13 @@ pub(super) struct ShiftAreaProperties {
     #[serde(flatten)]
     midi: MidiProperties,
 
-    note: u8, // Columns of this grid
-              //w: u8,
+    #[serde(flatten)]
+    note: NoteProperties,
+    // Columns of this grid
+    //w: u8,
 
-              // Rows of this grid
-              //h: u8,
+    // Rows of this grid
+    //h: u8,
 }
 
 /// A single Notebutton. Sends out its defined Midi Note
@@ -187,7 +195,8 @@ pub(super) struct NoteButtonProperties {
     #[serde(flatten)]
     button: ButtonProperties,
 
-    note: u8,
+    #[serde(flatten)]
+    note: NoteProperties,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -300,7 +309,8 @@ pub(super) struct XYPadProperties {
     #[serde(flatten)]
     output: Properties,
 
-    note: Option<u8>,
+    #[serde(flatten)]
+    note: NoteProperties,
     velocity: Option<u8>,
 
     x: CCProperties,
@@ -316,5 +326,5 @@ pub(super) struct TabbedViewProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
-    tabs: Vec<Widget>
+    tabs: Vec<Widget>,
 }

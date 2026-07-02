@@ -1,7 +1,7 @@
 import { AllowedPayloads, CCMessagePayload, NoteMessagePayload, OscMessagePayload } from "@hdj/homebrewdj-web-client";
-import { WidgetCallbacks, MIDIReceiveDataCallback, OSCReceiveDataCallback } from "@hdj/widgets";
 import { uuid } from "./utils";
 import { Widget } from "@hdj/definitions";
+import { MidiCCRegisterFn, MidiCCSend, MidiCCUnregisterFn, MidiNoteRegisterFn, MidiNoteSend, MidiNoteUnregisterFn, MIDIReceiveDataCallback, OSCReceiveDataCallback, OscRegisterFn, OscSend, OscUnregisterFn, Outgoing, WCallbacks } from "@hdj/widgets";
 
 type MIDICallbackMap = Map<number, Map<number, Map<string, MIDIReceiveDataCallback>>>;
 type OSCCallbackMap = Map<string, Map<string, OSCReceiveDataCallback>>;
@@ -10,21 +10,29 @@ interface EventBusCallback {
     send(msg: AllowedPayloads): void;
 }
 
-export class EventBus implements WidgetCallbacks {
+export class EventBus extends WCallbacks {
+    sender: Outgoing | null = null;
+    
+    setSender(sender: Outgoing) {
+        this.sender = sender;
+    }
+}
+
+export class EventBusOld implements WCallbacks {
     sender?: EventBusCallback;
     ccCallbackMap: MIDICallbackMap = new Map();
     noteCallbackMap: MIDICallbackMap = new Map();
     oscCallbackMap: OSCCallbackMap = new Map();
-    next?: WidgetCallbacks
-    
-    setNext(w: WidgetCallbacks) {
+    next?: WCallbacks
+
+    setNext(w: WCallbacks) {
         this.next = w;
     }
-    
+
     setSender(sender: EventBusCallback) {
         this.sender = sender;
     }
-    
+
     sendUiEvent(def: Widget) {
         throw new Error("not implemented");
     }
@@ -35,15 +43,15 @@ export class EventBus implements WidgetCallbacks {
             cb(args[0])
         });
     }
-    
-    processNote({ channel, note, velocity, on }: NoteMessagePayload) {
+
+    processNote({ channel, note, velocity }: NoteMessagePayload) {
         const c = this.noteCallbackMap.get(channel);
         const cc = c?.get(note)
         cc?.forEach((cb) => {
             cb(velocity)
         })
     }
-    
+
     processCC({ channel, cc, value }: CCMessagePayload) {
         const c = this.ccCallbackMap.get(channel);
         const ccc = c?.get(cc);
@@ -51,19 +59,21 @@ export class EventBus implements WidgetCallbacks {
             cb(value)
         })
     }
-    
-    sendNote(channel: number, note: number, velocity: number, on: boolean) {
-        console.log("note", channel, note, velocity, on);
+
+    /// MARK: - Interface Implementations
+
+    sendNote: MidiNoteSend = ({ channel, note }, value: number) => {
+        console.log("note", channel, note, value, value > 64);
         if (this.sender) this.sender.send({
             type: "note",
             channel,
             note,
-            velocity,
-            on
+            velocity: value,
+            on: value > 64
         })
     }
-    
-    sendOSC(address: string, args: any[]) {
+
+    sendOSC: OscSend<number[]> = ({ address }, args: number[]) => {
         console.log("osc update", address, args);
         if (this.sender) this.sender.send({
             type: "oscmsg",
@@ -72,7 +82,7 @@ export class EventBus implements WidgetCallbacks {
         })
     }
 
-    sendCC(channel: number, cc: number, value: number) {
+    sendCC: MidiCCSend = ({ channel, cc }, value) => {
         console.log("cc", channel, cc, value);
         if (this.sender) this.sender.send({
             type: "cc",
@@ -82,19 +92,19 @@ export class EventBus implements WidgetCallbacks {
         })
     }
 
-    registerOSC(address: string, cb: OSCReceiveDataCallback) {
+    registerOSC: OscRegisterFn = ({ address }, cb) => {
         if (!this.oscCallbackMap.has(address)) {
             this.oscCallbackMap.set(address, new Map());
         }
 
         const oscMap = this.oscCallbackMap.get(address);
-        
+
         const id = uuid();
         oscMap?.set(id, cb);
         return id
     }
 
-    unregisterOSC(address: string, id: string) {
+    unregisterOSC: OscUnregisterFn = (id, { address }) => {
         if (!this.oscCallbackMap.has(address)) {
             return;
         }
@@ -102,7 +112,8 @@ export class EventBus implements WidgetCallbacks {
         oscMap?.delete(id);
     }
 
-    registerCC(channel: number, cc: number, cb: MIDIReceiveDataCallback) {
+    registerCC: MidiCCRegisterFn = (def, cb) => {
+        const { channel, cc } = def;
 
         if (!this.ccCallbackMap.has(channel)) {
             this.ccCallbackMap.set(channel, new Map());
@@ -115,27 +126,29 @@ export class EventBus implements WidgetCallbacks {
         const ccMap = channelMap?.get(cc);
         const id = uuid()
         ccMap?.set(id, cb);
-        if (this.next) this.next.registerCC(channel, cc, cb);
+        if (this.next) this.next.registerCC(def, cb);
         return id
     }
 
-    registerNote(channel: number, note: number, cb: MIDIReceiveDataCallback) {
-        if (!this.noteCallbackMap.has(channel)) {
-            this.noteCallbackMap.set(channel, new Map());
+    registerNote: MidiNoteRegisterFn = (def, cb) => {
+        if (!this.noteCallbackMap.has(def.channel)) {
+            this.noteCallbackMap.set(def.channel, new Map());
         }
-        const channelMap = this.noteCallbackMap.get(channel);
+        const channelMap = this.noteCallbackMap.get(def.channel);
 
-        if (!channelMap?.has(note)) {
-            channelMap?.set(note, new Map())
+        if (!channelMap?.has(def.note)) {
+            channelMap?.set(def.note, new Map())
         }
-        const noteMap = channelMap?.get(note);
+        const noteMap = channelMap?.get(def.note);
         const id = uuid()
         noteMap?.set(id, cb);
-        if (this.next) this.next.registerNote(channel, note, cb)
+        if (this.next) this.next.registerNote(def, cb)
         return id
     }
 
-    unregisterNote(channel: number, note: number, id: string) {
+    unregisterNote: MidiNoteUnregisterFn = (id, def) => {
+        const { channel, note } = def;
+
         if (!this.noteCallbackMap.has(channel)) {
             this.noteCallbackMap.set(channel, new Map());
         }
@@ -147,10 +160,11 @@ export class EventBus implements WidgetCallbacks {
 
         const noteMap = channelMap?.get(note);
         noteMap?.delete(id);
-        if (this.next) this.next.unregisterNote(channel, note, id);
+        if (this.next) this.next.unregisterNote(id, def);
     }
 
-    unregisterCC(channel: number, cc: number, id: string) {
+    unregisterCC: MidiCCUnregisterFn = (id, def) => {
+        const { channel, cc } = def
         if (!this.ccCallbackMap.has(channel)) {
             this.ccCallbackMap.set(channel, new Map());
         }
@@ -161,7 +175,7 @@ export class EventBus implements WidgetCallbacks {
         }
         const ccMap = channelMap?.get(cc);
         ccMap?.delete(id);
-        if (this.next) this.next.unregisterCC(channel, cc, id)
+        if (this.next) this.next.unregisterCC(id, def)
     }
 
 }

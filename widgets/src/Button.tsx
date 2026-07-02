@@ -1,7 +1,8 @@
-import { NoteButtonProperties, CCButtonProperties, midi as MidiProperties, osc as OscProperties } from "@hdj/definitions";
+import { NoteButtonProperties, CCButtonProperties } from "@hdj/definitions";
 import { useEffect, useRef, useState } from "react";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils.ts";
+import { useWidgetAction } from "./Callbacks.tsx";
 
 function Button(props: { label: string, on: boolean }) {
     return <div className={"target" + " " + (props.on ? "press" : "")}>
@@ -11,50 +12,31 @@ function Button(props: { label: string, on: boolean }) {
     </div >
 }
 
-export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProperties>) {
+export function NoteButton({ def }: WidgetProperties<NoteButtonProperties>) {
     const [on, setOn] = useState(false);
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef(false);
 
+    const callbacks = useWidgetAction();
+
     const send = (v: number) => {
         switch (def.output) {
             case "midi":
-                if (callbacks.sendNote) {
-                    callbacks.sendNote(def.channel, def.note, v ? 127 : 0, v > 64)
-                }
+                callbacks.send(def, v ? 127 : 0)
                 break;
             case "osc":
-                if (callbacks.sendOSC) {
-                    callbacks.sendOSC(def.address, [v])
-                }
+                callbacks.send(def, [v])
                 break;
         }
     }
 
     //    useEffect(() => { console.log(callbacks) })
     useEffect(() => {
-        switch (def.output) {
-            case "midi":
-                {
-
-                    const id = callbacks.registerNote(def.channel, def.note, (v) => {
-                        setOn(v > 64);
-                    })
-                    return () => {
-                        callbacks.unregisterNote(def.channel, def.note, id)
-                    }
-                }
-
-            case "osc":
-                {
-                    const id = callbacks.registerOSC(def.address, (v) => {
-                        setOn(v > 64);
-                    });
-
-                    return () => {
-                        callbacks.unregisterOSC(def.address, id)
-                    }
-                }
+        const id = callbacks.register(def, (v) => {
+            setOn(v > 64);
+        })
+        return () => {
+            callbacks.unregister(id, def)
         }
     }, [])
     const start = ({ currentTarget, pointerId }) => {
@@ -107,43 +89,23 @@ export function NoteButton({ def, callbacks }: WidgetProperties<NoteButtonProper
 
 }
 
-export function CCButton({ def, callbacks }: WidgetProperties<CCButtonProperties>) {
+export function CCButton({ def }: WidgetProperties<CCButtonProperties>) {
     const [on, setOn] = useState(false);
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef<boolean>(false);
 
+    const callbacks = useWidgetAction();
+
     const send = (v: number) => {
-        switch (def.output) {
-            case "midi":
-                if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, v);
-                break;
-            case "osc":
-                if (callbacks.sendOSC) callbacks.sendOSC(def.address, [v])
-                break;
-        }
+        callbacks.send(def, v);
     }
 
     useEffect(() => {
-        switch (def.output) {
-            case "midi":
-                {
-                    const id = callbacks.registerCC(def.channel, def.cc, (v) => {
-                        setOn(v > 64);
-                    });
-                    return () => {
-                        callbacks.unregisterCC(def.channel, def.cc, id);
-                    }
-                }
-
-            case "osc":
-                {
-                    const id = callbacks.registerOSC(def.address, (v) => {
-                        setOn(v > 64);
-                    });
-                    return () => {
-                        callbacks.unregisterOSC(def.address, id);
-                    }
-                }
+        const id = callbacks.register(def, (v) => {
+            setOn(v > 64);
+        });
+        return () => {
+            callbacks.unregister(id, def);
         }
     })
 
