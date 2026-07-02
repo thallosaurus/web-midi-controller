@@ -181,7 +181,7 @@ export class HomebrewDJControllerOnly {
                     break;
 
                 case "oscmsg":
-                    console.log(msg);
+                    //console.log(msg);
                     this.oscPort.send(msg)
                     break;
             }
@@ -214,7 +214,7 @@ export class HomebrewDJControllerOnly {
                     break;
             }
         });
-        this.oscPort = OscDriver.customHost(config.hostname, 8000);
+        this.oscPort = OscDriver.customHost("127.0.0.1", 8000);
         this.oscPort.addEventListener((msg: OscMessagePayload) => {
             console.log("osc payload", msg);
             this.server.broadcast(msg);
