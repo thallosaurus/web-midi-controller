@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
-import type { HorizontalMixerProperties, NoteButtonProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import type { HorizontalMixerProperties, NoteButtonProperties, Overlay, VerticalMixerProperties, Widget } from "@hdj/definitions";
 import { ChildLayout, Layout, WidgetCallbacks } from "@hdj/widgets";
 import "./App.css";
 import "@hdj/widgets/style.css"
+import { TestOscOverlay, MATRIX_OVERLAY } from "./TestOverlays";
+import { OverlayEditorTree } from "./Editor";
 
 const DEFAULT_BUTTON: Widget & NoteButtonProperties = {
   "type": "notebutton",
@@ -29,9 +31,15 @@ const DEFAULT_HPANEL: Widget & HorizontalMixerProperties = {
 }
 
 function App() {
+  return (
+    <OverlayEditorTree overlay={MATRIX_OVERLAY} />
+  )
+}
+
+function App_() {
 
   const [cells, setCells] = useState<Widget[]>([
-    
+
   ])
   const cbs: WidgetCallbacks = {
     sendNote(c, n, v, on) {
