@@ -180,7 +180,7 @@ export class HomebrewDJControllerOnly {
                     }
                     break;
 
-                case "oscmsg":
+                case "osc":
                     //console.log(msg);
                     this.oscPort.send(msg)
                     break;
