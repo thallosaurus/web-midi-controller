@@ -79,9 +79,28 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
     useEffect(() => {
         switch (def.output) {
             case "midi":
-                const id_x = callbacks.registerCC(def.channel, def.x.cc, setValueX)
-                const id_y = callbacks.registerCC(def.channel, def.y.cc, setValueY)
-            }
+                {
+                    const id_x = callbacks.registerCC(def.channel, def.x.cc, setValueX)
+                    const id_y = callbacks.registerCC(def.channel, def.y.cc, setValueY)
+                    return () => {
+                        callbacks.unregisterCC(def.channel, def.x.cc, id_x);
+                        callbacks.unregisterCC(def.channel, def.y.cc, id_y);
+                    }
+                }
+            case "osc":
+                {
+                    const id_x = callbacks.registerOSC(def.address + "/x", (v) => {
+                        setValueX(v);
+                    })
+                    const id_y = callbacks.registerOSC(def.address + "/y", (v) => {
+                        setValueY(v);
+                    })
+                    return () => {
+                        callbacks.unregisterOSC(def.address + "/x", id_x);
+                        callbacks.unregisterOSC(def.address + "/y", id_y);
+                    }
+                }
+        }
     }, [])
 
     return (
