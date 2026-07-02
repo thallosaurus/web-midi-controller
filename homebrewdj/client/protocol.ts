@@ -19,7 +19,7 @@ export interface CCMessagePayload {
 }
 
 export interface OscMessagePayload {
-    type: "oscmsg"
+    type: "osc"
     address: string,
     args: Array<any>
 }

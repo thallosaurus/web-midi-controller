@@ -27,7 +27,7 @@ function App() {
           setConnected(true)
         break
         default:
-          
+          eventbus.current.extInput(msg);
         break;
       }
     }

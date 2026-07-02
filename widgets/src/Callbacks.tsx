@@ -46,28 +46,30 @@ type MidiCCProperties = midi & CCProperties;
 type MIDICallbackMap = Map<number, Map<number, Map<string, MIDIReceiveDataCallback>>>;
 type OSCCallbackMap = Map<string, Map<string, OSCReceiveDataCallback>>;
 
-export interface NoteDelta {
+export type DeltaMessages = NoteDelta | CCDelta | OscDelta;
+
+interface NoteDelta {
     type: "note",
     channel: number,
     note: number,
     velocity: number
 }
 
-export interface CCDelta {
+interface CCDelta {
     type: "cc",
     channel: number,
     cc: number,
     value: number
 }
 
-export interface OscDelta {
+interface OscDelta {
     type: "osc"
     address: string,
     args: Array<any>
 }
 
 export interface Outgoing {
-    send(msg: any): void;
+    send(msg: DeltaMessages): void;
 }
 
 interface InternalCallbackMap {
@@ -78,14 +80,14 @@ interface InternalCallbackMap {
 
 export abstract class WCallbacks {
     abstract sender: Outgoing | null;
-    private sendNote: MidiNoteSend = ({ channel, note }, value) => {
-        console.log("note", channel, note, value, value > 64);
+    private sendNote: MidiNoteSend = ({ channel, note }, velocity) => {
+        console.log("note", channel, note, velocity, velocity > 64);
         if (this.sender) this.sender.send({
             type: "note",
             channel,
             note,
-            velocity: value,
-            on: value > 64
+            velocity,
+            //on: value > 64
         })
     }
     private registerNote: MidiNoteRegisterFn = (def, cb) => {
@@ -168,7 +170,7 @@ export abstract class WCallbacks {
     private sendOSC: OscSend<number[]> = ({ address }, args: number[]) => {
         console.log("osc update", address, args);
         if (this.sender) this.sender.send({
-            type: "oscmsg",
+            type: "osc",
             address,
             args
         })
@@ -293,7 +295,7 @@ export abstract class WCallbacks {
                 this.externalCC(msg);
                 break;
             case "osc":
-                this.externalOsc
+                this.externalOsc(msg);
         }
     }
 }
