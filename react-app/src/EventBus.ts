@@ -1,6 +1,7 @@
 import { AllowedPayloads, CCMessagePayload, NoteMessagePayload, OscMessagePayload } from "@hdj/homebrewdj-web-client";
 import { WidgetCallbacks, MIDIReceiveDataCallback, OSCReceiveDataCallback } from "@hdj/widgets";
 import { uuid } from "./utils";
+import { Widget } from "@hdj/definitions";
 
 type MIDICallbackMap = Map<number, Map<number, Map<string, MIDIReceiveDataCallback>>>;
 type OSCCallbackMap = Map<string, Map<string, OSCReceiveDataCallback>>;
@@ -22,6 +23,10 @@ export class EventBus implements WidgetCallbacks {
     
     setSender(sender: EventBusCallback) {
         this.sender = sender;
+    }
+    
+    sendUiEvent(def: Widget) {
+        throw new Error("not implemented");
     }
 
     processOSC({ address, args }: OscMessagePayload) {
