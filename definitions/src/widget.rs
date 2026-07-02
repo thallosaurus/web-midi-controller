@@ -313,11 +313,21 @@ pub(super) struct XYPadProperties {
     note: NoteProperties,
     velocity: Option<u8>,
 
-    x: CCProperties,
-    y: CCProperties,
+    x: PadAxisProperties,
+    y: PadAxisProperties,
 
     label: Option<String>,
     //mode: RotaryMode,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct PadAxisProperties {
+    #[serde(flatten)]
+    cc: CCProperties,
+
+    #[serde(flatten)]
+    output: Properties
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]

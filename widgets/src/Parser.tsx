@@ -8,7 +8,7 @@ import { Jogwheel } from "./Jogwheel.tsx";
 import { ReactElement } from "react";
 import { useWidgetAction, WCallbacks, WidgetActionContext } from "./Callbacks.tsx";
 
-export function ChildLayout({ childWidgets, aux }: { childWidgets: Widget[], aux?: React.ReactElement }) {
+/*export function ChildLayout({ childWidgets, aux }: { childWidgets: Widget[], aux?: React.ReactElement }) {
   return <>{childWidgets.map((v, i) => <RichLayout key={i} def={v} aux={aux} />)}</>
 }
 
@@ -23,7 +23,7 @@ export function RichLayout({ def, aux }: { def: Widget, aux?: ReactElement }) {
     </form>) : ""}
     <SingleLayout def={def} />
   </>
-}
+}*/
 
 const stringToElement = (d, k, a) => {
   switch (d.type) {

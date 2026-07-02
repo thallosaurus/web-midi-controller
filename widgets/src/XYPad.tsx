@@ -15,15 +15,18 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
     const targetRef = useRef<HTMLDivElement | null>(null);
     const callbacks = useWidgetAction();
 
-    const sendUpdate = (s: boolean) => {
+    const sendNoteUpdate = (s: boolean) => {
         //callbacks.sendCC(def.channel, def.x.cc, valueX);
         //callbacks.sendCC(def.channel, def.y.cc, valueY);
-        if (def.output == "midi"){
             if (def.note) {
                 //callbacks.sendNote(def.channel, def.note, def.velocity, s);
+                callbacks.send(def, s ? 127 : 0);
+                setPressed(s);
             }
-        }
-        setPressed(s);
+    }
+
+    const sendAxisUpdate = (x, y) => {
+        
     }
 
     const update = ({ clientX, clientY }) => {
@@ -55,7 +58,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
         //this.sendValue(0)
         // note update - kaoss like
         //sendUpdate({ valueX: 0, valueY: 0})
-        sendUpdate(false);
+        sendNoteUpdate(false);
         //callbacks.sendCC()
     }
 

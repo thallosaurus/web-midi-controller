@@ -1,5 +1,5 @@
 import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
-import { ChildLayout, Layout, RichLayout, WidgetProperties } from "./Parser.tsx";
+import { Layout, WidgetProperties } from "./Parser.tsx";
 import { useEffect, useState } from "react";
 import { useWidgetAction } from "./Callbacks.tsx";
 
