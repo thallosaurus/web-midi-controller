@@ -39,14 +39,14 @@ export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
     };
 
     const touch_move = ({ clientX }) => {
-        if (!this.state.active) return;
+        if (!active) return;
 
         const now = performance.now();
         const dx = clientX - lastX.current;
         const dt = now - lastTime.current;
 
-        this.state.lastX = clientX;
-        this.state.lastTime = now;
+        lastX.current = clientX;
+        lastTime.current = now;
 
         if (dt <= 0) return;
 
