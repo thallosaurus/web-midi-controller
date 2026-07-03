@@ -97,8 +97,8 @@ export abstract class WCallbacks {
     private sendNote: MidiNoteSend = ({ channel, note }, velocity) => {
         const c = this.callbacks.noteCallbackMap.get(channel).get(note);
         
+        console.log("note", channel, note, velocity, velocity > 64);
         if (c.lastValue != velocity) {
-            console.log("note", channel, note, velocity, velocity > 64);
             
             const msg: NoteDelta = {
                 type: "note",
@@ -243,6 +243,7 @@ export abstract class WCallbacks {
         if (isMidiNote(def)) return this.registerNote(def, cb)
         if (isMidiCC(def)) return this.registerCC(def, cb)
         if (isOSC(def)) return this.registerOSC(def, cb)
+        throw new Error("unsupported properties")
     }
 
     unregister(id: string, def: MidiNoteProperties | MidiCCProperties | osc) {
@@ -250,12 +251,14 @@ export abstract class WCallbacks {
         if (isMidiNote(def)) return this.unregisterNote(id, def)
         if (isMidiCC(def)) return this.unregisterCC(id, def)
         if (isOSC(def)) return this.unregisterOSC(id, def)
+        throw new Error("unsupported properties")
     }
 
     send(def: MidiNoteProperties | MidiCCProperties | osc, value: number) {
         if (isMidiNote(def)) return this.sendNote(def, value)
         if (isMidiCC(def)) return this.sendCC(def, Math.floor(value * 127))
         if (isOSC(def)) return this.sendOSC(def, [value])
+        throw new Error("unsupported properties")
     }
 
     private externalOsc({ address, args }: OscDelta) {

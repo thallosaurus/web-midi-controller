@@ -132,10 +132,16 @@ export const XYPAD_OVERLAY = {
           "channel": 2,
           "label": "XY Pad",
           "type": "xypad",
+          "output": "midi",
+          "note": 60,
           "x": {
+            "output": "midi",
+            "channel": 1,
             "cc": 4
           },
           "y": {
+            "output": "midi",
+            "channel": 1,
             "cc": 5
           }
         }

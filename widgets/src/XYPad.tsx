@@ -7,9 +7,9 @@ import { useWidgetAction } from "./Callbacks.tsx";
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
 export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
+    const [pressed, setPressed] = useState(false);
     const [valueX, setValueX] = useState(0);
     const [valueY, setValueY] = useState(0);
-    const [pressed, setPressed] = useState(false);
 
     const activePointer = useRef<number | null>(null);
     const targetRef = useRef<HTMLDivElement | null>(null);
@@ -18,15 +18,14 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
     const sendNoteUpdate = (s: boolean) => {
         //callbacks.sendCC(def.channel, def.x.cc, valueX);
         //callbacks.sendCC(def.channel, def.y.cc, valueY);
-            if (def.note) {
                 //callbacks.sendNote(def.channel, def.note, def.velocity, s);
-                callbacks.send(def, s ? 127 : 0);
-                setPressed(s);
-            }
+        callbacks.send(def, s ? 127 : 0);
+        setPressed(s);
     }
 
     const sendAxisUpdate = (x, y) => {
-        
+        callbacks.send(def.x, x);
+        callbacks.send(def.y, y);
     }
 
     const update = ({ clientX, clientY }) => {
@@ -45,6 +44,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
             setValueY(Math.floor(y))
             //callbacks.sendCC(def.channel, def.y.cc, y);
         }
+        sendAxisUpdate(valueX, valueY);
     }
 
     const end = ({ pointerId, target, }) => {
@@ -70,7 +70,8 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
         el.setPointerCapture(activePointer.current);
         update({ clientX, clientY });
 
-        setPressed(true);
+        //setPressed(true);
+        sendNoteUpdate(true);
         //this.target.classList.add("pressed");
 
         //this.sendValue(def.velocity ?? 127)
@@ -84,6 +85,14 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
 
 
     useEffect(() => {
+        const note_id = callbacks.register(def, (v) => setPressed(v > 64));
+        const id_x = callbacks.register(def.x, setValueX);
+        const id_y = callbacks.register(def.y, setValueY);
+        return () => {
+            callbacks.unregister(note_id, def);
+            callbacks.unregister(id_x, def.x);
+            callbacks.unregister(id_y, def.y);
+        }
         /*switch (def.output) {
             case "midi":
                 {
