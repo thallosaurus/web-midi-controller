@@ -1,7 +1,7 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
-import { AllowedPayloads, WebsocketClient } from "@hdj/homebrewdj-web-client";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { type AllowedPayloads, WebsocketClient } from "@hdj/homebrewdj-web-client";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
 import { EventBus, WebsocketContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
