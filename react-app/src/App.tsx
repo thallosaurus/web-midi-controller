@@ -40,7 +40,7 @@ function App() {
 
   useEffect(() => {
     const url = getEndpointUrl();
-    const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload | ConnectedPayload>(url, process, (id) => {
+    const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload | ConnectedPayload | OscMessagePayload>(url, process, (id) => {
       setConnected(true);
     });
     client.current = wsClient;
