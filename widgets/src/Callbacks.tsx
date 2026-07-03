@@ -112,8 +112,8 @@ export abstract class WCallbacks {
             
             if (this.sender) this.sender.send(msg);
             c.lastValue = velocity
+            this.extInput(msg);
         }
-        //this.extInput(msg);
     }
 
     private registerNote: MidiNoteRegisterFn = (def, cb) => {
@@ -146,7 +146,7 @@ export abstract class WCallbacks {
 
             if (this.sender) this.sender.send(msg)
             c.lastValue = value;
-            //this.extInput(msg);
+            this.extInput(msg);
         }
 
     }
@@ -282,7 +282,7 @@ export abstract class WCallbacks {
         const c = this.callbacks.ccCallbackMap.get(channel);
         const ccc = c?.get(cc);
         ccc?.callbacks.forEach((c) => {
-            c(value)
+            c(value / 127)
         })
     }
 

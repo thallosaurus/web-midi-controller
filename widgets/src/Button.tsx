@@ -55,7 +55,7 @@ export function Button({ def }: WidgetProperties<ButtonProperties>) {
             latchOn.current = !latchOn.current;
         }
 
-        setValue(latchOn.current ? 127 : 0)
+        //setValue(latchOn.current ? 127 : 0)
         callbacks.send(def, latchOn.current ? 127 : 0)
         //if (callbacks.sendNote) callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
     };

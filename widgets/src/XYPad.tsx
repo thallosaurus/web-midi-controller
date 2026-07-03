@@ -17,7 +17,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
 
     const sendNoteUpdate = (s: boolean) => {
         callbacks.send(def, s ? 127 : 0);
-        setPressed(s);
+        //setPressed(s);
     }
 
     const sendAxisUpdate = (x, y) => {
@@ -33,15 +33,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
 
         const bottom = clientY - rect.top
         const y = (1 - clamp((bottom) / rect.height));
-
-        if (valueX != x) {
-            setValueX(x)
-            sendAxisUpdate(valueX, valueY);
-        }
-        if (valueY != y) {
-            setValueY(y)
-            sendAxisUpdate(valueX, valueY);
-        }
+        sendAxisUpdate(x, y);
     }
 
     const end = ({ pointerId, target, }) => {
@@ -76,9 +68,9 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
 
 
     useEffect(() => {
-        const note_id = callbacks.register(def, (v) => {});
-        const id_x = callbacks.register(def.x, (v) => {});
-        const id_y = callbacks.register(def.y, (v) => {});
+        const note_id = callbacks.register(def, (v) => { setPressed(v > 64)});
+        const id_x = callbacks.register(def.x, setValueX);
+        const id_y = callbacks.register(def.y, setValueY);
         return () => {
             callbacks.unregister(note_id, def);
             callbacks.unregister(id_x, def.x);

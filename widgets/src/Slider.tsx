@@ -152,7 +152,7 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
                         //console.log(rect);
                         //console.log(v);
                         //this.sendValue(v);
-                        setValue(v)
+                        //setValue(v)
                         //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
                         send(v);
                     }
@@ -178,7 +178,7 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
 
                     if (v != value) {
                         //this.sendValue(v);
-                        setValue(v)
+                        //setValue(v)
                         //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
                         send(v);
                     }

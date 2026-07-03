@@ -1,7 +1,7 @@
 import { RotarySliderProperties } from "@hdj/definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWidgetAction } from "./Callbacks.tsx";
 
 const sensitivity = 0.5;    // px -> value
@@ -38,10 +38,10 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
 
         const new_value = Math.floor(Math.max(0, Math.min(127, value + (dx * sensitivity))));
 
-        if (new_value != value) {
-            setValue(new_value)
-            send(new_value)
-        }
+        /*if (new_value != value) {
+            //setValue(new_value)
+            }*/
+       send(new_value)
     }
 
     const touch_stop = ({ target, pointerId }) => {
@@ -50,11 +50,18 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         el.releasePointerCapture(pointerId);
 
         if (def.mode == "snapback") {
-            setValue(def.default_value ?? 0)
+            //setValue(def.default_value ?? 0)
             //callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0)
             send(def.default_value ?? 0)
         }
     }
+
+    useEffect(() => {
+        const id = callbacks.register(def, setValue)
+        return () => {
+            callbacks.unregister(id, def);
+        }
+    }, [])
 
     const rotationStyle = (a) => { return { "--rotation": `${a}deg` } as React.CSSProperties }
 
