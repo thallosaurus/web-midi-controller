@@ -32,19 +32,21 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
         const rect = targetRef.current.getBoundingClientRect();
 
         const left = (clientX - rect.left)
-        const x = Math.floor(clamp(left / rect.width) * 127);
+        const x = clamp(left / rect.width);
 
         const bottom = clientY - rect.top
-        const y = Math.floor((1 - clamp((bottom) / rect.height)) * 127);
+        const y = (1 - clamp((bottom) / rect.height));
+        
         if (valueX != x) {
-            setValueX(Math.floor(x))
+            setValueX(x)
+            sendAxisUpdate(valueX, valueY);
             //callbacks.sendCC(def.channel, def.x.cc, x);
         }
         if (valueY != y) {
-            setValueY(Math.floor(y))
+            setValueY(y)
+            sendAxisUpdate(valueX, valueY);
             //callbacks.sendCC(def.channel, def.y.cc, y);
         }
-        sendAxisUpdate(valueX, valueY);
     }
 
     const end = ({ pointerId, target, }) => {
@@ -85,9 +87,9 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
 
 
     useEffect(() => {
-        const note_id = callbacks.register(def, (v) => setPressed(v > 64));
-        const id_x = callbacks.register(def.x, setValueX);
-        const id_y = callbacks.register(def.y, setValueY);
+        const note_id = callbacks.register(def, (v) => {});
+        const id_x = callbacks.register(def.x, (v) => {});
+        const id_y = callbacks.register(def.y, (v) => {});
         return () => {
             callbacks.unregister(note_id, def);
             callbacks.unregister(id_x, def.x);
@@ -145,7 +147,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
                     userSelect: "none",
                     touchAction: "none"
                 }}>
-                    {valueX}/{valueY}
+                    {Math.floor(valueX*127)}/{Math.floor(valueY*127)}
                 </div>
             </div>
         </div>

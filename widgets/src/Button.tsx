@@ -5,6 +5,8 @@ import { vibrate } from "./utils.ts";
 import { useWidgetAction } from "./Callbacks.tsx";
 
 function Button(props: { label: string, on: boolean }) {
+    const [value, setValue] = useState(0.0);
+    
     return <div className={"target" + " " + (props.on ? "press" : "")}>
         <div>
             {props.label}
