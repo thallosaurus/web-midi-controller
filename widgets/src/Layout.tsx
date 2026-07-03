@@ -42,22 +42,32 @@ export function Grid({ def }: WidgetProperties<GridMixerProperties> & { aux?: Re
     </div>)
 }
 
+const shiftPanelAVisible = (shift: boolean) => {
+    return { display: shift ? "none" : "block" }
+}
+
+const shiftPanelBVisible = (shift: boolean) => {
+    return { display: shift ? "block" : "none" }
+}
+
 export function ShiftArea({ def }: WidgetProperties<ShiftAreaProperties> & { aux?: React.ReactElement }) {
     const [shift, setShift] = useState(false);
     const callbacks = useWidgetAction();
+
     useEffect(() => {
-        callbacks.register(def, (v) => {
-            setShift(v > 64);
-        })
+        const id = callbacks.register(def, (v) => setShift(v > 64))
+        return () => {
+            callbacks.unregister(id, def);
+        }
     }, [])
     return (<div id={def.id} className="shift">
         <div className="panel a" style={{
-            display: shift ? "none": "block"
+            ...shiftPanelAVisible(shift)
         }}>
             <Layout children={def.a} />
         </div>
         <div className="panel b" style={{
-            display: shift ? "block": "none"
+            ...shiftPanelBVisible(shift)
         }}>
             <Layout children={def.b} />
         </div>
