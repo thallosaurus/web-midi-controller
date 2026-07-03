@@ -1,6 +1,6 @@
 import { ConnectedPayload } from "./protocol.ts";
 
-type WebsocketMessageCallback<T> = (id: string, msg: T) => void;
+export type WebsocketMessageCallback<T> = (id: string, msg: T) => void;
 
 /*export function asyncWebsocketClient<T>(endpoint: URL, handler: WebsocketMessageCallback<T>) {
     return new Promise((res, rej) => {
@@ -24,9 +24,13 @@ interface ConnectRequest {
 
 export class WebsocketClient<T> {
     private ws: WebSocket | null = null
-    private id: string | null = null
+    private _id: string | null = null
     handler: WebsocketMessageCallback<T>
     connectionIdHandler: ((id: string | null) => void) | null = null
+
+    get id() {
+        return this._id;
+    }
 
     asyncConnect(endpoint: URL): Promise<string> {
         return new Promise((open, rej) => {
@@ -51,29 +55,23 @@ export class WebsocketClient<T> {
         ws.onopen = (ev) => {
             console.log("connection established", ev);
         }
-        ws.onmessage = (ev) => this.processMessage(ev, (id) => {
-            console.log(id);
-            if (this.connectionIdHandler) {
-                this.connectionIdHandler(id);
+        ws.onmessage = ({ data }) => {
+            const msg = JSON.parse(data);
+            if (isConnectionMessage(msg)) {
+                this._id = msg.id;
+                if (this.connectionIdHandler) {
+                    this.connectionIdHandler(msg.id);
+                }
+                if (open) open(msg.id);
+                return;
+            } else {
+                this.handler(msg.id, msg)
             }
-            if (open) open(id);
-        })
+
+        }
         ws.onclose = (ev) => console.log("connection closed", ev);
         ws.onerror = (ev) => console.log("connection error", ev);
         this.ws = ws;
-    }
-
-    private processMessage({ data }: MessageEvent, idHandler: (id: string) => void) {
-        const msg = JSON.parse(data);
-
-        // catch connection messages
-        if (isConnectionMessage(msg)) {
-            this.id = msg.id
-            idHandler(this.id);
-            //if (open) { open(msg.id) }
-        } else {
-            this.handler(this.id!, msg)
-        }
     }
 
     constructor(
