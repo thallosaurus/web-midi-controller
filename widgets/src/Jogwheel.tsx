@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { WidgetProperties } from "./Parser";
-import { JogwheelProperties, midi as MidiProperties } from "@hdj/definitions";
+import { JogwheelProperties } from "@hdj/definitions";
 import { useWidgetAction } from "./Callbacks.tsx";
 
 export interface JogwheelState {

@@ -1,4 +1,4 @@
-import { midi as MidiProperties, RotarySliderProperties } from "@hdj/definitions";
+import { RotarySliderProperties } from "@hdj/definitions";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils";
 import { useRef, useState } from "react";

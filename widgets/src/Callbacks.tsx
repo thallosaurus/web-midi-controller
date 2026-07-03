@@ -44,7 +44,9 @@ export type MidiCCSend = SendFn<MidiCCProperties, number>;
 type MidiNoteProperties = midi & NoteProperties;
 type MidiCCProperties = midi & CCProperties;
 
-type MIDICallbackMap = Map<number, Map<number, { callbacks: Map<string, MIDIReceiveDataCallback>, lastValue: number }>>;
+type CallbackMap<T> = { callbacks: Map<string, T>, lastValue: number };
+
+type MIDICallbackMap = Map<number, Map<number, CallbackMap<MIDIReceiveDataCallback>>>;
 type OSCCallbackMap = Map<string, Map<string, OSCReceiveDataCallback>>;
 
 export type DeltaMessages = NoteDelta | CCDelta | OscDelta;

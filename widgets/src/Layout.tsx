@@ -1,4 +1,4 @@
-import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties } from "@hdj/definitions";
 import { Layout, WidgetProperties } from "./Parser.tsx";
 import { useEffect, useState } from "react";
 import { useWidgetAction } from "./Callbacks.tsx";
