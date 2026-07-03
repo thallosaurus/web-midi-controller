@@ -78,6 +78,18 @@ interface InternalCallbackMap {
     oscCallbackMap: OSCCallbackMap;
 }
 
+function isMidiNote(def: MidiNoteProperties): def is MidiNoteProperties {
+    return (def.output == "midi" && "note" in def)
+}
+
+function isMidiCC(def: MidiCCProperties): def is MidiCCProperties {
+    return (def.output == "midi" && "cc" in def)
+}
+
+function isOSC(def: osc): def is osc {
+    return (def.output == "osc")
+}
+
 export abstract class WCallbacks {
     abstract sender: Outgoing | null;
     private sendNote: MidiNoteSend = ({ channel, note }, velocity) => {
@@ -205,12 +217,12 @@ export abstract class WCallbacks {
         switch (def.output) {
             case "midi":
                 {
-                    if ((def as MidiNoteProperties).note) {
+                    if ("note" in def) {
                         // register midi note
-                        return this.registerNote(def as MidiNoteProperties, cb)
-                    } else if ((def as MidiCCProperties).cc) {
+                        return this.registerNote(def, cb)
+                    } else if ("cc" in def) {
                         // register cc
-                        return this.registerCC(def as MidiCCProperties, cb);
+                        return this.registerCC(def, cb);
                     }
                 }
                 break;
@@ -296,6 +308,9 @@ export abstract class WCallbacks {
                 break;
             case "osc":
                 this.externalOsc(msg);
+                break;
+            default:
+                throw new Error("invalid external input")
         }
     }
 }
