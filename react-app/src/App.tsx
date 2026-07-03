@@ -69,9 +69,11 @@ function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, even
           <div style={{
             fontWeight: "bold"
           }}>HomebrewDJ v{getVersion()}</div>
+          {ws.connected ? 
           <b onClick={() => setOverlayPicker(true)}>
             {overlay?.name ?? "No overlay loaded"}
           </b>
+          : <div></div>}
           <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connected ? "connected" : "disconnected"}>{ws.connected ? "connected" : "disconnected"}</div>
         </header>
         {ws.connected ?
@@ -84,10 +86,10 @@ function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, even
           </>
           : <ConnectScreen />}
       </div>
-      <OverlaySwitcher
-        showModal={showOverlayPicker}
-        closeSwitcher={() => setOverlayPicker(false)}
-        setOverlay={setOverlay}></OverlaySwitcher>
+        <OverlaySwitcher
+          showModal={showOverlayPicker}
+          closeSwitcher={() => setOverlayPicker(false)}
+          setOverlay={setOverlay}></OverlaySwitcher>
     </>
   )
 }
