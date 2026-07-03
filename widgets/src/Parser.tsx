@@ -1,42 +1,24 @@
-import { CCProperties, midi, NoteProperties, osc, Overlay, Widget } from "@hdj/definitions"
+import { Overlay, Widget } from "@hdj/definitions";
 import { CCButton, NoteButton } from "./Button.tsx";
 import { CCSlider } from "./Slider.tsx";
 import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout.tsx";
 import { Rotary } from "./Rotary.tsx";
 import { XYPad } from "./XYPad.tsx";
 import { Jogwheel } from "./Jogwheel.tsx";
-import { ReactElement } from "react";
-import { useWidgetAction, WCallbacks, WidgetActionContext } from "./Callbacks.tsx";
+import { WCallbacks, WidgetActionContext } from "./Callbacks.tsx";
 
-/*export function ChildLayout({ childWidgets, aux }: { childWidgets: Widget[], aux?: React.ReactElement }) {
-  return <>{childWidgets.map((v, i) => <RichLayout key={i} def={v} aux={aux} />)}</>
-}
-
-export function RichLayout({ def, aux }: { def: Widget, aux?: ReactElement }) {
-  const callbacks = useWidgetAction();
-  return <>
-    {aux ? (<form onSubmit={(ev) => {
-      ev.preventDefault();
-      //callbacks.sendUiEvent(def)
-    }}>
-      {aux}
-    </form>) : ""}
-    <SingleLayout def={def} />
-  </>
-}*/
-
-const stringToElement = (d, k, a) => {
+const stringToElement = (d, k) => {
   switch (d.type) {
     case 'notebutton':
       return <NoteButton def={d} key={k} />
     case 'ccslider':
       return <CCSlider def={d} key={k} />
     case 'horiz-mixer':
-      return <Horizontal def={d} key={k} aux={a} />
+      return <Horizontal def={d} key={k} />
     case 'vert-mixer':
-      return <Vertical def={d} key={k} aux={a} />
+      return <Vertical def={d} key={k} />
     case 'grid-mixer':
-      return <Grid def={d} key={k} aux={a} />
+      return <Grid def={d} key={k} />
     case 'ccbutton':
       return <CCButton def={d} key={k} />
     case 'rotary':
@@ -51,48 +33,22 @@ const stringToElement = (d, k, a) => {
       return <TabbedArea def={d} key={k} />
     case 'empty':
     default:
-      return <div className="empty"></div>
+      return <div className="empty" key={k}></div>
   };
 
 }
-export function SingleLayout({ def, aux }: { def: Widget, aux?: ReactElement }) {
+/* export function SingleLayout({ def }: { def: Widget }) {
 
   return <>
-    {stringToElement(def, 0, aux)}
+    {stringToElement(def, uuid())}
   </>
-}
+} */
 
-export function Layout({ children, aux }: { children: Widget[], aux?: React.ReactElement }) {
+export function Layout({ children }: { children: Widget[], aux?: React.ReactElement }) {
   return <>
     {children.map((def, k) => {
-      //stringToElement(def, k, callbacks, aux)
-      switch (def.type) {
-        case 'notebutton':
-          return <NoteButton def={def} key={k} />
-        case 'ccslider':
-          return <CCSlider def={def} key={k} />
-        case 'horiz-mixer':
-          return <Horizontal def={def} key={k} aux={aux} />
-        case 'vert-mixer':
-          return <Vertical def={def} key={k} aux={aux} />
-        case 'grid-mixer':
-          return <Grid def={def} key={k} aux={aux} />
-        case 'ccbutton':
-          return <CCButton def={def} key={k} />
-        case 'rotary':
-          return <Rotary def={def} key={k} />
-        case 'xypad':
-          return <XYPad def={def} key={k} />
-        case 'shift':
-          return <ShiftArea def={def} key={k} />
-        case 'jogwheel':
-          return <Jogwheel def={def} key={k} />
-        case 'tab':
-          return <TabbedArea def={def} key={k} />
-        case 'empty':
-        default:
-          return <div className="empty"></div>
-      }
+      const key = `${k}-${def.type}-${def.id}`
+      return stringToElement(def, key)
     })}
   </>
 }
@@ -119,7 +75,7 @@ export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WC
         justifyContent: "center",
         ...style ?? {}
       }}>
-        <Layout children={o.cells} aux={<></>} />
+        <Layout children={o.cells} />
       </div>
     </WidgetActionContext>
   )

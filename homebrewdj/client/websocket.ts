@@ -26,6 +26,7 @@ export class WebsocketClient<T = ConnectedPayload> {
 
         ws.addEventListener("close", (ev) => {
             this.id = null;
+            console.log("endpoint closed connection")
             if (close) close(ev.reason);
         })
 

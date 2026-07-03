@@ -109,7 +109,7 @@ pub(super) enum Widget {
 
     /// An empty cell useful as a grid placeholder
     #[serde(rename = "empty")]
-    Empty,
+    Empty(EmptyProperties),
 
     #[serde(rename = "shift")]
     ShiftArea(ShiftAreaProperties),
@@ -275,6 +275,23 @@ pub(super) struct RotarySliderProperties {
     label: Option<String>,
 
     mode: RotaryMode,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct EmptyProperties {
+    #[serde(flatten)]
+    base: BaseProperties,
+
+    /* #[serde(flatten)]
+    output: Properties,
+
+    #[serde(flatten)]
+    ccprop: CCProperties,
+
+    label: Option<String>,
+
+    mode: RotaryMode, */
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]

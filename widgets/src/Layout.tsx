@@ -3,7 +3,7 @@ import { Layout, WidgetProperties } from "./Parser.tsx";
 import { useEffect, useState } from "react";
 import { useWidgetAction } from "./Callbacks.tsx";
 
-export function Vertical({ def, aux }: WidgetProperties<VerticalMixerProperties> & { aux?: React.ReactElement }) {
+export function Vertical({ def }: WidgetProperties<VerticalMixerProperties> & { aux?: React.ReactElement }) {
     //return (<div>{Layout(def.vert)}</div>)
     return <div id={def.id} className="widget vert-mixer" style={{
         display: "flex",
@@ -12,11 +12,11 @@ export function Vertical({ def, aux }: WidgetProperties<VerticalMixerProperties>
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.vert} aux={aux} />
+        <Layout children={def.vert} />
     </div>
 }
 
-export function Horizontal({ def, aux }: WidgetProperties<HorizontalMixerProperties> & { aux?: React.ReactElement }) {
+export function Horizontal({ def }: WidgetProperties<HorizontalMixerProperties> & { aux?: React.ReactElement }) {
     return (<div id={def.id} className="widget horiz-mixer" style={{
         display: "flex",
         flexDirection: "row",
@@ -24,12 +24,12 @@ export function Horizontal({ def, aux }: WidgetProperties<HorizontalMixerPropert
         width: "100%",
         height: "100%",
     }}>
-        <Layout children={def.horiz} aux={aux} />
+        <Layout children={def.horiz} />
     </div>)
 
 }
 
-export function Grid({ def, aux }: WidgetProperties<GridMixerProperties> & { aux?: React.ReactElement }) {
+export function Grid({ def }: WidgetProperties<GridMixerProperties> & { aux?: React.ReactElement }) {
     return (<div id={def.id} className="widget grid" style={{
         display: "grid",
         gridTemplateColumns: `repeat(${def.h}, 1fr)`,
@@ -38,7 +38,7 @@ export function Grid({ def, aux }: WidgetProperties<GridMixerProperties> & { aux
         height: "100%",
         gap: "1em"
     }}>
-        <Layout children={def.grid} aux={aux} />
+        <Layout children={def.grid} />
     </div>)
 }
 
@@ -49,7 +49,7 @@ export function ShiftArea({ def }: WidgetProperties<ShiftAreaProperties> & { aux
         callbacks.register(def, (v) => {
             setShift(v > 64);
         })
-    })
+    }, [])
     return (<div id={def.id} className="shift">
         <div className="panel a" style={{
             display: shift ? "none": "block"

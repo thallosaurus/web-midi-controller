@@ -69,6 +69,7 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
     }
 
     useEffect(() => {
+        console.log("ccslider effect", def.cc)
         const id = callbacks.register(def, setValue);
         return () => {
             callbacks.unregister(id, def)

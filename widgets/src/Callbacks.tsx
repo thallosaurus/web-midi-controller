@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 import { uuid } from "./utils";
 
 type WidgetId = string;
+export type ReceiveDataCallback = (v: number) => void;
 export type MIDIReceiveDataCallback = (v: number) => void;
 export type OSCReceiveDataCallback = (v: number) => void;
 
@@ -43,7 +44,7 @@ export type MidiCCSend = SendFn<MidiCCProperties, number>;
 type MidiNoteProperties = midi & NoteProperties;
 type MidiCCProperties = midi & CCProperties;
 
-type MIDICallbackMap = Map<number, Map<number, Map<string, MIDIReceiveDataCallback>>>;
+type MIDICallbackMap = Map<number, Map<number, { callbacks: Map<string, MIDIReceiveDataCallback>, lastValue: number }>>;
 type OSCCallbackMap = Map<string, Map<string, OSCReceiveDataCallback>>;
 
 export type DeltaMessages = NoteDelta | CCDelta | OscDelta;
@@ -78,20 +79,21 @@ interface InternalCallbackMap {
     oscCallbackMap: OSCCallbackMap;
 }
 
-function isMidiNote(def: MidiNoteProperties): def is MidiNoteProperties {
-    return (def.output == "midi" && "note" in def)
+function isMidiNote(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiNoteProperties {
+    return (def.output === "midi" && "note" in def)
 }
 
-function isMidiCC(def: MidiCCProperties): def is MidiCCProperties {
-    return (def.output == "midi" && "cc" in def)
+function isMidiCC(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiCCProperties {
+    return (def.output === "midi" && "cc" in def)
 }
 
-function isOSC(def: osc): def is osc {
-    return (def.output == "osc")
+function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
+    return (def.output === "osc")
 }
 
 export abstract class WCallbacks {
     abstract sender: Outgoing | null;
+
     private sendNote: MidiNoteSend = ({ channel, note }, velocity) => {
         console.log("note", channel, note, velocity, velocity > 64);
         if (this.sender) this.sender.send({
@@ -102,6 +104,7 @@ export abstract class WCallbacks {
             //on: value > 64
         })
     }
+
     private registerNote: MidiNoteRegisterFn = (def, cb) => {
 
         if (!this.callbacks.noteCallbackMap.has(def.channel)) {
@@ -110,9 +113,9 @@ export abstract class WCallbacks {
         const channelMap = this.callbacks.noteCallbackMap.get(def.channel);
 
         if (!channelMap?.has(def.note)) {
-            channelMap?.set(def.note, new Map())
+            channelMap?.set(def.note, { callbacks: new Map(), lastValue: 0 })
         }
-        const noteMap = channelMap?.get(def.note);
+        const noteMap = channelMap?.get(def.note).callbacks;
         const id = uuid()
         noteMap?.set(id, cb);
         //if (this.next) this.next.registerNote(def, cb)
@@ -120,13 +123,18 @@ export abstract class WCallbacks {
     }
 
     private sendCC: MidiCCSend = ({ channel, cc }, value) => {
-        console.log("cc", channel, cc, value);
-        if (this.sender) this.sender.send({
-            type: "cc",
-            channel,
-            cc,
-            value
-        })
+        const c = this.callbacks.ccCallbackMap.get(channel).get(cc);
+        //console.log("cc", channel, cc, value, c, this.callbacks.ccCallbackMap);
+        if (c.lastValue != value) {
+            if (this.sender) this.sender.send({
+                type: "cc",
+                channel,
+                cc,
+                value
+            })
+            c.lastValue = value;
+        }
+
     }
 
     private registerCC: MidiCCRegisterFn = (def, cb) => {
@@ -138,9 +146,9 @@ export abstract class WCallbacks {
         const channelMap = this.callbacks.ccCallbackMap.get(channel);
 
         if (!channelMap?.has(cc)) {
-            channelMap?.set(cc, new Map());
+            channelMap?.set(cc, { callbacks: new Map(), lastValue: 0 });
         }
-        const ccMap = channelMap?.get(cc);
+        const ccMap = channelMap?.get(cc).callbacks;
         const id = uuid()
         ccMap?.set(id, cb);
         //if (this.next) this.next.registerCC(def, cb);
@@ -155,9 +163,9 @@ export abstract class WCallbacks {
         const channelMap = this.callbacks.ccCallbackMap.get(channel);
 
         if (!channelMap?.has(cc)) {
-            channelMap?.set(cc, new Map());
+            channelMap?.set(cc, { callbacks: new Map(), lastValue: 0 });
         }
-        const ccMap = channelMap?.get(cc);
+        const ccMap = channelMap?.get(cc).callbacks;
         ccMap?.delete(id);
         //if (this.next) this.next.unregisterCC(id, def)
     }
@@ -171,10 +179,10 @@ export abstract class WCallbacks {
         const channelMap = this.callbacks.noteCallbackMap.get(channel);
 
         if (!channelMap?.has(note)) {
-            channelMap?.set(note, new Map());
+            channelMap?.set(note, { callbacks: new Map(), lastValue: 0 });
         }
 
-        const noteMap = channelMap?.get(note);
+        const noteMap = channelMap?.get(note).callbacks;
         noteMap?.delete(id);
         //if (this.next) this.next.unregisterNote(id, def);
     }
@@ -187,6 +195,7 @@ export abstract class WCallbacks {
             args
         })
     }
+
     private registerOSC: OscRegisterFn = ({ address }, cb) => {
         if (!this.callbacks.oscCallbackMap.has(address)) {
             this.callbacks.oscCallbackMap.set(address, new Map());
@@ -214,65 +223,23 @@ export abstract class WCallbacks {
     }
 
     register(def: MidiNoteProperties | MidiCCProperties | osc, cb: MIDIReceiveDataCallback | OSCReceiveDataCallback): WidgetId {
-        switch (def.output) {
-            case "midi":
-                {
-                    if ("note" in def) {
-                        // register midi note
-                        return this.registerNote(def, cb)
-                    } else if ("cc" in def) {
-                        // register cc
-                        return this.registerCC(def, cb);
-                    }
-                }
-                break;
-            case "osc":
-                //register osc
-                return this.registerOSC(def, cb);
-        }
-    }
-    unregister(id: string, def: MidiNoteProperties | MidiCCProperties | osc) {
-        switch (def.output) {
-            case "midi":
-                {
-                    if ((def as MidiNoteProperties).note) {
-                        // register midi note
-                        this.unregisterNote(id, def as MidiNoteProperties)
-                        break;
-                    } else if ((def as MidiCCProperties).cc) {
-                        // register cc
-                        this.unregisterCC(id, def as MidiCCProperties);
-                        break;
-                    }
-                }
-                break;
-            case "osc":
-                //register osc
-                this.unregisterOSC(id, def);
-                break;
-        }
+        console.log("registering", def)
+        if (isMidiNote(def)) return this.registerNote(def, cb)
+        if (isMidiCC(def)) return this.registerCC(def, cb)
+        if (isOSC(def)) return this.registerOSC(def, cb)
     }
 
-    send<T>(def: MidiNoteProperties | MidiCCProperties | osc, value: T) {
-        switch (def.output) {
-            case "midi":
-                {
-                    if ((def as MidiNoteProperties).note) {
-                        // register midi note
-                        this.sendNote(def as MidiNoteProperties, value as number)
-                        break;
-                    } else if ((def as MidiCCProperties).cc) {
-                        // register cc
-                        this.sendCC(def as MidiCCProperties, value as number);
-                        break;
-                    }
-                }
-                break;
-            case "osc":
-                //register osc
-                this.sendOSC(def, value as number[]);
-                break;
-        }
+    unregister(id: string, def: MidiNoteProperties | MidiCCProperties | osc) {
+        console.log("unregistering", def)
+        if (isMidiNote(def)) return this.unregisterNote(id, def)
+        if (isMidiCC(def)) return this.unregisterCC(id, def)
+        if (isOSC(def)) return this.unregisterOSC(id, def)
+    }
+
+    send(def: MidiNoteProperties | MidiCCProperties | osc, value: number) {
+        if (isMidiNote(def)) return this.sendNote(def, value)
+        if (isMidiCC(def)) return this.sendCC(def, Math.floor(value * 127))
+        if (isOSC(def)) return this.sendOSC(def, [value])
     }
 
     private externalOsc({ address, args }: OscDelta) {
@@ -285,16 +252,16 @@ export abstract class WCallbacks {
     private externalNote({ channel, note, velocity }: NoteDelta) {
         const c = this.callbacks.noteCallbackMap.get(channel);
         const cc = c?.get(note)
-        cc?.forEach((cb) => {
-            cb(velocity)
+        cc?.callbacks.forEach((c) => {
+            c(velocity)
         })
     }
 
     private externalCC({ channel, cc, value }: CCDelta) {
         const c = this.callbacks.ccCallbackMap.get(channel);
         const ccc = c?.get(cc);
-        ccc?.forEach((cb) => {
-            cb(value)
+        ccc?.callbacks.forEach((c) => {
+            c(value)
         })
     }
 

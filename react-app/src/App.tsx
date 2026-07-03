@@ -14,9 +14,14 @@ function getEndpointUrl() {
     url = new URL("/ws", location.href);
     url.protocol = "ws";
   }
+
   
   console.log(url);
   return url;
+}
+
+function getVersion() {
+  return import.meta.env.VITE_VERSION ?? "dev";
 }
 
 function App() {
@@ -72,7 +77,7 @@ function MainView({ defaultOverlay, eventbus, connected }: { defaultOverlay?: Ov
         }}>
           <div style={{
             fontWeight: "bold"
-          }}>HomebrewDJ</div>
+          }}>HomebrewDJ v{getVersion()}</div>
           <b onClick={() => setOverlayPicker(true)}>
             {overlay?.name ?? "No overlay loaded"}
           </b>

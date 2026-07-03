@@ -606,7 +606,7 @@ export const MATRIX_OVERLAY = {
   ]
 };
 
-export const ABLETON_OVERLAY = {
+export const ABLETON_OVERLAY: Overlay = {
   "id": "ableton_performance",
   "name": "Ableton Performance",
   "cells": [
@@ -614,12 +614,14 @@ export const ABLETON_OVERLAY = {
       "type": "horiz-mixer",
       "horiz": [
         {
+          "id": null,
           "output": "midi",
+          "vertical": false,
           "cc": 10,
           "channel": 1,
           "label": "Volume 1",
           "mode": "relative",
-          "type": "ccslider"
+          "type": "ccslider",
         },
         {
           "output": "midi",
@@ -638,6 +640,7 @@ export const ABLETON_OVERLAY = {
           "type": "ccslider"
         },
         {
+          "output": "midi",
           "cc": 40,
           "channel": 1,
           "label": "Volume 4",

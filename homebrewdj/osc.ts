@@ -59,7 +59,7 @@ export class OscDriver {
     }
 
     async send(msg: OscMessagePayload) {
-        if (this.sender) await this.sender.send(msg.address, ...msg.args)
+        if (this.sender) await this.sender.send(msg.address, msg.args)
     }
 
     stop() {

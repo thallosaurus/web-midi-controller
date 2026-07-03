@@ -24,8 +24,8 @@ export function NoteButton({ def }: WidgetProperties<NoteButtonProperties>) {
             case "midi":
                 callbacks.send(def, v ? 127 : 0)
                 break;
-            case "osc":
-                callbacks.send(def, [v])
+                case "osc":
+                callbacks.send(def, v)
                 break;
         }
     }
