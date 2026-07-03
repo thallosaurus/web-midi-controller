@@ -95,14 +95,23 @@ export abstract class WCallbacks {
     abstract sender: Outgoing | null;
 
     private sendNote: MidiNoteSend = ({ channel, note }, velocity) => {
-        console.log("note", channel, note, velocity, velocity > 64);
-        if (this.sender) this.sender.send({
-            type: "note",
-            channel,
-            note,
-            velocity,
-            //on: value > 64
-        })
+        const c = this.callbacks.noteCallbackMap.get(channel).get(note);
+        
+        if (c.lastValue != velocity) {
+            console.log("note", channel, note, velocity, velocity > 64);
+            
+            const msg: NoteDelta = {
+                type: "note",
+                channel,
+                note,
+                velocity,
+                //on: value > 64
+            };
+            
+            if (this.sender) this.sender.send(msg);
+            c.lastValue = velocity
+        }
+        //this.extInput(msg);
     }
 
     private registerNote: MidiNoteRegisterFn = (def, cb) => {
@@ -124,15 +133,18 @@ export abstract class WCallbacks {
 
     private sendCC: MidiCCSend = ({ channel, cc }, value) => {
         const c = this.callbacks.ccCallbackMap.get(channel).get(cc);
-        //console.log("cc", channel, cc, value, c, this.callbacks.ccCallbackMap);
         if (c.lastValue != value) {
-            if (this.sender) this.sender.send({
+            console.log("cc", channel, cc, value);
+            const msg: CCDelta = {
                 type: "cc",
                 channel,
                 cc,
                 value
-            })
+            };
+
+            if (this.sender) this.sender.send(msg)
             c.lastValue = value;
+            //this.extInput(msg);
         }
 
     }
@@ -189,11 +201,15 @@ export abstract class WCallbacks {
 
     private sendOSC: OscSend<number[]> = ({ address }, args: number[]) => {
         console.log("osc update", address, args);
-        if (this.sender) this.sender.send({
+        const msg: OscDelta = {
             type: "osc",
             address,
             args
-        })
+        };
+
+        if (this.sender) this.sender.send(msg)
+
+        //this.extInput(msg)
     }
 
     private registerOSC: OscRegisterFn = ({ address }, cb) => {

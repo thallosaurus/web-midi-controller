@@ -606,6 +606,53 @@ export const MATRIX_OVERLAY = {
   ]
 };
 
+export const MIDI_TEST_OVERLAY: Overlay = {
+  name: "MIDI Test Overlay",
+  channel: null,
+  program: null,
+  id: null,
+  cells: [{
+    "type": "ccslider",
+    "output": "midi",
+    "cc": 1,
+    "channel": 1,
+    "id": "test1",
+    "label": "test",
+    "mode": "absolute",
+    "vertical": true,
+    "value": 0,
+    "value_off": 0,
+    "default_value": 0
+  },
+  {
+    "type": "ccslider",
+    "output": "midi",
+    "cc": 1,
+    "channel": 1,
+    "id": "test2",
+    "label": "test",
+    "mode": "absolute",
+    "vertical": true,
+    "value": 0,
+    "value_off": 0,
+    "default_value": 0
+  },
+  {
+    "type": "ccslider",
+    "output": "midi",
+    "cc": 1,
+    "channel": 1,
+    "id": "test3",
+    "label": "test",
+    "mode": "absolute",
+    "vertical": true,
+    "value": 0,
+    "value_off": 0,
+    "default_value": 0
+  }
+  ],
+};
+
 export const ABLETON_OVERLAY: Overlay = {
   "id": "ableton_performance",
   "name": "Ableton Performance",
