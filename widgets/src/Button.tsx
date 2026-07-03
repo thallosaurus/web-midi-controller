@@ -1,46 +1,26 @@
-import { NoteButtonProperties, CCButtonProperties } from "@hdj/definitions";
+import { NoteButtonProperties, CCButtonProperties, osc, Widget } from "@hdj/definitions";
 import { useEffect, useRef, useState } from "react";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils.ts";
-import { useWidgetAction } from "./Callbacks.tsx";
+import { MidiCCProperties, MidiNoteProperties, useWidgetAction } from "./Callbacks.tsx";
 
-function Button(props: { label: string, on: boolean }) {
-    const [value, setValue] = useState(0.0);
-    
-    return <div className={"target" + " " + (props.on ? "press" : "")}>
-        <div>
-            {props.label}
-        </div>
-    </div >
-}
+type ButtonProperties = Widget & (NoteButtonProperties | CCButtonProperties);
 
-export function NoteButton({ def }: WidgetProperties<NoteButtonProperties>) {
-    const [on, setOn] = useState(false);
+export function Button({ def }: WidgetProperties<ButtonProperties>) {
+    const [value, setValue] = useState(0);
     const activePointer = useRef<number | null>(null);
     const latchOn = useRef(false);
-
     const callbacks = useWidgetAction();
 
-    const send = (v: number) => {
-        switch (def.output) {
-            case "midi":
-                callbacks.send(def, v ? 127 : 0)
-                break;
-                case "osc":
-                callbacks.send(def, v)
-                break;
-        }
-    }
-
-    //    useEffect(() => { console.log(callbacks) })
     useEffect(() => {
         const id = callbacks.register(def, (v) => {
-            setOn(v > 64);
+            setValue(v);
         })
         return () => {
             callbacks.unregister(id, def)
         }
     }, [])
+
     const start = ({ currentTarget, pointerId }) => {
         vibrate();
         const el = currentTarget as HTMLElement;
@@ -50,11 +30,12 @@ export function NoteButton({ def }: WidgetProperties<NoteButtonProperties>) {
         if (def.mode == "trigger") {
             //this.state.latch_on = true;
             latchOn.current = true;
-            setOn(latchOn.current)
+            setValue(latchOn.current ? 127 : 0)
             /*if (callbacks.sendNote) {
                 callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
             }*/
-            send(latchOn.current ? 127 : 0);
+            //send(latchOn.current ? 127 : 0);
+            callbacks.send(def, latchOn.current ? 127 : 0)
         }
 
     }
@@ -74,10 +55,53 @@ export function NoteButton({ def }: WidgetProperties<NoteButtonProperties>) {
             latchOn.current = !latchOn.current;
         }
 
-        setOn(latchOn.current)
-        send(latchOn.current ? 127 : 0)
+        setValue(latchOn.current ? 127 : 0)
+        callbacks.send(def, latchOn.current ? 127 : 0)
         //if (callbacks.sendNote) callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
     };
+
+    return <div id={def.id} className={`widget ${def.type}`}
+        onPointerDown={start}
+        onPointerUp={end}
+        onPointerCancel={end}>
+        <div className={"target" + " " + (value > 64 ? "press" : "")}>
+            <div>
+                {def.label}
+            </div>
+        </div >
+    </div>
+}
+/*
+export function NoteButton({ def }: WidgetProperties<NoteButtonProperties>) {
+    const [on, setOn] = useState(false);
+    const activePointer = useRef<number | null>(null);
+    const latchOn = useRef(false);
+
+    const callbacks = useWidgetAction();
+
+    const send = (v: number) => {
+        switch (def.output) {
+            case "midi":
+                callbacks.send(def, v ? 127 : 0)
+                break;
+            case "osc":
+                callbacks.send(def, v)
+                break;
+        }
+    }
+
+    //    useEffect(() => { console.log(callbacks) })
+    useEffect(() => {
+        const id = callbacks.register(def, (v) => {
+            setOn(v > 64);
+        })
+        return () => {
+            callbacks.unregister(id, def)
+        }
+    }, [])
+
+
+
 
     return <div id={def.id}
         onPointerDown={start}
@@ -85,7 +109,7 @@ export function NoteButton({ def }: WidgetProperties<NoteButtonProperties>) {
         onPointerCancel={end}
         className="widget notebutton">
 
-        <Button label={def.label ?? String(def.note)} on={on} />
+        <Button def={def} />
 
     </div>
 
@@ -160,3 +184,4 @@ export function CCButton({ def }: WidgetProperties<CCButtonProperties>) {
         <Button label={def.label} on={on} />
     </div>)
 }
+    */

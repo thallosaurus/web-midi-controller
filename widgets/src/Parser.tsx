@@ -1,5 +1,5 @@
 import { Overlay, Widget } from "@hdj/definitions";
-import { CCButton, NoteButton } from "./Button.tsx";
+import { Button } from "./Button.tsx";
 import { CCSlider } from "./Slider.tsx";
 import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout.tsx";
 import { Rotary } from "./Rotary.tsx";
@@ -9,8 +9,9 @@ import { WCallbacks, WidgetActionContext } from "./Callbacks.tsx";
 
 const stringToElement = (d, k) => {
   switch (d.type) {
+    case 'ccbutton':
     case 'notebutton':
-      return <NoteButton def={d} key={k} />
+      return <Button def={d} key={k} />
     case 'ccslider':
       return <CCSlider def={d} key={k} />
     case 'horiz-mixer':
@@ -19,8 +20,6 @@ const stringToElement = (d, k) => {
       return <Vertical def={d} key={k} />
     case 'grid-mixer':
       return <Grid def={d} key={k} />
-    case 'ccbutton':
-      return <CCButton def={d} key={k} />
     case 'rotary':
       return <Rotary def={d} key={k} />
     case 'xypad':

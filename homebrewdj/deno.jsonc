@@ -9,7 +9,7 @@
     "compile:mac": "mkdir -p dist && deno compile -A --include ../react-app/dist --no-check --unstable-sloppy-imports --include ../midi-driver/target/debug/libmidi_driver.dylib --output dist/homebrewdj.mac main.ts",
     "compile": "mkdir -p dist && deno compile -A --no-check --unstable-sloppy-imports --output dist/homebrewdj.mac main.ts",
     "run:prod:mac": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib ./dist/homebrewdj.mac",
-    "build-client": "deno run -A scripts/build_npm.ts 0.2.0"
+    "build-client": "deno run -A scripts/build_npm.ts 0.2.1"
   },
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",

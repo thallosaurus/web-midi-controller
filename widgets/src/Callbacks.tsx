@@ -41,8 +41,8 @@ export type MidiCCRegisterFn = RegisterFn<MidiCCProperties, MIDIReceiveDataCallb
 export type MidiCCUnregisterFn = UnregisterFn<MidiCCProperties>;
 export type MidiCCSend = SendFn<MidiCCProperties, number>;
 
-type MidiNoteProperties = midi & NoteProperties;
-type MidiCCProperties = midi & CCProperties;
+export type MidiNoteProperties = midi & NoteProperties;
+export type MidiCCProperties = midi & CCProperties;
 
 type CallbackMap<T> = { callbacks: Map<string, T>, lastValue: number };
 
@@ -309,11 +309,7 @@ export interface UiEventCallbacks {
 
 export const WidgetActionContext = createContext<WCallbacks | null>(null);
 export function useWidgetAction() {
-
     const bus = useContext(WidgetActionContext);
-
-    if (!bus) throw new Error("Missing EventBusProvider");
-
+    if (!bus) throw new Error("Missing WidgetActionContext");
     return bus;
-
 }
