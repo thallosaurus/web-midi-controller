@@ -1,7 +1,7 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
 import { AllowedPayloads, WebsocketClient } from "@hdj/homebrewdj-web-client";
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
 import { EventBus, WebsocketContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
@@ -24,13 +24,11 @@ function getVersion() {
 }
 
 function App() {
+  const eventbus = useRef<EventBus>(new EventBus());
   const process = (id: string, msg: AllowedPayloads) => {
-    if (eventbus.current) {
-      eventbus.current.extInput(msg);
-    }
+    eventbus.current.extInput(msg);
   }
 
-  const eventbus = useRef<EventBus>(new EventBus());
   //const websocket = useRef(new WebsocketClient<AllowedPayloads>(process))
 
   return (
@@ -94,6 +92,16 @@ function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, even
   )
 }
 
+const buttonStyle: CSSProperties = {
+  padding: "1em",
+  fontFamily: "monospace",
+  border: "none",
+  backgroundColor: "white",
+  display: "block",
+  width: "100%",
+  fontWeight: "bold"
+}
+
 function ConnectScreen() {
   const ws = useWebsocketContext();
 
@@ -103,17 +111,17 @@ function ConnectScreen() {
     height: "100%",
     justifyContent: "space-around"
   }}>
-    <div>
-      <h2>Connect</h2>
-      <button style={{
-        padding: "1em",
-        fontFamily: "monospace",
-        border: "none",
-        backgroundColor: "white"
-      }} onClick={async () => {
-        await ws.connect(getEndpointUrl())
-        console.log("after connect")
-      }}>Connect</button>
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-around"
+    }}>
+      <div>
+        <button style={buttonStyle} onClick={async () => {
+          await ws.connect(getEndpointUrl())
+          console.log("after connect")
+        }}>Connect</button>
+      </div>
     </div>
   </div>
 }

@@ -2,7 +2,7 @@ import { NoteButtonProperties, CCButtonProperties, osc, Widget } from "@hdj/defi
 import { useEffect, useRef, useState } from "react";
 import { WidgetProperties } from "./Parser.tsx";
 import { vibrate } from "./utils.ts";
-import { MidiCCProperties, MidiNoteProperties, useWidgetAction } from "./Callbacks.tsx";
+import { useWidgetAction } from "./Callbacks.tsx";
 
 type ButtonProperties = Widget & (NoteButtonProperties | CCButtonProperties);
 
@@ -30,7 +30,7 @@ export function Button({ def }: WidgetProperties<ButtonProperties>) {
         if (def.mode == "trigger") {
             //this.state.latch_on = true;
             latchOn.current = true;
-            setValue(latchOn.current ? 127 : 0)
+            //setValue(latchOn.current ? 127 : 0)
             /*if (callbacks.sendNote) {
                 callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
             }*/

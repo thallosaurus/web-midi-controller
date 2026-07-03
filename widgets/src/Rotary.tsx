@@ -57,7 +57,7 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
     }
 
     useEffect(() => {
-        const id = callbacks.register(def, setValue)
+        const id = callbacks.register(def, (v) => setValue(v / 127))
         return () => {
             callbacks.unregister(id, def);
         }

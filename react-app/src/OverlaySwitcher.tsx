@@ -10,8 +10,8 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
     XYPAD_OVERLAY,
     MATRIX_OVERLAY,
     TestOscOverlay,
-    MIDI_TEST_OVERLAY
-    //TRAKTOR_PERFORMANCE
+    MIDI_TEST_OVERLAY,
+    TRAKTOR_PERFORMANCE
   ])
 
   const dialogRef = useRef<HTMLDialogElement>(null);
