@@ -16,9 +16,6 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
     const callbacks = useWidgetAction();
 
     const sendNoteUpdate = (s: boolean) => {
-        //callbacks.sendCC(def.channel, def.x.cc, valueX);
-        //callbacks.sendCC(def.channel, def.y.cc, valueY);
-                //callbacks.sendNote(def.channel, def.note, def.velocity, s);
         callbacks.send(def, s ? 127 : 0);
         setPressed(s);
     }
@@ -36,16 +33,14 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
 
         const bottom = clientY - rect.top
         const y = (1 - clamp((bottom) / rect.height));
-        
+
         if (valueX != x) {
             setValueX(x)
             sendAxisUpdate(valueX, valueY);
-            //callbacks.sendCC(def.channel, def.x.cc, x);
         }
         if (valueY != y) {
             setValueY(y)
             sendAxisUpdate(valueX, valueY);
-            //callbacks.sendCC(def.channel, def.y.cc, y);
         }
     }
 
@@ -53,15 +48,9 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
         if (pointerId !== activePointer.current) return;
         const el = target as HTMLDivElement;
         el.releasePointerCapture(pointerId);
-        //this.updateFromEvent(e);
         activePointer.current = null;
         setPressed(false);
-        //this.target.classList.remove("pressed");
-        //this.sendValue(0)
-        // note update - kaoss like
-        //sendUpdate({ valueX: 0, valueY: 0})
         sendNoteUpdate(false);
-        //callbacks.sendCC()
     }
 
     const start = ({ pointerId, target, clientX, clientY }) => {
@@ -95,30 +84,6 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
             callbacks.unregister(id_x, def.x);
             callbacks.unregister(id_y, def.y);
         }
-        /*switch (def.output) {
-            case "midi":
-                {
-                    const id_x = callbacks.registerCC(def.channel, def.x.cc, setValueX)
-                    const id_y = callbacks.registerCC(def.channel, def.y.cc, setValueY)
-                    return () => {
-                        callbacks.unregisterCC(def.channel, def.x.cc, id_x);
-                        callbacks.unregisterCC(def.channel, def.y.cc, id_y);
-                    }
-                }
-            case "osc":
-                {
-                    const id_x = callbacks.registerOSC(def.address + "/x", (v) => {
-                        setValueX(v);
-                    })
-                    const id_y = callbacks.registerOSC(def.address + "/y", (v) => {
-                        setValueY(v);
-                    })
-                    return () => {
-                        callbacks.unregisterOSC(def.address + "/x", id_x);
-                        callbacks.unregisterOSC(def.address + "/y", id_y);
-                    }
-                }
-        }*/
     }, [])
 
     return (
