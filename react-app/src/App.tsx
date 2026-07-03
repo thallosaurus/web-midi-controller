@@ -1,10 +1,10 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
-import { AllowedPayloads, CCMessagePayload, ConnectedPayload, NoteMessagePayload, OscMessagePayload, WebsocketClient } from "@hdj/homebrewdj-web-client";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { EventBus } from "./EventBus";
+import { AllowedPayloads, WebsocketClient } from "@hdj/homebrewdj-web-client";
+import { useEffect, useRef, useState } from "react";
 import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
+import { EventBus, WebsocketContext, useWebsocketContext } from "./Contexts";
 
 function getEndpointUrl() {
   let url;
@@ -23,27 +23,6 @@ function getVersion() {
   return import.meta.env.VITE_VERSION ?? "0.0.0";
 }
 
-export const WebsocketContext = createContext<WebsocketClient<AllowedPayloads> | null>(null);
-export function useWebsocketContext() {
-  const [connectionId, setConnectionId] = useState<string | null>(null);
-  const ctx = useContext(WebsocketContext);
-  if (!ctx) throw new Error("no websocket loaded")
-  return {
-    connected: () => {
-      return connectionId !== null
-    },
-    //connectionId,
-    connect: async (uri: URL) => {
-      const id = await ctx.asyncConnect(uri);
-      setConnectionId(id);
-    },
-    disconnect: () => {
-      ctx.disconnect();
-      setConnectionId(null);
-    },
-    ws: ctx
-  };
-}
 
 function App() {
   const process = (id: string, msg: AllowedPayloads) => {
