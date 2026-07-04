@@ -1,4 +1,4 @@
-import { CCSliderProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { ButtonMode, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
 
 const TestOscWidget: Widget & CCSliderProperties = {
   output: "osc",
@@ -659,387 +659,123 @@ export const MIDI_TEST_OVERLAY: Overlay = {
   ],
 };
 
+function createCCSlider(label: string, channel: number, cc: number, mode: SliderMode, vertical: boolean): CCSliderProperties & Widget {
+  return {
+    id: null,
+    type: "ccslider",
+    output: "midi",
+    cc,
+    channel,
+    label,
+    mode,
+    vertical,
+    value: 0,
+    default_value: 0,
+    value_off: 0,
+  }
+}
+
+function createMidiNoteButton(label: string, channel: number, note: number, mode: ButtonMode): NoteButtonProperties & Widget {
+  return {
+    id: null,
+    type: "notebutton",
+    output: "midi",
+    channel,
+    note,
+    label,
+    mode
+  }
+}
+
 export const ABLETON_OVERLAY: Overlay = {
   "id": "ableton_performance",
   "name": "Ableton Performance",
   "cells": [
     {
       "type": "horiz-mixer",
+      id: "volumes",
       "horiz": [
-        {
-          "id": null,
-          "output": "midi",
-          "vertical": false,
-          "cc": 10,
-          "channel": 1,
-          "label": "Volume 1",
-          "mode": "relative",
-          "type": "ccslider",
-        },
-        {
-          "output": "midi",
-          "cc": 20,
-          "channel": 1,
-          "label": "Volume 2",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "output": "midi",
-          "cc": 30,
-          "channel": 1,
-          "label": "Volume 3",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "output": "midi",
-          "cc": 40,
-          "channel": 1,
-          "label": "Volume 4",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "output": "midi",
-          "cc": 50,
-          "channel": 1,
-          "label": "Volume 5",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "output": "midi",
-          "cc": 60,
-          "channel": 1,
-          "label": "Volume 6",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "output": "midi",
-          "cc": 70,
-          "channel": 1,
-          "label": "Volume 7",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "output": "midi",
-          "cc": 80,
-          "channel": 1,
-          "label": "Volume 8",
-          "mode": "relative",
-          "type": "ccslider"
-        }
+        createCCSlider("Volume 1", 1, 10, "relative", false),
+        createCCSlider("Volume 2", 1, 20, "relative", false),
+        createCCSlider("Volume 3", 1, 30, "relative", false),
+        createCCSlider("Volume 4", 1, 40, "relative", false),
+        createCCSlider("Volume 5", 1, 50, "relative", false),
+        createCCSlider("Volume 6", 1, 60, "relative", false),
+        createCCSlider("Volume 7", 1, 70, "relative", false),
+        createCCSlider("Volume 8", 1, 80, "relative", false)
       ]
     },
     {
       "id": "returns",
       "type": "vert-mixer",
       "vert": [
-        {
-          "output": "midi",
-          "cc": 90,
-          "channel": 1,
-          "label": "Reverb",
-          "mode": "snapback",
-          "type": "ccslider",
-          "vertical": true
-        },
-        {
-          "output": "midi",
-          "cc": 91,
-          "channel": 1,
-          "label": "Filter",
-          "mode": "snapback",
-          "type": "ccslider",
-          "vertical": true
-        },
-        {
-          "output": "midi",
-          "cc": 92,
-          "channel": 1,
-          "label": "Test",
-          "mode": "absolute",
-          "type": "ccslider",
-          "vertical": true
-        }
+        createCCSlider("Reverb", 1, 90, "snapback", true),
+        createCCSlider("Filter", 1, 91, "snapback", true),
+        createCCSlider("Test", 1, 92, "absolute", true)
       ]
     }
   ]
 };
 
-export const TRAKTOR_PERFORMANCE = {
+function createOneDeviceTraktorDeck(channel: number): VerticalMixerProperties & Widget {
+  return {
+    "type": "vert-mixer",
+    "vert": [
+      {
+        "h": 2,
+        "id": `deck_${channel}_loop`,
+        "type": "grid-mixer",
+        "w": 4,
+        "grid": [
+          createMidiNoteButton("1/4 Loop", channel, 16, "trigger"),
+          createMidiNoteButton("1/2 Loop", channel, 15, "trigger"),
+          createMidiNoteButton("1 Loop", channel, 14, "trigger"),
+          createMidiNoteButton("2 Loop", channel, 13, "trigger"),
+          createMidiNoteButton("4 Loop", channel, 12, "trigger"),
+          createMidiNoteButton("8 Loop", channel, 11, "trigger"),
+          createMidiNoteButton("16 Loop", channel, 10, "trigger"),
+          createMidiNoteButton("32 Loop", channel, 9, "trigger")
+        ]
+      },
+      {
+        "type": "vert-mixer",
+        "id": `deck_${channel}_eq`,
+        "vert": [
+          createCCSlider("Bass", channel, 17, "snapback", true),
+          createCCSlider("Mid", channel, 16, "snapback", true),
+          createCCSlider("Hi", channel, 15, "snapback", true),
+        ]
+      },
+      {
+        "type": "horiz-mixer",
+        "id": `deck_${channel}_transport`,
+        "horiz": [
+          createMidiNoteButton("Play/Pause", channel, 1, "trigger"),
+          createMidiNoteButton("Sync", channel, 2, "trigger")
+        ]
+      }
+    ]
+  }
+}
+
+export const TRAKTOR_PERFORMANCE: Overlay = {
   "id": "traktor_performance",
   "name": "One-device Traktor 2.0",
+  "style": `#deck_1_eq, #deck_2_eq {
+    /*flex-grow: 1;*/
+  }`,
+  "channel": null,
+  "program": null,
   "cells": [
-    {
-      "type": "vert-mixer",
-      "vert": [
-        {
-          "h": 2,
-          "id": "deck_a",
-          "type": "grid-mixer",
-          "w": 4,
-          "grid": [
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "1/4 Loop",
-              "mode": "trigger",
-              "note": 16,
-              "type": "notebutton"
-            },
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "1/2 Loop",
-              "mode": "trigger",
-              "note": 15,
-              "type": "notebutton"
-            },
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "1 Loop",
-              "mode": "trigger",
-              "note": 14,
-              "type": "notebutton"
-            },
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "2 Loop",
-              "mode": "trigger",
-              "note": 13,
-              "type": "notebutton"
-            },
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "4 Loop",
-              "mode": "trigger",
-              "note": 12,
-              "type": "notebutton"
-            },
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "8 Loop",
-              "mode": "trigger",
-              "note": 11,
-              "type": "notebutton"
-            },
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "16 Loop",
-              "mode": "trigger",
-              "note": 10,
-              "type": "notebutton"
-            },
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "32 Loop",
-              "mode": "trigger",
-              "note": 9,
-              "type": "notebutton"
-            }
-          ]
-        },
-        {
-          "type": "horiz-mixer",
-          "horiz": [
-            {
-              "output": "midi",
-              "cc": 17,
-              "channel": 1,
-              "default_value": 64,
-              "label": "Bass",
-              "mode": "snapback",
-              "type": "rotary"
-            },
-            {
-              "output": "midi",
-              "cc": 16,
-              "channel": 1,
-              "default_value": 64,
-              "label": "Mid",
-              "mode": "snapback",
-              "type": "rotary"
-            },
-            {
-              "output": "midi",
-              "cc": 15,
-              "channel": 1,
-              "default_value": 64,
-              "label": "Hi",
-              "mode": "snapback",
-              "type": "rotary"
-            }
-          ]
-        },
-        {
-          "type": "horiz-mixer",
-          "horiz": [
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "Play/Pause",
-              "mode": "trigger",
-              "note": 1,
-              "type": "notebutton"
-            },
-            {
-              "output": "midi",
-              "channel": 1,
-              "label": "Sync",
-              "mode": "trigger",
-              "note": 2,
-              "type": "notebutton"
-            }
-          ]
-        }
-      ]
-    },
+        createOneDeviceTraktorDeck(1),
     {
       "id": "levels",
       "type": "horiz-mixer",
       "horiz": [
-        {
-          "output": "midi",
-          "cc": 0,
-          "channel": 1,
-          "label": "Test",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "output": "midi",
-          "cc": 1,
-          "channel": 1,
-          "label": "Test",
-          "mode": "relative",
-          "type": "ccslider"
-        }
+        createCCSlider("Test", 1, 0, "relative", false),
+        createCCSlider("Test", 2, 0, "relative", false)
       ]
     },
-    {
-      "h": 8,
-      "id": "deck_b",
-      "type": "grid-mixer",
-      "w": 4,
-      "grid": [
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "1/4 Loop",
-          "mode": "trigger",
-          "note": 36,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "1/2 Loop",
-          "mode": "trigger",
-          "note": 35,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "1 Loop",
-          "mode": "trigger",
-          "note": 34,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "2 Loop",
-          "mode": "trigger",
-          "note": 33,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "4 Loop",
-          "mode": "trigger",
-          "note": 32,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "8 Loop",
-          "mode": "trigger",
-          "note": 31,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "16 Loop",
-          "mode": "trigger",
-          "note": 30,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "32 Loop",
-          "mode": "trigger",
-          "note": 29,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "Kill Bass",
-          "mode": "trigger",
-          "note": 47,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "Kill Mid",
-          "mode": "trigger",
-          "note": 48,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "Kill Hi",
-          "mode": "trigger",
-          "note": 49,
-          "type": "notebutton"
-        },
-        {
-          "type": "empty"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "Play/Pause",
-          "mode": "trigger",
-          "note": 21,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "label": "Sync",
-          "mode": "trigger",
-          "note": 22,
-          "type": "notebutton"
-        }
-      ]
-    }
+   createOneDeviceTraktorDeck(2)
   ]
 }

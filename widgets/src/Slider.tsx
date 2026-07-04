@@ -112,8 +112,8 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
     };
 
     const reset = () => {
-        setValue(def.default_value ?? 0);
-        send(def.default_value ?? 0);
+        setValue((def.default_value ?? 0) / 127);
+        send((def.default_value ?? 0) / 127);
         //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0);
         //this.eventbus!.updateCC(this.prop.channel, this.prop.cc, def.default_value ?? 0);
     };
@@ -125,7 +125,6 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
             case "snapback":
             case "absolute":
                 {
-                    debugger;
                     let v: number;
                     if (!def.vertical) {
                         const n = rect.bottom - clientY;

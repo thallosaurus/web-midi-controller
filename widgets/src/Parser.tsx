@@ -64,6 +64,7 @@ export interface WidgetProperties<T> {
 export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WCallbacks, style?: React.CSSProperties }) {
   return (
     <WidgetActionContext value={callbacks}>
+      <style>{o.style??""}</style>
       <div id={o.id} className="overlay" data-overlay="view" style={{
         //width: "calc(100% - 1em)",
         //height: "calc(100% - 1em)",

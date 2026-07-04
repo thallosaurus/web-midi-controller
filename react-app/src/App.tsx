@@ -46,7 +46,7 @@ function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, even
   const ws = useWebsocketContext();
 
   useEffect(() => {
-    //ws.connect(getEndpointUrl())
+    ws.connect(getEndpointUrl())
     eventbus.setSender(ws.ws);
     return () => {
       eventbus.setSender(null);

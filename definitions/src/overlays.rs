@@ -19,6 +19,9 @@ pub struct Overlay {
     /// Set to None to disable Program Changes
     program: Option<u8>,
 
+    /// Custom Inline Styles used for UI
+    style: Option<String>,
+
     #[serde(flatten)]
     base: BaseProperties,
 

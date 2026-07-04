@@ -14,13 +14,14 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
 
     const callbacks = useWidgetAction();
 
-    const send = (v: number) => {
+    /*const send = (v: number) => {
+        console.log(v);
         callbacks.send(def, v)
-    }
+    }*/
 
-    const [value, setValue] = useState<number>(def.default_value ?? 0);
+    const [value, setValue] = useState<number>((def.default_value ?? 0) / 127);
 
-    const angle = () => MIN_ANGLE + (value / 127) * (MAX_ANGLE - MIN_ANGLE);
+    const angle = () => MIN_ANGLE + (value) * (MAX_ANGLE - MIN_ANGLE);
 
     const touch_start = ({ target, pointerId, clientX }) => {
         const el = target as HTMLElement;
@@ -36,12 +37,10 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         const dx = clientX - lastX.current;
         lastX.current = clientX;
 
-        const new_value = Math.floor(Math.max(0, Math.min(127, value + (dx * sensitivity))));
-
-        /*if (new_value != value) {
-            //setValue(new_value)
-            }*/
-       send(new_value)
+        console.log(lastX);
+        const new_value = Math.max(0, Math.min(1, value + (dx * sensitivity / 127)));
+        setValue(new_value);
+        callbacks.send(def, new_value)
     }
 
     const touch_stop = ({ target, pointerId }) => {
@@ -50,9 +49,9 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         el.releasePointerCapture(pointerId);
 
         if (def.mode == "snapback") {
-            //setValue(def.default_value ?? 0)
-            //callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0)
-            send(def.default_value ?? 0)
+            const reset = (def.default_value ?? 0) / 127;
+            setValue(reset);
+            callbacks.send(def, reset);
         }
     }
 
@@ -72,6 +71,6 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
             }}
             ></div>
         </div>
-        <div className="label">{def.label ?? ("CC" + def.cc + ":\n" + value)}</div>
+        <div className="label">{def.label ?? ("CC" + def.cc + ":\n" + Math.round(value * 127))}</div>
     </div>)
 }

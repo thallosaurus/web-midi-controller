@@ -33,7 +33,7 @@ export function Grid({ def }: WidgetProperties<GridMixerProperties> & { aux?: Re
     return (<div id={def.id} className="widget grid" style={{
         display: "grid",
         gridTemplateColumns: `repeat(${def.h}, 1fr)`,
-        gridTemplateRows: `repeat(${def.h}, 1fr)`,
+        gridTemplateRows: `repeat(${def.w}, 1fr)`,
         width: "100%",
         height: "100%",
         gap: "1em"
