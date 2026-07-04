@@ -11,7 +11,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         #midi-driver = pkgs.callPackage ./midi-driver {};
-        version = "v0.2.1";
+        version = builtins.readFile ./packaging/version;
 
         traktorController = builtins.fetchurl {
           url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/homebrewdj_traktor.js";
