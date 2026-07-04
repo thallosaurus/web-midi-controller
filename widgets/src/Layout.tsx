@@ -1,9 +1,9 @@
 import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
-import { WidgetProperties } from "./Parser";
-import { Children, CSSProperties, ReactNode, useEffect, useState } from "react";
+import { SingleWidget, WidgetProperties } from "./Parser";
+import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { useWidgetAction } from "./Callbacks";
 
-function Panel({ id, type, style, children }: { id: string, type: string, style: CSSProperties, children: ReactNode }) {
+export function Panel({ id, type, style, children }: { id: string, type: string, style: CSSProperties, children: ReactNode }) {
     return <div id={id} className={`widget ${type}`} style={{
         display: "flex",
         //flexDirection: "column",
@@ -41,25 +41,16 @@ export function Grid({ def, children }: WidgetProperties<Widget & GridMixerPrope
             gridTemplateColumns: `repeat(${def.h}, 1fr)`,
             gridTemplateRows: `repeat(${def.w}, 1fr)`,
         }}>
-
             {children}
         </Panel>)
 }
 
-const shiftPanelAVisible = (shift: boolean) => {
-    return { display: shift ? "none" : "block" }
-}
-
-const shiftPanelBVisible = (shift: boolean) => {
-    return { display: shift ? "block" : "none" }
-}
-
 export function ShiftArea({ def, children }: WidgetProperties<ShiftAreaProperties> & { children: ReactNode[] }) {
-    const [shift, setShift] = useState(false);
+    const [shift, setShift] = useState(0);
     const callbacks = useWidgetAction();
 
     useEffect(() => {
-        const id = callbacks.register(def, (v) => setShift(v > 64))
+        const id = callbacks.register(def, (v) => setShift(Math.floor(v / 64)))
         return () => {
             callbacks.unregister(id, def);
         }
@@ -68,7 +59,7 @@ export function ShiftArea({ def, children }: WidgetProperties<ShiftAreaPropertie
     return (<div id={def.id} className="shift">
         {children.map((v, i) => {
             return <div className="panel" style={{
-                
+                display: shift == i ? "block" : "none"
             }}>{v}</div>
         })}
     </div>)
