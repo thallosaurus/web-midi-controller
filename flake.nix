@@ -15,18 +15,20 @@
 
         traktorController = builtins.fetchurl {
           url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/homebrewdj_traktor.js";
-          sha256 = "sha256:c10efb572f77354430c2c53b703e6feb48592f0d21097814149c4453afeb4bdc";
+          #sha256 = "sha256:c10efb572f77354430c2c53b703e6feb48592f0d21097814149c4453afeb4bdc";
+          sha256 = builtins.readFile ./packaging/homebrewdj_traktor.js.sha256;
         };
 
         driver = builtins.fetchurl {
           url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/libmidi_driver.so";
-          sha256 = "sha256:25982f75f921613cf76f91afe1586c98d78470706da86d5e3588fd51c0691bb3";
+          sha256 = builtins.readFile ./packaging/libmidi_driver.so.sha256;
         };
 
         ui = pkgs.fetchzip {
           url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/webui.zip";
           stripRoot = false;
-          sha256 = "sha256:bf73ac229aa47aafae65acf76ceed414687dad3bbf1871e7b630ad93625a4715";
+#          sha256 = "sha256:bf73ac229aa47aafae65acf76ceed414687dad3bbf1871e7b630ad93625a4715";
+          sha256 = builtins.readFile ./packaging/webui.zip.sha256;
         };
 
         config = pkgs.writeText "config.json" ''
@@ -45,7 +47,7 @@
           pname = "homebrewdj";
           version = version;
           
-          inherit src;
+#          inherit src;
 
           nativeBuildInputs = [ pkgs.alsa-lib ];
 
