@@ -1,7 +1,7 @@
 import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties } from "@hdj/definitions";
-import { Layout, WidgetProperties } from "./Parser.tsx";
+import { Layout, WidgetProperties } from "./Parser";
 import { useEffect, useState } from "react";
-import { useWidgetAction } from "./Callbacks.tsx";
+import { useWidgetAction } from "./Callbacks";
 
 export function Vertical({ def }: WidgetProperties<VerticalMixerProperties> & { aux?: React.ReactElement }) {
     //return (<div>{Layout(def.vert)}</div>)

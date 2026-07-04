@@ -1,2 +1,2 @@
-export * from "./Parser.tsx"
-export * from "./Callbacks.tsx"
+export * from "./Parser"
+export * from "./Callbacks"

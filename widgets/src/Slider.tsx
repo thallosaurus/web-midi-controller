@@ -1,8 +1,8 @@
 import { CCSliderProperties, SliderMode } from "@hdj/definitions";
-import { WidgetProperties } from "./Parser.tsx";
+import { WidgetProperties } from "./Parser";
 import { useEffect, useRef, useState } from "react";
-import { vibrate } from "./utils.ts";
-import { useWidgetAction } from "./Callbacks.tsx";
+import { vibrate } from "./utils";
+import { useWidgetAction } from "./Callbacks";
 
 const MAX_LEVEL = 1.0;
 

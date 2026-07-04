@@ -50,10 +50,7 @@ pub(super) struct CCProperties {
 #[ts(export, export_to = "Widget.ts")]
 pub (super) struct ValueProperties {
     min: Option<u8>,
-
-    /// May be redundant?
     max: Option<u8>,
-
     default: Option<u8>
 }
 

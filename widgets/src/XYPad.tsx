@@ -1,8 +1,8 @@
 import { XYPadProperties } from "@hdj/definitions";
-import { WidgetProperties } from "./Parser.tsx";
+import { WidgetProperties } from "./Parser";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils";
-import { useWidgetAction } from "./Callbacks.tsx";
+import { useWidgetAction } from "./Callbacks";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 

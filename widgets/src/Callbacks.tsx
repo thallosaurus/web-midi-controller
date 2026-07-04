@@ -1,4 +1,4 @@
-import { osc, midi, NoteProperties, CCProperties, Widget } from "@hdj/definitions";
+import { osc, midi, NoteProperties, CCProperties, Widget, ValueProperties } from "@hdj/definitions";
 import { createContext, useContext } from "react";
 import { uuid } from "./utils";
 
@@ -93,6 +93,11 @@ function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
     return (def.output === "osc")
 }
 
+function hasScalingProperties(value: ValueProperties | null): value is ValueProperties {
+    return value !== null 
+        && ( Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
+}
+
 export abstract class WCallbacks {
     abstract sender: Outgoing | null;
 
@@ -149,6 +154,16 @@ export abstract class WCallbacks {
         }
         const ccMap = channelMap?.get(cc).callbacks;
         ccMap?.delete(id);
+
+        // cleanup
+        if (ccMap.size === 0) {
+            channelMap.delete(cc);
+        }
+
+        if (channelMap.size === 0) {
+            this.callbacks.ccCallbackMap.delete(cc);
+        }
+        console.log(this.callbacks.ccCallbackMap);
         //if (this.next) this.next.unregisterCC(id, def)
     }
 
@@ -166,6 +181,16 @@ export abstract class WCallbacks {
 
         const noteMap = channelMap?.get(note).callbacks;
         noteMap?.delete(id);
+
+                // cleanup
+        if (noteMap.size === 0) {
+            channelMap.delete(note);
+        }
+
+        if (channelMap.size === 0) {
+            this.callbacks.noteCallbackMap.delete(channel);
+        }
+        console.log(this.callbacks.noteCallbackMap);
         //if (this.next) this.next.unregisterNote(id, def);
     }
 

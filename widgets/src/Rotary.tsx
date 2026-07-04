@@ -1,8 +1,8 @@
 import { RotarySliderProperties } from "@hdj/definitions";
-import { WidgetProperties } from "./Parser.tsx";
+import { WidgetProperties } from "./Parser";
 import { vibrate } from "./utils";
 import { useEffect, useRef, useState } from "react";
-import { useWidgetAction } from "./Callbacks.tsx";
+import { useWidgetAction } from "./Callbacks";
 
 const sensitivity = 0.5;    // px -> value
 const MIN_ANGLE = -135;

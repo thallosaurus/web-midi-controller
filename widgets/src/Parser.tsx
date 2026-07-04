@@ -1,11 +1,11 @@
 import { Overlay, Widget } from "@hdj/definitions";
-import { Button } from "./Button.tsx";
-import { CCSlider } from "./Slider.tsx";
-import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout.tsx";
-import { Rotary } from "./Rotary.tsx";
-import { XYPad } from "./XYPad.tsx";
-import { Jogwheel } from "./Jogwheel.tsx";
-import { WCallbacks, WidgetActionContext } from "./Callbacks.tsx";
+import { Button } from "./Button";
+import { CCSlider } from "./Slider";
+import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout";
+import { Rotary } from "./Rotary";
+import { XYPad } from "./XYPad";
+import { Jogwheel } from "./Jogwheel";
+import { WCallbacks, WidgetActionContext } from "./Callbacks";
 
 const stringToElement = (d, k) => {
   switch (d.type) {

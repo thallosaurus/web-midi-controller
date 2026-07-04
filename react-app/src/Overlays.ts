@@ -1,4 +1,4 @@
-import { ButtonMode, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { ButtonMode, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, RotaryMode, RotarySliderProperties, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
 
 const TestOscWidget: Widget & CCSliderProperties = {
   output: "osc",
@@ -23,11 +23,11 @@ export const TestOscOverlay: Overlay = {
 
 function createDeck(ch: number): Widget & VerticalMixerProperties {
   return {
-    id: "deck_" + ch,
+    id: "volume_deck" + ch,
     type: "vert-mixer",
     vert: [
       createCCSlider("Deck A", ch, 1, "absolute", false),
-      createMidiNoteButton("Mixer Cue", ch, 33, "latch")]
+      createMidiNoteButton("Mixer Cue", ch, 33, "latch", "mixercue_deck"+ch)]
   }
 }
 
@@ -36,13 +36,13 @@ export const VOLUME_SLIDER_OVERLAY_NEW: Overlay = {
   channel: null,
   program: null,
   style: `
-    #volume_slider_overlay_new #mixercue_decka, 
-    #volume_slider_overlay_new #mixercue_deckb {
+    #volume_slider_overlay_new #mixercue_deck1, 
+    #volume_slider_overlay_new #mixercue_deck2 {
       flex-shrink: 4;
       width: 50%;
     }
-    #volume_slider_overlay_new #volume_decka .slider, 
-    #volume_slider_overlay_new #volume_deckb .slider {
+    #volume_slider_overlay_new #volume_deck1 .slider, 
+    #volume_slider_overlay_new #volume_deck2 .slider {
       width: 50%;
     }
   `,
@@ -66,7 +66,7 @@ export const VOLUME_SLIDER_OVERLAY: Overlay = {
   }]
 };
 
-export const XYPAD_OVERLAY = {
+export const XYPAD_OVERLAY: Overlay = {
   "id": "fullscreen-xy-pad",
   "name": "Fullscreen XY Pad",
   "program": 0,
@@ -97,465 +97,66 @@ export const XYPAD_OVERLAY = {
   ]
 }
 
-export const MATRIX_OVERLAY = {
+const DEFAULT_MATRIX_MAP = [
+  0, 1, 2, 3, 4, 5, 6, 16,
+  17, 18, 19, 20, 21, 22, 23, 24,
+  32, 33, 34, 35, 36, 37, 38, 39,
+  48, 49, 50, 51, 52, 53, 54, 55,
+  64, 65, 66, 67, 68, 69, 70, 71,
+  80, 81, 82, 83, 84, 85, 86, 87,
+  96, 97, 98, 99, 100, 101, 102, 103,
+  112, 113, 114, 115, 116, 117, 118, 119
+];
+
+function createRotaries(label: string, ch: number, cc: number, mode: RotaryMode, htmlId: string | null = null): RotarySliderProperties & Widget {
+  return {
+    id: htmlId,
+    type: "rotary",
+    output: "midi",
+    cc,
+    channel: ch,
+    mode,
+    label
+  }
+}
+
+export const ROTARIES_TEST: Overlay = {
+  name: "Rotaries Test",
+  channel: null,
+  program: null,
+  style: null,
+  id: "rotaries_test",
+  cells: [
+    createRotaries("test", 1, 1, "relative"),
+    createRotaries("test", 1, 2, "relative"),
+    createRotaries("test", 1, 3, "relative"),
+  ],
+}
+
+function createMatrix(ch: number, w: number, h: number, a = DEFAULT_MATRIX_MAP, htmlId = null): GridMixerProperties & Widget {
+  return {
+    "id": htmlId,
+    "type": "grid-mixer",
+    "h": h,
+    "w": w,
+    "grid": a.map((v) => {
+      return createMidiNoteButton("", ch, v, "trigger")
+    })
+  }
+}
+
+export const MATRIX_OVERLAY: Overlay = {
   "id": "note-midi-grid",
   "name": "8x8 MIDI Grid",
+  channel: null,
+  program: null,
+  style: `
+  #note-midi-grid .grid {
+    width: 80% !important;
+  }
+  `,
   "cells": [
-    {
-      "h": 8,
-      "type": "grid-mixer",
-      "w": 8,
-      "grid": [
-        {
-          "channel": 1,
-          "output": "midi",
-          "mode": "trigger",
-          "note": 0,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 1,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 2,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 3,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 4,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 5,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 6,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 16,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 17,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 18,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 19,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 20,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 21,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 22,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 23,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 24,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 32,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 33,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 34,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 35,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 36,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 37,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 38,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 39,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 48,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 49,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 50,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 51,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 52,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 53,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 54,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 55,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 64,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 65,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 66,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 67,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 68,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 69,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 70,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 71,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 80,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 81,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 82,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 83,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 84,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 85,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 86,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 87,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 96,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 97,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 98,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 99,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 100,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 101,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 102,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 103,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 112,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 113,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 114,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 115,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 116,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 117,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 118,
-          "type": "notebutton"
-        },
-        {
-          "output": "midi",
-          "channel": 1,
-          "mode": "trigger",
-          "note": 119,
-          "type": "notebutton"
-        }
-      ]
-    }
+    createMatrix(1, 8, 8)
   ]
 };
 
@@ -564,49 +165,15 @@ export const MIDI_TEST_OVERLAY: Overlay = {
   channel: null,
   program: null,
   id: null,
-  cells: [{
-    "type": "ccslider",
-    "output": "midi",
-    "cc": 1,
-    "channel": 1,
-    "id": "test1",
-    "label": "test",
-    "mode": "absolute",
-    "vertical": true,
-    "value": 0,
-    "value_off": 0,
-    "default_value": 0
-  },
-  {
-    "type": "ccslider",
-    "output": "midi",
-    "cc": 1,
-    "channel": 1,
-    "id": "test2",
-    "label": "test",
-    "mode": "absolute",
-    "vertical": true,
-    "value": 0,
-    "value_off": 0,
-    "default_value": 0
-  },
-  {
-    "type": "ccslider",
-    "output": "midi",
-    "cc": 1,
-    "channel": 1,
-    "id": "test3",
-    "label": "test",
-    "mode": "absolute",
-    "vertical": true,
-    "value": 0,
-    "value_off": 0,
-    "default_value": 0
-  }
+  style: null,
+  cells: [
+    createCCSlider("test", 1, 1, "absolute", true, "test1"),
+    createCCSlider("test", 1, 1, "absolute", true, "test2"),
+    createCCSlider("test", 1, 1, "absolute", true, "test3")
   ],
 };
 
-function createCCSlider(label: string, channel: number, cc: number, mode: SliderMode, vertical: boolean, htmlId = null): CCSliderProperties & Widget {
+function createCCSlider(label: string, channel: number, cc: number, mode: SliderMode, vertical: boolean, htmlId: string | null = null): CCSliderProperties & Widget {
   return {
     id: htmlId,
     type: "ccslider",
@@ -620,7 +187,7 @@ function createCCSlider(label: string, channel: number, cc: number, mode: Slider
   }
 }
 
-function createMidiNoteButton(label: string, channel: number, note: number, mode: ButtonMode, htmlId = null): NoteButtonProperties & Widget {
+function createMidiNoteButton(label: string, channel: number, note: number, mode: ButtonMode, htmlId: string | null = null): NoteButtonProperties & Widget {
   return {
     id: htmlId,
     type: "notebutton",
@@ -635,6 +202,14 @@ function createMidiNoteButton(label: string, channel: number, note: number, mode
 export const ABLETON_OVERLAY: Overlay = {
   "id": "ableton_performance",
   "name": "Ableton Performance",
+  "channel": null,
+  program: null,
+  style: `
+  #ableton_performance #returns {
+    height: 70% !important;
+    align-self: center;
+  }
+  `,
   "cells": [
     {
       "type": "horiz-mixer",
@@ -665,6 +240,7 @@ export const ABLETON_OVERLAY: Overlay = {
 function createOneDeviceTraktorDeck(channel: number): VerticalMixerProperties & Widget {
   return {
     "type": "vert-mixer",
+    id: null,
     "vert": [
       {
         "h": 2,
