@@ -6,21 +6,7 @@ import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
 import { EventBus, WebsocketContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
 import { ConnectScreen } from "./Connect";
-
-export function getEndpointUrl() {
-  let url;
-  try {
-    url = new URL(import.meta.env.VITE_BACKEND);
-  } catch (e) {
-    url = new URL("/ws", location.href);
-    url.protocol = "ws";
-  }
-  return url;
-}
-
-function getVersion() {
-  return import.meta.env.VITE_VERSION ?? "0.0.0";
-}
+import { getEndpointUrl, getVersion } from "./utils";
 
 function App() {
   const eventbus = useRef<EventBus>(new EventBus());

@@ -54,7 +54,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
+export function Slider({ def }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);

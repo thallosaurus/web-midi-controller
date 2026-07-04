@@ -48,6 +48,7 @@ const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callb
 
     ws.addEventListener("error", (ev) => {
         console.log("error", ev);
+        clients.delete(id);
     })
 
     ws.addEventListener("close", (ev) => {

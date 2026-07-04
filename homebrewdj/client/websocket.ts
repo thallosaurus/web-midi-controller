@@ -29,10 +29,11 @@ export class WebsocketClient<T> {
     }
 
     asyncConnect(endpoint: URL): Promise<string> {
-        return new Promise((open, rej) => {
+        return new Promise((open, close) => {
             this.connect({
                 endpoint,
-                open
+                open,
+                close
             })
         })
     }
@@ -72,7 +73,10 @@ export class WebsocketClient<T> {
             console.log("connection closed", ev);
             if (close) close();
         }
-        ws.onerror = (ev) => console.log("connection error", ev);
+        ws.onerror = (ev) => {
+            console.log("connection error", ev);
+            if (close) close();
+        }
         this.ws = ws;
     }
 

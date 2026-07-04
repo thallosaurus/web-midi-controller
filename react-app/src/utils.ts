@@ -13,3 +13,18 @@ function pseudoUUID(): string {
     return v.toString(16);
   });
 }
+
+export function getEndpointUrl() {
+  let url;
+  try {
+    url = new URL(import.meta.env.VITE_BACKEND);
+  } catch (e) {
+    url = new URL("/ws", location.href);
+    url.protocol = "ws";
+  }
+  return url;
+}
+
+export function getVersion() {
+  return import.meta.env.VITE_VERSION ?? "0.0.0";
+}

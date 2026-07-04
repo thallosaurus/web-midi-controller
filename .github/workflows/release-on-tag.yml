@@ -203,3 +203,26 @@ jobs:
               native-win/midi-driver/target/release/*.dll
               native-mac/midi-driver/target/release/*.dylib
               native-linux/midi-driver/target/release/*.so
+
+        - uses: actions/checkout@v4
+          if: startsWith(github.ref, 'refs/tags/')
+          with:
+            path: repo
+
+        - name: Calculate Hashes
+          run: |
+            sha256 -q native-linux/midi-driver/target/release/libmidi_driver.so > repo/packaging/libmidi_driver.so.sha256
+            sha256 -q native-linux/js/homebrewdj_traktor.js > repo/packaging/homebrewdj_traktor.js.sha256
+            sha256 -q webui.zip > repo/packaging/webui.zip.sha256
+            
+
+        - name: Create Pull Request
+          uses: peter-evans/create-pull-request@v7
+          with:
+            commit-message: "Update NixOS release hashes"
+            title: "Update hashes for ${{ github.ref_name }}"
+            path: repo
+            body: |
+              Automatically generated after release.
+            branch: update-release-hashes
+            delete-branch: true

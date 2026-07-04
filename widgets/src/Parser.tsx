@@ -1,35 +1,46 @@
 import { Overlay, Widget } from "@hdj/definitions";
 import { Button } from "./Button";
-import { CCSlider } from "./Slider";
+import { Slider } from "./Slider";
 import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout";
 import { Rotary } from "./Rotary";
 import { XYPad } from "./XYPad";
 import { Jogwheel } from "./Jogwheel";
 import { WCallbacks, WidgetActionContext } from "./Callbacks";
 
-const stringToElement = (d, k) => {
+const stringToElement = (d: Widget, k) => {
   switch (d.type) {
     case 'ccbutton':
     case 'notebutton':
       return <Button def={d} key={k} />
     case 'ccslider':
-      return <CCSlider def={d} key={k} />
+      return <Slider def={d} key={k} />
     case 'horiz-mixer':
-      return <Horizontal def={d} key={k} />
+      return <Horizontal def={d} key={k}>
+        <SingleWidget children={d.horiz} />
+      </Horizontal>
     case 'vert-mixer':
-      return <Vertical def={d} key={k} />
+      return <Vertical def={d} key={k}>
+        <SingleWidget children={d.vert} />
+      </Vertical>
     case 'grid-mixer':
-      return <Grid def={d} key={k} />
+      return <Grid def={d} key={k}>
+        <SingleWidget children={d.grid} />
+      </Grid>
     case 'rotary':
       return <Rotary def={d} key={k} />
     case 'xypad':
       return <XYPad def={d} key={k} />
     case 'shift':
-      return <ShiftArea def={d} key={k} />
+      return <ShiftArea def={d} key={k}>
+        <SingleWidget children={d.a} />
+        <SingleWidget children={d.b} />
+      </ShiftArea>
     case 'jogwheel':
       return <Jogwheel def={d} key={k} />
     case 'tab':
-      return <TabbedArea def={d} key={k} />
+      return <TabbedArea def={d} key={k}>
+        <SingleWidget children={d.tabs} />
+      </TabbedArea>
     case 'empty':
     default:
       return <div className="empty" key={k}></div>
@@ -43,7 +54,7 @@ const stringToElement = (d, k) => {
   </>
 } */
 
-export function Layout({ children }: { children: Widget[], aux?: React.ReactElement }) {
+export function SingleWidget({ children }: { children: Widget[] }) {
   return <>
     {children.map((def, k) => {
       const key = `${k}-${def.type}-${def.id}`
@@ -75,7 +86,7 @@ export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WC
         justifyContent: "center",
         ...style ?? {}
       }}>
-        <Layout children={o.cells} />
+        <SingleWidget children={o.cells} />
       </div>
     </WidgetActionContext>
   )
