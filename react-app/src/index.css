@@ -25,6 +25,10 @@ body {
     background-color: red;
 }
 
+#connection-status.connecting::before {
+    background-color: orange;
+}
+
 #connection-status.connected::before {
     background-color: lightgreen;
 }

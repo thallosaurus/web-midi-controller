@@ -12,7 +12,7 @@ export class EventBus extends WCallbacks {
 
 type WebsocketContextType = {
     ws: WebsocketClient<AllowedPayloads>,
-    connected: boolean,
+    connectionState: ConnectionState,
     connectionId: string | null,
     connect: (uri: URL) => Promise<void>;
     disconnect: () => void;
@@ -24,25 +24,45 @@ export function useWebsocketContext() {
         return ctx;
 }
 
+enum ConnectionState {
+    Offline = "disconnected",
+    Connecting = "connecting",
+    Online = "connected"
+}
+
 export const WebsocketProvider = ({ children, messageHandler }: { children: ReactNode, messageHandler: WebsocketMessageCallback<AllowedPayloads>}) => {
     const wsRef = useRef(new WebsocketClient<AllowedPayloads>(messageHandler))
     
-    const [connected, setConnected] = useState(false);
     const [connectionId, setConnectionId] = useState<string | null>(null);
+    const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
 
     return <WebsocketContext.Provider value={{
         ws: wsRef.current,
-        connected,
         connectionId,
+        connectionState,
         connect: async (uri) => {
-            const id = await wsRef.current.asyncConnect(uri);
-            setConnectionId(id);
-            setConnected(true);
+            setConnectionState(ConnectionState.Connecting);
+            await new Promise((res, rej) => {
+                wsRef.current.connect({
+                    endpoint: uri,
+                    open: (id) => {
+                        setConnectionId(id)
+                        setConnectionState(ConnectionState.Online);
+                        res(id)
+                    },
+                    close: () => {
+                        setConnectionId(null);
+                        setConnectionState(ConnectionState.Offline);
+                        rej();
+                    }
+                })
+            })
+            //const id = await wsRef.current.asyncConnect(uri);
         },
         disconnect: () => {
             wsRef.current.disconnect();
             setConnectionId(null);
-            setConnected(false);
+            setConnectionState(ConnectionState.Offline);
         }
     }}>{children}</WebsocketContext.Provider>
 }

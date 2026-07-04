@@ -116,7 +116,7 @@ export class Server<T = AllowedPayloads> {
         this.app.addEventListener("listen", (e) => {
             console.log("listening to", listenOptions.port ?? 8080)
         });
-        
+
         this.app.listen({
             // default is localhost only for development, but can be overridden in listenOptions
             hostname: "127.0.0.1",

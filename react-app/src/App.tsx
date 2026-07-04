@@ -5,8 +5,9 @@ import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
 import { EventBus, WebsocketContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
+import { ConnectScreen } from "./Connect";
 
-function getEndpointUrl() {
+export function getEndpointUrl() {
   let url;
   try {
     url = new URL(import.meta.env.VITE_BACKEND);
@@ -14,8 +15,6 @@ function getEndpointUrl() {
     url = new URL("/ws", location.href);
     url.protocol = "ws";
   }
-
-  console.log(url);
   return url;
 }
 
@@ -28,8 +27,6 @@ function App() {
   const process = (id: string, msg: AllowedPayloads) => {
     eventbus.current.extInput(msg);
   }
-
-  //const websocket = useRef(new WebsocketClient<AllowedPayloads>(process))
 
   return (
     <>
@@ -69,14 +66,14 @@ function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, even
           <div style={{
             fontWeight: "bold"
           }}>HomebrewDJ v{getVersion()}</div>
-          {ws.connected ? 
-          <b onClick={() => setOverlayPicker(true)}>
-            {overlay?.name ?? "No overlay loaded"}
-          </b>
-          : <div></div>}
-          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connected ? "connected" : "disconnected"}>{ws.connected ? "connected" : "disconnected"}</div>
+          {ws.connectionState == "connected" ?
+            <b onClick={() => setOverlayPicker(true)}>
+              {overlay?.name ?? "No overlay loaded"}
+            </b>
+            : <div></div>}
+          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connectionState}>{ws.connectionState}</div>
         </header>
-        {ws.connected ?
+        {ws.connectionState == "connected" ?
           <>
             {overlay ? <OverlayView o={overlay} callbacks={eventbus} style={{
               width: "calc(100% - 2em)",
@@ -86,46 +83,12 @@ function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, even
           </>
           : <ConnectScreen />}
       </div>
-        <OverlaySwitcher
-          showModal={showOverlayPicker}
-          closeSwitcher={() => setOverlayPicker(false)}
-          setOverlay={setOverlay}></OverlaySwitcher>
+      <OverlaySwitcher
+        showModal={showOverlayPicker}
+        closeSwitcher={() => setOverlayPicker(false)}
+        setOverlay={setOverlay}></OverlaySwitcher>
     </>
   )
-}
-
-const buttonStyle: CSSProperties = {
-  padding: "1em",
-  fontFamily: "monospace",
-  border: "none",
-  backgroundColor: "white",
-  display: "block",
-  width: "100%",
-  fontWeight: "bold"
-}
-
-function ConnectScreen() {
-  const ws = useWebsocketContext();
-
-  return <div style={{
-    display: "flex",
-    width: "100%",
-    height: "100%",
-    justifyContent: "space-around"
-  }}>
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-around"
-    }}>
-      <div>
-        <button style={buttonStyle} onClick={async () => {
-          await ws.connect(getEndpointUrl())
-          console.log("after connect")
-        }}>Connect</button>
-      </div>
-    </div>
-  </div>
 }
 
 export default App;

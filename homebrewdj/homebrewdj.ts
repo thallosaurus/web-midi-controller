@@ -61,11 +61,11 @@ export class HomebrewDJTraktorSetup {
                     break;
                 case "note":
                     {
-                        const { note, channel, on } = msg;
+                        const { note, channel, velocity } = msg;
                         if (channel == 1) {
-                            this.deckAAux.sendTraktorMidi(note, on);
+                            this.deckAAux.sendTraktorMidi(note, velocity > 64);
                         } else if (channel == 2) {
-                            this.deckBAux.sendTraktorMidi(note, on)
+                            this.deckBAux.sendTraktorMidi(note, velocity > 64)
                         }
                     }
                     break;
@@ -107,7 +107,7 @@ export class HomebrewDJTraktorSetup {
                         type: "note",
                         channel: t.channel,
                         note: t.note,
-                        on: t.type == "NoteOn",
+                        //on: t.type == "NoteOn",
                         velocity: t.velocity
                     });
 
@@ -152,7 +152,7 @@ export class HomebrewDJControllerOnly {
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
         this.server = new Server((msg: AllowedPayloads) => {
-            console.debug("websocket payload", msg);
+            //console.debug("websocket payload", msg);
             switch (msg.type) {
                 case "cc":
                     this.midiPort.sendMidi({
@@ -163,7 +163,7 @@ export class HomebrewDJControllerOnly {
                     })
                     break;
                 case "note":
-                    if (msg.on) {
+                    if (msg.velocity > 64) {
                         this.midiPort.sendMidi({
                             type: "NoteOn",
                             channel: msg.channel,
@@ -200,7 +200,7 @@ export class HomebrewDJControllerOnly {
                         type: "note",
                         channel: t.channel,
                         note: t.note,
-                        on: t.type == "NoteOn",
+                        //on: t.type == "NoteOn",
                         velocity: t.velocity
                     });
                     break;

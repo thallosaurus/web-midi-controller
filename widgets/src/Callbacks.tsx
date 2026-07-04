@@ -163,7 +163,6 @@ export abstract class WCallbacks {
         if (channelMap.size === 0) {
             this.callbacks.ccCallbackMap.delete(cc);
         }
-        console.log(this.callbacks.ccCallbackMap);
         //if (this.next) this.next.unregisterCC(id, def)
     }
 
@@ -190,7 +189,6 @@ export abstract class WCallbacks {
         if (channelMap.size === 0) {
             this.callbacks.noteCallbackMap.delete(channel);
         }
-        console.log(this.callbacks.noteCallbackMap);
         //if (this.next) this.next.unregisterNote(id, def);
     }
 
@@ -279,6 +277,7 @@ export abstract class WCallbacks {
             };
 
             if (this.sender) this.sender.send(msg)
+            this.extInput(msg);
             return
         }
         throw new Error("unsupported properties")

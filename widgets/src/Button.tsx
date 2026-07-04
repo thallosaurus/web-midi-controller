@@ -28,13 +28,7 @@ export function Button({ def }: WidgetProperties<ButtonProperties>) {
         el.setPointerCapture(pointerId);
 
         if (def.mode == "trigger") {
-            //this.state.latch_on = true;
             latchOn.current = true;
-            //setValue(latchOn.current ? 127 : 0)
-            /*if (callbacks.sendNote) {
-                callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
-            }*/
-            //send(latchOn.current ? 127 : 0);
             callbacks.send(def, latchOn.current ? 127 : 0)
         }
 
