@@ -178,7 +178,9 @@ jobs:
         - name: Package releases
           run: |
             chmod +x homebrewdj-linux/homebrewdj
+            chmod +x homebrewdj-linux/homebrewdj_controller
             chmod +x homebrewdj-mac/homebrewdj
+            chmod +x homebrewdj-mac/homebrewdj_controller
             zip -r homebrewdj-linux.zip homebrewdj-linux
             zip -r homebrewdj-win.zip homebrewdj-win
             zip -r homebrewdj-mac.zip homebrewdj-mac
