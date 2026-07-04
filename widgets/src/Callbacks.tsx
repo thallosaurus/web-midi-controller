@@ -94,8 +94,8 @@ function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
 }
 
 function hasScalingProperties(value: ValueProperties | null): value is ValueProperties {
-    return value !== null 
-        && ( Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
+    return value !== null
+        && (Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
 }
 
 export abstract class WCallbacks {
@@ -182,7 +182,7 @@ export abstract class WCallbacks {
         const noteMap = channelMap?.get(note).callbacks;
         noteMap?.delete(id);
 
-                // cleanup
+        // cleanup
         if (noteMap.size === 0) {
             channelMap.delete(note);
         }
@@ -284,6 +284,12 @@ export abstract class WCallbacks {
         throw new Error("unsupported properties")
     }
 
+    private runCallbacks(map: CallbackMap<ReceiveDataCallback>, value: number) {
+        map.callbacks.forEach((cb) => {
+            cb(value)
+        });
+    }
+
     private externalOsc({ address, args }: OscDelta) {
         const c = this.callbacks.oscCallbackMap.get(address);
         c?.forEach((cb) => {
@@ -291,29 +297,23 @@ export abstract class WCallbacks {
         });
     }
 
-    private externalNote({ channel, note, velocity }: NoteDelta) {
-        const c = this.callbacks.noteCallbackMap.get(channel);
-        const cc = c?.get(note)
-        cc?.callbacks.forEach((c) => {
-            c(velocity)
-        })
-    }
-
-    private externalCC({ channel, cc, value }: CCDelta) {
-        const c = this.callbacks.ccCallbackMap.get(channel);
-        const ccc = c?.get(cc);
-        ccc?.callbacks.forEach((c) => {
-            c(value / 127)
-        })
-    }
-
     extInput(msg: (NoteDelta | CCDelta | OscDelta)) {
         switch (msg.type) {
             case "note":
-                this.externalNote(msg);
+                {
+
+                    const c = this.callbacks.noteCallbackMap.get(msg.channel);
+                    const cc = c?.get(msg.note)
+                    this.runCallbacks(cc, msg.velocity);
+                }
                 break;
             case "cc":
-                this.externalCC(msg);
+                {
+
+                    const c = this.callbacks.ccCallbackMap.get(msg.channel);
+                    const ccc = c?.get(msg.cc);
+                    this.runCallbacks(ccc, msg.value / 127);
+                }
                 break;
             case "osc":
                 this.externalOsc(msg);
@@ -322,10 +322,6 @@ export abstract class WCallbacks {
                 throw new Error("invalid external input")
         }
     }
-}
-
-export interface UiEventCallbacks {
-    sendUiEvent: (def: Widget) => void;
 }
 
 export const WidgetActionContext = createContext<WCallbacks | null>(null);

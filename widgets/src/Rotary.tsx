@@ -38,9 +38,8 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         const dx = clientX - lastX.current;
         lastX.current = clientX;
 
-        console.log(lastX);
         const new_value = Math.max(0, Math.min(1, value + (dx * sensitivity / 127)));
-        setValue(new_value);
+        //setValue(new_value);
         callbacks.send(def, new_value)
     }
 
@@ -58,7 +57,7 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
     }
 
     useEffect(() => {
-        const id = callbacks.register(def, (v) => setValue(v / 127))
+        const id = callbacks.register(def, (v) => setValue(v))
         return () => {
             callbacks.unregister(id, def);
         }

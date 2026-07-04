@@ -1,8 +1,8 @@
 import { NoteButtonProperties, CCButtonProperties, osc, Widget } from "@hdj/definitions";
 import { useEffect, useRef, useState } from "react";
-import { WidgetProperties } from "./Parser.tsx";
-import { vibrate } from "./utils.ts";
-import { useWidgetAction } from "./Callbacks.tsx";
+import { WidgetProperties } from "./Parser";
+import { vibrate } from "./utils";
+import { useWidgetAction } from "./Callbacks";
 
 type ButtonProperties = Widget & (NoteButtonProperties | CCButtonProperties);
 
