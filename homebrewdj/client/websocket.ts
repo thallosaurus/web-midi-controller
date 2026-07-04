@@ -1,54 +1,95 @@
 import { ConnectedPayload } from "./protocol.ts";
 
-type WebsocketMessageCallback<T> = (id: string, msg: T) => void;
+export type WebsocketMessageCallback<T> = (id: string, msg: T) => void;
 
-export function asyncWebsocketClient<T>(endpoint: URL, handler: WebsocketMessageCallback<T>) {
-    return new Promise((res, rej) => {
-        return new WebsocketClient<T>(endpoint, handler, res, rej);
-    })
+const isConnectionMessage = (msg: { type: "connection" }): msg is ConnectedPayload => {
+    return msg.type === "connection"
 }
 
-export class WebsocketClient<T = ConnectedPayload> {
-    private ws: WebSocket
-    private id: string | null = null
+const isWebsocketConnected = (ws: WebSocket | null): ws is WebSocket => {
+    return (ws !== null && ws.readyState == WebSocket.OPEN)
+}
 
-    constructor(endpoint: URL,
-        handler: WebsocketMessageCallback<T>,
-        open?: (id: string) => void,
-        close?: (reason?: string) => void
-    ) {
-        const ws = new WebSocket(endpoint);
-        //handler(ws);
+interface ConnectRequest {
+    endpoint: URL,
+    open?: (id: string) => void,
+    close?: () => void
+}
 
-        ws.addEventListener("open", (ev) => {
-            console.log("connection established", ev);
+export class WebsocketClient<T> {
+    private ws: WebSocket | null = null
+    private _id: string | null = null
+    handler: WebsocketMessageCallback<T>
+    connectionIdHandler: ((id: string | null) => void) | null = null
+    private outCounter = 0
+    private inCounter = 0
+
+    get id() {
+        return this._id;
+    }
+
+    asyncConnect(endpoint: URL): Promise<string> {
+        return new Promise((open, rej) => {
+            this.connect({
+                endpoint,
+                open
+            })
         })
+    }
 
-        ws.addEventListener("close", (ev) => {
-            this.id = null;
-            if (close) close(ev.reason);
-        })
-
-        ws.addEventListener("message", (ev) => {
-            const msg = JSON.parse(ev.data);
-            if (msg.type == "connection") {
-                this.id = msg.id
-                if (open) { open(msg.id) }
-            } else {
-                handler(this.id!, msg)
+    disconnect() {
+        if (isWebsocketConnected(this.ws)) {
+            this.ws.close();
+            if (this.connectionIdHandler) {
+                this.connectionIdHandler(null);
             }
-        })
+        }
+    }
 
-        ws.addEventListener("error", (ev) => {
-            console.log(ev);
-            if (close) close()
-        })
+    connect({ endpoint, open, close }: ConnectRequest) {
+        const ws = new WebSocket(endpoint);
+        ws.onopen = (ev) => {
+            this.inCounter = 0;
+            this.outCounter = 0;
+            console.log("connection established", ev);
+        }
+        ws.onmessage = ({ data }) => {
+            const msg = JSON.parse(data);
+            if (isConnectionMessage(msg)) {
+                this._id = msg.id;
+                if (this.connectionIdHandler) {
+                    this.connectionIdHandler(msg.id);
+                }
+                if (open) open(msg.id);
+                return;
+            } else {
+                this.handler(msg.id, msg)
+                this.inCounter++;
+            }
+
+        }
+        ws.onclose = (ev) => {
+            console.log("connection closed", ev);
+            if (close) close();
+        }
+        ws.onerror = (ev) => console.log("connection error", ev);
         this.ws = ws;
     }
 
+    constructor(
+        handler: WebsocketMessageCallback<T>,
+        connectionIdHandler: ((id: string | null) => void) | null = null,
+    ) {
+        this.handler = handler;
+        this.connectionIdHandler = connectionIdHandler;
+        //const ws = new WebSocket(endpoint);
+        //handler(ws);
+    }
+
     send(data: T) {
-        if (this.ws.readyState == this.ws.OPEN) {
-            this.ws.send(JSON.stringify({ ...data }))
+        if (isWebsocketConnected(this.ws)) {
+            this.ws.send(JSON.stringify({ ...data, "timestamp": performance.now(), packetNum: this.outCounter }))
+            this.outCounter++;
         }
     }
 }

@@ -1,25 +1,31 @@
 import { useEffect, useRef } from "react";
 import { WidgetProperties } from "./Parser";
 import { JogwheelProperties } from "@hdj/definitions";
+import { useWidgetAction } from "./Callbacks";
 
 export interface JogwheelState {
 
 }
 
-export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties>) {
+export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
     const active = useRef<boolean>(false);
     const lastX = useRef<number>(0);
     const lastTime = useRef<number>(0);
+
+    const callbacks = useWidgetAction();
 
     const updateValue = (v: number) => {
         const abs = Math.abs(v);
 
         if (abs < 0.002) return; // deadzone
 
-        if (v > 0) {
-            callbacks.sendCC(this.prop.channel, this.prop.cc, 66)
-        } else {
-            callbacks.sendCC(this.prop.channel, this.prop.cc, 64)
+        if (def.output == "midi") {
+
+            if (v > 0) {
+                callbacks.send(def, 66)
+            } else {
+                callbacks.send(def, 64)
+            }
         }
     }
 
@@ -33,14 +39,14 @@ export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties
     };
 
     const touch_move = ({ clientX }) => {
-        if (!this.state.active) return;
+        if (!active) return;
 
         const now = performance.now();
         const dx = clientX - lastX.current;
         const dt = now - lastTime.current;
 
-        this.state.lastX = clientX;
-        this.state.lastTime = now;
+        lastX.current = clientX;
+        lastTime.current = now;
 
         if (dt <= 0) return;
 
@@ -57,16 +63,16 @@ export function Jogwheel({ def, callbacks }: WidgetProperties<JogwheelProperties
     };
 
     useEffect(() => {
-        const id = callbacks.registerCC(def.channel, def.cc, (v) => {
+        const id = callbacks.register(def, (v) => {
             // doesnt update ui
         })
         return () => {
-            callbacks.unregisterCC(def.channel, def.cc, id)
+            callbacks.unregister(id, def)
         }
-    })
+    }, [])
 
     return (
-        <div className="jogwheel" id={def.id}
+        <div className="widget jogwheel" id={def.id}
             onPointerDown={touch_start}
             onPointerMove={touch_move}
             onPointerUp={touch_stop}

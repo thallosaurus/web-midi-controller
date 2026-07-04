@@ -1,97 +1,72 @@
-import { HorizontalMixerProperties, Overlay, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { ButtonMode, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, RotaryMode, RotarySliderProperties, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
 
-const deckA: Widget & VerticalMixerProperties = {
-  id: "deck_a",
-  type: "vert-mixer",
-  vert: [{
-    "type": "ccslider",
-    "cc": 1,
-    "channel": 1,
-    "label": "Deck A",
-    "mode": "absolute",
-    "vertical": false,
-    "value": 0,
-    "value_off": 0,
-    "id": "volume_decka",
-    "default_value": 0
-  }, {
-    "type": "notebutton",
-    "mode": "latch",
-    "id": "mixercue_decka",
-    "label": "Mixer Cue",
-    "channel": 1,
-    "note": 33
-  }]
+const TestOscWidget: Widget & CCSliderProperties = {
+  output: "osc",
+  address: "/test",
+  label: "osc-test",
+  mode: "absolute",
+  type: "ccslider",
+  id: null,
+  vertical: false,
+  cc: 3,
+  value: null
 }
 
-const deckB: Widget & VerticalMixerProperties = {
-  id: "deck_b",
-  type: "vert-mixer",
-  vert: [{
-    "type": "ccslider",
-    "cc": 1,
-    "channel": 2,
-    "label": "Deck B",
-    "mode": "absolute",
-    "vertical": false,
-    "value": 0,
-    "value_off": 0,
-    "id": "volume_deckb",
-    "default_value": 0
-  }, {
-    "type": "notebutton",
-    "mode": "latch",
-    "id": "mixercue_deckb",
-    "label": "Mixer Cue",
-    "channel": 2,
-    "note": 33
-  }]
+export const TestOscOverlay: Overlay = {
+  id: "test_osc",
+  name: "OSC Test Overlay",
+  style: null,
+  channel: null,
+  program: null,
+  cells: [TestOscWidget]
+}
+
+function createDeck(ch: number): Widget & VerticalMixerProperties {
+  return {
+    id: "volume_deck" + ch,
+    type: "vert-mixer",
+    vert: [
+      createCCSlider("Deck A", ch, 1, "absolute", false),
+      createMidiNoteButton("Mixer Cue", ch, 33, "latch", "mixercue_deck"+ch)]
+  }
 }
 
 export const VOLUME_SLIDER_OVERLAY_NEW: Overlay = {
   name: "Volume Sliders (New)",
   channel: null,
   program: null,
+  style: `
+    #volume_slider_overlay_new #mixercue_deck1, 
+    #volume_slider_overlay_new #mixercue_deck2 {
+      flex-shrink: 4;
+      width: 50%;
+    }
+    #volume_slider_overlay_new #volume_deck1 .slider, 
+    #volume_slider_overlay_new #volume_deck2 .slider {
+      width: 50%;
+    }
+  `,
   id: "volume_slider_overlay_new",
-  cells: [deckA, deckB]
+  cells: [createDeck(1), createDeck(2)]
 }
 
 export const VOLUME_SLIDER_OVERLAY: Overlay = {
   name: "Volume Sliders",
   channel: null,
   program: null,
+  style: null,
   id: "volume_slider_overlay",
   cells: [{
     type: "horiz-mixer",
     id: null,
-    horiz: [{
-      "type": "ccslider",
-      "cc": 1,
-      "channel": 1,
-      "label": "Deck A",
-      "mode": "absolute",
-      "vertical": false,
-      "value": 0,
-      "value_off": 0,
-      "id": null,
-      "default_value": 0
-    },
-    {
-      "type": "ccslider",
-      "cc": 1,
-      "channel": 2,
-      "label": "Deck B",
-      "mode": "absolute",
-      "vertical": false,
-      "value": 0,
-      "value_off": 0,
-      "id": null,
-      "default_value": 0
-    }]
+    horiz: [
+      createCCSlider("Deck A", 1, 1, "absolute", false),
+      createCCSlider("Deck B", 2, 1, "absolute", false)
+    ]
   }]
 };
 
-export const XYPAD_OVERLAY = {
+export const XYPAD_OVERLAY: Overlay = {
   "id": "fullscreen-xy-pad",
   "name": "Fullscreen XY Pad",
   "program": 0,
@@ -104,10 +79,16 @@ export const XYPAD_OVERLAY = {
           "channel": 2,
           "label": "XY Pad",
           "type": "xypad",
+          "output": "midi",
+          "note": 60,
           "x": {
+            "output": "midi",
+            "channel": 1,
             "cc": 4
           },
           "y": {
+            "output": "midi",
+            "channel": 1,
             "cc": 5
           }
         }
@@ -116,744 +97,206 @@ export const XYPAD_OVERLAY = {
   ]
 }
 
-export const MATRIX_OVERLAY = {
+const DEFAULT_MATRIX_MAP = [
+  0, 1, 2, 3, 4, 5, 6, 16,
+  17, 18, 19, 20, 21, 22, 23, 24,
+  32, 33, 34, 35, 36, 37, 38, 39,
+  48, 49, 50, 51, 52, 53, 54, 55,
+  64, 65, 66, 67, 68, 69, 70, 71,
+  80, 81, 82, 83, 84, 85, 86, 87,
+  96, 97, 98, 99, 100, 101, 102, 103,
+  112, 113, 114, 115, 116, 117, 118, 119
+];
+
+function createRotaries(label: string, ch: number, cc: number, mode: RotaryMode, htmlId: string | null = null): RotarySliderProperties & Widget {
+  return {
+    id: htmlId,
+    type: "rotary",
+    output: "midi",
+    cc,
+    channel: ch,
+    mode,
+    label
+  }
+}
+
+export const ROTARIES_TEST: Overlay = {
+  name: "Rotaries Test",
+  channel: null,
+  program: null,
+  style: null,
+  id: "rotaries_test",
+  cells: [
+    createRotaries("test", 1, 1, "relative"),
+    createRotaries("test", 1, 2, "relative"),
+    createRotaries("test", 1, 3, "relative"),
+  ],
+}
+
+function createMatrix(ch: number, w: number, h: number, a = DEFAULT_MATRIX_MAP, htmlId = null): GridMixerProperties & Widget {
+  return {
+    "id": htmlId,
+    "type": "grid-mixer",
+    "h": h,
+    "w": w,
+    "grid": a.map((v) => {
+      return createMidiNoteButton("", ch, v, "trigger")
+    })
+  }
+}
+
+export const MATRIX_OVERLAY: Overlay = {
   "id": "note-midi-grid",
   "name": "8x8 MIDI Grid",
+  channel: null,
+  program: null,
+  style: `
+  #note-midi-grid .grid {
+    width: 80% !important;
+  }
+  `,
   "cells": [
-    {
-      "h": 8,
-      "type": "grid-mixer",
-      "w": 8,
-      "grid": [
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 0,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 1,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 2,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 3,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 4,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 5,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 6,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 16,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 17,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 18,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 19,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 20,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 21,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 22,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 23,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 24,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 32,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 33,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 34,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 35,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 36,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 37,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 38,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 39,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 48,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 49,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 50,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 51,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 52,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 53,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 54,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 55,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 64,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 65,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 66,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 67,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 68,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 69,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 70,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 71,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 80,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 81,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 82,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 83,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 84,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 85,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 86,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 87,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 96,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 97,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 98,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 99,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 100,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 101,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 102,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 103,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 112,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 113,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 114,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 115,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 116,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 117,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 118,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "mode": "trigger",
-          "note": 119,
-          "type": "notebutton"
-        }
-      ]
-    }
+    createMatrix(1, 8, 8)
   ]
 };
 
-export const ABLETON_OVERLAY = {
+export const MIDI_TEST_OVERLAY: Overlay = {
+  name: "MIDI Test Overlay",
+  channel: null,
+  program: null,
+  id: null,
+  style: null,
+  cells: [
+    createCCSlider("test", 1, 1, "absolute", true, "test1"),
+    createCCSlider("test", 1, 1, "absolute", true, "test2"),
+    createCCSlider("test", 1, 1, "absolute", true, "test3")
+  ],
+};
+
+function createCCSlider(label: string, channel: number, cc: number, mode: SliderMode, vertical: boolean, htmlId: string | null = null): CCSliderProperties & Widget {
+  return {
+    id: htmlId,
+    type: "ccslider",
+    output: "midi",
+    cc,
+    channel,
+    label,
+    mode,
+    vertical,
+    value: null,
+  }
+}
+
+function createMidiNoteButton(label: string, channel: number, note: number, mode: ButtonMode, htmlId: string | null = null): NoteButtonProperties & Widget {
+  return {
+    id: htmlId,
+    type: "notebutton",
+    output: "midi",
+    channel,
+    note,
+    label,
+    mode
+  }
+}
+
+export const ABLETON_OVERLAY: Overlay = {
   "id": "ableton_performance",
   "name": "Ableton Performance",
+  "channel": null,
+  program: null,
+  style: `
+  #ableton_performance #returns {
+    height: 70% !important;
+    align-self: center;
+  }
+  `,
   "cells": [
     {
       "type": "horiz-mixer",
+      id: "volumes",
       "horiz": [
-        {
-          "cc": 10,
-          "channel": 1,
-          "label": "Volume 1",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "cc": 20,
-          "channel": 1,
-          "label": "Volume 2",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "cc": 30,
-          "channel": 1,
-          "label": "Volume 3",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "cc": 40,
-          "channel": 1,
-          "label": "Volume 4",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "cc": 50,
-          "channel": 1,
-          "label": "Volume 5",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "cc": 60,
-          "channel": 1,
-          "label": "Volume 6",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "cc": 70,
-          "channel": 1,
-          "label": "Volume 7",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "cc": 80,
-          "channel": 1,
-          "label": "Volume 8",
-          "mode": "relative",
-          "type": "ccslider"
-        }
+        createCCSlider("Volume 1", 1, 10, "relative", false),
+        createCCSlider("Volume 2", 1, 20, "relative", false),
+        createCCSlider("Volume 3", 1, 30, "relative", false),
+        createCCSlider("Volume 4", 1, 40, "relative", false),
+        createCCSlider("Volume 5", 1, 50, "relative", false),
+        createCCSlider("Volume 6", 1, 60, "relative", false),
+        createCCSlider("Volume 7", 1, 70, "relative", false),
+        createCCSlider("Volume 8", 1, 80, "relative", false)
       ]
     },
     {
       "id": "returns",
       "type": "vert-mixer",
       "vert": [
-        {
-          "cc": 90,
-          "channel": 1,
-          "label": "Reverb",
-          "mode": "snapback",
-          "type": "ccslider",
-          "vertical": true
-        },
-        {
-          "cc": 91,
-          "channel": 1,
-          "label": "Filter",
-          "mode": "snapback",
-          "type": "ccslider",
-          "vertical": true
-        },
-        {
-          "cc": 92,
-          "channel": 1,
-          "label": "Test",
-          "mode": "absolute",
-          "type": "ccslider",
-          "vertical": true
-        }
+        createCCSlider("Reverb", 1, 90, "snapback", true),
+        createCCSlider("Filter", 1, 91, "snapback", true),
+        createCCSlider("Test", 1, 92, "absolute", true)
       ]
     }
   ]
 };
 
-export const TRAKTOR_PERFORMANCE = {
+function createOneDeviceTraktorDeck(channel: number): VerticalMixerProperties & Widget {
+  return {
+    "type": "vert-mixer",
+    id: null,
+    "vert": [
+      {
+        "h": 2,
+        "id": `deck_${channel}_loop`,
+        "type": "grid-mixer",
+        "w": 4,
+        "grid": [
+          createMidiNoteButton("1/4 Loop", channel, 16, "trigger"),
+          createMidiNoteButton("1/2 Loop", channel, 15, "trigger"),
+          createMidiNoteButton("1 Loop", channel, 14, "trigger"),
+          createMidiNoteButton("2 Loop", channel, 13, "trigger"),
+          createMidiNoteButton("4 Loop", channel, 12, "trigger"),
+          createMidiNoteButton("8 Loop", channel, 11, "trigger"),
+          createMidiNoteButton("16 Loop", channel, 10, "trigger"),
+          createMidiNoteButton("32 Loop", channel, 9, "trigger")
+        ]
+      },
+      {
+        "type": "vert-mixer",
+        "id": `deck_${channel}_eq`,
+        "vert": [
+          createCCSlider("Bass", channel, 17, "snapback", true),
+          createCCSlider("Mid", channel, 16, "snapback", true),
+          createCCSlider("Hi", channel, 15, "snapback", true),
+        ]
+      },
+      {
+        "type": "horiz-mixer",
+        "id": `deck_${channel}_transport`,
+        "horiz": [
+          createMidiNoteButton("Play/Pause", channel, 1, "trigger"),
+          createMidiNoteButton("Sync", channel, 2, "trigger")
+        ]
+      }
+    ]
+  }
+}
+
+export const TRAKTOR_PERFORMANCE: Overlay = {
   "id": "traktor_performance",
   "name": "One-device Traktor 2.0",
+  "style": `#deck_1_eq, #deck_2_eq {
+    /*flex-grow: 1;*/
+  }`,
+  "channel": null,
+  "program": null,
   "cells": [
-    {
-      "type": "vert-mixer",
-      "vert": [
-        {
-          "h": 2,
-          "id": "deck_a",
-          "type": "grid-mixer",
-          "w": 4,
-          "grid": [
-            {
-              "channel": 1,
-              "label": "1/4 Loop",
-              "mode": "trigger",
-              "note": 16,
-              "type": "notebutton"
-            },
-            {
-              "channel": 1,
-              "label": "1/2 Loop",
-              "mode": "trigger",
-              "note": 15,
-              "type": "notebutton"
-            },
-            {
-              "channel": 1,
-              "label": "1 Loop",
-              "mode": "trigger",
-              "note": 14,
-              "type": "notebutton"
-            },
-            {
-              "channel": 1,
-              "label": "2 Loop",
-              "mode": "trigger",
-              "note": 13,
-              "type": "notebutton"
-            },
-            {
-              "channel": 1,
-              "label": "4 Loop",
-              "mode": "trigger",
-              "note": 12,
-              "type": "notebutton"
-            },
-            {
-              "channel": 1,
-              "label": "8 Loop",
-              "mode": "trigger",
-              "note": 11,
-              "type": "notebutton"
-            },
-            {
-              "channel": 1,
-              "label": "16 Loop",
-              "mode": "trigger",
-              "note": 10,
-              "type": "notebutton"
-            },
-            {
-              "channel": 1,
-              "label": "32 Loop",
-              "mode": "trigger",
-              "note": 9,
-              "type": "notebutton"
-            }
-          ]
-        },
-        {
-          "type": "horiz-mixer",
-          "horiz": [
-            {
-              "cc": 17,
-              "channel": 1,
-              "default_value": 64,
-              "label": "Bass",
-              "mode": "snapback",
-              "type": "rotary"
-            },
-            {
-              "cc": 16,
-              "channel": 1,
-              "default_value": 64,
-              "label": "Mid",
-              "mode": "snapback",
-              "type": "rotary"
-            },
-            {
-              "cc": 15,
-              "channel": 1,
-              "default_value": 64,
-              "label": "Hi",
-              "mode": "snapback",
-              "type": "rotary"
-            }
-          ]
-        },
-        {
-          "type": "horiz-mixer",
-          "horiz": [
-            {
-              "channel": 1,
-              "label": "Play/Pause",
-              "mode": "trigger",
-              "note": 1,
-              "type": "notebutton"
-            },
-            {
-              "channel": 1,
-              "label": "Sync",
-              "mode": "trigger",
-              "note": 2,
-              "type": "notebutton"
-            }
-          ]
-        }
-      ]
-    },
+    createOneDeviceTraktorDeck(1),
     {
       "id": "levels",
       "type": "horiz-mixer",
       "horiz": [
-        {
-          "cc": 0,
-          "channel": 1,
-          "label": "Test",
-          "mode": "relative",
-          "type": "ccslider"
-        },
-        {
-          "cc": 1,
-          "channel": 1,
-          "label": "Test",
-          "mode": "relative",
-          "type": "ccslider"
-        }
+        createCCSlider("Test", 1, 0, "relative", false),
+        createCCSlider("Test", 2, 0, "relative", false)
       ]
     },
-    {
-      "h": 8,
-      "id": "deck_b",
-      "type": "grid-mixer",
-      "w": 4,
-      "grid": [
-        {
-          "channel": 1,
-          "label": "1/4 Loop",
-          "mode": "trigger",
-          "note": 36,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "1/2 Loop",
-          "mode": "trigger",
-          "note": 35,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "1 Loop",
-          "mode": "trigger",
-          "note": 34,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "2 Loop",
-          "mode": "trigger",
-          "note": 33,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "4 Loop",
-          "mode": "trigger",
-          "note": 32,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "8 Loop",
-          "mode": "trigger",
-          "note": 31,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "16 Loop",
-          "mode": "trigger",
-          "note": 30,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "32 Loop",
-          "mode": "trigger",
-          "note": 29,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "Kill Bass",
-          "mode": "trigger",
-          "note": 47,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "Kill Mid",
-          "mode": "trigger",
-          "note": 48,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "Kill Hi",
-          "mode": "trigger",
-          "note": 49,
-          "type": "notebutton"
-        },
-        {
-          "type": "empty"
-        },
-        {
-          "channel": 1,
-          "label": "Play/Pause",
-          "mode": "trigger",
-          "note": 21,
-          "type": "notebutton"
-        },
-        {
-          "channel": 1,
-          "label": "Sync",
-          "mode": "trigger",
-          "note": 22,
-          "type": "notebutton"
-        }
-      ]
-    }
+    createOneDeviceTraktorDeck(2)
   ]
 }

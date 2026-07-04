@@ -1,0 +1,68 @@
+import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback } from "@hdj/homebrewdj-web-client";
+import { Outgoing, WCallbacks } from "@hdj/widgets";
+import { createContext, useState, useContext, useRef, ReactNode } from "react";
+
+export class EventBus extends WCallbacks {
+    sender: Outgoing | null = null;
+
+    setSender(sender: Outgoing | null) {
+        this.sender = sender;
+    }
+}
+
+type WebsocketContextType = {
+    ws: WebsocketClient<AllowedPayloads>,
+    connectionState: ConnectionState,
+    connectionId: string | null,
+    connect: (uri: URL) => Promise<void>;
+    disconnect: () => void;
+}
+export const WebsocketContext = createContext<WebsocketContextType| null>(null);
+export function useWebsocketContext() {
+    const ctx = useContext(WebsocketContext);
+    if (!ctx) throw new Error("no websocketcontext loaded")
+        return ctx;
+}
+
+enum ConnectionState {
+    Offline = "disconnected",
+    Connecting = "connecting",
+    Online = "connected"
+}
+
+export const WebsocketProvider = ({ children, messageHandler }: { children: ReactNode, messageHandler: WebsocketMessageCallback<AllowedPayloads>}) => {
+    const wsRef = useRef(new WebsocketClient<AllowedPayloads>(messageHandler))
+    
+    const [connectionId, setConnectionId] = useState<string | null>(null);
+    const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
+
+    return <WebsocketContext.Provider value={{
+        ws: wsRef.current,
+        connectionId,
+        connectionState,
+        connect: async (uri) => {
+            setConnectionState(ConnectionState.Connecting);
+            await new Promise((res, rej) => {
+                wsRef.current.connect({
+                    endpoint: uri,
+                    open: (id) => {
+                        setConnectionId(id)
+                        setConnectionState(ConnectionState.Online);
+                        res(id)
+                    },
+                    close: () => {
+                        setConnectionId(null);
+                        setConnectionState(ConnectionState.Offline);
+                        rej();
+                    }
+                })
+            })
+            //const id = await wsRef.current.asyncConnect(uri);
+        },
+        disconnect: () => {
+            wsRef.current.disconnect();
+            setConnectionId(null);
+            setConnectionState(ConnectionState.Offline);
+        }
+    }}>{children}</WebsocketContext.Provider>
+}

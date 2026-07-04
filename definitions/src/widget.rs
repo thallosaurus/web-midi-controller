@@ -13,9 +13,23 @@ pub(super) struct BaseProperties {
 /// Shared Properties for all Midi Widgets
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
+#[serde(tag = "output", rename = "midi")]
 pub(super) struct MidiProperties {
     /// The midi channel the widget sends on. 1 = Channel 1; 0 is Overlay Global Channel
     channel: u8,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct NoteProperties {
+    note: u8,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+#[serde(tag = "output", rename = "osc")]
+pub(super) struct OscProperties {
+    address: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -28,13 +42,16 @@ pub(super) struct ButtonProperties {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct CCProperties {
-    cc: u8,
-    value: Option<u8>,
-
-    /// May be redundant?
-    value_off: Option<u8>,
-    default_value: Option<u8>,
+    cc: u8
     //label: Option<String>
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub (super) struct ValueProperties {
+    min: Option<u8>,
+    max: Option<u8>,
+    default: Option<u8>
 }
 
 /*#[derive(Serialize, Deserialize, Debug, TS)]
@@ -44,6 +61,14 @@ pub(super) struct ChildrenContainer {
 }*/
 
 /// MARK: - JSON Definitions
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+#[serde(untagged)]
+enum Properties {
+    Midi(MidiProperties),
+    Osc(OscProperties),
+}
 
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
@@ -64,36 +89,36 @@ pub(super) enum Widget {
 
     /// A button that sends MIDI Notes
     #[serde(rename = "notebutton")]
-    NoteButton(NoteButtonProperties),
+    MidiNoteButton(NoteButtonProperties),
 
     /// A slider that sends out CC values
     #[serde(rename = "ccslider")]
-    CCSlider(CCSliderProperties),
+    MidiCCSlider(CCSliderProperties),
 
     /// A button that sends out CC values
     #[serde(rename = "ccbutton")]
-    CCButton(CCButtonProperties),
+    MidiCCButton(CCButtonProperties),
 
     /// A rotary slider that sends out CC values
     #[serde(rename = "rotary")]
-    RotarySlider(RotarySliderProperties),
+    MidiRotarySlider(RotarySliderProperties),
 
     /// An input that sends out relative CC values (3Fh/41h)
     #[serde(rename = "jogwheel")]
-    Jogwheel(JogwheelProperties),
+    MidiJogwheel(JogwheelProperties),
 
     #[serde(rename = "xypad")]
     XYPad(XYPadProperties),
 
     /// An empty cell useful as a grid placeholder
     #[serde(rename = "empty")]
-    Empty,
+    Empty(EmptyProperties),
 
     #[serde(rename = "shift")]
     ShiftArea(ShiftAreaProperties),
 
     #[serde(rename = "tab")]
-    TabbedView(TabbedViewProperties)
+    TabbedView(TabbedViewProperties),
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -151,11 +176,13 @@ pub(super) struct ShiftAreaProperties {
     #[serde(flatten)]
     midi: MidiProperties,
 
-    note: u8, // Columns of this grid
-              //w: u8,
+    #[serde(flatten)]
+    note: NoteProperties,
+    // Columns of this grid
+    //w: u8,
 
-              // Rows of this grid
-              //h: u8,
+    // Rows of this grid
+    //h: u8,
 }
 
 /// A single Notebutton. Sends out its defined Midi Note
@@ -166,12 +193,13 @@ pub(super) struct NoteButtonProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    output: Properties,
 
     #[serde(flatten)]
     button: ButtonProperties,
 
-    note: u8,
+    #[serde(flatten)]
+    note: NoteProperties,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -181,10 +209,12 @@ pub(super) struct CCSliderProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    output: Properties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
+
+    value: Option<ValueProperties>,
 
     label: Option<String>,
 
@@ -211,14 +241,17 @@ enum SliderMode {
 pub(super) struct CCButtonProperties {
     #[serde(flatten)]
     base: BaseProperties,
+
     #[serde(flatten)]
-    midi: MidiProperties,
+    output: Properties,
 
     #[serde(flatten)]
     button: ButtonProperties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
+
+    value: Option<ValueProperties>,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -228,7 +261,7 @@ pub(super) struct JogwheelProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    output: Properties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
@@ -241,7 +274,7 @@ pub(super) struct RotarySliderProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    output: Properties,
 
     #[serde(flatten)]
     ccprop: CCProperties,
@@ -249,6 +282,23 @@ pub(super) struct RotarySliderProperties {
     label: Option<String>,
 
     mode: RotaryMode,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct EmptyProperties {
+    #[serde(flatten)]
+    base: BaseProperties,
+
+    /* #[serde(flatten)]
+    output: Properties,
+
+    #[serde(flatten)]
+    ccprop: CCProperties,
+
+    label: Option<String>,
+
+    mode: RotaryMode, */
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -281,16 +331,27 @@ pub(super) struct XYPadProperties {
     base: BaseProperties,
 
     #[serde(flatten)]
-    midi: MidiProperties,
+    output: Properties,
 
-    note: Option<u8>,
+    #[serde(flatten)]
+    note: NoteProperties,
     velocity: Option<u8>,
 
-    x: CCProperties,
-    y: CCProperties,
+    x: PadAxisProperties,
+    y: PadAxisProperties,
 
     label: Option<String>,
     //mode: RotaryMode,
+}
+
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "Widget.ts")]
+pub(super) struct PadAxisProperties {
+    #[serde(flatten)]
+    cc: CCProperties,
+
+    #[serde(flatten)]
+    output: Properties
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -299,5 +360,5 @@ pub(super) struct TabbedViewProperties {
     #[serde(flatten)]
     base: BaseProperties,
 
-    tabs: Vec<Widget>
+    tabs: Vec<Widget>,
 }

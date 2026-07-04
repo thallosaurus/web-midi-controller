@@ -1,19 +1,27 @@
 import { RotarySliderProperties } from "@hdj/definitions";
-import { WidgetProperties } from "./Parser.tsx";
+import { WidgetProperties } from "./Parser";
 import { vibrate } from "./utils";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useWidgetAction } from "./Callbacks";
 
 const sensitivity = 0.5;    // px -> value
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
 
-export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperties>) {
+export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
     const lastX = useRef<number>(0);
     const active = useRef<boolean>(false);
 
-    const [value, setValue] = useState<number>(def.default_value ?? 0);
+    const callbacks = useWidgetAction();
 
-    const angle = () => MIN_ANGLE + (value / 127) * (MAX_ANGLE - MIN_ANGLE);
+    /*const send = (v: number) => {
+        console.log(v);
+        callbacks.send(def, v)
+    }*/
+
+    const [value, setValue] = useState<number>(0);
+
+    const angle = () => MIN_ANGLE + (value) * (MAX_ANGLE - MIN_ANGLE);
 
     const touch_start = ({ target, pointerId, clientX }) => {
         const el = target as HTMLElement;
@@ -21,6 +29,7 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
         vibrate();
         lastX.current = clientX;
         active.current = true;
+        console.log(lastX, active);
     };
 
     const touch_move = ({ clientX }) => {
@@ -29,34 +38,40 @@ export function Rotary({ def, callbacks }: WidgetProperties<RotarySliderProperti
         const dx = clientX - lastX.current;
         lastX.current = clientX;
 
-        const new_value = Math.floor(Math.max(0, Math.min(127, value + (dx * sensitivity))));
-
-        if (new_value != value) {
-            setValue(new_value)
-            callbacks.sendCC(def.channel, def.cc, new_value)
-        }
+        const new_value = Math.max(0, Math.min(1, value + (dx * sensitivity / 127)));
+        //setValue(new_value);
+        callbacks.send(def, new_value)
     }
-    
+
     const touch_stop = ({ target, pointerId }) => {
         active.current = false;
         const el = target as HTMLElement;
         el.releasePointerCapture(pointerId);
-        
+
         if (def.mode == "snapback") {
-            setValue(def.default_value ?? 0)
-            callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0)
+            //const reset = (def.default_value ?? 0) / 127;
+            const reset = 0;
+            setValue(reset);
+            callbacks.send(def, reset);
         }
     }
 
-    const rotationStyle = (a) => { return {"--rotation": `${a}deg`} as React.CSSProperties }
+    useEffect(() => {
+        const id = callbacks.register(def, (v) => setValue(v))
+        return () => {
+            callbacks.unregister(id, def);
+        }
+    }, [])
 
-    return (<div id={def.id} className="rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
-        <div className="widget">
+    const rotationStyle = (a) => { return { "--rotation": `${a}deg` } as React.CSSProperties }
+
+    return (<div id={def.id} className="widget rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
+        <div className="wwidget">
             <div className="dial" style={{
                 transform: `translateX(-50%) rotate(${angle()}deg)`
             }}
             ></div>
         </div>
-        <div className="label">{def.label ?? ("CC" + def.cc + ":\n" + value)}</div>
+        <div className="label">{def.label ?? ("CC" + def.cc + ":\n" + Math.round(value * 127))}</div>
     </div>)
 }

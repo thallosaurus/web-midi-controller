@@ -8,7 +8,7 @@ export interface NoteMessagePayload {
     channel: number,
     note: number,
     velocity: number,
-    on: boolean
+    //on: boolean
 }
 
 export interface CCMessagePayload {
@@ -18,4 +18,10 @@ export interface CCMessagePayload {
     value: number
 }
 
-export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | ConnectedPayload;
+export interface OscMessagePayload {
+    type: "osc"
+    address: string,
+    args: Array<any>
+}
+
+export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | OscMessagePayload;

@@ -1,87 +1,53 @@
-import { Overlay, Widget } from "@hdj/definitions"
-import { CCButton, NoteButton } from "./Button.tsx";
-import { CCSlider } from "./Slider.tsx";
-import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout.tsx";
-import { Rotary } from "./Rotary.tsx";
-import { XYPad } from "./XYPad.tsx";
-import { Jogwheel } from "./Jogwheel.tsx";
+import { Overlay, Widget } from "@hdj/definitions";
+import { Button } from "./Button";
+import { CCSlider } from "./Slider";
+import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout";
+import { Rotary } from "./Rotary";
+import { XYPad } from "./XYPad";
+import { Jogwheel } from "./Jogwheel";
+import { WCallbacks, WidgetActionContext } from "./Callbacks";
 
-export type ReceiveDataCallback = (v: number) => void;
+const stringToElement = (d, k) => {
+  switch (d.type) {
+    case 'ccbutton':
+    case 'notebutton':
+      return <Button def={d} key={k} />
+    case 'ccslider':
+      return <CCSlider def={d} key={k} />
+    case 'horiz-mixer':
+      return <Horizontal def={d} key={k} />
+    case 'vert-mixer':
+      return <Vertical def={d} key={k} />
+    case 'grid-mixer':
+      return <Grid def={d} key={k} />
+    case 'rotary':
+      return <Rotary def={d} key={k} />
+    case 'xypad':
+      return <XYPad def={d} key={k} />
+    case 'shift':
+      return <ShiftArea def={d} key={k} />
+    case 'jogwheel':
+      return <Jogwheel def={d} key={k} />
+    case 'tab':
+      return <TabbedArea def={d} key={k} />
+    case 'empty':
+    default:
+      return <div className="empty" key={k}></div>
+  };
 
-export type SendNoteCallback = (channel: number, note: number, velocity: number, on: boolean) => void;
-export type SendCCCallback = (channel: number, cc: number, value: number) => void;
-export type RegisterCCCallback = (channel: number, cc: number, cb: ReceiveDataCallback) => string;
-export type RegisterNoteCallback = (channel: number, note: number, cb: ReceiveDataCallback) => string;
-
-export type UnregisterNoteCallback = (channel: number, note: number, id: string) => void;
-export type UnregisterCCCallback = (channel: number, cc: number, id: string) => void;
-
-export interface WidgetProperties<T> {
-  def: T,
-  callbacks: WidgetCallbacks
 }
+/* export function SingleLayout({ def }: { def: Widget }) {
 
-export interface WidgetCallbacks {
-  /**
-   * Sends out Note Data
-   */
-  sendNote: SendNoteCallback
-  /**
-   * registers this widget for input Note Data
-   */
-  registerNote: RegisterNoteCallback
+  return <>
+    {stringToElement(def, uuid())}
+  </>
+} */
 
-  /**
-   * Sends out CC Data
-   */
-  sendCC: SendCCCallback
-
-  /**
-   * registers this widget for input CC Data
-   */
-  registerCC: RegisterCCCallback
-
-  /**
-   * Unregisters this widget from input CC Data
-   */
-  unregisterCC: UnregisterCCCallback
-
-  /**
-   * Unregisters this widget from input Note Data
-   */
-  unregisterNote: UnregisterNoteCallback
-}
-
-export function Layout({ children, callbacks }: { children: Widget[], callbacks: WidgetCallbacks }) {
+export function Layout({ children }: { children: Widget[], aux?: React.ReactElement }) {
   return <>
     {children.map((def, k) => {
-      switch (def.type) {
-        case 'notebutton':
-          return <NoteButton def={def} key={k} callbacks={callbacks} />
-        case 'ccslider':
-          return <CCSlider def={def} key={k} callbacks={callbacks} />
-        case 'horiz-mixer':
-          return <Horizontal def={def} key={k} callbacks={callbacks} />
-        case 'vert-mixer':
-          return <Vertical def={def} key={k} callbacks={callbacks} />
-        case 'grid-mixer':
-          return <Grid def={def} key={k} callbacks={callbacks} />
-        case 'ccbutton':
-          return <CCButton def={def} key={k} callbacks={callbacks} />
-        case 'rotary':
-          return <Rotary def={def} key={k} callbacks={callbacks} />
-        case 'xypad':
-          return <XYPad def={def} key={k} callbacks={callbacks} />
-        case 'shift':
-          return <ShiftArea def={def} key={k} callbacks={callbacks} />
-        case 'jogwheel':
-          return <Jogwheel def={def} key={k} callbacks={callbacks} />
-        case 'tab':
-          return <TabbedArea def={def} key={k} callbacks={callbacks} />
-        case 'empty':
-        default:
-          return <div className="empty"></div>
-      }
+      const key = `${k}-${def.type}-${def.id}`
+      return stringToElement(def, key)
     })}
   </>
 }
@@ -90,19 +56,27 @@ function testCallback(def: any, v: number) {
   console.log(def, v);
 }
 
-export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WidgetCallbacks, style?: React.CSSProperties }) {
+export interface WidgetProperties<T> {
+  def: T,
+  //callbacks: WidgetCallbacks,
+}
+
+export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WCallbacks, style?: React.CSSProperties }) {
   return (
-    <div id={o.id} className="overlay" data-overlay="view" style={{
-      //width: "calc(100% - 1em)",
-      //height: "calc(100% - 1em)",
-      width: "100%",
-      height: "100%",
-      display: "flex",
-      gap: "1em",
-      justifyContent: "center",
-      ...style ?? {}
-    }}>
-      <Layout children={o.cells} callbacks={callbacks} />
-    </div>
+    <WidgetActionContext value={callbacks}>
+      <style>{o.style??""}</style>
+      <div id={o.id} className="overlay" data-overlay="view" style={{
+        //width: "calc(100% - 1em)",
+        //height: "calc(100% - 1em)",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        gap: "1em",
+        justifyContent: "center",
+        ...style ?? {}
+      }}>
+        <Layout children={o.cells} />
+      </div>
+    </WidgetActionContext>
   )
 }

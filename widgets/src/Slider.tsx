@@ -1,9 +1,10 @@
 import { CCSliderProperties, SliderMode } from "@hdj/definitions";
-import { WidgetProperties } from "./Parser.tsx";
+import { WidgetProperties } from "./Parser";
 import { useEffect, useRef, useState } from "react";
-import { vibrate } from "./utils.ts";
+import { vibrate } from "./utils";
+import { useWidgetAction } from "./Callbacks";
 
-const MAX_LEVEL = 127;
+const MAX_LEVEL = 1.0;
 
 const growFactor = (value) => {
     return (value / MAX_LEVEL) * 100 + "%";
@@ -20,13 +21,21 @@ const horizontalFillStyle = (value, type: SliderMode) => {
 const verticalSliderStyle = () => {
     return {
         width: "100%",
-    }
+        "userSelect": "none",
+        "-webkit-user-select": "none",
+
+        //-moz-user-select: none;
+
+        //-ms-user-select: none;
+    } as React.CSSProperties
 }
 
 const horizontalSliderStyle = () => {
     return {
         height: "100%",
-    }
+        "userSelect": "none",
+        "-webkit-user-select": "none"
+    } as React.CSSProperties
 }
 
 const verticalCCSliderStyle = () => {
@@ -45,7 +54,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties>) {
+export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);
@@ -53,13 +62,19 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
     const baseY = useRef<number>(0);
     const activePointer = useRef<number | null>(null);
 
+    const callbacks = useWidgetAction();
+
+    const send = (v: number) => {
+        callbacks.send(def, v);
+    }
+
     useEffect(() => {
-        const id = callbacks.registerCC(def.channel, def.cc, setValue)
+        console.log("ccslider effect", def.cc)
+        const id = callbacks.register(def, setValue);
         return () => {
-            callbacks.unregisterCC(def.channel, def.cc, id)
+            callbacks.unregister(id, def)
         }
-        //  callbacks.registerCC(def.channel, def.y.cc, (v) => setValueY)
-    })
+    }, [])
 
     const start = ({ currentTarget, pointerId, clientX, clientY }) => {
         //preventDefault();
@@ -97,8 +112,11 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
     };
 
     const reset = () => {
-        setValue(def.default_value ?? 0);
-        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0);
+        //setValue((def.default_value ?? 0) / 127);
+        setValue(0);
+        send(0);
+        //send((def.default_value ?? 0) / 127);
+        //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0);
         //this.eventbus!.updateCC(this.prop.channel, this.prop.cc, def.default_value ?? 0);
     };
 
@@ -112,24 +130,21 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
                     let v: number;
                     if (!def.vertical) {
                         const n = rect.bottom - clientY;
-                        v = Math.floor(
+                        v =
                             Math.max(
                                 0,
                                 Math.min(
                                     MAX_LEVEL,
                                     (n / rect.height) * MAX_LEVEL,
                                 ),
-                            ),
-                        );
+                            );
                     } else {
                         const n = clientX - rect.left;
-                        v = Math.floor(
-                            Math.max(
-                                0,
-                                Math.min(
-                                    (n / rect.width) * MAX_LEVEL,
-                                    MAX_LEVEL,
-                                ),
+                        v = Math.max(
+                            0,
+                            Math.min(
+                                (n / rect.width) * MAX_LEVEL,
+                                MAX_LEVEL,
                             ),
                         );
                     }
@@ -138,8 +153,9 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
                         //console.log(rect);
                         //console.log(v);
                         //this.sendValue(v);
-                        setValue(v)
-                        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
+                        //setValue(v)
+                        //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
+                        send(v);
                     }
                 }
                 break;
@@ -152,23 +168,20 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
                         const sensitivity = MAX_LEVEL / (rect.height);
                         const next = baseValue.current + n * sensitivity;
                         //(options.vertical ? (rect.width) : (rect.height));
-                        v = Math.floor(
-                            Math.max(0, Math.min(MAX_LEVEL, next)),
-                        );
+                        v = Math.max(0, Math.min(MAX_LEVEL, next))
                     } else {
                         const delta = clientX - baseX.current;
                         const sensitivity = MAX_LEVEL / rect.width;
                         const next = baseValue.current + delta * sensitivity;
 
-                        v = Math.floor(
-                            Math.max(0, Math.min(MAX_LEVEL, next)),
-                        );
+                        v = Math.max(0, Math.min(MAX_LEVEL, next))
                     }
 
                     if (v != value) {
                         //this.sendValue(v);
-                        setValue(v)
-                        if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
+                        //setValue(v)
+                        //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, value);
+                        send(v);
                     }
                 }
 
@@ -178,7 +191,7 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
     };
 
     return <div id={def.id} className="ccslider" style={def.vertical ? verticalCCSliderStyle() : horizontalCCSliderStyle()}>
-        <div className="slider"
+        <div className="widget slider"
             style={def.vertical ? verticalSliderStyle() : horizontalSliderStyle()}
 
             onPointerDown={start}
@@ -198,9 +211,11 @@ export function CCSlider({ def, callbacks }: WidgetProperties<CCSliderProperties
             margin: ".3em",
             fontFamily: "monospace",
             border: "none",
-            whiteSpace: "nowrap"
+            whiteSpace: "nowrap",
+            userSelect: "none",
+            pointerEvents: "none"
         }}>
-            <div>{value}</div>
+            <div>{Math.round(value * 127)}</div>
             <div>{def.label}</div>
         </button>
     </div >

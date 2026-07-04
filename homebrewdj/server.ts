@@ -14,7 +14,7 @@ type HandlerCallback<T> = (msg: T) => void;
  * @param context Oak request context.
  */
 const StaticHandler = async (context: Context) => {
-    console.log(new URL(StaticAssets, import.meta.url).pathname)
+    //console.log(new URL(StaticAssets, import.meta.url).pathname)
     await context.send({
         root: new URL(StaticAssets, import.meta.url).pathname,
         index: "index.html",
@@ -33,12 +33,12 @@ const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callb
     const id = randomUUID();
 
     ws.addEventListener("open", (ev) => {
-        console.log("open", id);
+        console.log("new websocket connection with id", id);
         ws.send(JSON.stringify({
             type: "connection",
             id
         }))
-        console.log(clients);
+        //console.log(clients);
     })
 
     ws.addEventListener("message", (ev) => {
@@ -53,7 +53,6 @@ const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callb
     ws.addEventListener("close", (ev) => {
         console.log("close", id)
         clients.delete(id);
-        console.log(clients);
     })
 
     return id;
@@ -115,9 +114,9 @@ export class Server<T = AllowedPayloads> {
         this.app.use(ws.routes());
         this.app.use(ws.allowedMethods());
         this.app.addEventListener("listen", (e) => {
-            console.log(e, "listening to ", listenOptions.port ?? 8080)
+            console.log("listening to", listenOptions.port ?? 8080)
         });
-        
+
         this.app.listen({
             // default is localhost only for development, but can be overridden in listenOptions
             hostname: "127.0.0.1",

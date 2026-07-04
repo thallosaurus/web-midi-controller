@@ -1796,6 +1796,25 @@ detect-libc@^2.0.3:
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.1.2.tgz#689c5dcdc1900ef5583a4cb9f6d7b473742074ad"
   integrity sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==
 
+dockview-core@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/dockview-core/-/dockview-core-7.0.2.tgz#3c0bc1d7b90925b9a7c555686daed367bb34cf56"
+  integrity sha512-i666ndkUdT4U+Bo2Yu3d6KwCJNqe21VJ0oschdgcXucZ5TquzBFX94zcUBEfg4IewTv2BuiPJ7r/2JTGLLv6ig==
+
+dockview-react@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/dockview-react/-/dockview-react-7.0.2.tgz#d1e5851cf809086046a2ed54f9d43751a879b2eb"
+  integrity sha512-tnbRM1C/Ok1n/HXGMF0OWmc6Qlx5pbsSJucxX+3XcuNYkZgKiaNJX3BpdBlSxexjytTI/Xywh0ZNGF3/4Fa9LA==
+  dependencies:
+    dockview "^7.0.2"
+
+dockview@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/dockview/-/dockview-7.0.2.tgz#e1044dea3cb6a87c20d57cd3b003b38b6e7238c4"
+  integrity sha512-QhgbJ7RTFsWvrs1lQZKPGCLTGjKU7kI5ZWX5lwU03arM9lIoQlbfv1b/uQ7V5zTkRw7JDndEqjKMgEFw2I8Kow==
+  dependencies:
+    dockview-core "^7.0.2"
+
 electron-to-chromium@^1.5.328:
   version "1.5.368"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.368.tgz#8e8d4600c5f5f01e891f8f843b4a941afb640412"
@@ -2291,6 +2310,11 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
+
+node-osc@^11.6.0:
+  version "11.6.0"
+  resolved "https://registry.yarnpkg.com/node-osc/-/node-osc-11.6.0.tgz#5141310bca3abe81dbc167517f81bc1ca8dfa8d4"
+  integrity sha512-LIMMYsYPlHi18SLiMnvZqwHAPXkerr3rUsOLaWYjBKPcCyhvxAjNbt4MeSwgvUG0+9zSgPs+RQCjv1KiOvEJUQ==
 
 node-releases@^2.0.36:
   version "2.0.47"

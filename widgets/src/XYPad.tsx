@@ -1,58 +1,48 @@
 import { XYPadProperties } from "@hdj/definitions";
-import { WidgetProperties } from "./Parser.tsx";
+import { WidgetProperties } from "./Parser";
 import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils";
+import { useWidgetAction } from "./Callbacks";
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
-export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
+export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
+    const [pressed, setPressed] = useState(false);
     const [valueX, setValueX] = useState(0);
     const [valueY, setValueY] = useState(0);
-    const [pressed, setPressed] = useState(false);
 
     const activePointer = useRef<number | null>(null);
     const targetRef = useRef<HTMLDivElement | null>(null);
+    const callbacks = useWidgetAction();
 
-    const sendUpdate = (s: boolean) => {
-        //callbacks.sendCC(def.channel, def.x.cc, valueX);
-        //callbacks.sendCC(def.channel, def.y.cc, valueY);
-        if (def.note) {
-            callbacks.sendNote(def.channel, def.note, def.velocity, s);
-        }
-        setPressed(s);
+    const sendNoteUpdate = (s: boolean) => {
+        callbacks.send(def, s ? 127 : 0);
+        //setPressed(s);
+    }
+
+    const sendAxisUpdate = (x, y) => {
+        callbacks.send(def.x, x);
+        callbacks.send(def.y, y);
     }
 
     const update = ({ clientX, clientY }) => {
         const rect = targetRef.current.getBoundingClientRect();
 
         const left = (clientX - rect.left)
-        const x = Math.floor(clamp(left / rect.width) * 127);
+        const x = clamp(left / rect.width);
 
         const bottom = clientY - rect.top
-        const y = Math.floor((1 - clamp((bottom) / rect.height)) * 127);
-        if (valueX != x) {
-            setValueX(Math.floor(x))
-            callbacks.sendCC(def.channel, def.x.cc, x);
-        }
-        if (valueY != y) {
-            setValueY(Math.floor(y))
-            callbacks.sendCC(def.channel, def.y.cc, y);
-        }
+        const y = (1 - clamp((bottom) / rect.height));
+        sendAxisUpdate(x, y);
     }
 
     const end = ({ pointerId, target, }) => {
         if (pointerId !== activePointer.current) return;
         const el = target as HTMLDivElement;
         el.releasePointerCapture(pointerId);
-        //this.updateFromEvent(e);
         activePointer.current = null;
         setPressed(false);
-        //this.target.classList.remove("pressed");
-        //this.sendValue(0)
-        // note update - kaoss like
-        //sendUpdate({ valueX: 0, valueY: 0})
-        sendUpdate(false);
-        //callbacks.sendCC()
+        sendNoteUpdate(false);
     }
 
     const start = ({ pointerId, target, clientX, clientY }) => {
@@ -63,7 +53,8 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
         el.setPointerCapture(activePointer.current);
         update({ clientX, clientY });
 
-        setPressed(true);
+        //setPressed(true);
+        sendNoteUpdate(true);
         //this.target.classList.add("pressed");
 
         //this.sendValue(def.velocity ?? 127)
@@ -77,12 +68,18 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
 
 
     useEffect(() => {
-        callbacks.registerCC(def.channel, def.x.cc, setValueX)
-        callbacks.registerCC(def.channel, def.y.cc, setValueY)
-    })
+        const note_id = callbacks.register(def, (v) => { setPressed(v > 64)});
+        const id_x = callbacks.register(def.x, setValueX);
+        const id_y = callbacks.register(def.y, setValueY);
+        return () => {
+            callbacks.unregister(note_id, def);
+            callbacks.unregister(id_x, def.x);
+            callbacks.unregister(id_y, def.y);
+        }
+    }, [])
 
     return (
-        <div className="xypad" id={def.id}>
+        <div className="widget xypad" id={def.id}>
             <div className="target"
                 ref={targetRef}
                 onPointerDown={start}
@@ -107,7 +104,7 @@ export function XYPad({ def, callbacks }: WidgetProperties<XYPadProperties>) {
                     userSelect: "none",
                     touchAction: "none"
                 }}>
-                    {valueX}/{valueY}
+                    {Math.floor(valueX*127)}/{Math.floor(valueY*127)}
                 </div>
             </div>
         </div>

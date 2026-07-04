@@ -1,5 +1,3 @@
-@import url(./custom.css);
-
 #root {
     width: 100vw;
     height: 100vh; 
@@ -25,6 +23,10 @@ body {
 
 #connection-status.disconnected::before {
     background-color: red;
+}
+
+#connection-status.connecting::before {
+    background-color: orange;
 }
 
 #connection-status.connected::before {

@@ -12,4 +12,6 @@
 
 .overlay[data-overlay="view"] > * {
     align-items: center;
+    -webkit-user-select: none;
+    user-select: none;
 }

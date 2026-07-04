@@ -1,12 +1,13 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
-import { AllowedPayloads, asyncWebsocketClient, CCMessagePayload, ConnectedPayload, NoteMessagePayload, WebsocketClient } from "@hdj/homebrewdj-web-client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { EventBus } from "./EventBus";
-import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
+import { type AllowedPayloads, WebsocketClient } from "@hdj/homebrewdj-web-client";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
+import { EventBus, WebsocketContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
+import { ConnectScreen } from "./Connect";
 
-function getEndpointUrl() {
+export function getEndpointUrl() {
   let url;
   try {
     url = new URL(import.meta.env.VITE_BACKEND);
@@ -14,50 +15,41 @@ function getEndpointUrl() {
     url = new URL("/ws", location.href);
     url.protocol = "ws";
   }
-  
-  console.log(url);
   return url;
 }
 
+function getVersion() {
+  return import.meta.env.VITE_VERSION ?? "0.0.0";
+}
+
 function App() {
-  const process = (id: string, msg: CCMessagePayload | NoteMessagePayload | ConnectedPayload) => {
-    if (eventbus.current) {
-      switch (msg.type) {
-        case "connection":
-          setConnected(true)
-        break
-        case "cc":
-          eventbus.current.processCC(msg);
-          break
-        case "note":
-          eventbus.current.processNote(msg);
-          break;
-      }
-    }
-  }
-
-  const client = useRef<WebsocketClient<AllowedPayloads> | null>(null);
   const eventbus = useRef<EventBus>(new EventBus());
-
-  const [connected, setConnected] = useState(false);
-
-  useEffect(() => {
-    const url = getEndpointUrl();
-    const wsClient = new WebsocketClient<CCMessagePayload | NoteMessagePayload | ConnectedPayload>(url, process);
-    client.current = wsClient;
-    eventbus.current.setSender(wsClient);
-  })
+  const process = (id: string, msg: AllowedPayloads) => {
+    eventbus.current.extInput(msg);
+  }
 
   return (
     <>
-      <MainView connected={connected} defaultOverlay={VOLUME_SLIDER_OVERLAY_NEW} eventbus={eventbus.current} />
+      <WebsocketProvider messageHandler={process}>
+        <MainView defaultOverlay={VOLUME_SLIDER_OVERLAY_NEW} eventbus={eventbus.current} />
+      </WebsocketProvider>
     </>
   )
 }
 
-function MainView({ defaultOverlay, eventbus, connected }: { defaultOverlay?: Overlay, eventbus: EventBus, connected: boolean }) {
+function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, eventbus: EventBus }) {
   const [showOverlayPicker, setOverlayPicker] = useState(false);
   const [overlay, setOverlay] = useState<Overlay | null>(defaultOverlay ?? null)
+  const ws = useWebsocketContext();
+
+  useEffect(() => {
+    ws.connect(getEndpointUrl())
+    eventbus.setSender(ws.ws);
+    return () => {
+      eventbus.setSender(null);
+    }
+  }, [])
+
   return (
     <>
       <div style={{
@@ -73,17 +65,23 @@ function MainView({ defaultOverlay, eventbus, connected }: { defaultOverlay?: Ov
         }}>
           <div style={{
             fontWeight: "bold"
-          }}>HomebrewDJ</div>
-          <b onClick={() => setOverlayPicker(true)}>
-            {overlay?.name ?? "No overlay loaded"}
-          </b>
-          <div id="connection-status" className={connected?"connected":"disconnected"}>{connected?"connected":"disconnected"}</div>
+          }}>HomebrewDJ v{getVersion()}</div>
+          {ws.connectionState == "connected" ?
+            <b onClick={() => setOverlayPicker(true)}>
+              {overlay?.name ?? "No overlay loaded"}
+            </b>
+            : <div></div>}
+          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connectionState}>{ws.connectionState}</div>
         </header>
-        {overlay ? <OverlayView o={overlay} callbacks={eventbus} style={{
-          width: "calc(100% - 2em)",
-          height: "calc(100% - 2em)",
-          padding: "1em"
-        }} /> : ""}
+        {ws.connectionState == "connected" ?
+          <>
+            {overlay ? <OverlayView o={overlay} callbacks={eventbus} style={{
+              width: "calc(100% - 2em)",
+              height: "calc(100% - 2em)",
+              padding: "1em"
+            }} /> : ""}
+          </>
+          : <ConnectScreen />}
       </div>
       <OverlaySwitcher
         showModal={showOverlayPicker}
