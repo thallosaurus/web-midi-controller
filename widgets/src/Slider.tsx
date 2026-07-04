@@ -112,8 +112,10 @@ export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
     };
 
     const reset = () => {
-        setValue((def.default_value ?? 0) / 127);
-        send((def.default_value ?? 0) / 127);
+        //setValue((def.default_value ?? 0) / 127);
+        setValue(0);
+        send(0);
+        //send((def.default_value ?? 0) / 127);
         //if (callbacks.sendCC) callbacks.sendCC(def.channel, def.cc, def.default_value ?? 0);
         //this.eventbus!.updateCC(this.prop.channel, this.prop.cc, def.default_value ?? 0);
     };

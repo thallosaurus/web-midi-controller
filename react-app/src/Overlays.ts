@@ -9,113 +9,60 @@ const TestOscWidget: Widget & CCSliderProperties = {
   id: null,
   vertical: false,
   cc: 3,
-  value: 0,
-  value_off: 0,
-  default_value: 0
+  value: null
 }
 
 export const TestOscOverlay: Overlay = {
   id: "test_osc",
   name: "OSC Test Overlay",
+  style: null,
   channel: null,
   program: null,
   cells: [TestOscWidget]
 }
 
-const deckA: Widget & VerticalMixerProperties = {
-  id: "deck_a",
-  type: "vert-mixer",
-  vert: [{
-    "type": "ccslider",
-    "cc": 1,
-    "output": "midi",
-    "channel": 1,
-    "label": "Deck A",
-    "mode": "absolute",
-    "vertical": false,
-    "value": 0,
-    "value_off": 0,
-    "id": "volume_decka",
-    "default_value": 0
-  }, {
-    "output": "midi",
-    "type": "notebutton",
-    "mode": "latch",
-    "id": "mixercue_decka",
-    "label": "Mixer Cue",
-    "channel": 1,
-    "note": 33
-  }]
-}
-
-const deckB: Widget & VerticalMixerProperties = {
-  id: "deck_b",
-  type: "vert-mixer",
-  vert: [{
-    "output": "midi",
-    "type": "ccslider",
-    "cc": 1,
-    "channel": 2,
-    "label": "Deck B",
-    "mode": "absolute",
-    "vertical": false,
-    "value": 0,
-    "value_off": 0,
-    "id": "volume_deckb",
-    "default_value": 0
-  }, {
-    "output": "midi",
-    "type": "notebutton",
-    "mode": "latch",
-    "id": "mixercue_deckb",
-    "label": "Mixer Cue",
-    "channel": 2,
-    "note": 33
-  }]
+function createDeck(ch: number): Widget & VerticalMixerProperties {
+  return {
+    id: "deck_" + ch,
+    type: "vert-mixer",
+    vert: [
+      createCCSlider("Deck A", ch, 1, "absolute", false),
+      createMidiNoteButton("Mixer Cue", ch, 33, "latch")]
+  }
 }
 
 export const VOLUME_SLIDER_OVERLAY_NEW: Overlay = {
   name: "Volume Sliders (New)",
   channel: null,
   program: null,
+  style: `
+    #volume_slider_overlay_new #mixercue_decka, 
+    #volume_slider_overlay_new #mixercue_deckb {
+      flex-shrink: 4;
+      width: 50%;
+    }
+    #volume_slider_overlay_new #volume_decka .slider, 
+    #volume_slider_overlay_new #volume_deckb .slider {
+      width: 50%;
+    }
+  `,
   id: "volume_slider_overlay_new",
-  cells: [deckA, deckB]
+  cells: [createDeck(1), createDeck(2)]
 }
 
 export const VOLUME_SLIDER_OVERLAY: Overlay = {
   name: "Volume Sliders",
   channel: null,
   program: null,
+  style: null,
   id: "volume_slider_overlay",
   cells: [{
     type: "horiz-mixer",
     id: null,
-    horiz: [{
-      "output": "midi",
-      "type": "ccslider",
-      "cc": 1,
-      "channel": 1,
-      "label": "Deck A",
-      "mode": "absolute",
-      "vertical": false,
-      "value": 0,
-      "value_off": 0,
-      "id": null,
-      "default_value": 0
-    },
-    {
-      "output": "midi",
-      "type": "ccslider",
-      "cc": 1,
-      "channel": 2,
-      "label": "Deck B",
-      "mode": "absolute",
-      "vertical": false,
-      "value": 0,
-      "value_off": 0,
-      "id": null,
-      "default_value": 0
-    }]
+    horiz: [
+      createCCSlider("Deck A", 1, 1, "absolute", false),
+      createCCSlider("Deck B", 2, 1, "absolute", false)
+    ]
   }]
 };
 
@@ -659,9 +606,9 @@ export const MIDI_TEST_OVERLAY: Overlay = {
   ],
 };
 
-function createCCSlider(label: string, channel: number, cc: number, mode: SliderMode, vertical: boolean): CCSliderProperties & Widget {
+function createCCSlider(label: string, channel: number, cc: number, mode: SliderMode, vertical: boolean, htmlId = null): CCSliderProperties & Widget {
   return {
-    id: null,
+    id: htmlId,
     type: "ccslider",
     output: "midi",
     cc,
@@ -669,15 +616,13 @@ function createCCSlider(label: string, channel: number, cc: number, mode: Slider
     label,
     mode,
     vertical,
-    value: 0,
-    default_value: 0,
-    value_off: 0,
+    value: null,
   }
 }
 
-function createMidiNoteButton(label: string, channel: number, note: number, mode: ButtonMode): NoteButtonProperties & Widget {
+function createMidiNoteButton(label: string, channel: number, note: number, mode: ButtonMode, htmlId = null): NoteButtonProperties & Widget {
   return {
-    id: null,
+    id: htmlId,
     type: "notebutton",
     output: "midi",
     channel,
@@ -767,7 +712,7 @@ export const TRAKTOR_PERFORMANCE: Overlay = {
   "channel": null,
   "program": null,
   "cells": [
-        createOneDeviceTraktorDeck(1),
+    createOneDeviceTraktorDeck(1),
     {
       "id": "levels",
       "type": "horiz-mixer",
@@ -776,6 +721,6 @@ export const TRAKTOR_PERFORMANCE: Overlay = {
         createCCSlider("Test", 2, 0, "relative", false)
       ]
     },
-   createOneDeviceTraktorDeck(2)
+    createOneDeviceTraktorDeck(2)
   ]
 }

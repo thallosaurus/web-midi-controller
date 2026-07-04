@@ -96,24 +96,10 @@ function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
 export abstract class WCallbacks {
     abstract sender: Outgoing | null;
 
-    private sendNote: MidiNoteSend = ({ channel, note }, velocity) => {
-        const c = this.callbacks.noteCallbackMap.get(channel).get(note);
-        
-        console.log("note", channel, note, velocity, velocity > 64);
-        if (c.lastValue != velocity) {
-            
-            const msg: NoteDelta = {
-                type: "note",
-                channel,
-                note,
-                velocity,
-                //on: value > 64
-            };
-            
-            if (this.sender) this.sender.send(msg);
-            c.lastValue = velocity
-            this.extInput(msg);
-        }
+    private callbacks: InternalCallbackMap = {
+        ccCallbackMap: new Map(),
+        noteCallbackMap: new Map(),
+        oscCallbackMap: new Map(),
     }
 
     private registerNote: MidiNoteRegisterFn = (def, cb) => {
@@ -131,24 +117,6 @@ export abstract class WCallbacks {
         noteMap?.set(id, cb);
         //if (this.next) this.next.registerNote(def, cb)
         return id
-    }
-
-    private sendCC: MidiCCSend = ({ channel, cc }, value) => {
-        const c = this.callbacks.ccCallbackMap.get(channel).get(cc);
-        if (c.lastValue != value) {
-            console.log("cc", channel, cc, value);
-            const msg: CCDelta = {
-                type: "cc",
-                channel,
-                cc,
-                value
-            };
-
-            if (this.sender) this.sender.send(msg)
-            c.lastValue = value;
-            this.extInput(msg);
-        }
-
     }
 
     private registerCC: MidiCCRegisterFn = (def, cb) => {
@@ -201,19 +169,6 @@ export abstract class WCallbacks {
         //if (this.next) this.next.unregisterNote(id, def);
     }
 
-    private sendOSC: OscSend<number[]> = ({ address }, args: number[]) => {
-        console.log("osc update", address, args);
-        const msg: OscDelta = {
-            type: "osc",
-            address,
-            args
-        };
-
-        if (this.sender) this.sender.send(msg)
-
-        //this.extInput(msg)
-    }
-
     private registerOSC: OscRegisterFn = ({ address }, cb) => {
         if (!this.callbacks.oscCallbackMap.has(address)) {
             this.callbacks.oscCallbackMap.set(address, new Map());
@@ -234,12 +189,6 @@ export abstract class WCallbacks {
         oscMap?.delete(id);
     }
 
-    private callbacks: InternalCallbackMap = {
-        ccCallbackMap: new Map(),
-        noteCallbackMap: new Map(),
-        oscCallbackMap: new Map(),
-    }
-
     register(def: MidiNoteProperties | MidiCCProperties | osc, cb: MIDIReceiveDataCallback | OSCReceiveDataCallback): WidgetId {
         console.log("registering", def)
         if (isMidiNote(def)) return this.registerNote(def, cb)
@@ -257,9 +206,56 @@ export abstract class WCallbacks {
     }
 
     send(def: MidiNoteProperties | MidiCCProperties | osc, value: number) {
-        if (isMidiNote(def)) return this.sendNote(def, value)
-        if (isMidiCC(def)) return this.sendCC(def, Math.floor(value * 127))
-        if (isOSC(def)) return this.sendOSC(def, [value])
+        if (isMidiNote(def)) {
+            const c = this.callbacks.noteCallbackMap.get(def.channel).get(def.note);
+
+            console.log("note", def.channel, def.note, value, value > 64);
+            if (c.lastValue != value) {
+
+                const msg: NoteDelta = {
+                    type: "note",
+                    channel: def.channel,
+                    note: def.note,
+                    velocity: value,
+                    //on: value > 64
+                };
+
+                c.lastValue = value
+                if (this.sender) this.sender.send(msg);
+                this.extInput(msg);
+            }
+            return
+        }
+        if (isMidiCC(def)) {
+            const c = this.callbacks.ccCallbackMap.get(def.channel).get(def.cc);
+            if (c.lastValue != value) {
+                console.log("cc", def.channel, def.cc, value);
+                const msg: CCDelta = {
+                    type: "cc",
+                    channel: def.channel,
+                    cc: def.cc,
+                    value: Math.floor(value * 127)
+                };
+
+                c.lastValue = value;
+                if (this.sender) this.sender.send(msg)
+                this.extInput(msg);
+            }
+            return
+
+            //return this.sendCC(def, Math.floor(value * 127))
+        }
+        if (isOSC(def)) {
+            console.log("osc update", def.address, value);
+            const msg: OscDelta = {
+                type: "osc",
+                address: def.address,
+                args: [value]
+            };
+
+            if (this.sender) this.sender.send(msg)
+            return
+        }
         throw new Error("unsupported properties")
     }
 

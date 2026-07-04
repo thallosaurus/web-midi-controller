@@ -2,15 +2,7 @@
     width: 80% !important;
 }
 
-#volume_slider_overlay_new #mixercue_decka, 
-#volume_slider_overlay_new #mixercue_deckb {
-    flex-shrink: 4;
-    width: 50%;
-}
-#volume_slider_overlay_new #volume_decka .slider, 
-#volume_slider_overlay_new #volume_deckb .slider {
-    width: 50%;
-}
+
 #ableton_performance #returns {
     height: 70% !important;
     align-self: center;

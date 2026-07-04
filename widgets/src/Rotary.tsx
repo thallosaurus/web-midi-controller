@@ -19,7 +19,7 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         callbacks.send(def, v)
     }*/
 
-    const [value, setValue] = useState<number>((def.default_value ?? 0) / 127);
+    const [value, setValue] = useState<number>(0);
 
     const angle = () => MIN_ANGLE + (value) * (MAX_ANGLE - MIN_ANGLE);
 
@@ -29,6 +29,7 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         vibrate();
         lastX.current = clientX;
         active.current = true;
+        console.log(lastX, active);
     };
 
     const touch_move = ({ clientX }) => {
@@ -49,7 +50,8 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         el.releasePointerCapture(pointerId);
 
         if (def.mode == "snapback") {
-            const reset = (def.default_value ?? 0) / 127;
+            //const reset = (def.default_value ?? 0) / 127;
+            const reset = 0;
             setValue(reset);
             callbacks.send(def, reset);
         }
