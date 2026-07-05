@@ -1,10 +1,9 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
-import { type AllowedPayloads } from "@hdj/homebrewdj-web-client";
 import { useContext, useEffect, useRef, useState } from "react";
 import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
-import { EventBus, EventBusContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
+import { EventBusContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
 import { ConnectScreen } from "./Connect";
 import { getEndpointUrl, getVersion } from "./utils";
 import "./index.css"

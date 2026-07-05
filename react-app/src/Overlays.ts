@@ -1,4 +1,4 @@
-import { ButtonMode, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, RotaryMode, RotarySliderProperties, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { ButtonMode, CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, RotaryMode, RotarySliderProperties, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
 
 const TestOscWidget: Widget & CCSliderProperties = {
   output: "osc",
@@ -66,6 +66,54 @@ export const VOLUME_SLIDER_OVERLAY: Overlay = {
   }]
 };
 
+export const XYPAD_PERFORMANCE: Overlay = {
+  "id": "xypad-performance",
+  "name": "XYPad Performance",
+  program: null,
+  channel: null,
+  style: `#perf-mixer {
+    width: 20% !important;
+    height: 60% !important;
+
+  }  
+  `,
+  "cells": [{
+      "type": "horiz-mixer",
+      "id": "horiz",
+      "horiz": [
+        {
+          "channel": 1,
+          "label": "XY Pad",
+          "type": "xypad",
+          "output": "midi",
+          "note": 60,
+          "velocity": 127,
+          "id": "xy-pad-w",
+          "x": {
+            "output": "midi",
+            "channel": 1,
+            "cc": 4,
+            "value": null
+          },
+          "y": {
+            "output": "midi",
+            "channel": 1,
+            "cc": 5,
+            "value": null
+          }
+        },
+        {
+          type: "vert-mixer",
+          id: "perf-mixer",
+          vert: [
+            createCCSlider("XFade", 1, 13, "snapback", true),
+            createMidiCCButton("XFade", 1, 13, "trigger", "xfade")
+          ]
+        }
+      ]
+    }]
+}
+
 export const XYPAD_OVERLAY: Overlay = {
   "id": "fullscreen-xy-pad",
   "name": "Fullscreen XY Pad",
@@ -78,7 +126,7 @@ export const XYPAD_OVERLAY: Overlay = {
       "id": "vert",
       "vert": [
         {
-          "channel": 2,
+          "channel": 1,
           "label": "XY Pad",
           "type": "xypad",
           "output": "midi",
@@ -201,6 +249,19 @@ function createMidiNoteButton(label: string, channel: number, note: number, mode
     output: "midi",
     channel,
     note,
+    label,
+    mode
+  }
+}
+
+function createMidiCCButton(label: string, channel: number, cc: number, mode: ButtonMode, htmlId: string | null = null): CCButtonProperties & Widget {
+  return {
+    id: htmlId,
+    type: "ccbutton",
+    output: "midi",
+    channel,
+    cc,
+    value: null,
     label,
     mode
   }

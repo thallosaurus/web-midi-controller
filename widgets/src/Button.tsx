@@ -29,7 +29,7 @@ export function Button({ def }: WidgetProperties<ButtonProperties>) {
 
         if (def.mode == "trigger") {
             latchOn.current = true;
-            callbacks.send(def, latchOn.current ? 127 : 0)
+            callbacks.send(def, latchOn.current ? 1 : 0)
         }
 
     }

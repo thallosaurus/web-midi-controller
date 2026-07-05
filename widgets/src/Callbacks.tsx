@@ -276,7 +276,7 @@ export abstract class WCallbacks {
                     type: "note",
                     channel: def.channel,
                     note: def.note,
-                    velocity: v,
+                    velocity: Math.floor(v * 127),
                     //on: value > 64
                 };
 
