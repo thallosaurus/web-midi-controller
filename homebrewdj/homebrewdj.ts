@@ -5,6 +5,7 @@ import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { Server } from "./server.ts";
 import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
+import { MidiMessage } from "@hdj/midi-driver";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
@@ -147,7 +148,7 @@ export class HomebrewDJControllerOnly {
     });
 
     oscPort: OscDriver;
-    
+
     constructor(config_path = "./config.json") {
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
@@ -155,34 +156,51 @@ export class HomebrewDJControllerOnly {
             //console.debug("websocket payload", msg);
             switch (msg.type) {
                 case "cc":
-                    this.midiPort.sendMidi({
-                        type: "ControlChange",
-                        cc: msg.cc,
-                        channel: msg.channel,
-                        value: msg.value
-                    })
+                    {
+                        const m: MidiMessage = {
+                            type: "ControlChange",
+                            cc: msg.cc,
+                            channel: msg.channel,
+                            value: msg.value
+                        };
+
+                        this.midiPort.sendMidi(m)
+                        this.server.broadcast({
+                            ...m,
+                            type: "cc"
+                        })
+                    }
                     break;
                 case "note":
-                    if (msg.velocity > 64) {
-                        this.midiPort.sendMidi({
-                            type: "NoteOn",
+                    {
+                        const m = {
                             channel: msg.channel,
                             note: msg.note,
                             velocity: msg.velocity
-                        });
-                    } else {
-                        this.midiPort.sendMidi({
-                            type: "NoteOff",
-                            channel: msg.channel,
-                            note: msg.note,
-                            velocity: msg.velocity
-                        });
+                        };
+
+                        if (msg.velocity > 64) {
+                            this.midiPort.sendMidi({
+                                type: "NoteOn",
+                                ...m
+                            });
+                        } else {
+                            this.midiPort.sendMidi({
+                                type: "NoteOff",
+                                ...m
+                            });
+                        }
+                        this.server.broadcast({
+                            type: "note",
+                            ...m
+                        })
                     }
                     break;
 
                 case "osc":
                     //console.log(msg);
                     this.oscPort.send(msg)
+                    this.server.broadcast(msg)
                     break;
             }
         }, {

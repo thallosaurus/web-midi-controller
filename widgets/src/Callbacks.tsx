@@ -98,6 +98,17 @@ function hasScalingProperties(value: ValueProperties | null): value is ValueProp
     //&& (Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
 }
 
+interface MidiLookupResult {
+    [n: number]: [{
+        type: "cc" | "note",
+        sub: number
+    }]
+}
+
+interface LookupResult {
+    midi: MidiLookupResult
+}
+
 export abstract class WCallbacks {
     abstract sender: Outgoing | null;
 
@@ -105,6 +116,34 @@ export abstract class WCallbacks {
         ccCallbackMap: new Map(),
         noteCallbackMap: new Map(),
         oscCallbackMap: new Map(),
+    }
+
+    lookup(): LookupResult {
+        const midi = {};
+        this.callbacks.ccCallbackMap.forEach((v, ch) => {
+            if (!midi[ch]) midi[ch] = [];
+
+            v.forEach((vv, sub) => {
+                midi[ch].push({
+                    type: "cc",
+                    sub
+                });
+            })
+        })
+
+        this.callbacks.noteCallbackMap.forEach((v, ch) => {
+            if (!midi[ch]) midi[ch] = [];
+            v.forEach((vv, sub) => {
+                midi[ch].push({
+                    type: "note",
+                    sub
+                })
+            })
+        });
+
+        return {
+            midi
+        }
     }
 
     private registerNote: MidiNoteRegisterFn = (def, cb) => {
