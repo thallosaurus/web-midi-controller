@@ -57,7 +57,7 @@ const stringToElement = (d: Widget, k: string) => {
 
 export function WidgetCell({ def, k }: { def: Widget, k?: string }) {
   return <>
-    {stringToElement(def, k ?? "")}
+    {stringToElement(def, def.id)}
   </>
 }
 

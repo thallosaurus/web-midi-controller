@@ -1,6 +1,6 @@
 import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback } from "@hdj/homebrewdj-web-client";
 import { Outgoing, WCallbacks } from "@hdj/widgets";
-import { createContext, useState, useContext, useRef, ReactNode } from "react";
+import { createContext, useState, useContext, useRef, ReactNode, useEffect } from "react";
 
 export class EventBus extends WCallbacks {
     sender: Outgoing | null = null;
@@ -17,11 +17,13 @@ type WebsocketContextType = {
     connect: (uri: URL) => Promise<void>;
     disconnect: () => void;
 }
-export const WebsocketContext = createContext<WebsocketContextType| null>(null);
+
+export const EventBusContext = createContext<EventBus>(new EventBus());
+export const WebsocketContext = createContext<WebsocketContextType | null>(null);
 export function useWebsocketContext() {
     const ctx = useContext(WebsocketContext);
     if (!ctx) throw new Error("no websocketcontext loaded")
-        return ctx;
+    return ctx;
 }
 
 enum ConnectionState {
@@ -30,11 +32,21 @@ enum ConnectionState {
     Online = "connected"
 }
 
-export const WebsocketProvider = ({ children, messageHandler }: { children: ReactNode, messageHandler: WebsocketMessageCallback<AllowedPayloads>}) => {
-    const wsRef = useRef(new WebsocketClient<AllowedPayloads>(messageHandler))
+
+export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     
     const [connectionId, setConnectionId] = useState<string | null>(null);
     const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
+    const bus = useContext(EventBusContext);
+    const wsRef = useRef(new WebsocketClient<AllowedPayloads>((id: string, msg: AllowedPayloads) => {
+        bus.extInput(msg);
+    }))
+    useEffect(() => {
+        bus.setSender(wsRef.current);
+        return () => {
+            bus.setSender(null);
+        }
+    }, [])
 
     return <WebsocketContext.Provider value={{
         ws: wsRef.current,

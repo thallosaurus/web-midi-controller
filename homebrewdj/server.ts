@@ -42,7 +42,7 @@ const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callb
     })
 
     ws.addEventListener("message", (ev) => {
-        //console.log("message", id, ev.data);
+        console.log("message", id, ev.data);
         callback(JSON.parse(ev.data));
     })
 

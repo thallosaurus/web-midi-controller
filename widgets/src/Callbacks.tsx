@@ -336,7 +336,7 @@ export abstract class WCallbacks {
     }
 
     private runCallbacks(map: CallbackMap<ReceiveDataCallback>, value: number) {
-        map.callbacks.forEach((cb) => {
+        map?.callbacks.forEach((cb) => {
             cb(value)
         });
     }
