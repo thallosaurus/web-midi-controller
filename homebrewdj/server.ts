@@ -8,6 +8,8 @@ import { StaticAssets } from "./static.ts";
  */
 type HandlerCallback<T> = (msg: T) => void;
 
+type WebSocketClientMap = { map: Map<UUID, {ws: WebSocket, clientNumber: number }>, nextClientNumber: number };
+
 /**
  * Serves the web application's static assets.
  *
@@ -29,14 +31,15 @@ const StaticHandler = async (context: Context) => {
  * @param callback Message handler invoked for incoming payloads.
  * @returns Unique identifier assigned to the connection.
  */
-const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callback: HandlerCallback<T>) => {
+const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callback: HandlerCallback<T>) => {
     const id = randomUUID();
 
     ws.addEventListener("open", (ev) => {
         console.log("new websocket connection with id", id);
         ws.send(JSON.stringify({
             type: "connection",
-            id
+            id,
+            clientNumber: clients.nextClientNumber
         }))
         //console.log(clients);
     })
@@ -48,12 +51,12 @@ const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callb
 
     ws.addEventListener("error", (ev) => {
         console.log("error", ev);
-        clients.delete(id);
+        clients.map.delete(id);
     })
 
     ws.addEventListener("close", (ev) => {
         console.log("close", id)
-        clients.delete(id);
+        clients.map.delete(id);
     })
 
     return id;
@@ -65,7 +68,7 @@ const WebsocketHandler = <T>(clients: Map<UUID, WebSocket>, ws: WebSocket, callb
  * @param clients Active client registry.
  * @param callback Message handler invoked for incoming payloads.
  */
-export const WebsocketRouter = <T>(clients: Map<UUID, WebSocket>, callback: HandlerCallback<T>) => {
+export const WebsocketRouter = <T>(clients: WebSocketClientMap, callback: HandlerCallback<T>) => {
     const router = new Router();
     router.get("/ws", (ctx) => {
         if (!ctx.isUpgradable) {
@@ -74,7 +77,8 @@ export const WebsocketRouter = <T>(clients: Map<UUID, WebSocket>, callback: Hand
 
         const ws = ctx.upgrade();
         const id = WebsocketHandler(clients, ws, callback);
-        clients.set(id, ws);
+        clients.map.set(id, {ws, clientNumber: clients.nextClientNumber});
+        clients.nextClientNumber++;
     })
     router.get("/", StaticHandler)
     router.get("/manifest.json", StaticHandler)
@@ -97,7 +101,7 @@ interface ListenOptions {
 export class Server<T = AllowedPayloads> {
     controller: AbortController;
     app: Application;
-    clients = new Map<UUID, WebSocket>();
+    clients: WebSocketClientMap = { map: new Map<UUID, { ws: WebSocket, clientNumber: number }>(), nextClientNumber: 0 };
 
     /**
      * Creates and starts a new server instance.
@@ -133,8 +137,8 @@ export class Server<T = AllowedPayloads> {
      * @param msg Payload to broadcast.
      */
     broadcast(msg: T) {
-        this.clients.forEach(client => {
-            client.send(JSON.stringify(msg))
+        this.clients.map.forEach(client => {
+            client.ws.send(JSON.stringify(msg))
         });
     }
 

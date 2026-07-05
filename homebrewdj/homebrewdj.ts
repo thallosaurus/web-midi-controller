@@ -5,7 +5,7 @@ import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { Server } from "./server.ts";
 import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
-import { MidiMessage } from "@hdj/midi-driver";
+import type { MidiMessage } from "@hdj/midi-driver";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
@@ -18,6 +18,94 @@ interface HomebrewDJConfig {
     dawOutput: string;
     traktorInput: string;
     traktorOutput: string;
+}
+
+interface WebsocketForwardOptions {
+    msg: AllowedPayloads,
+    server: Server,
+    midiPort: MidiDriver,
+    oscPort: OscDriver
+}
+const forwardWebsocketMessageToPorts = ({ msg, server, midiPort, oscPort }: WebsocketForwardOptions) => {
+    //console.debug("websocket payload", msg);
+    switch (msg.type) {
+        case "cc":
+            {
+                const m: MidiMessage = {
+                    type: "ControlChange",
+                    cc: msg.cc,
+                    channel: msg.channel,
+                    value: msg.value
+                };
+
+                midiPort.sendMidi(m)
+                server.broadcast({
+                    ...m,
+                    type: "cc"
+                })
+            }
+            break;
+        case "note":
+            {
+                const m = {
+                    channel: msg.channel,
+                    note: msg.note,
+                    velocity: msg.velocity
+                };
+
+                if (msg.velocity > 64) {
+                    midiPort.sendMidi({
+                        type: "NoteOn",
+                        ...m
+                    });
+                } else {
+                    midiPort.sendMidi({
+                        type: "NoteOff",
+                        ...m
+                    });
+                }
+                server.broadcast({
+                    type: "note",
+                    ...m
+                })
+            }
+            break;
+
+        case "osc":
+            //console.log(msg);
+            oscPort.send(msg)
+            server.broadcast(msg)
+            break;
+    }
+}
+
+interface MidiForwardOptions {
+    t: MidiMessage,
+    server: Server
+}
+const forwardMidiToServer = ({ t, server }: MidiForwardOptions) => {
+    console.debug("midiport payload", t);
+
+    switch (t.type) {
+        case "NoteOn":
+        case "NoteOff":
+            server.broadcast({
+                type: "note",
+                channel: t.channel,
+                note: t.note,
+                //on: t.type == "NoteOn",
+                velocity: t.velocity
+            });
+            break;
+        case "ControlChange":
+            server.broadcast({
+                type: "cc",
+                channel: t.channel,
+                cc: t.cc,
+                value: t.value
+            });
+            break;
+    }
 }
 
 /**
@@ -100,6 +188,8 @@ export class HomebrewDJTraktorSetup {
 
         this.traktor.addEventListener((ev: CustomEvent) => {
             const t = ev.detail;
+            forwardMidiToServer({ t, server: this.server })
+/*            const t = ev.detail;
 
             switch (t.type) {
                 case "NoteOn":
@@ -121,7 +211,7 @@ export class HomebrewDJTraktorSetup {
                         value: t.value
                     });
                     break;
-            }
+            }*/
         })
 
         this.launchpad.loadSurface(LaunchpadSurfaceStore.Session, new TraktorSurface(this.traktor));
@@ -153,84 +243,22 @@ export class HomebrewDJControllerOnly {
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
         this.server = new Server((msg: AllowedPayloads) => {
-            //console.debug("websocket payload", msg);
-            switch (msg.type) {
-                case "cc":
-                    {
-                        const m: MidiMessage = {
-                            type: "ControlChange",
-                            cc: msg.cc,
-                            channel: msg.channel,
-                            value: msg.value
-                        };
-
-                        this.midiPort.sendMidi(m)
-                        this.server.broadcast({
-                            ...m,
-                            type: "cc"
-                        })
-                    }
-                    break;
-                case "note":
-                    {
-                        const m = {
-                            channel: msg.channel,
-                            note: msg.note,
-                            velocity: msg.velocity
-                        };
-
-                        if (msg.velocity > 64) {
-                            this.midiPort.sendMidi({
-                                type: "NoteOn",
-                                ...m
-                            });
-                        } else {
-                            this.midiPort.sendMidi({
-                                type: "NoteOff",
-                                ...m
-                            });
-                        }
-                        this.server.broadcast({
-                            type: "note",
-                            ...m
-                        })
-                    }
-                    break;
-
-                case "osc":
-                    //console.log(msg);
-                    this.oscPort.send(msg)
-                    this.server.broadcast(msg)
-                    break;
-            }
+            forwardWebsocketMessageToPorts({
+                msg,
+                midiPort: this.midiPort,
+                oscPort: this.oscPort,
+                server: this.server
+            })
         }, {
             hostname: config.hostname
         });
 
         this.midiPort.addEventListener((ev: CustomEvent) => {
             const t = ev.detail;
-            console.debug("midiport payload", t);
-
-            switch (t.type) {
-                case "NoteOn":
-                case "NoteOff":
-                    this.server.broadcast({
-                        type: "note",
-                        channel: t.channel,
-                        note: t.note,
-                        //on: t.type == "NoteOn",
-                        velocity: t.velocity
-                    });
-                    break;
-                case "ControlChange":
-                    this.server.broadcast({
-                        type: "cc",
-                        channel: t.channel,
-                        cc: t.cc,
-                        value: t.value
-                    });
-                    break;
-            }
+            forwardMidiToServer({
+                t,
+                server: this.server
+            })
         });
         this.oscPort = OscDriver.customHost("127.0.0.1", 8000);
         this.oscPort.addEventListener((msg: OscMessagePayload) => {

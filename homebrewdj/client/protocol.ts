@@ -1,6 +1,7 @@
 export interface ConnectedPayload {
     type: "connection",
-    id: string
+    id: string,
+    clientNumber: number
 }
 
 export interface NoteMessagePayload {
