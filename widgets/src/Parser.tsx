@@ -57,7 +57,6 @@ const stringToElement = (d: Widget, k: string) => {
 
 export function WidgetCell({ def, k }: { def: Widget, k?: string }) {
   return <>
-  <p>widget</p>
     {stringToElement(def, k ?? "")}
   </>
 }
@@ -85,8 +84,6 @@ export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WC
     <WidgetActionContext value={callbacks}>
       <style>{o.style ?? ""}</style>
       <div id={o.id} className="overlay" data-overlay="view" style={{
-        //width: "calc(100% - 1em)",
-        //height: "calc(100% - 1em)",
         width: "100%",
         height: "100%",
         display: "flex",
