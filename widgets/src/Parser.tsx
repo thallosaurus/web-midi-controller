@@ -7,43 +7,44 @@ import { XYPad } from "./XYPad";
 import { Jogwheel } from "./Jogwheel";
 import { WCallbacks, WidgetActionContext } from "./Callbacks";
 
-const stringToElement = (d: Widget) => {
+const stringToElement = (d: Widget, k: string) => {
+  console.log(d);
   switch (d.type) {
     case 'ccbutton':
     case 'notebutton':
-      return <Button def={d} />
+      return <Button def={d} key={k} />
     case 'ccslider':
-      return <Slider def={d} />
+      return <Slider def={d} key={k} />
     case 'horiz-mixer':
-      return <Horizontal def={d}>
+      return <Horizontal def={d} key={k}>
         <SingleWidget children={d.horiz} />
       </Horizontal>
     case 'vert-mixer':
-      return <Vertical def={d}>
+      return <Vertical def={d} key={k}>
         <SingleWidget children={d.vert} />
       </Vertical>
     case 'grid-mixer':
-      return <Grid def={d}>
+      return <Grid def={d} key={k}>
         <SingleWidget children={d.grid} />
       </Grid>
     case 'rotary':
-      return <Rotary def={d} />
+      return <Rotary def={d} key={k} />
     case 'xypad':
-      return <XYPad def={d} />
+      return <XYPad def={d} key={k} />
     case 'shift':
-      return <ShiftArea def={d}>
+      return <ShiftArea def={d} key={k}>
         <SingleWidget children={d.a} />
         <SingleWidget children={d.b} />
       </ShiftArea>
     case 'jogwheel':
-      return <Jogwheel def={d} />
+      return <Jogwheel def={d} key={k} />
     case 'tab':
-      return <TabbedArea def={d}>
+      return <TabbedArea def={d} key={k}>
         <SingleWidget children={d.tabs} />
       </TabbedArea>
     case 'empty':
     default:
-      return <div className="empty"></div>
+      return <div className="empty" key={k}></div>
   };
 
 }
@@ -54,9 +55,10 @@ const stringToElement = (d: Widget) => {
   </>
 } */
 
-export function WidgetCell({ def }: { def: Widget }) {
+export function WidgetCell({ def, k }: { def: Widget, k?: string }) {
   return <>
-    {stringToElement(def)}
+  <p>widget</p>
+    {stringToElement(def, k ?? "")}
   </>
 }
 
@@ -64,7 +66,7 @@ export function SingleWidget({ children }: { children: Widget[] }) {
   return <>
     {children.map((def, key) => {
       const k = `${key}-${def.type}-${def.id}`;
-      <WidgetCell def={def} key={k} />
+      return <WidgetCell def={def} k={k} />
     })}
   </>
 }
