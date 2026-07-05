@@ -9,9 +9,7 @@ const TestOscWidget: Widget & CCSliderProperties = {
   id: null,
   vertical: false,
   cc: 3,
-  value: 0,
-  value_off: 0,
-  default_value: 0
+  value: null,
 }
 
 export const TestOscOverlay: Overlay = {
@@ -19,6 +17,7 @@ export const TestOscOverlay: Overlay = {
   name: "OSC Test Overlay",
   channel: null,
   program: null,
+  style: "",
   cells: [TestOscWidget]
 }
 
@@ -28,6 +27,7 @@ export const MATRIX_OVERLAY: Overlay = {
   "name": "8x8 MIDI Grid",
   "channel": null,
   "program": null,
+  style: "",
   "cells": [
     {
       "id": null,
