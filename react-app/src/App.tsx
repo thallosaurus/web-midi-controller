@@ -9,6 +9,7 @@ import { ConnectScreen } from "./Connect";
 import { getEndpointUrl, getVersion } from "./utils";
 import "./index.css"
 import "@hdj/widgets/style.css"
+import { AssignDialog } from "./AssignDialog";
 
 function App() {
   /*const eventbus = useRef<EventBus>(new EventBus());
@@ -67,7 +68,7 @@ function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
           display: "flex",
           justifyContent: "space-between",
         }}>
-          <div style={{
+          <div onClick={() => setShowDiags(true)} style={{
             fontWeight: "bold"
           }}>HomebrewDJ v{getVersion()}</div>
 
@@ -92,6 +93,9 @@ function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
         showModal={showOverlayPicker}
         closeSwitcher={() => setOverlayPicker(false)}
         setOverlay={setOverlay}></OverlaySwitcher>
+      <AssignDialog
+        showModal={showDiags}
+        closeDialog={() => setShowDiags(false)} />
     </>
   )
 }

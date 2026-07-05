@@ -99,14 +99,12 @@ function hasScalingProperties(value: ValueProperties | null): value is ValueProp
 }
 
 interface MidiLookupResult {
-    [n: number]: [{
-        type: "cc" | "note",
-        sub: number
-    }]
+    type: "cc" | "note",
+    sub: number
 }
 
-interface LookupResult {
-    midi: MidiLookupResult
+export interface LookupResult {
+    midi: Map<number, MidiLookupResult[]>
 }
 
 export abstract class WCallbacks {
@@ -119,22 +117,22 @@ export abstract class WCallbacks {
     }
 
     lookup(): LookupResult {
-        const midi = {};
+        const midi = new Map<number, MidiLookupResult[]>();
         this.callbacks.ccCallbackMap.forEach((v, ch) => {
-            if (!midi[ch]) midi[ch] = [];
-
             v.forEach((vv, sub) => {
-                midi[ch].push({
+                if (!midi.has(ch)) midi.set(ch, []);
+                midi.get(ch)!.push({
                     type: "cc",
                     sub
-                });
+                })
             })
         })
 
         this.callbacks.noteCallbackMap.forEach((v, ch) => {
-            if (!midi[ch]) midi[ch] = [];
+            //midi[ch] = [];
             v.forEach((vv, sub) => {
-                midi[ch].push({
+        if (!midi.has(ch)) midi.set(ch, [])
+                midi.get(ch)!.push({
                     type: "note",
                     sub
                 })

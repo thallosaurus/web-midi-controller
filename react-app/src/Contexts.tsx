@@ -12,6 +12,7 @@ export class EventBus extends WCallbacks {
 
 type WebsocketContextType = {
     ws: WebsocketClient<AllowedPayloads>,
+    bus: EventBus,
     connectionState: ConnectionState,
     connectionId: string | null,
     connect: (uri: URL) => Promise<void>;
@@ -50,6 +51,7 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
 
     return <WebsocketContext.Provider value={{
         ws: wsRef.current,
+        bus,
         connectionId,
         connectionState,
         connect: async (uri) => {
