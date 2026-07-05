@@ -95,7 +95,7 @@ function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
 
 function hasScalingProperties(value: ValueProperties | null): value is ValueProperties {
     return value !== null
-        && (Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
+    //&& (Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
 }
 
 export abstract class WCallbacks {
@@ -228,22 +228,22 @@ export abstract class WCallbacks {
         throw new Error("unsupported properties")
     }
 
-    send(def: MidiNoteProperties | MidiCCProperties | osc, value: number) {
+    send(def: MidiNoteProperties | MidiCCProperties | osc, v: number) {
         if (isMidiNote(def)) {
             const c = this.callbacks.noteCallbackMap.get(def.channel).get(def.note);
 
-            console.log("note", def.channel, def.note, value, value > 64);
-            if (c.lastValue != value) {
+            console.log("note", def.channel, def.note, v, v > 64);
+            if (c.lastValue != v) {
 
                 const msg: NoteDelta = {
                     type: "note",
                     channel: def.channel,
                     note: def.note,
-                    velocity: value,
+                    velocity: v,
                     //on: value > 64
                 };
 
-                c.lastValue = value
+                c.lastValue = v
                 if (this.sender) this.sender.send(msg);
                 this.extInput(msg);
             }
@@ -251,6 +251,17 @@ export abstract class WCallbacks {
         }
         if (isMidiCC(def)) {
             const c = this.callbacks.ccCallbackMap.get(def.channel).get(def.cc);
+
+            // stubbed
+            let value = v;
+            if (hasScalingProperties(def.value)) {
+                const delta = def.value.max - def.value.min;
+
+                value = v * delta;
+            } else {
+                value = v;
+            }
+
             if (c.lastValue != value) {
                 console.log("cc", def.channel, def.cc, value);
                 const msg: CCDelta = {
@@ -269,6 +280,7 @@ export abstract class WCallbacks {
             //return this.sendCC(def, Math.floor(value * 127))
         }
         if (isOSC(def)) {
+            let value = v;
             console.log("osc update", def.address, value);
             const msg: OscDelta = {
                 type: "osc",

@@ -30,6 +30,7 @@ pub(super) struct NoteProperties {
 #[serde(tag = "output", rename = "osc")]
 pub(super) struct OscProperties {
     address: String,
+    value: Option<ValueProperties>,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -42,8 +43,9 @@ pub(super) struct ButtonProperties {
 #[derive(Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "Widget.ts")]
 pub(super) struct CCProperties {
-    cc: u8
+    cc: u8,
     //label: Option<String>
+    value: Option<ValueProperties>,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
@@ -213,8 +215,6 @@ pub(super) struct CCSliderProperties {
 
     #[serde(flatten)]
     ccprop: CCProperties,
-
-    value: Option<ValueProperties>,
 
     label: Option<String>,
 
