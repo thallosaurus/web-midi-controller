@@ -71,9 +71,11 @@ export const XYPAD_OVERLAY: Overlay = {
   "name": "Fullscreen XY Pad",
   "program": 0,
   "channel": null,
+  "style": null,
   "cells": [
     {
       "type": "vert-mixer",
+      "id": "vert",
       "vert": [
         {
           "channel": 2,
@@ -81,15 +83,19 @@ export const XYPAD_OVERLAY: Overlay = {
           "type": "xypad",
           "output": "midi",
           "note": 60,
+          "velocity": 127,
+          "id": "xy-pad-w",
           "x": {
             "output": "midi",
             "channel": 1,
-            "cc": 4
+            "cc": 4,
+            "value": null
           },
           "y": {
             "output": "midi",
             "channel": 1,
-            "cc": 5
+            "cc": 5,
+            "value": null
           }
         }
       ]
@@ -116,7 +122,8 @@ function createRotaries(label: string, ch: number, cc: number, mode: RotaryMode,
     cc,
     channel: ch,
     mode,
-    label
+    label,
+    value: null
   }
 }
 

@@ -7,43 +7,43 @@ import { XYPad } from "./XYPad";
 import { Jogwheel } from "./Jogwheel";
 import { WCallbacks, WidgetActionContext } from "./Callbacks";
 
-const stringToElement = (d: Widget, k) => {
+const stringToElement = (d: Widget) => {
   switch (d.type) {
     case 'ccbutton':
     case 'notebutton':
-      return <Button def={d} key={k} />
+      return <Button def={d} />
     case 'ccslider':
-      return <Slider def={d} key={k} />
+      return <Slider def={d} />
     case 'horiz-mixer':
-      return <Horizontal def={d} key={k}>
+      return <Horizontal def={d}>
         <SingleWidget children={d.horiz} />
       </Horizontal>
     case 'vert-mixer':
-      return <Vertical def={d} key={k}>
+      return <Vertical def={d}>
         <SingleWidget children={d.vert} />
       </Vertical>
     case 'grid-mixer':
-      return <Grid def={d} key={k}>
+      return <Grid def={d}>
         <SingleWidget children={d.grid} />
       </Grid>
     case 'rotary':
-      return <Rotary def={d} key={k} />
+      return <Rotary def={d} />
     case 'xypad':
-      return <XYPad def={d} key={k} />
+      return <XYPad def={d} />
     case 'shift':
-      return <ShiftArea def={d} key={k}>
+      return <ShiftArea def={d}>
         <SingleWidget children={d.a} />
         <SingleWidget children={d.b} />
       </ShiftArea>
     case 'jogwheel':
-      return <Jogwheel def={d} key={k} />
+      return <Jogwheel def={d} />
     case 'tab':
-      return <TabbedArea def={d} key={k}>
+      return <TabbedArea def={d}>
         <SingleWidget children={d.tabs} />
       </TabbedArea>
     case 'empty':
     default:
-      return <div className="empty" key={k}></div>
+      return <div className="empty"></div>
   };
 
 }
@@ -54,11 +54,17 @@ const stringToElement = (d: Widget, k) => {
   </>
 } */
 
+export function WidgetCell({ def }: { def: Widget }) {
+  return <>
+    {stringToElement(def)}
+  </>
+}
+
 export function SingleWidget({ children }: { children: Widget[] }) {
   return <>
-    {children.map((def, k) => {
-      const key = `${k}-${def.type}-${def.id}`
-      return stringToElement(def, key)
+    {children.map((def, key) => {
+      const k = `${key}-${def.type}-${def.id}`;
+      <WidgetCell def={def} key={k} />
     })}
   </>
 }
@@ -75,7 +81,7 @@ export interface WidgetProperties<T> {
 export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WCallbacks, style?: React.CSSProperties }) {
   return (
     <WidgetActionContext value={callbacks}>
-      <style>{o.style??""}</style>
+      <style>{o.style ?? ""}</style>
       <div id={o.id} className="overlay" data-overlay="view" style={{
         //width: "calc(100% - 1em)",
         //height: "calc(100% - 1em)",

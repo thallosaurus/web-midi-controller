@@ -294,9 +294,10 @@ export abstract class WCallbacks {
             // stubbed
             let value = v;
             if (hasScalingProperties(def.value)) {
-                const delta = def.value.max - def.value.min;
+                //const delta = (def.value?.max ?? 127) - (def.value?.min ?? 0);
 
-                value = v * delta;
+                //value = v * delta;
+                value = v;
             } else {
                 value = v;
             }
