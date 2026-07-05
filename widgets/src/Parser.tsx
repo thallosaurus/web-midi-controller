@@ -3,7 +3,7 @@ import { Button } from "./Button";
 import { Slider } from "./Slider";
 import { Grid, Horizontal, ShiftArea, TabbedArea, Vertical } from "./Layout";
 import { Rotary } from "./Rotary";
-import { XYPad } from "./XYPad";
+import { CanvasXYPad, XYPad } from "./XYPad";
 import { Jogwheel } from "./Jogwheel";
 import { WCallbacks, WidgetActionContext } from "./Callbacks";
 
@@ -30,7 +30,8 @@ const stringToElement = (d: Widget, k: string) => {
     case 'rotary':
       return <Rotary def={d} key={k} />
     case 'xypad':
-      return <XYPad def={d} key={k} />
+      //return <XYPad def={d} key={k} />
+      return <CanvasXYPad def={d} key={k} />
     case 'shift':
       return <ShiftArea def={d} key={k}>
         <SingleWidget children={d.a} />
