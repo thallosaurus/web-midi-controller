@@ -181,8 +181,9 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        const w = canvas.width;
-        const h = canvas.height;
+        const rect = canvas.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
 
         ctx.fillStyle = "#222";
         ctx.fillRect(0, 0, w, h);
@@ -208,10 +209,18 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
 
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
+
+        /*canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         const ctx = canvas.getContext("2d");
-        ctx?.scale(dpr, dpr);
+        ctx?.scale(dpr, dpr);*/
+
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         draw(state.current.x, state.current.y, state.current.pressed);
 
         const note_id = callbacks.register(def, (v) => {
