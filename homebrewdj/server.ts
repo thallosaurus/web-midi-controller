@@ -111,7 +111,8 @@ export const WebsocketRouter = <T>(clients: WebSocketClientMap, callback: Handle
 
 interface ListenOptions {
     port?: number,
-    hostname?: string
+    hostname?: string,
+    systemChannel?: number
 }
 
 /**
@@ -126,7 +127,7 @@ export class Server<T = AllowedPayloads> {
     clients: WebSocketClientMap = { map: new Map<UUID, { ws: WebSocket, clientNumber: number }>(), nextClientNumber: 0 };
     selectedClientNumber = 0;
     // 1-index based system channel
-    systemMidiChannel = 16;
+    private systemMidiChannel: number;
 
     /**
      * Creates and starts a new server instance.
@@ -139,6 +140,8 @@ export class Server<T = AllowedPayloads> {
     constructor(callback: HandlerCallback<T>, listenOptions: ListenOptions = {}, app = new Application(), controller = new AbortController()) {
         this.app = app;
         this.controller = controller;
+
+        this.systemMidiChannel = listenOptions.systemChannel ?? 16;
 
         const ws = WebsocketRouter(this.clients, callback);
         this.app.use(ws.routes());
