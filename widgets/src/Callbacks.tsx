@@ -71,7 +71,7 @@ interface OscDelta {
     args: Array<any>
 }
 
-interface PgrmDelta {
+export interface PgrmDelta {
     type: "pgrm",
     value: number
 }
@@ -376,9 +376,9 @@ export abstract class WCallbacks {
                 this.externalOsc(msg);
                 break;
             
-            case "pgrm":
+            /*case "pgrm":
                 console.log(msg);
-                break;
+                break;*/
             default:
                 throw new Error("invalid external input " + JSON.stringify(msg))
         }

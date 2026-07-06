@@ -1,12 +1,20 @@
+import { Overlay } from "@hdj/definitions";
 import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback } from "@hdj/homebrewdj-web-client";
-import { Outgoing, WCallbacks } from "@hdj/widgets";
+import { Outgoing, PgrmDelta, WCallbacks } from "@hdj/widgets";
 import { createContext, useState, useContext, useRef, ReactNode, useEffect } from "react";
+
+type ProgramChangeHandler = (msg: PgrmDelta) => void
 
 export class EventBus extends WCallbacks {
     sender: Outgoing | null = null;
+    programChange: (ProgramChangeHandler) | null = null;
 
     setSender(sender: Outgoing | null) {
         this.sender = sender;
+    }
+
+    setProgramChangeHandler(handler: ProgramChangeHandler | null) {
+        this.programChange = handler
     }
 }
 
@@ -40,7 +48,11 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
     const bus = useContext(EventBusContext);
     const wsRef = useRef(new WebsocketClient<AllowedPayloads>((id: string, msg: AllowedPayloads) => {
-        bus.extInput(msg);
+        if (msg.type == "clientnumber") {
+
+        } else {
+            bus.extInput(msg);
+        }
     }))
     useEffect(() => {
         bus.setSender(wsRef.current);
