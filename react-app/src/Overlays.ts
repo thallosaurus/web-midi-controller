@@ -106,7 +106,10 @@ export const XYPAD_PERFORMANCE: Overlay = {
           type: "vert-mixer",
           id: "perf-mixer",
           vert: [
-            createCCSlider("XFade", 1, 13, "snapback", true),
+            //createCCSlider("XFade", 1, 13, "snapback", true),
+            createMidiNoteButton("Previous", 16, 66, "trigger", "prev-scene"),
+            createMidiNoteButton("Play Selected Scene", 16, 68, "trigger", "play-scene"),
+            createMidiNoteButton("Next", 16, 67, "trigger", "next-scene"),
             createMidiCCButton("XFade", 1, 13, "trigger", "xfade")
           ]
         }
