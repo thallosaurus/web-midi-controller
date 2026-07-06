@@ -16,7 +16,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
     const callbacks = useWidgetAction();
 
     const sendNoteUpdate = (s: boolean) => {
-        callbacks.send(def, s ? 127 : 0);
+        callbacks.send(def, s ? 1 : 0);
     }
 
     const sendAxisUpdate = (x, y) => {
@@ -62,7 +62,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
 
 
     useEffect(() => {
-        const note_id = callbacks.register(def, (v) => { setPressed(v > 64) });
+        const note_id = callbacks.register(def, (v) => { setPressed(v > 0.5) });
         const id_x = callbacks.register(def.x, setValueX);
         const id_y = callbacks.register(def.y, setValueY);
         return () => {
@@ -112,7 +112,7 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
     const callbacks = useWidgetAction();
 
     const sendNoteUpdate = (s: boolean) => {
-        callbacks.send(def, s ? 127 : 0);
+        callbacks.send(def, s ? 1 : 0);
         //setPressed(s);
     }
 
