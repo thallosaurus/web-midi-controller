@@ -49,13 +49,13 @@ const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callbac
         callback(JSON.parse(ev.data));
     })
 
-    ws.addEventListener("error", (ev) => {
-        console.log("error", ev);
+    ws.addEventListener("error", (v) => {
+        console.log("error", (v as ErrorEvent).error);
         clients.map.delete(id);
     })
 
     ws.addEventListener("close", (ev) => {
-        console.log("close", id)
+        //console.log("close", id)
         clients.map.delete(id);
     })
 

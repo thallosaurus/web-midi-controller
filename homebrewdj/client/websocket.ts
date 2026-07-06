@@ -70,11 +70,11 @@ export class WebsocketClient<T> {
 
         }
         ws.onclose = (ev) => {
-            //console.log("connection closed", ev);
+            console.log("connection closed", ev);
             if (close) close();
         }
         ws.onerror = (ev) => {
-            //console.log("connection error", ev);
+            console.log("connection error", ev);
             if (close) close();
         }
         this.ws = ws;
