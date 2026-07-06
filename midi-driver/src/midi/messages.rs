@@ -24,6 +24,12 @@ pub struct CCPayload {
 
 #[derive(Clone, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
+pub struct ProgramChangePayload {
+    value: u8
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
 #[serde(tag = "type")]
 pub enum MidiMessage {
     NoteOn {
@@ -44,8 +50,9 @@ pub enum MidiMessage {
     ProgramChange {
         #[serde(flatten)]
         midi: MidiPayload,
-
-        value: u8,
+        
+        #[serde(flatten)]
+        value: ProgramChangePayload,
     },
     Pitchbend {
         #[serde(flatten)]
@@ -114,7 +121,7 @@ impl From<Vec<u8>> for MidiMessage {
                 let ch = data[0] - 0xC0;
                 Self::ProgramChange {
                     midi: MidiPayload { channel: ch + 1},
-                    value: *val,
+                    value: ProgramChangePayload { value: *val },
                 }
             }
             [0x90..=0x9F, note, 0] => {
@@ -187,7 +194,7 @@ impl From<MidiMessage> for Vec<u8> {
             MidiMessage::NoteOff { midi, note } => {
                 vec![0x80 + (midi.channel - 1), note.note, note.velocity]
             }
-            MidiMessage::ProgramChange { midi, value } => vec![0xC0 + (midi.channel - 1), value],
+            MidiMessage::ProgramChange { midi, value } => vec![0xC0 + (midi.channel - 1), value.value],
             MidiMessage::ControlChange { midi, cc } => {
                 vec![0xB0 + (midi.channel - 1), cc.cc, cc.value]
             }

@@ -2,7 +2,7 @@ import { randomUUID, UUID } from "node:crypto";
 import { Router, Context, Application } from "oak";
 import { AllowedPayloads } from "./client/protocol.ts";
 import { StaticAssets } from "./static.ts";
-import { MidiMessage } from "@hdj/midi-driver";
+import { CCPayload, MidiMessage } from "@hdj/midi-driver";
 import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { OscDriver } from "./osc.ts";
 
@@ -14,6 +14,23 @@ import { OscDriver } from "./osc.ts";
 type HandlerCallback<T> = (msg: T) => void;
 
 type WebSocketClientMap = { map: Map<UUID, { ws: WebSocket, clientNumber: number }>, nextClientNumber: number };
+
+export const isSystemMessage = (msg: MidiMessage, systemChannel: number) => {
+    return (
+        msg.type == "NoteOn"
+        || msg.type == "NoteOff"
+        || msg.type == "ControlChange"
+        || msg.type == "ProgramChange"
+    ) && msg.channel == systemChannel
+}
+
+export const isClientSelectorBank = (t: MidiMessage): boolean => {
+    return t.type == "ControlChange" && t.cc === 0
+}
+
+export const isClientSelectorSub = (t: MidiMessage): boolean => {
+    return t.type == "ControlChange" && t.cc === 32
+}
 
 /**
  * Serves the web application's static assets.
@@ -108,6 +125,8 @@ export class Server<T = AllowedPayloads> {
     app: Application;
     clients: WebSocketClientMap = { map: new Map<UUID, { ws: WebSocket, clientNumber: number }>(), nextClientNumber: 0 };
     selectedClientNumber = 0;
+    // 1-index based system channel
+    systemMidiChannel = 16;
 
     /**
      * Creates and starts a new server instance.
@@ -171,6 +190,26 @@ export class Server<T = AllowedPayloads> {
      */
     close() {
         this.controller.abort();
+    }
+
+    /**
+     * 
+     * @param msg 
+     * @returns true if the processing should continue and send it to clients if applicable
+     */
+    processSystemMessage(msg: MidiMessage): boolean {
+        if (isClientSelectorBank(msg)) {
+            const m = msg as CCPayload;
+            this.selectedClientNumber = m.value;
+            console.log(this);
+            return false;
+        }
+        if (isClientSelectorSub(msg)) {
+            const m = msg as CCPayload;
+            //this.selectedClientNumber = m.value;
+            return false;
+        }
+        return true;
     }
 }
 
@@ -253,6 +292,10 @@ export const forwardMidiToServer = ({ t, server }: MidiForwardOptions) => {
             });
             break;
         case "ControlChange":
+            if (isSystemMessage(t, server.systemMidiChannel)) {
+                if (!server.processSystemMessage(t)) return;
+            }
+
             server.broadcast({
                 type: "cc",
                 channel: t.channel,
@@ -267,10 +310,12 @@ export const forwardMidiToServer = ({ t, server }: MidiForwardOptions) => {
             // sub as cc 32
             // and the program as programchange
             {
-                server.sendToClient(server.selectedClientNumber, {
-                    type: "pgrm",
-                    value: t.value
-                });
+                if (isSystemMessage(t, server.systemMidiChannel)) {
+                    server.sendToClient(server.selectedClientNumber, {
+                        type: "pgrm",
+                        value: t.value
+                    });
+                }
             }
             break;
     }

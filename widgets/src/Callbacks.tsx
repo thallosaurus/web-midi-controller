@@ -162,7 +162,7 @@ export abstract class WCallbacks {
             channelMap?.set(def.note, { callbacks: new Map(), lastValue: 0 })
         }
         const noteMap = channelMap?.get(def.note).callbacks;
-        const id = uuid()
+        const id = uuid();
         noteMap?.set(id, cb);
         //if (this.next) this.next.registerNote(def, cb)
         return id
@@ -299,6 +299,7 @@ export abstract class WCallbacks {
             // stubbed
             let value = v;
             if (hasScalingProperties(def.value)) {
+                console.log(v, def.value);
                 //const delta = (def.value?.max ?? 127) - (def.value?.min ?? 0);
 
                 //value = v * delta;
@@ -379,7 +380,7 @@ export abstract class WCallbacks {
                 console.log(msg);
                 break;
             default:
-                throw new Error("invalid external input")
+                throw new Error("invalid external input " + JSON.stringify(msg))
         }
     }
 }

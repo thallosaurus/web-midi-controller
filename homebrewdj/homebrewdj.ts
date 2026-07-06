@@ -102,29 +102,6 @@ export class HomebrewDJTraktorSetup {
         this.traktor.addEventListener((ev: CustomEvent) => {
             const t = ev.detail;
             forwardMidiToServer({ t, server: this.server })
-/*            const t = ev.detail;
-
-            switch (t.type) {
-                case "NoteOn":
-                case "NoteOff":
-                    this.server.broadcast({
-                        type: "note",
-                        channel: t.channel,
-                        note: t.note,
-                        //on: t.type == "NoteOn",
-                        velocity: t.velocity
-                    });
-
-                    break;
-                case "ControlChange":
-                    this.server.broadcast({
-                        type: "cc",
-                        channel: t.channel,
-                        cc: t.cc,
-                        value: t.value
-                    });
-                    break;
-            }*/
         })
 
         this.launchpad.loadSurface(LaunchpadSurfaceStore.Session, new TraktorSurface(this.traktor));
