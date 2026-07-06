@@ -50,7 +50,7 @@ export function Button({ def }: WidgetProperties<ButtonProperties>) {
         }
 
         //setValue(latchOn.current ? 127 : 0)
-        callbacks.send(def, latchOn.current ? 127 : 0)
+        callbacks.send(def, latchOn.current ? 1 : 0)
         //if (callbacks.sendNote) callbacks.sendNote(def.channel, def.note, latchOn.current ? 127 : 0, latchOn.current)
     };
 
@@ -58,7 +58,7 @@ export function Button({ def }: WidgetProperties<ButtonProperties>) {
         onPointerDown={start}
         onPointerUp={end}
         onPointerCancel={end}>
-        <div className={"target" + " " + (value > 64 ? "press" : "")}>
+        <div className={"target" + " " + (value > 0.5 ? "press" : "")}>
             <div>
                 {def.label}
             </div>
