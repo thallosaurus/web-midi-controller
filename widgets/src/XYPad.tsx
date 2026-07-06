@@ -17,7 +17,6 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
 
     const sendNoteUpdate = (s: boolean) => {
         callbacks.send(def, s ? 127 : 0);
-        //setPressed(s);
     }
 
     const sendAxisUpdate = (x, y) => {
@@ -53,12 +52,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
         el.setPointerCapture(activePointer.current);
         update({ clientX, clientY });
 
-        //setPressed(true);
         sendNoteUpdate(true);
-        //this.target.classList.add("pressed");
-
-        //this.sendValue(def.velocity ?? 127)
-        //sendUpdate({ valueX: def.velocity ?? 127, valueY: def.velocity ?? 127})
     };
 
     const move = ({ pointerId, clientX, clientY }) => {

@@ -1,8 +1,9 @@
-import { ConnectedPayload } from "./protocol.ts";
+import { ClientNumberPayload, ConnectedPayload } from "./protocol.ts";
 
 export type WebsocketMessageCallback<T> = (id: string, msg: T) => void;
 
 const isConnectionMessage = (msg: { type: "connection" }): msg is ConnectedPayload => msg.type === "connection"
+const isClientNumberPayload = (msg: { type: "clientnumber"}): msg is ClientNumberPayload => msg.type == "clientnumber"
 const isWebsocketConnected = (ws: WebSocket | null): ws is WebSocket => (ws !== null && ws.readyState == WebSocket.OPEN)
 
 interface ConnectRequest {
@@ -18,7 +19,7 @@ export class WebsocketClient<T> {
 
     private handler: WebsocketMessageCallback<T>
     private connectionIdHandler: ((id: string | null) => void) | null = null
-    
+
     private outCounter = 0
     private inCounter = 0
 
@@ -57,16 +58,22 @@ export class WebsocketClient<T> {
             if (isConnectionMessage(msg)) {
                 this._id = msg.id;
                 this.clientNumber = msg.clientNumber;
+                console.log(msg);
 
                 if (this.connectionIdHandler) {
                     this.connectionIdHandler(msg.id);
                 }
                 if (open) open(msg.id);
                 return;
-            } else {
-                this.handler(msg.id, msg)
-                this.inCounter++;
+
             }
+
+            if (isClientNumberPayload(msg)) {
+                this.clientNumber = msg.clientNumber;
+                return
+            }
+            this.handler(msg.id, msg)
+            this.inCounter++;
 
         }
         ws.onclose = (ev) => {

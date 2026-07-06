@@ -113,7 +113,7 @@ impl From<Vec<u8>> for MidiMessage {
                 // Program changes
                 let ch = data[0] - 0xC0;
                 Self::ProgramChange {
-                    midi: MidiPayload { channel: ch },
+                    midi: MidiPayload { channel: ch + 1},
                     value: *val,
                 }
             }

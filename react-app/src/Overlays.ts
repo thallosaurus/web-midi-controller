@@ -165,6 +165,13 @@ const DEFAULT_MATRIX_MAP = [
   112, 113, 114, 115, 116, 117, 118, 119
 ];
 
+const MPC_MATRIX_MAP = [
+  48, 49, 50, 51,
+  44, 45, 46, 47,
+  40, 41, 42, 43,
+  36, 37, 38, 39
+]
+
 function createRotaries(label: string, ch: number, cc: number, mode: RotaryMode, htmlId: string | null = null): RotarySliderProperties & Widget {
   return {
     id: htmlId,
@@ -191,6 +198,14 @@ export const ROTARIES_TEST: Overlay = {
   ],
 }
 
+function createMPCMatrix(ch: number, htmlId = null): Widget & GridMixerProperties {
+  return createMatrix(ch, 4, 4, MPC_MATRIX_MAP, htmlId);
+}
+
+function createLaunchpadMatrix(ch: number, htmlId = null): Widget & GridMixerProperties {
+  return createMatrix(ch, 8, 8, DEFAULT_MATRIX_MAP, htmlId);
+}
+
 function createMatrix(ch: number, w: number, h: number, a = DEFAULT_MATRIX_MAP, htmlId = null): GridMixerProperties & Widget {
   return {
     "id": htmlId,
@@ -214,7 +229,7 @@ export const MATRIX_OVERLAY: Overlay = {
   }
   `,
   "cells": [
-    createMatrix(1, 8, 8)
+    createLaunchpadMatrix(1)
   ]
 };
 

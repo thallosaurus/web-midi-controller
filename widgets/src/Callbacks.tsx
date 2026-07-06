@@ -71,6 +71,13 @@ interface OscDelta {
     args: Array<any>
 }
 
+interface PgrmDelta {
+    type: "pgrm",
+    value: number
+}
+
+//interface ProgramChangeEvent 
+
 export interface Outgoing {
     send(msg: DeltaMessages): void;
 }
@@ -346,7 +353,7 @@ export abstract class WCallbacks {
         });
     }
 
-    extInput(msg: (NoteDelta | CCDelta | OscDelta)) {
+    extInput(msg: (NoteDelta | CCDelta | OscDelta | PgrmDelta)) {
         switch (msg.type) {
             case "note":
                 {
@@ -366,6 +373,10 @@ export abstract class WCallbacks {
                 break;
             case "osc":
                 this.externalOsc(msg);
+                break;
+            
+            case "pgrm":
+                console.log(msg);
                 break;
             default:
                 throw new Error("invalid external input")
