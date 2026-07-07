@@ -1,26 +1,25 @@
-import { ConnectedPayload } from "./protocol.ts";
+import { ClientNumberPayload, ConnectedPayload } from "./protocol.ts";
 
 export type WebsocketMessageCallback<T> = (id: string, msg: T) => void;
 
-const isConnectionMessage = (msg: { type: "connection" }): msg is ConnectedPayload => {
-    return msg.type === "connection"
-}
-
-const isWebsocketConnected = (ws: WebSocket | null): ws is WebSocket => {
-    return (ws !== null && ws.readyState == WebSocket.OPEN)
-}
+const isConnectionMessage = (msg: { type: "connection" }): msg is ConnectedPayload => msg.type === "connection"
+const isClientNumberPayload = (msg: { type: "clientnumber"}): msg is ClientNumberPayload => msg.type == "clientnumber"
+const isWebsocketConnected = (ws: WebSocket | null): ws is WebSocket => (ws !== null && ws.readyState == WebSocket.OPEN)
 
 interface ConnectRequest {
     endpoint: URL,
-    open?: (id: string) => void,
+    open?: (p: ConnectedPayload) => void,
     close?: () => void
 }
 
 export class WebsocketClient<T> {
     private ws: WebSocket | null = null
     private _id: string | null = null
-    handler: WebsocketMessageCallback<T>
-    connectionIdHandler: ((id: string | null) => void) | null = null
+    private clientNumber: number | null = null
+
+    private handler: WebsocketMessageCallback<T>
+    private connectionIdHandler: ((id: string | null) => void) | null = null
+
     private outCounter = 0
     private inCounter = 0
 
@@ -28,11 +27,12 @@ export class WebsocketClient<T> {
         return this._id;
     }
 
-    asyncConnect(endpoint: URL): Promise<string> {
-        return new Promise((open, rej) => {
+    asyncConnect(endpoint: URL): Promise<ConnectedPayload> {
+        return new Promise((open, close) => {
             this.connect({
                 endpoint,
-                open
+                open,
+                close
             })
         })
     }
@@ -57,22 +57,33 @@ export class WebsocketClient<T> {
             const msg = JSON.parse(data);
             if (isConnectionMessage(msg)) {
                 this._id = msg.id;
+                this.clientNumber = msg.clientNumber;
+                console.log(msg);
+
                 if (this.connectionIdHandler) {
                     this.connectionIdHandler(msg.id);
                 }
-                if (open) open(msg.id);
+                if (open) open(msg);
                 return;
-            } else {
-                this.handler(msg.id, msg)
-                this.inCounter++;
+
             }
+
+            if (isClientNumberPayload(msg)) {
+                this.clientNumber = msg.clientNumber;
+                return
+            }
+            this.handler(msg.id, msg)
+            this.inCounter++;
 
         }
         ws.onclose = (ev) => {
             console.log("connection closed", ev);
             if (close) close();
         }
-        ws.onerror = (ev) => console.log("connection error", ev);
+        ws.onerror = (ev) => {
+            console.log("connection error", ev);
+            if (close) close();
+        }
         this.ws = ws;
     }
 

@@ -41,9 +41,6 @@ function CCButtonEditor({ widget }: { widget: Widget & CCButtonProperties }) {
         <li><b>{widget.type}</b></li>
         <li>Label: {widget.label}</li>
         <li>CC: {widget.cc}</li>
-        <li>Default Value: {widget.default_value}</li>
-        <li>Value: {widget.value}</li>
-        <li>Value Off: {widget.value_off}</li>
         <li>Output: {widget.output}</li>
         <li>Mode: {widget.mode}</li>
     </>
@@ -54,9 +51,6 @@ function CCSliderEditor({ widget }: { widget: Widget & CCSliderProperties }) {
         <li><b>{widget.type}</b></li>
         <li>Label: {widget.label}</li>
         <li>CC: {widget.cc}</li>
-        <li>Default Value: {widget.default_value}</li>
-        <li>Value: {widget.value}</li>
-        <li>Value Off: {widget.value_off}</li>
         <li>Output: {widget.output}</li>
         <li>Mode: {widget.mode}</li>
     </>

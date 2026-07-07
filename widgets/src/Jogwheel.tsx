@@ -20,7 +20,6 @@ export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
         if (abs < 0.002) return; // deadzone
 
         if (def.output == "midi") {
-
             if (v > 0) {
                 callbacks.send(def, 66)
             } else {

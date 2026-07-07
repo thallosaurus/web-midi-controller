@@ -1,66 +1,70 @@
-import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties } from "@hdj/definitions";
-import { Layout, WidgetProperties } from "./Parser";
-import { useEffect, useState } from "react";
+import { GridMixerProperties, HorizontalMixerProperties, ShiftAreaProperties, TabbedViewProperties, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { SingleWidget, WidgetProperties } from "./Parser";
+import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { useWidgetAction } from "./Callbacks";
 
-export function Vertical({ def }: WidgetProperties<VerticalMixerProperties> & { aux?: React.ReactElement }) {
-    //return (<div>{Layout(def.vert)}</div>)
-    return <div id={def.id} className="widget vert-mixer" style={{
+export function Panel({ id, type, style, children }: { id: string, type: string, style: CSSProperties, children: ReactNode }) {
+    return <div id={id} className={`widget ${type}`} style={{
         display: "flex",
-        flexDirection: "column",
+        //flexDirection: "column",
         gap: "1em",
         width: "100%",
         height: "100%",
+        ...style
     }}>
-        <Layout children={def.vert} />
+        {children}
     </div>
 }
 
-export function Horizontal({ def }: WidgetProperties<HorizontalMixerProperties> & { aux?: React.ReactElement }) {
-    return (<div id={def.id} className="widget horiz-mixer" style={{
-        display: "flex",
-        flexDirection: "row",
-        gap: "1em",
-        width: "100%",
-        height: "100%",
+export function Vertical({ def, children }: WidgetProperties<Widget & VerticalMixerProperties> & { children: ReactNode }) {
+    //return (<div>{Layout(def.vert)}</div>)
+    return <Panel id={def.id} type="vert-mixer" style={{
+        flexDirection: "column"
     }}>
-        <Layout children={def.horiz} />
-    </div>)
-
+        {children}
+    </Panel>
 }
 
-export function Grid({ def }: WidgetProperties<GridMixerProperties> & { aux?: React.ReactElement }) {
-    return (<div id={def.id} className="widget grid" style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${def.h}, 1fr)`,
-        gridTemplateRows: `repeat(${def.w}, 1fr)`,
-        width: "100%",
-        height: "100%",
-        gap: "1em"
+export function Horizontal({ def, children }: WidgetProperties<Widget & HorizontalMixerProperties> & { children: ReactNode }) {
+    return <Panel id={def.id} type="horiz-mixer" style={{
+        flexDirection: "row"
     }}>
-        <Layout children={def.grid} />
-    </div>)
+        {children}
+    </Panel>
+
 }
 
-const shiftPanelAVisible = (shift: boolean) => {
-    return { display: shift ? "none" : "block" }
+export function Grid({ def, children }: WidgetProperties<Widget & GridMixerProperties> & { children: ReactNode }) {
+    return (
+        <Panel id={def.id} type="grid-mixer" style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${def.h}, 1fr)`,
+            gridTemplateRows: `repeat(${def.w}, 1fr)`,
+        }}>
+            {children}
+        </Panel>)
 }
 
-const shiftPanelBVisible = (shift: boolean) => {
-    return { display: shift ? "block" : "none" }
-}
-
-export function ShiftArea({ def }: WidgetProperties<ShiftAreaProperties> & { aux?: React.ReactElement }) {
-    const [shift, setShift] = useState(false);
+export function ShiftArea({ def, children }: WidgetProperties<ShiftAreaProperties> & { children: ReactNode[] }) {
+    const [shift, setShift] = useState(0);
     const callbacks = useWidgetAction();
 
     useEffect(() => {
-        const id = callbacks.register(def, (v) => setShift(v > 64))
+        const id = callbacks.register(def, (v) => setShift(Math.floor(v / 64)))
         return () => {
             callbacks.unregister(id, def);
         }
     }, [])
+
     return (<div id={def.id} className="shift">
+        {children.map((v, i) => {
+            return <div className="panel" style={{
+                display: shift == i ? "block" : "none"
+            }}>{v}</div>
+        })}
+    </div>)
+
+    /*return (<div id={def.id} className="shift">
         <div className="panel a" style={{
             ...shiftPanelAVisible(shift)
         }}>
@@ -71,15 +75,15 @@ export function ShiftArea({ def }: WidgetProperties<ShiftAreaProperties> & { aux
         }}>
             <Layout children={def.b} />
         </div>
-    </div>)
+    </div>)*/
 }
 
-export function TabbedArea({ def }: WidgetProperties<TabbedViewProperties>) {
+export function TabbedArea({ def, children }: WidgetProperties<TabbedViewProperties> & { children: ReactNode }) {
     const [tab, setCurrentTab] = useState(0);
 
     return (
         <div className="tab" id={def.id}>
-            <Layout children={def.tabs} />
+            {children}
         </div>
     )
 }

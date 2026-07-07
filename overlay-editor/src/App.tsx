@@ -2,10 +2,10 @@ import { useRef, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import type { HorizontalMixerProperties, NoteButtonProperties, Overlay, VerticalMixerProperties, Widget } from "@hdj/definitions";
-import { ChildLayout, Layout, WidgetCallbacks } from "@hdj/widgets";
+import { Outgoing, SingleWidget, WCallbacks, WidgetActionContext } from "@hdj/widgets";
 import "./App.css";
 import "@hdj/widgets/style.css"
-import { TestOscOverlay, MATRIX_OVERLAY } from "./TestOverlays";
+import { MATRIX_OVERLAY } from "./TestOverlays";
 import { OverlayEditorTree } from "./Editor";
 
 const DEFAULT_BUTTON: Widget & NoteButtonProperties = {
@@ -36,45 +36,15 @@ function App() {
   )
 }
 
-function App_() {
+class StubCallbacks extends WCallbacks {
+  sender: Outgoing | null = null
+}
 
+function App_() {
+  const cbs = useRef(new StubCallbacks());
   const [cells, setCells] = useState<Widget[]>([
 
   ])
-  const cbs: WidgetCallbacks = {
-    sendNote(c, n, v, on) {
-      console.log(c, n, v, on)
-    },
-    sendCC(c, cc, v) {
-      console.log(c, cc, v);
-    },
-    sendOSC(a, args) {
-      console.log(a, args);
-    },
-    registerNote(c, n, cb) {
-      return crypto.randomUUID();
-    },
-    registerCC(c, n, cb) {
-      return crypto.randomUUID();
-    },
-    registerOSC(address, cb) {
-      return crypto.randomUUID();
-    },
-
-    unregisterNote(ch, n, id) {
-
-    },
-
-    unregisterOSC(a, id) {
-
-    },
-    unregisterCC(id) {
-
-    },
-    sendUiEvent(def) {
-      console.log(def);
-    }
-  };
 
   return (
     <>
@@ -112,7 +82,9 @@ function App_() {
             }}>Add VPanel</button>
           </div>
         </header>
-        <ChildLayout childWidgets={cells} callbacks={cbs} aux={<button className="aux" type="submit">Edit</button>} />
+        <WidgetActionContext value={cbs.current}>
+          <SingleWidget children={cells} />
+        </WidgetActionContext>
       </div>
     </>
   )

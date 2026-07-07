@@ -11,22 +11,24 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         #midi-driver = pkgs.callPackage ./midi-driver {};
-        version = "v0.2.0";
+        version = builtins.readFile ./packaging/version;
 
         traktorController = builtins.fetchurl {
           url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/homebrewdj_traktor.js";
-          sha256 = "sha256:0dxssiz9kk79wxy2xz4v9z41wzzav3al1ymrzrgbrdc0kbhscgfr";
+          #sha256 = "sha256:c10efb572f77354430c2c53b703e6feb48592f0d21097814149c4453afeb4bdc";
+          sha256 = builtins.readFile ./packaging/homebrewdj_traktor.js.sha256;
         };
 
         driver = builtins.fetchurl {
           url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/libmidi_driver.so";
-          sha256 = "sha256:1c7nn4246vsy5b29yapvsy465hkwf6hzviyg2r8pymy3v1cmz4nv";
+          sha256 = builtins.readFile ./packaging/libmidi_driver.so.sha256;
         };
 
         ui = pkgs.fetchzip {
           url = "https://github.com/thallosaurus/web-midi-controller/releases/download/${version}/webui.zip";
           stripRoot = false;
-          sha256 = "sha256-WkqiEGmUtgt5MJFSrtG/if8GHD5qHENbidlefYPqPzE=";
+#          sha256 = "sha256:bf73ac229aa47aafae65acf76ceed414687dad3bbf1871e7b630ad93625a4715";
+          sha256 = builtins.readFile ./packaging/webui.zip.sha256;
         };
 
         config = pkgs.writeText "config.json" ''
@@ -45,7 +47,7 @@
           pname = "homebrewdj";
           version = version;
           
-          inherit src;
+#          inherit src;
 
           nativeBuildInputs = [ pkgs.alsa-lib ];
 

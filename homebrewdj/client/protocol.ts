@@ -1,6 +1,17 @@
 export interface ConnectedPayload {
     type: "connection",
-    id: string
+    id: string,
+    clientNumber: number
+}
+
+export interface ClientNumberPayload {
+    type: "clientnumber"
+    clientNumber: number
+}
+
+export interface ProgramChangeMessage {
+    type: "pgrm",
+    value: number
 }
 
 export interface NoteMessagePayload {
@@ -24,4 +35,4 @@ export interface OscMessagePayload {
     args: Array<any>
 }
 
-export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | OscMessagePayload;
+export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | OscMessagePayload | ClientNumberPayload | ProgramChangeMessage;

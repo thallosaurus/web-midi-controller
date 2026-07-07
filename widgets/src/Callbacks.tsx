@@ -71,6 +71,13 @@ interface OscDelta {
     args: Array<any>
 }
 
+export interface PgrmDelta {
+    type: "pgrm",
+    value: number
+}
+
+//interface ProgramChangeEvent 
+
 export interface Outgoing {
     send(msg: DeltaMessages): void;
 }
@@ -95,7 +102,16 @@ function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
 
 function hasScalingProperties(value: ValueProperties | null): value is ValueProperties {
     return value !== null
-        && (Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
+    //&& (Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
+}
+
+interface MidiLookupResult {
+    type: "cc" | "note",
+    sub: number
+}
+
+export interface LookupResult {
+    midi: Map<number, MidiLookupResult[]>
 }
 
 export abstract class WCallbacks {
@@ -105,6 +121,34 @@ export abstract class WCallbacks {
         ccCallbackMap: new Map(),
         noteCallbackMap: new Map(),
         oscCallbackMap: new Map(),
+    }
+
+    lookup(): LookupResult {
+        const midi = new Map<number, MidiLookupResult[]>();
+        this.callbacks.ccCallbackMap.forEach((v, ch) => {
+            v.forEach((vv, sub) => {
+                if (!midi.has(ch)) midi.set(ch, []);
+                midi.get(ch)!.push({
+                    type: "cc",
+                    sub
+                })
+            })
+        })
+
+        this.callbacks.noteCallbackMap.forEach((v, ch) => {
+            //midi[ch] = [];
+            v.forEach((vv, sub) => {
+        if (!midi.has(ch)) midi.set(ch, [])
+                midi.get(ch)!.push({
+                    type: "note",
+                    sub
+                })
+            })
+        });
+
+        return {
+            midi
+        }
     }
 
     private registerNote: MidiNoteRegisterFn = (def, cb) => {
@@ -118,7 +162,7 @@ export abstract class WCallbacks {
             channelMap?.set(def.note, { callbacks: new Map(), lastValue: 0 })
         }
         const noteMap = channelMap?.get(def.note).callbacks;
-        const id = uuid()
+        const id = uuid();
         noteMap?.set(id, cb);
         //if (this.next) this.next.registerNote(def, cb)
         return id
@@ -228,22 +272,22 @@ export abstract class WCallbacks {
         throw new Error("unsupported properties")
     }
 
-    send(def: MidiNoteProperties | MidiCCProperties | osc, value: number) {
+    send(def: MidiNoteProperties | MidiCCProperties | osc, v: number) {
         if (isMidiNote(def)) {
             const c = this.callbacks.noteCallbackMap.get(def.channel).get(def.note);
 
-            console.log("note", def.channel, def.note, value, value > 64);
-            if (c.lastValue != value) {
+            console.log("note", def.channel, def.note, v, v > 64);
+            if (c.lastValue != v) {
 
                 const msg: NoteDelta = {
                     type: "note",
                     channel: def.channel,
                     note: def.note,
-                    velocity: value,
+                    velocity: Math.floor(v * 127),
                     //on: value > 64
                 };
 
-                c.lastValue = value
+                c.lastValue = v
                 if (this.sender) this.sender.send(msg);
                 this.extInput(msg);
             }
@@ -251,6 +295,19 @@ export abstract class WCallbacks {
         }
         if (isMidiCC(def)) {
             const c = this.callbacks.ccCallbackMap.get(def.channel).get(def.cc);
+
+            // stubbed
+            let value = v;
+            if (hasScalingProperties(def.value)) {
+                console.log(v, def.value);
+                //const delta = (def.value?.max ?? 127) - (def.value?.min ?? 0);
+
+                //value = v * delta;
+                value = v;
+            } else {
+                value = v;
+            }
+
             if (c.lastValue != value) {
                 console.log("cc", def.channel, def.cc, value);
                 const msg: CCDelta = {
@@ -269,6 +326,7 @@ export abstract class WCallbacks {
             //return this.sendCC(def, Math.floor(value * 127))
         }
         if (isOSC(def)) {
+            let value = v;
             console.log("osc update", def.address, value);
             const msg: OscDelta = {
                 type: "osc",
@@ -284,7 +342,7 @@ export abstract class WCallbacks {
     }
 
     private runCallbacks(map: CallbackMap<ReceiveDataCallback>, value: number) {
-        map.callbacks.forEach((cb) => {
+        map?.callbacks.forEach((cb) => {
             cb(value)
         });
     }
@@ -296,7 +354,7 @@ export abstract class WCallbacks {
         });
     }
 
-    extInput(msg: (NoteDelta | CCDelta | OscDelta)) {
+    extInput(msg: (NoteDelta | CCDelta | OscDelta | PgrmDelta)) {
         switch (msg.type) {
             case "note":
                 {
@@ -317,8 +375,12 @@ export abstract class WCallbacks {
             case "osc":
                 this.externalOsc(msg);
                 break;
+            
+            /*case "pgrm":
+                console.log(msg);
+                break;*/
             default:
-                throw new Error("invalid external input")
+                throw new Error("invalid external input " + JSON.stringify(msg))
         }
     }
 }

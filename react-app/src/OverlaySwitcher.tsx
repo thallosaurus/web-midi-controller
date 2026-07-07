@@ -1,6 +1,6 @@
 import { Overlay } from "@hdj/definitions";
 import { useRef, useLayoutEffect } from "react";
-import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW, XYPAD_OVERLAY, MATRIX_OVERLAY, ABLETON_OVERLAY, TRAKTOR_PERFORMANCE, TestOscOverlay, MIDI_TEST_OVERLAY, ROTARIES_TEST } from "./Overlays";
+import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW, XYPAD_OVERLAY, MATRIX_OVERLAY, ABLETON_OVERLAY, TRAKTOR_PERFORMANCE, TestOscOverlay, MIDI_TEST_OVERLAY, ROTARIES_TEST, XYPAD_PERFORMANCE } from "./Overlays";
 
 export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { showModal: boolean, closeSwitcher: () => void, setOverlay: (o: Overlay) => void }) {
   const overlays = useRef([
@@ -12,7 +12,8 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
     TestOscOverlay,
     MIDI_TEST_OVERLAY,
     TRAKTOR_PERFORMANCE,
-    ROTARIES_TEST
+    ROTARIES_TEST,
+    XYPAD_PERFORMANCE
   ])
 
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -31,7 +32,8 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
     color: "black",
     backgroundColor: "white",
     border: "none",
-    fontSize: "1.2em"
+    fontSize: "1.2em",
+    margin: "0.25em 0"
   } as React.CSSProperties;
 
   return (
@@ -53,7 +55,7 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
         display: "flex",
         flexDirection: "column",
         width: "50vw",
-        gap: ".5em"
+        //gap: ".5em",
       }}>
         {overlays.current.map((v, i) => {
           return (<button style={{ ...buttonStyle, fontWeight: "bold" }} type="submit" name="selected" value={i} key={String(v.id)}>{v.name}</button>)

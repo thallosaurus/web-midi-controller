@@ -1,4 +1,4 @@
-import { ButtonMode, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, RotaryMode, RotarySliderProperties, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { ButtonMode, CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, RotaryMode, RotarySliderProperties, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
 
 const TestOscWidget: Widget & CCSliderProperties = {
   output: "osc",
@@ -66,30 +66,87 @@ export const VOLUME_SLIDER_OVERLAY: Overlay = {
   }]
 };
 
+export const XYPAD_PERFORMANCE: Overlay = {
+  "id": "xypad-performance",
+  "name": "XYPad Performance",
+  program: null,
+  channel: null,
+  style: `#perf-mixer {
+    width: 20% !important;
+    height: 60% !important;
+
+  }  
+  `,
+  "cells": [{
+      "type": "horiz-mixer",
+      "id": "horiz",
+      "horiz": [
+        {
+          "channel": 1,
+          "label": "XY Pad",
+          "type": "xypad",
+          "output": "midi",
+          "note": 60,
+          "velocity": 127,
+          "id": "xy-pad-w",
+          "x": {
+            "output": "midi",
+            "channel": 1,
+            "cc": 4,
+            "value": null
+          },
+          "y": {
+            "output": "midi",
+            "channel": 1,
+            "cc": 5,
+            "value": null
+          }
+        },
+        {
+          type: "vert-mixer",
+          id: "perf-mixer",
+          vert: [
+            //createCCSlider("XFade", 1, 13, "snapback", true),
+            createMidiNoteButton("Previous", 16, 66, "trigger", "prev-scene"),
+            createMidiNoteButton("Play Selected Scene", 16, 68, "trigger", "play-scene"),
+            createMidiNoteButton("Next", 16, 67, "trigger", "next-scene"),
+            createMidiCCButton("XFade", 1, 13, "trigger", "xfade")
+          ]
+        }
+      ]
+    }]
+}
+
 export const XYPAD_OVERLAY: Overlay = {
   "id": "fullscreen-xy-pad",
   "name": "Fullscreen XY Pad",
   "program": 0,
   "channel": null,
+  "style": null,
   "cells": [
     {
       "type": "vert-mixer",
+      "id": "vert",
       "vert": [
         {
-          "channel": 2,
+          "channel": 1,
           "label": "XY Pad",
           "type": "xypad",
           "output": "midi",
           "note": 60,
+          "velocity": 127,
+          "id": "xy-pad-w",
           "x": {
             "output": "midi",
             "channel": 1,
-            "cc": 4
+            "cc": 4,
+            "value": null
           },
           "y": {
             "output": "midi",
             "channel": 1,
-            "cc": 5
+            "cc": 5,
+            "value": null
           }
         }
       ]
@@ -108,6 +165,13 @@ const DEFAULT_MATRIX_MAP = [
   112, 113, 114, 115, 116, 117, 118, 119
 ];
 
+const MPC_MATRIX_MAP = [
+  48, 49, 50, 51,
+  44, 45, 46, 47,
+  40, 41, 42, 43,
+  36, 37, 38, 39
+]
+
 function createRotaries(label: string, ch: number, cc: number, mode: RotaryMode, htmlId: string | null = null): RotarySliderProperties & Widget {
   return {
     id: htmlId,
@@ -116,7 +180,8 @@ function createRotaries(label: string, ch: number, cc: number, mode: RotaryMode,
     cc,
     channel: ch,
     mode,
-    label
+    label,
+    value: null
   }
 }
 
@@ -131,6 +196,14 @@ export const ROTARIES_TEST: Overlay = {
     createRotaries("test", 1, 2, "relative"),
     createRotaries("test", 1, 3, "relative"),
   ],
+}
+
+function createMPCMatrix(ch: number, htmlId = null): Widget & GridMixerProperties {
+  return createMatrix(ch, 4, 4, MPC_MATRIX_MAP, htmlId);
+}
+
+function createLaunchpadMatrix(ch: number, htmlId = null): Widget & GridMixerProperties {
+  return createMatrix(ch, 8, 8, DEFAULT_MATRIX_MAP, htmlId);
 }
 
 function createMatrix(ch: number, w: number, h: number, a = DEFAULT_MATRIX_MAP, htmlId = null): GridMixerProperties & Widget {
@@ -156,7 +229,7 @@ export const MATRIX_OVERLAY: Overlay = {
   }
   `,
   "cells": [
-    createMatrix(1, 8, 8)
+    createLaunchpadMatrix(1)
   ]
 };
 
@@ -194,6 +267,19 @@ function createMidiNoteButton(label: string, channel: number, note: number, mode
     output: "midi",
     channel,
     note,
+    label,
+    mode
+  }
+}
+
+function createMidiCCButton(label: string, channel: number, cc: number, mode: ButtonMode, htmlId: string | null = null): CCButtonProperties & Widget {
+  return {
+    id: htmlId,
+    type: "ccbutton",
+    output: "midi",
+    channel,
+    cc,
+    value: null,
     label,
     mode
   }

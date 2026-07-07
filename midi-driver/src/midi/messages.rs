@@ -24,66 +24,101 @@ pub struct CCPayload {
 
 #[derive(Clone, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
+pub struct ProgramChangePayload {
+    #[serde(flatten)]
+    midi: MidiPayload,
+
+    value: u8,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
+pub struct NoteOnPayload {
+    #[serde(flatten)]
+    midi: MidiPayload,
+
+    #[serde(flatten)]
+    note: NotePayload,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
+pub struct NoteOffPayload {
+    #[serde(flatten)]
+    midi: MidiPayload,
+
+    #[serde(flatten)]
+    note: NotePayload,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
+pub struct PitchbendPayload {
+    #[serde(flatten)]
+    midi: MidiPayload,
+    value: u16,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
+pub struct ControlChangePayload {
+    #[serde(flatten)]
+    midi: MidiPayload,
+
+    #[serde(flatten)]
+    cc: CCPayload,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
+pub struct ChannelPressurePayload {
+        #[serde(flatten)]
+        midi: MidiPayload,
+
+        pressure: u8,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
+pub struct AftertouchPayload {
+        #[serde(flatten)]
+        midi: MidiPayload,
+
+        #[serde(flatten)]
+        note: NotePayload,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
+pub struct SongPositionPointerPayload {
+    value: u16
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
+pub struct SysExPayload {
+    data: Vec<u8>
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, TS)]
+#[ts(export, export_to = "MidiPayload.ts")]
 #[serde(tag = "type")]
 pub enum MidiMessage {
-    NoteOn {
-        #[serde(flatten)]
-        midi: MidiPayload,
+    NoteOn(NoteOnPayload),
 
-        #[serde(flatten)]
-        note: NotePayload,
-    },
-
-    NoteOff {
-        #[serde(flatten)]
-        midi: MidiPayload,
-
-        #[serde(flatten)]
-        note: NotePayload,
-    },
-    ProgramChange {
-        #[serde(flatten)]
-        midi: MidiPayload,
-
-        value: u8,
-    },
-    Pitchbend {
-        #[serde(flatten)]
-        midi: MidiPayload,
-        value: u16,
-    },
-    ControlChange {
-        #[serde(flatten)]
-        midi: MidiPayload,
-
-        #[serde(flatten)]
-        cc: CCPayload,
-    },
-    ChannelPressure {
-        #[serde(flatten)]
-        midi: MidiPayload,
-        
-        pressure: u8
-    },
+    NoteOff(NoteOffPayload),
+    ProgramChange(ProgramChangePayload),
+    Pitchbend(PitchbendPayload),
+    ControlChange(ControlChangePayload),
+    ChannelPressure(ChannelPressurePayload),
     TimingClock,
     Start,
     Continue,
     Stop,
     Unknown,
-    Aftertouch {
-        #[serde(flatten)]
-        midi: MidiPayload,
-
-        #[serde(flatten)]
-        note: NotePayload
-
-    },
-    SongPositionPointer {
-        value: u16,
-    },
-    SysEx {
-        data: Vec<u8>
-    }
+    Aftertouch(AftertouchPayload),
+    SongPositionPointer(SongPositionPointerPayload),
+    SysEx(SysExPayload),
 }
 
 impl From<Vec<u8>> for MidiMessage {
@@ -91,72 +126,75 @@ impl From<Vec<u8>> for MidiMessage {
         match data.as_slice() {
             [0x90..=0x9F, note, vel] if *vel > 0 => {
                 let ch = data[0] - 0x90;
-                Self::NoteOn {
-                    midi: MidiPayload { channel: ch + 1 },
+                Self::NoteOn(NoteOnPayload { 
+midi: MidiPayload { channel: ch + 1 },
                     note: NotePayload {
                         note: *note,
                         velocity: *vel,
-                    },
-                }
+                    }
+                 })
             }
             [0x80..=0x8F, note, _] => {
                 let ch = data[0] - 0x80;
-                Self::NoteOff {
+                Self::NoteOff(NoteOffPayload { 
                     midi: MidiPayload { channel: ch + 1 },
                     note: NotePayload {
                         note: *note,
                         velocity: 0,
                     },
-                }
+                })
             }
             [0xC0..=0xCF, val] => {
                 // Program changes
                 let ch = data[0] - 0xC0;
-                Self::ProgramChange {
-                    midi: MidiPayload { channel: ch },
+                Self::ProgramChange(ProgramChangePayload { 
+                    midi: MidiPayload { channel: ch + 1 },
                     value: *val,
-                }
+                })
             }
             [0x90..=0x9F, note, 0] => {
                 let ch = data[0] - 0x90;
 
-                Self::NoteOff {
+                Self::NoteOff(NoteOffPayload {
                     midi: MidiPayload { channel: ch + 1 },
                     note: NotePayload {
                         note: *note,
                         velocity: 0,
                     },
-                }
-            },
+                })
+            }
 
             [0xA0..=0xAF, note, vel] => {
                 let ch = data[0] - 0xA0;
 
-                Self::Aftertouch {
-                    note: NotePayload { note: *note, velocity: *vel },
-                    midi: MidiPayload { channel: ch }
-                }
-            },
+                Self::Aftertouch(AftertouchPayload {
+                    note: NotePayload {
+                        note: *note,
+                        velocity: *vel,
+                    },
+                    midi: MidiPayload { channel: ch },
+                })
+            }
 
             [0xB0..=0xBF, cc, val] => {
                 let ch = data[0] - 0xB0;
 
-                Self::ControlChange {
+                Self::ControlChange(ControlChangePayload {
                     midi: MidiPayload { channel: ch + 1 },
                     cc: CCPayload {
                         cc: *cc,
                         value: *val,
                     },
-                }
+                })
             }
             [0xE0..=0xEF, lsb, msb] => {
                 let ch = data[0] - 0xE0;
 
                 let value = ((*msb as u16) << 7) | (*lsb as u16);
-                Self::Pitchbend {
+                Self::Pitchbend(PitchbendPayload {
                     midi: MidiPayload { channel: ch },
                     value,
-                }
+                })
             }
             [0xF8] => Self::TimingClock,
             [0xFA] => Self::Start,
@@ -164,14 +202,15 @@ impl From<Vec<u8>> for MidiMessage {
             [0xFC] => Self::Stop,
             [0xF2, lsb, msb] => {
                 let value = ((*msb as u16) << 7) | (*lsb as u16);
-                Self::SongPositionPointer { value }
-            },
-            [0xF0, ..] => {
-                Self::SysEx { data }
-            },
+                Self::SongPositionPointer (SongPositionPointerPayload{ value })
+            }
+            [0xF0, ..] => Self::SysEx(SysExPayload { data }),
             [0xD0..=0xDF, pressure] => {
                 let ch = data[0] - 0xD0;
-                Self::ChannelPressure { midi: MidiPayload { channel: ch }, pressure: *pressure }
+                Self::ChannelPressure (ChannelPressurePayload{
+                    midi: MidiPayload { channel: ch },
+                    pressure: *pressure,
+                })
             }
             _ => Self::Unknown,
         }
@@ -181,39 +220,39 @@ impl From<Vec<u8>> for MidiMessage {
 impl From<MidiMessage> for Vec<u8> {
     fn from(value: MidiMessage) -> Self {
         match value {
-            MidiMessage::NoteOn { midi, note } => {
-                vec![0x90 + (midi.channel - 1), note.note, note.velocity]
+            MidiMessage::NoteOn(p) => {
+                vec![0x90 + (p.midi.channel - 1), p.note.note, p.note.velocity]
             }
-            MidiMessage::NoteOff { midi, note } => {
-                vec![0x80 + (midi.channel - 1), note.note, note.velocity]
+            MidiMessage::NoteOff(p) => {
+                vec![0x80 + (p.midi.channel - 1), p.note.note, p.note.velocity]
             }
-            MidiMessage::ProgramChange { midi, value } => vec![0xC0 + (midi.channel - 1), value],
-            MidiMessage::ControlChange { midi, cc } => {
-                vec![0xB0 + (midi.channel - 1), cc.cc, cc.value]
+            MidiMessage::ProgramChange(p) => {
+                vec![0xC0 + (p.midi.channel - 1), p.value]
             }
-            MidiMessage::Pitchbend { midi, value } => {
-                let lsb = (value & 0x7F) as u8;
-                let msb = ((value >> 7) & 0x7F) as u8;
-                vec![0xE0 + midi.channel, lsb, msb]
+            MidiMessage::ControlChange(p)=> {
+                vec![0xB0 + (p.midi.channel - 1), p.cc.cc, p.cc.value]
+            }
+            MidiMessage::Pitchbend(p) => {
+                let lsb = (p.value & 0x7F) as u8;
+                let msb = ((p.value >> 7) & 0x7F) as u8;
+                vec![0xE0 + p.midi.channel, lsb, msb]
             }
             MidiMessage::Unknown => vec![],
             MidiMessage::TimingClock => vec![0xF8],
             MidiMessage::Start => vec![0xFA],
             MidiMessage::Continue => vec![0xFB],
             MidiMessage::Stop => vec![0xFC],
-            MidiMessage::SongPositionPointer { value } => {
-                let lsb = (value & 0x7F) as u8;
-                let msb = ((value >> 7) & 0x7F) as u8;
+            MidiMessage::SongPositionPointer(p) => {
+                let lsb = (p.value & 0x7F) as u8;
+                let msb = ((p.value >> 7) & 0x7F) as u8;
                 vec![0xF2, lsb, msb]
-            },
-            MidiMessage::SysEx { data } => {
-                data.clone()
-            },
-            MidiMessage::ChannelPressure { midi, pressure } => {
-                vec![0xD0 + midi.channel, pressure]
             }
-            MidiMessage::Aftertouch { midi, note } => {
-                vec![0xA0 + midi.channel, note.note, note.velocity]
+            MidiMessage::SysEx(p) => p.data.clone(),
+            MidiMessage::ChannelPressure(p) => {
+                vec![0xD0 + p.midi.channel, p.pressure]
+            }
+            MidiMessage::Aftertouch(p) => {
+                vec![0xA0 + p.midi.channel, p.note.note, p.note.velocity]
             }
         }
     }

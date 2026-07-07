@@ -1,6 +1,6 @@
 import { CSSProperties, useRef, useState } from "react";
 import { useWebsocketContext } from "./Contexts";
-import { getEndpointUrl } from "./App";
+import { getEndpointUrl } from "./utils";
 
 const buttonStyle: CSSProperties = {
   padding: "1em",

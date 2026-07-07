@@ -1,53 +1,57 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
-import { type AllowedPayloads, WebsocketClient } from "@hdj/homebrewdj-web-client";
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
-import { EventBus, WebsocketContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
+import { EventBusContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
 import { ConnectScreen } from "./Connect";
-
-export function getEndpointUrl() {
-  let url;
-  try {
-    url = new URL(import.meta.env.VITE_BACKEND);
-  } catch (e) {
-    url = new URL("/ws", location.href);
-    url.protocol = "ws";
-  }
-  return url;
-}
-
-function getVersion() {
-  return import.meta.env.VITE_VERSION ?? "0.0.0";
-}
+import { getEndpointUrl, getVersion } from "./utils";
+import "./index.css"
+import "@hdj/widgets/style.css"
+import { AssignDialog } from "./AssignDialog";
 
 function App() {
-  const eventbus = useRef<EventBus>(new EventBus());
+  /*const eventbus = useRef<EventBus>(new EventBus());
   const process = (id: string, msg: AllowedPayloads) => {
     eventbus.current.extInput(msg);
-  }
+  }*/
+
+  useEffect(() => {
+
+    const errorHandler = ({ message, filename, lineno }: ErrorEvent) => {
+      alert(`${message} ${filename}:${lineno}`)
+    }
+    /*const asyncErrorHandler = ({ reason }: PromiseRejectionEvent) => {
+      alert(reason)
+    }*/
+
+    window.addEventListener("error", errorHandler);
+    //window.addEventListener("unhandledrejection", asyncErrorHandler);
+    return () => {
+      window.removeEventListener("error", errorHandler);
+      //window.addEventListener("unhandledrejection", asyncErrorHandler);
+    }
+  }, []);
 
   return (
     <>
-      <WebsocketProvider messageHandler={process}>
-        <MainView defaultOverlay={VOLUME_SLIDER_OVERLAY_NEW} eventbus={eventbus.current} />
+      <WebsocketProvider>
+        <MainView defaultOverlay={VOLUME_SLIDER_OVERLAY_NEW} />
       </WebsocketProvider>
     </>
   )
 }
 
-function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, eventbus: EventBus }) {
+function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
   const [showOverlayPicker, setOverlayPicker] = useState(false);
+  const [showDiags, setShowDiags] = useState(false);
   const [overlay, setOverlay] = useState<Overlay | null>(defaultOverlay ?? null)
   const ws = useWebsocketContext();
 
+  const bus = useContext(EventBusContext);
+
   useEffect(() => {
     ws.connect(getEndpointUrl())
-    eventbus.setSender(ws.ws);
-    return () => {
-      eventbus.setSender(null);
-    }
   }, [])
 
   return (
@@ -63,19 +67,20 @@ function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, even
           display: "flex",
           justifyContent: "space-between",
         }}>
-          <div style={{
+          <div onClick={() => setShowDiags(true)} style={{
             fontWeight: "bold"
           }}>HomebrewDJ v{getVersion()}</div>
+
           {ws.connectionState == "connected" ?
             <b onClick={() => setOverlayPicker(true)}>
               {overlay?.name ?? "No overlay loaded"}
             </b>
             : <div></div>}
-          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connectionState}>{ws.connectionState}</div>
+          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connectionState}>{ws.connectionState} {/*ws.clientId*/}</div>
         </header>
         {ws.connectionState == "connected" ?
           <>
-            {overlay ? <OverlayView o={overlay} callbacks={eventbus} style={{
+            {overlay ? <OverlayView o={overlay} callbacks={bus} style={{
               width: "calc(100% - 2em)",
               height: "calc(100% - 2em)",
               padding: "1em"
@@ -87,6 +92,9 @@ function MainView({ defaultOverlay, eventbus }: { defaultOverlay?: Overlay, even
         showModal={showOverlayPicker}
         closeSwitcher={() => setOverlayPicker(false)}
         setOverlay={setOverlay}></OverlaySwitcher>
+      <AssignDialog
+        showModal={showDiags}
+        closeDialog={() => setShowDiags(false)} />
     </>
   )
 }

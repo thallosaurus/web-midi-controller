@@ -23,10 +23,6 @@ const verticalSliderStyle = () => {
         width: "100%",
         "userSelect": "none",
         "-webkit-user-select": "none",
-
-        //-moz-user-select: none;
-
-        //-ms-user-select: none;
     } as React.CSSProperties
 }
 
@@ -54,7 +50,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
-export function CCSlider({ def }: WidgetProperties<CCSliderProperties>) {
+export function Slider({ def }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
     const baseValue = useRef<number>(0);
