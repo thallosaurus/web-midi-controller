@@ -106,6 +106,7 @@ export const WebsocketRouter = <T>(clients: WebSocketClientMap, callback: Handle
     router.get("/", StaticHandler)
     router.get("/manifest.json", StaticHandler)
     router.get("/assets/:file", StaticHandler)
+    router.get("/icons/:file", StaticHandler)
 
     return router;
 }

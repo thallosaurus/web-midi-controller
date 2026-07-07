@@ -12,10 +12,10 @@
     "verbatimModuleSyntax": false,
     "moduleDetection": "force",
     "noEmit": false,
+    "sourceMap": true,
     
     "declaration": true,
     "emitDeclarationOnly": false,
-    "types": ["./src/vite-env.d.ts"],
 
     /* Linting */
     "strict": false,

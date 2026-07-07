@@ -6,10 +6,12 @@
     "dev": "RUST_LOG=info LIBRARY=./target/debug/libmidi_driver.dylib deno run -A bin/surface_test.ts",
     "debug": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A --inspect-wait bin/surface_test.ts",
     "state": "RUST_LOG=debug LIBRARY=./target/debug/libmidi_driver.dylib deno run -A bin/state_test.ts",
-    "build": "deno bundle --outdir main.ts"
+    "build": "deno bundle --outdir main.ts",
+    "build:diagram": "tsuml2 --glob './src/**/*.(ts|tsx)'"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
-    "@driver-deno": "../midi-driver/deno_mod.ts"
+    "@driver-deno": "../midi-driver/deno_mod.ts",
+    "tsuml": "npm:tsuml2"
   }
 }

@@ -18,5 +18,6 @@ export default defineConfig({
   })],
   optimizeDeps: {
     include: ["@hdj/homebrewdj-web-client"],
+    exclude: ["@hdj/widgets"],
   }
 })
