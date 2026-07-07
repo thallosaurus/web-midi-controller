@@ -23,10 +23,6 @@ const verticalSliderStyle = () => {
         width: "100%",
         "userSelect": "none",
         "-webkit-user-select": "none",
-
-        //-moz-user-select: none;
-
-        //-ms-user-select: none;
     } as React.CSSProperties
 }
 

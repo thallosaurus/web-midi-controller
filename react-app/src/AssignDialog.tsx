@@ -1,4 +1,4 @@
-import { ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { CSSProperties, ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { useWebsocketContext } from "./Contexts";
 import { LookupResult } from "@hdj/widgets";
 import { AllowedPayloads, WebsocketClient } from "@hdj/homebrewdj-web-client";
@@ -76,6 +76,15 @@ const buttonStyle = {
     fontSize: "1.2em"
 } as React.CSSProperties;
 
+const fix = {
+    width: "80%",
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    margin: 0,
+} as CSSProperties;
+
 export function AssignDialog({ showModal, closeDialog }: { showModal: boolean, closeDialog: () => void }) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const ws = useWebsocketContext();
@@ -94,14 +103,14 @@ export function AssignDialog({ showModal, closeDialog }: { showModal: boolean, c
 
     return (
         <dialog ref={dialogRef} onClose={closeDialog} style={{
-            width: "80%",
+            //   width: "80%",
             border: "none",
             color: "white",
             backgroundColor: "#131313",
+            ...fix
         }}>
             <div style={{
                 padding: "1em 0",
-
             }}>
                 <p style={{
                     fontSize: "2em",

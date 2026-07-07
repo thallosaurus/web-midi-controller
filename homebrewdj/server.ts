@@ -63,6 +63,7 @@ const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callbac
             id,
             clientNumber: clients.nextClientNumber
         }))
+        clients.nextClientNumber++;
         //console.log(clients);
     })
 
@@ -100,7 +101,7 @@ export const WebsocketRouter = <T>(clients: WebSocketClientMap, callback: Handle
         const ws = ctx.upgrade();
         const id = WebsocketHandler(clients, ws, callback);
         clients.map.set(id, { ws, clientNumber: clients.nextClientNumber });
-        clients.nextClientNumber++;
+        //clients.nextClientNumber++;
     })
     router.get("/", StaticHandler)
     router.get("/manifest.json", StaticHandler)
@@ -126,8 +127,9 @@ export class Server<T = AllowedPayloads> {
     app: Application;
     clients: WebSocketClientMap = { map: new Map<UUID, { ws: WebSocket, clientNumber: number }>(), nextClientNumber: 0 };
     selectedClientNumber = 0;
+
     // 1-index based system channel
-    private systemMidiChannel: number;
+    //private systemMidiChannel: number;
 
     /**
      * Creates and starts a new server instance.
@@ -141,7 +143,7 @@ export class Server<T = AllowedPayloads> {
         this.app = app;
         this.controller = controller;
 
-        this.systemMidiChannel = listenOptions.systemChannel ?? 16;
+        //this.systemMidiChannel = listenOptions.systemChannel ?? 16;
 
         const ws = WebsocketRouter(this.clients, callback);
         this.app.use(ws.routes());
@@ -198,7 +200,7 @@ export class Server<T = AllowedPayloads> {
     /**
      * 
      * @param msg 
-     * @returns true if the processing should continue and send it to clients if applicable
+     * @returns true if the processing should continue and forward it to clients, if applicable
      */
     processSystemMessage(msg: MidiMessage): boolean {
         if (isClientSelectorBank(msg)) {
@@ -215,7 +217,6 @@ export class Server<T = AllowedPayloads> {
         return true;
     }
 }
-
 
 interface WebsocketForwardOptions {
     msg: AllowedPayloads,
@@ -278,9 +279,10 @@ export const forwardWebsocketMessageToPorts = ({ msg, server, midiPort, oscPort 
 
 interface MidiForwardOptions {
     t: MidiMessage,
-    server: Server
+    server: Server,
+    systemChannel: number
 }
-export const forwardMidiToServer = ({ t, server }: MidiForwardOptions) => {
+export const forwardMidiToServer = ({ t, server, systemChannel }: MidiForwardOptions) => {
     console.debug("midiport payload", t);
 
     switch (t.type) {
@@ -295,7 +297,7 @@ export const forwardMidiToServer = ({ t, server }: MidiForwardOptions) => {
             });
             break;
         case "ControlChange":
-            if (isSystemMessage(t, server.systemMidiChannel)) {
+            if (isSystemMessage(t, systemChannel)) {
                 if (!server.processSystemMessage(t)) return;
             }
 
@@ -313,7 +315,7 @@ export const forwardMidiToServer = ({ t, server }: MidiForwardOptions) => {
             // sub as cc 32
             // and the program as programchange
             {
-                if (isSystemMessage(t, server.systemMidiChannel)) {
+                if (isSystemMessage(t, systemChannel)) {
                     server.sendToClient(server.selectedClientNumber, {
                         type: "pgrm",
                         value: t.value

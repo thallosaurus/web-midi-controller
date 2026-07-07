@@ -8,7 +8,7 @@ const isWebsocketConnected = (ws: WebSocket | null): ws is WebSocket => (ws !== 
 
 interface ConnectRequest {
     endpoint: URL,
-    open?: (id: string) => void,
+    open?: (p: ConnectedPayload) => void,
     close?: () => void
 }
 
@@ -27,7 +27,7 @@ export class WebsocketClient<T> {
         return this._id;
     }
 
-    asyncConnect(endpoint: URL): Promise<string> {
+    asyncConnect(endpoint: URL): Promise<ConnectedPayload> {
         return new Promise((open, close) => {
             this.connect({
                 endpoint,
@@ -63,7 +63,7 @@ export class WebsocketClient<T> {
                 if (this.connectionIdHandler) {
                     this.connectionIdHandler(msg.id);
                 }
-                if (open) open(msg.id);
+                if (open) open(msg);
                 return;
 
             }

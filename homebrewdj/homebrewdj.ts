@@ -101,7 +101,7 @@ export class HomebrewDJTraktorSetup {
 
         this.traktor.addEventListener((ev: CustomEvent) => {
             const t = ev.detail;
-            forwardMidiToServer({ t, server: this.server })
+            forwardMidiToServer({ t, server: this.server, systemChannel: 16 })
         })
 
         this.launchpad.loadSurface(LaunchpadSurfaceStore.Session, new TraktorSurface(this.traktor));
@@ -147,7 +147,8 @@ export class HomebrewDJControllerOnly {
             const t = ev.detail;
             forwardMidiToServer({
                 t,
-                server: this.server
+                server: this.server,
+                systemChannel: 16   // move to config somewhere
             })
         });
         this.oscPort = OscDriver.customHost("127.0.0.1", 8000);

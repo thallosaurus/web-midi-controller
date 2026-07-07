@@ -7,8 +7,8 @@ body {
     background-color: black;
     color: white;
     font-family: monospace;
-    margin: 0;
     overflow: hidden;
+    margin: 0;
 }
 
 #connection-status::before {

@@ -76,7 +76,7 @@ function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
               {overlay?.name ?? "No overlay loaded"}
             </b>
             : <div></div>}
-          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connectionState}>{ws.connectionState}</div>
+          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connectionState}>{ws.connectionState} {/*ws.clientId*/}</div>
         </header>
         {ws.connectionState == "connected" ?
           <>

@@ -32,7 +32,8 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
     color: "black",
     backgroundColor: "white",
     border: "none",
-    fontSize: "1.2em"
+    fontSize: "1.2em",
+    margin: "0.25em 0"
   } as React.CSSProperties;
 
   return (
@@ -54,7 +55,7 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
         display: "flex",
         flexDirection: "column",
         width: "50vw",
-        gap: ".5em"
+        //gap: ".5em",
       }}>
         {overlays.current.map((v, i) => {
           return (<button style={{ ...buttonStyle, fontWeight: "bold" }} type="submit" name="selected" value={i} key={String(v.id)}>{v.name}</button>)

@@ -121,6 +121,35 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
         callbacks.send(def.y, y);
     }
 
+    const resize = () => {
+
+        const canvas = canvasRef.current;
+        if (!canvas) return null;
+
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+
+        const width = Math.round(rect.width * dpr);
+        const height = Math.round(rect.height * dpr);
+
+        if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return null;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+
+        return {
+            ctx,
+            width: rect.width,
+            height: rect.height,
+        };
+    };
+
     const update = ({ clientX, clientY }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;

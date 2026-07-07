@@ -1,9 +1,9 @@
 import { Overlay } from "@hdj/definitions";
-import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback } from "@hdj/homebrewdj-web-client";
+import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback, ConnectedPayload } from "@hdj/homebrewdj-web-client";
 import { Outgoing, PgrmDelta, WCallbacks } from "@hdj/widgets";
 import { createContext, useState, useContext, useRef, ReactNode, useEffect } from "react";
 
-type ProgramChangeHandler = (msg: PgrmDelta) => void
+type ProgramChangeHandler = (n: number) => void
 
 export class EventBus extends WCallbacks {
     sender: Outgoing | null = null;
@@ -23,6 +23,7 @@ type WebsocketContextType = {
     bus: EventBus,
     connectionState: ConnectionState,
     connectionId: string | null,
+    clientId: number,
     connect: (uri: URL) => Promise<void>;
     disconnect: () => void;
 }
@@ -45,19 +46,22 @@ enum ConnectionState {
 export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     
     const [connectionId, setConnectionId] = useState<string | null>(null);
+    const [clientId, setClientId] = useState<number>(0);
     const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
     const bus = useContext(EventBusContext);
     const wsRef = useRef(new WebsocketClient<AllowedPayloads>((id: string, msg: AllowedPayloads) => {
         if (msg.type == "clientnumber") {
-
+            setClientId(msg.clientNumber);
         } else {
             bus.extInput(msg);
         }
     }))
     useEffect(() => {
         bus.setSender(wsRef.current);
+        bus.setProgramChangeHandler(setClientId)
         return () => {
             bus.setSender(null);
+            bus.setProgramChangeHandler(null)
         }
     }, [])
 
@@ -66,15 +70,18 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         bus,
         connectionId,
         connectionState,
+        clientId,
         connect: async (uri) => {
             setConnectionState(ConnectionState.Connecting);
             await new Promise((res, rej) => {
                 wsRef.current.connect({
                     endpoint: uri,
-                    open: (id) => {
-                        setConnectionId(id)
+                    open: (p: ConnectedPayload) => {
+                        setConnectionId(p.id)
+                        setClientId(p.clientNumber)
+                        console.log(p);
                         setConnectionState(ConnectionState.Online);
-                        res(id)
+                        res(p.id)
                     },
                     close: () => {
                         setConnectionId(null);
