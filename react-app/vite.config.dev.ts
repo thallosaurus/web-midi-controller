@@ -9,6 +9,9 @@ process.env.VITE_VERSION = ver.version;
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    sourcemap: true
+  },
   plugins: [react(), legacy({
     targets: ["Android >= 4"],
     renderModernChunks: false,

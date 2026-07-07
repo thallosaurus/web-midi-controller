@@ -10,6 +10,7 @@ export default defineConfig({
   ],
   build: {
     //minify: false,
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "MyReactLib",
