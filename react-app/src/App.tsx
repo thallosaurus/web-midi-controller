@@ -1,6 +1,6 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ABLETON_OVERLAY, MATRIX_OVERLAY, MIDI_TEST_OVERLAY, ROTARIES_TEST, TestOscOverlay, TRAKTOR_PERFORMANCE, VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW, XYPAD_OVERLAY, XYPAD_PERFORMANCE } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
 import { EventBusContext, WebsocketProvider, useOverlayContext, useWebsocketContext } from "./Contexts";
