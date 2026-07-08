@@ -1,9 +1,9 @@
 import { OverlayView } from "@hdj/widgets";
 import type { Overlay } from "@hdj/definitions";
 import { useContext, useEffect, useRef, useState } from "react";
-import { VOLUME_SLIDER_OVERLAY_NEW } from "./Overlays";
+import { ABLETON_OVERLAY, MATRIX_OVERLAY, MIDI_TEST_OVERLAY, ROTARIES_TEST, TestOscOverlay, TRAKTOR_PERFORMANCE, VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW, XYPAD_OVERLAY, XYPAD_PERFORMANCE } from "./Overlays";
 import { OverlaySwitcher } from "./OverlaySwitcher";
-import { EventBusContext, WebsocketProvider, useWebsocketContext } from "./Contexts";
+import { EventBusContext, WebsocketProvider, useOverlayContext, useWebsocketContext } from "./Contexts";
 import { ConnectScreen } from "./Connect";
 import { getEndpointUrl, getVersion } from "./utils";
 import "./index.css"
@@ -47,11 +47,26 @@ function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
   const [showDiags, setShowDiags] = useState(false);
   const [overlay, setOverlay] = useState<Overlay | null>(defaultOverlay ?? null)
   const ws = useWebsocketContext();
+  const o = useOverlayContext();
 
   const bus = useContext(EventBusContext);
 
   useEffect(() => {
-    
+    //bus.setProgramChangeHandler((n) => console.log(n))
+    o.setOverlay = setOverlay;
+    o.applyOverlays([
+        VOLUME_SLIDER_OVERLAY_NEW,
+        ABLETON_OVERLAY,
+        VOLUME_SLIDER_OVERLAY,
+        XYPAD_OVERLAY,
+        MATRIX_OVERLAY,
+        TestOscOverlay,
+        MIDI_TEST_OVERLAY,
+        TRAKTOR_PERFORMANCE,
+        ROTARIES_TEST,
+        XYPAD_PERFORMANCE
+      ]);
+
     ws.connect(getEndpointUrl())
   }, [])
 

@@ -3,6 +3,16 @@ import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback, ConnectedPa
 import { CCDelta, NoteDelta, OscDelta, Outgoing, PgrmDelta, WCallbacks } from "@hdj/widgets";
 import { createContext, useState, useContext, useRef, ReactNode, useEffect } from "react";
 import { EventBus, ProgramChangeHandler } from "./EventBus";
+import { OverlayManager } from "./OverlayManager";
+
+export const OverlayContext = createContext<OverlayManager>(new OverlayManager());
+export function useOverlayContext() {
+    const ctx = useContext(OverlayContext);
+    if (!ctx) throw new Error("no overlaycontext loaded")
+    return ctx;
+}
+
+export const EventBusContext = createContext<EventBus>(new EventBus());
 
 type WebsocketContextType = {
     ws: WebsocketClient<AllowedPayloads>,
@@ -10,12 +20,10 @@ type WebsocketContextType = {
     connectionState: ConnectionState,
     connectionId: string | null,
     clientId: number | null,
-    setProgramChangeHandler: (handler: ProgramChangeHandler | null) => void,
+    //setProgramChangeHandler: (handler: ProgramChangeHandler | null) => void,
     connect: (uri: URL) => Promise<void>;
     disconnect: () => void;
 }
-
-export const EventBusContext = createContext<EventBus>(new EventBus());
 export const WebsocketContext = createContext<WebsocketContextType | null>(null);
 export function useWebsocketContext() {
     const ctx = useContext(WebsocketContext);
@@ -34,6 +42,7 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     const [connectionId, setConnectionId] = useState<string | null>(null);
     const [clientId, setClientId] = useState<number | null>(null);
     const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
+    const overlays = useContext(OverlayContext);
     const bus = useContext(EventBusContext);
     const wsRef = useRef(new WebsocketClient<AllowedPayloads>((id: string, msg: AllowedPayloads) => {
         //console.log("wsRef", msg);
@@ -44,10 +53,15 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     }))
     useEffect(() => {
         bus.setSender(wsRef.current);
-        bus.setProgramChangeHandler((n) => console.log("switching to ", n))
+
+        //bus.setProgramChangeHandler((n) => console.log("switching to ", n))
+        bus.setProgramChangeHandler(n => {
+            overlays.setByProgramId(n);
+        });
         return () => {
             bus.setSender(null);
-            bus.setProgramChangeHandler(null)
+            bus.setProgramChangeHandler(null);
+            //bus.setProgramChangeHandler(null)
         }
     }, [])
 
@@ -57,9 +71,9 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         connectionId,
         connectionState,
         clientId,
-        setProgramChangeHandler: (handler: ProgramChangeHandler | null) => {
+        /*setProgramChangeHandler: (handler: ProgramChangeHandler | null) => {
             bus.setProgramChangeHandler(handler);
-        },
+        },*/
         connect: async (uri) => {
             setConnectionState(ConnectionState.Connecting);
             await new Promise((res, rej) => {

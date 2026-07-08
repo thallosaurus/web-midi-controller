@@ -69,7 +69,7 @@ export const VOLUME_SLIDER_OVERLAY: Overlay = {
 export const XYPAD_PERFORMANCE: Overlay = {
   "id": "xypad-performance",
   "name": "XYPad Performance",
-  program: null,
+  program: 1,
   channel: null,
   style: `#perf-mixer {
     width: 20% !important;

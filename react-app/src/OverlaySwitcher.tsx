@@ -1,9 +1,10 @@
 import { Overlay } from "@hdj/definitions";
 import { useRef, useLayoutEffect } from "react";
 import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW, XYPAD_OVERLAY, MATRIX_OVERLAY, ABLETON_OVERLAY, TRAKTOR_PERFORMANCE, TestOscOverlay, MIDI_TEST_OVERLAY, ROTARIES_TEST, XYPAD_PERFORMANCE } from "./Overlays";
+import { useOverlayContext } from "./Contexts";
 
 export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { showModal: boolean, closeSwitcher: () => void, setOverlay: (o: Overlay) => void }) {
-  const overlays = useRef([
+  /*const overlays = useRef([
     VOLUME_SLIDER_OVERLAY_NEW,
     ABLETON_OVERLAY,
     VOLUME_SLIDER_OVERLAY,
@@ -14,9 +15,13 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
     TRAKTOR_PERFORMANCE,
     ROTARIES_TEST,
     XYPAD_PERFORMANCE
-  ])
+  ])*/
+
+  const overlays = useOverlayContext();
 
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const overlayctx = useOverlayContext();
+
   useLayoutEffect(() => {
     if (dialogRef.current?.open && !showModal) {
       dialogRef.current.close();
@@ -48,8 +53,11 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
       }}>Select Overlay</h2>
       <form action={(e) => {
         const selected = Number(e.get("selected"))
-        const overlay = overlays.current[selected];
-        setOverlay(overlay as Overlay)
+        //const overlay = overlays.current[selected];
+        //setOverlay(overlay as Overlay)//
+        //overlayctx.setAux(overlay);
+        overlayctx.setByIndex(selected);
+
         closeSwitcher()
       }} style={{
         display: "flex",
@@ -57,7 +65,7 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
         width: "50vw",
         //gap: ".5em",
       }}>
-        {overlays.current.map((v, i) => {
+        {overlayctx.overlays.map((v, i) => {
           return (<button style={{ ...buttonStyle, fontWeight: "bold" }} type="submit" name="selected" value={i} key={String(v.id)}>{v.name}</button>)
         })}
         <button type="button" style={buttonStyle} onClick={() => closeSwitcher()}>Close</button>
