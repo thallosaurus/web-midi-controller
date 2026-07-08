@@ -1,10 +1,10 @@
-import { randomUUID, UUID } from "node:crypto";
-import { Router, Context, Application } from "oak";
-import { AllowedPayloads } from "./client/protocol.ts";
-import { StaticAssets } from "./static.ts";
-import { CCPayload, MidiMessage } from "@hdj/midi-driver";
-import { MidiDriver } from "@hdj/midi-driver/ffi";
-import { OscDriver } from "./osc.ts";
+import { randomUUID, type UUID } from "node:crypto";
+import { Router, type Context, Application } from "oak";
+import type { AllowedPayloads } from "./client/protocol.ts";
+import { StaticAssets, StaticHandler } from "./static.ts";
+import type { CCPayload, MidiMessage } from "@hdj/midi-driver";
+import type { MidiDriver } from "@hdj/midi-driver/ffi";
+import type { OscDriver } from "./osc.ts";
 
 //const isProgramChangeBank(msg: MidiMessage): def is 
 
@@ -33,19 +33,6 @@ export const isClientSelectorSub = (t: MidiMessage): boolean => {
 }
 
 /**
- * Serves the web application's static assets.
- *
- * @param context Oak request context.
- */
-const StaticHandler = async (context: Context) => {
-    //console.log(new URL(StaticAssets, import.meta.url).pathname)
-    await context.send({
-        root: new URL(StaticAssets, import.meta.url).pathname,
-        index: "index.html",
-    })
-}
-
-/**
  * Registers WebSocket event handlers for a newly connected client.
  *
  * @param clients Active client registry.
@@ -56,17 +43,17 @@ const StaticHandler = async (context: Context) => {
 const WebsocketHandler = <T>(server: Server<T>, ws: WebSocket, callback: HandlerCallback<T>) => {
     const id = randomUUID();
 
-    ws.addEventListener("open", (ev) => {
+    ws.addEventListener("open", (_ev) => {
         console.log("new websocket connection with id", id);
         server.clients.map.set(id, { ws, clientNumber: server.clients.nextClientNumber });
 
+        const clientNumber = server.clientSelector.addClient(id);
         ws.send(JSON.stringify({
             type: "connection",
             id,
-            clientNumber: server.clients.nextClientNumber
+            clientNumber
         }))
-        server.clientSelector.addClient(id);
-        console.log(server.clientSelector);
+        //console.log(server.clientSelector);
         //clients.nextClientNumber++;
         //console.log(clients);
     })
@@ -81,7 +68,7 @@ const WebsocketHandler = <T>(server: Server<T>, ws: WebSocket, callback: Handler
         server.clients.map.delete(id);
     })
 
-    ws.addEventListener("close", (ev) => {
+    ws.addEventListener("close", (_ev) => {
         //console.log("close", id)
         server.clients.map.delete(id);
         server.clientSelector.removeClient(id)
@@ -104,7 +91,7 @@ export const WebsocketRouter = <T>(server: Server<T>, callback: HandlerCallback<
         }
 
         const ws = ctx.upgrade();
-        const id = WebsocketHandler(server, ws, callback);
+        WebsocketHandler(server, ws, callback);
         //clients.nextClientNumber++;
     })
     router.get("/", StaticHandler)
@@ -121,32 +108,53 @@ interface ListenOptions {
     systemChannel?: number
 }
 
+// ableton sends bank as cc 0,
+// sub as cc 32
+// and the program as programchange
 class ClientSelector {
-    clients: Map<number, UUID> = new Map();
-    currentClientId = 0;
+    assignments: Map<number, UUID> = new Map();
+    currentClientBank = 0;
+    currentClientSub = 0;
 
-    // gets incremented if client gets added
-    nextClientNumber = 0;
-
-    setBank(n: number) {
-        this.currentClientId = n;
+    get clientBank() {
+        return this.currentClientBank
     }
 
-    setSub(n: number) { }
+    get clientSub() {
+        return this.currentClientSub
+    }
+
+    // gets incremented if client gets added
+    //nextClientNumber = 0;
+
+    setBank(n: number) {
+        this.currentClientBank = n;
+    }
+
+    setSub(n: number) {
+        this.currentClientSub = n;
+    }
 
     // brittle, but ok for now
-    addClient(id: UUID) {
-        this.clients.set(this.nextClientNumber, id)
-        this.nextClientNumber++;
+    addClient(id: UUID): number | null {
+        for (let i = 0; i < 128; i++) {
+            if (this.assignments.has(i)) continue;
+            this.assignments.set(i, id);
+            return i;
+        }
+
+        throw new Error("no new client slots available")
+//        this.assignments.set(this.nextClientNumber, id)
+//        this.nextClientNumber++;
     }
 
     removeClient(id: UUID) {
         this.findClientByUUID(id, (n) => {
-            this.clients.delete(n);
+            this.assignments.delete(n);
         })
     }
     private findClientByUUID(id: UUID, fn: (n: number) => void) {
-        for (const [index, uuid] of this.clients.entries()) {
+        for (const [index, uuid] of this.assignments.entries()) {
             if (uuid === id) {
                 fn(index);
                 return;
@@ -156,14 +164,14 @@ class ClientSelector {
     }
 
     reorderId(newIndex: number, id: UUID) {
-        if (this.clients.has(newIndex)) throw new Error("newIndex is already taken")
+        if (this.assignments.has(newIndex)) throw new Error("newIndex is already taken")
         this.removeClient(id);
-        this.clients.set(newIndex, id);
+        this.assignments.set(newIndex, id);
     }
 
     getIndex(num: number): UUID | null {
-        if (this.clients.has(num)) {
-            return this.clients.get(num)!
+        if (this.assignments.has(num)) {
+            return this.assignments.get(num)!
         } else {
             return null;
         }
@@ -368,13 +376,9 @@ export const forwardMidiToServer = ({ t, server, systemChannel }: MidiForwardOpt
             break;
 
         case "ProgramChange":
-            //console.log(t);
-            // ableton sends bank as cc 0,
-            // sub as cc 32
-            // and the program as programchange
             {
                 if (isSystemMessage(t, systemChannel)) {
-                    server.sendToClient(server.clientSelector.currentClientId, {
+                    server.sendToClient(server.clientSelector.clientBank, {
                         type: "pgrm",
                         value: t.value
                     });

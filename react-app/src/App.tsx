@@ -68,6 +68,9 @@ function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
       ]);
 
     ws.connect(getEndpointUrl())
+    return () => {
+      o.clear();
+    }
   }, [])
 
   return (
@@ -92,7 +95,7 @@ function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
               {overlay?.name ?? "No overlay loaded"}
             </b>
             : <div></div>}
-          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connectionState}>{ws.connectionState} {/* " - " + ws.clientId*/}</div>
+          <div id="connection-status" onClick={() => ws.disconnect()} className={ws.connectionState}>{ws.connectionState} {ws.clientId}</div>
         </header>
         {ws.connectionState == "connected" ?
           <>

@@ -5,7 +5,7 @@ import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { forwardMidiToServer, forwardWebsocketMessageToPorts, Server } from "./server.ts";
 import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
-import type { MidiMessage } from "@hdj/midi-driver";
+//import type { MidiMessage } from "@hdj/midi-driver";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.

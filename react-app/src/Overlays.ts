@@ -120,7 +120,7 @@ export const XYPAD_PERFORMANCE: Overlay = {
 export const XYPAD_OVERLAY: Overlay = {
   "id": "fullscreen-xy-pad",
   "name": "Fullscreen XY Pad",
-  "program": 0,
+  "program": null,
   "channel": null,
   "style": null,
   "cells": [
@@ -289,7 +289,7 @@ export const ABLETON_OVERLAY: Overlay = {
   "id": "ableton_performance",
   "name": "Ableton Performance",
   "channel": null,
-  program: null,
+  "program": 0,
   style: `
   #ableton_performance #returns {
     height: 70% !important;
