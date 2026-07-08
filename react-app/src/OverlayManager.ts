@@ -6,6 +6,7 @@ export class OverlayManager {
 
   applyOverlays(o: Overlay[]) {
     this.overlays = o;
+    if (this.overlays.length > 0) this.setByIndex(0);
   }
   clear() {
     this.overlays = [];

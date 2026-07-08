@@ -58,7 +58,6 @@ function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
         ROTARIES_TEST,
         XYPAD_PERFORMANCE
       ]);
-      o.setByIndex(0);
 
     ws.connect(getEndpointUrl())
     return () => {
