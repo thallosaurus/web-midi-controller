@@ -53,17 +53,21 @@ const StaticHandler = async (context: Context) => {
  * @param callback Message handler invoked for incoming payloads.
  * @returns Unique identifier assigned to the connection.
  */
-const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callback: HandlerCallback<T>) => {
+const WebsocketHandler = <T>(server: Server<T>, ws: WebSocket, callback: HandlerCallback<T>) => {
     const id = randomUUID();
 
     ws.addEventListener("open", (ev) => {
         console.log("new websocket connection with id", id);
+        server.clients.map.set(id, { ws, clientNumber: server.clients.nextClientNumber });
+
         ws.send(JSON.stringify({
             type: "connection",
             id,
-            clientNumber: clients.nextClientNumber
+            clientNumber: server.clients.nextClientNumber
         }))
-        clients.nextClientNumber++;
+        server.clientSelector.addClient(id);
+        console.log(server.clientSelector);
+        //clients.nextClientNumber++;
         //console.log(clients);
     })
 
@@ -74,12 +78,13 @@ const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callbac
 
     ws.addEventListener("error", (v) => {
         console.log("error", (v as ErrorEvent).error);
-        clients.map.delete(id);
+        server.clients.map.delete(id);
     })
 
     ws.addEventListener("close", (ev) => {
         //console.log("close", id)
-        clients.map.delete(id);
+        server.clients.map.delete(id);
+        server.clientSelector.removeClient(id)
     })
 
     return id;
@@ -91,7 +96,7 @@ const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callbac
  * @param clients Active client registry.
  * @param callback Message handler invoked for incoming payloads.
  */
-export const WebsocketRouter = <T>(clients: WebSocketClientMap, callback: HandlerCallback<T>) => {
+export const WebsocketRouter = <T>(server: Server<T>, callback: HandlerCallback<T>) => {
     const router = new Router();
     router.get("/ws", (ctx) => {
         if (!ctx.isUpgradable) {
@@ -99,8 +104,7 @@ export const WebsocketRouter = <T>(clients: WebSocketClientMap, callback: Handle
         }
 
         const ws = ctx.upgrade();
-        const id = WebsocketHandler(clients, ws, callback);
-        clients.map.set(id, { ws, clientNumber: clients.nextClientNumber });
+        const id = WebsocketHandler(server, ws, callback);
         //clients.nextClientNumber++;
     })
     router.get("/", StaticHandler)
@@ -117,6 +121,41 @@ interface ListenOptions {
     systemChannel?: number
 }
 
+class ClientSelector {
+    clients: Map<number, UUID> = new Map();
+    currentClientId = 0;
+    
+    // gets incremented if client gets added
+    nextClientNumber = 0;
+
+    setBank(n: number) {
+        this.currentClientId = n;
+    }
+    setSub(n: number) {}
+
+    // brittle, but ok for now
+    addClient(id: UUID) {
+        this.clients.set(this.nextClientNumber, id)
+        this.nextClientNumber++;
+    }
+
+    removeClient(id: UUID) {
+        for (const [index, uuid] of this.clients.entries()) {
+            if (uuid === id) {
+                this.clients.delete(index);
+            }
+        }
+    }
+
+    getIndex(num: number): UUID | null {
+        if (this.clients.has(num)) {
+            return this.clients.get(num)!
+        } else {
+            return null;
+        }
+    }
+}
+
 /**
  * Lightweight HTTP and WebSocket server used by HomebrewDJ.
  *
@@ -127,7 +166,9 @@ export class Server<T = AllowedPayloads> {
     controller: AbortController;
     app: Application;
     clients: WebSocketClientMap = { map: new Map<UUID, { ws: WebSocket, clientNumber: number }>(), nextClientNumber: 0 };
-    selectedClientNumber = 0;
+
+    clientSelector = new ClientSelector();
+    //selectedClientNumber = 0;
 
     // 1-index based system channel
     //private systemMidiChannel: number;
@@ -146,7 +187,7 @@ export class Server<T = AllowedPayloads> {
 
         //this.systemMidiChannel = listenOptions.systemChannel ?? 16;
 
-        const ws = WebsocketRouter(this.clients, callback);
+        const ws = WebsocketRouter(this, callback);
         this.app.use(ws.routes());
         this.app.use(ws.allowedMethods());
         this.app.addEventListener("listen", (e) => {
@@ -162,6 +203,12 @@ export class Server<T = AllowedPayloads> {
         });
     }
 
+    /**
+     * 
+     * @deprecated
+     * @param num
+     * @returns 
+     */
     getClientByNumber(num: number): WebSocket | null {
         const found = this.clients.map.values().find((v, i) => {
             return v.clientNumber == num
@@ -182,13 +229,21 @@ export class Server<T = AllowedPayloads> {
         });
     }
 
+    private sendToId(id: UUID, msg: T) {
+        const i = this.clients.map.get(id);
+        if (i) this.sendToSocket(i.ws, msg);
+    }
+
     private sendToSocket(client: WebSocket, msg: T) {
         client.send(JSON.stringify(msg));
     }
 
     sendToClient(num: number, msg: T) {
-        const client = this.getClientByNumber(num);
-        if (client) this.sendToSocket(client, msg);
+        //const client = this.getClientByNumber(num);
+        const i = this.clientSelector.getIndex(num);
+        if (i) {
+            this.sendToId(i, msg);
+        }
     }
 
     /**
@@ -206,12 +261,14 @@ export class Server<T = AllowedPayloads> {
     processSystemMessage(msg: MidiMessage): boolean {
         if (isClientSelectorBank(msg)) {
             const m = msg as CCPayload;
-            this.selectedClientNumber = m.value;
+            this.clientSelector.setBank(m.value);
+            //this.selectedClientNumber = m.value;
             console.log(this);
             return false;
         }
         if (isClientSelectorSub(msg)) {
             const m = msg as CCPayload;
+            this.clientSelector.setSub(m.value);
             //this.selectedClientNumber = m.value;
             return false;
         }
@@ -317,7 +374,7 @@ export const forwardMidiToServer = ({ t, server, systemChannel }: MidiForwardOpt
             // and the program as programchange
             {
                 if (isSystemMessage(t, systemChannel)) {
-                    server.sendToClient(server.selectedClientNumber, {
+                    server.sendToClient(server.clientSelector.currentClientId, {
                         type: "pgrm",
                         value: t.value
                     });
