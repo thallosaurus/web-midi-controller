@@ -23,17 +23,6 @@ interface MainLayoutProps {
 
 export const MainLayout = ({ header, main }: MainLayoutProps) => {
     const [currentLayout, setCurrentLayout] = useState(Layout.MainOpen);
-    const [testData, setTestData] = useState<string[]>([]);
-
-    useEffect(() => {
-        const data = [
-        ];
-
-        for (let i = 0; i < 128; i++) {
-            data.push("AAAAAAAAAAAAA");
-        }
-        setTestData(data);
-    }, [])
 
     return (
         <LayoutContext.Provider value={{
@@ -61,21 +50,8 @@ export const MainLayout = ({ header, main }: MainLayoutProps) => {
                         width: "100%",
                         flexDirection: "column"
                     }}>
-
                         {main}
-                        <div>
-                            <button onClick={() => {
-                                setCurrentLayout(Layout.LeftSidebarOpen);
-                            }}>Open Left</button>
-
-                            <button onClick={() => {
-                                setCurrentLayout(Layout.RightSidebarOpen);
-                            }}>Open Right</button>
-                        </div>
                     </div>
-                    <div style={{
-                        display: isRightSidebarOpen(currentLayout) ? "block" : "none"
-                    }}>right</div>
                 </div>
 
             </div>
