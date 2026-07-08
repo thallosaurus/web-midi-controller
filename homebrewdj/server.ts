@@ -131,6 +131,7 @@ class ClientSelector {
     setBank(n: number) {
         this.currentClientId = n;
     }
+
     setSub(n: number) { }
 
     // brittle, but ok for now
@@ -140,11 +141,11 @@ class ClientSelector {
     }
 
     removeClient(id: UUID) {
-        this.findClient(id, (n) => {
+        this.findClientByUUID(id, (n) => {
             this.clients.delete(n);
         })
     }
-    private findClient(id: UUID, fn: (n: number) => void) {
+    private findClientByUUID(id: UUID, fn: (n: number) => void) {
         for (const [index, uuid] of this.clients.entries()) {
             if (uuid === id) {
                 fn(index);
