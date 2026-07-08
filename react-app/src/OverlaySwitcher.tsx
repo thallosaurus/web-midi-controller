@@ -3,7 +3,7 @@ import { useRef, useLayoutEffect } from "react";
 import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW, XYPAD_OVERLAY, MATRIX_OVERLAY, ABLETON_OVERLAY, TRAKTOR_PERFORMANCE, TestOscOverlay, MIDI_TEST_OVERLAY, ROTARIES_TEST, XYPAD_PERFORMANCE } from "./Overlays";
 import { useOverlayContext } from "./Contexts";
 
-export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { showModal: boolean, closeSwitcher: () => void, setOverlay: (o: Overlay) => void }) {
+export function OverlaySwitcher({ showModal, closeSwitcher }: { showModal: boolean, closeSwitcher: () => void }) {
   /*const overlays = useRef([
     VOLUME_SLIDER_OVERLAY_NEW,
     ABLETON_OVERLAY,
@@ -16,8 +16,6 @@ export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { show
     ROTARIES_TEST,
     XYPAD_PERFORMANCE
   ])*/
-
-  const overlays = useOverlayContext();
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const overlayctx = useOverlayContext();

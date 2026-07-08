@@ -16,18 +16,7 @@ export function ConnectScreen() {
   const ws = useWebsocketContext();
   const [url, setUrl] = useState(getEndpointUrl().host);
 
-  return <div style={{
-    display: "flex",
-    width: "100%",
-    height: "100%",
-    justifyContent: "space-around"
-  }}>
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-around"
-    }}>
-      <form>
+  return <form>
         <h2>Connect to Address</h2>
         <label htmlFor="urlInput">Hostname</label>
         <input name="urlInput" value={url} onChange={(ev) => setUrl(ev.target.value)} style={{
@@ -47,6 +36,4 @@ export function ConnectScreen() {
           console.log("after connect")
         }}>Connect</button>
       </form>
-    </div>
-  </div>
 }
