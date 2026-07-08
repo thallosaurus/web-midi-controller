@@ -1,8 +1,6 @@
-import { Overlay } from "@hdj/definitions";
-import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback, ConnectedPayload, ClientNumberPayload } from "@hdj/homebrewdj-web-client";
-import { CCDelta, NoteDelta, OscDelta, Outgoing, PgrmDelta, WCallbacks } from "@hdj/widgets";
+import { WebsocketClient, AllowedPayloads, ConnectedPayload } from "@hdj/homebrewdj-web-client";
 import { createContext, useState, useContext, useRef, ReactNode, useEffect } from "react";
-import { EventBus, ProgramChangeHandler } from "./EventBus";
+import { EventBus } from "./EventBus";
 import { OverlayManager } from "./OverlayManager";
 
 export const OverlayContext = createContext<OverlayManager>(new OverlayManager());

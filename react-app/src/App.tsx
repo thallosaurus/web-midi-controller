@@ -109,7 +109,7 @@ const HDJHeader = ({ currentOverlay, setShowDiags, setOverlayPicker }: {
   setOverlayPicker: (b: boolean) => void
 }) => {
   const ws = useWebsocketContext();
-  
+
   return <>
     <div onClick={() => setShowDiags(true)} style={{
       fontWeight: "bold"
@@ -137,7 +137,22 @@ const HDJMain = ({ currentOverlay }: { currentOverlay: Overlay | null }) => {
           height: "calc(100% - 2em)",
           padding: "1em"
         }} /> : "")
-      : <ConnectScreen />
+      : <div style={{
+        display: "flex",
+        width: "100%",
+        height: "100%",
+        justifyContent: "space-around"
+      }}>
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-around"
+        }}>
+          <ConnectScreen />
+
+        </div>
+      </div>
+
     }
   </>
 }
