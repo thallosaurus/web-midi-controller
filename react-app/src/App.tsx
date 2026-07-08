@@ -11,19 +11,11 @@ import "@hdj/widgets/style.css"
 import { AssignDialog } from "./AssignDialog";
 
 function App() {
-  /*const eventbus = useRef<EventBus>(new EventBus());
-  const process = (id: string, msg: AllowedPayloads) => {
-    eventbus.current.extInput(msg);
-  }*/
-
   useEffect(() => {
 
     const errorHandler = ({ message, filename, lineno }: ErrorEvent) => {
       alert(`${message} ${filename}:${lineno}`)
     }
-    /*const asyncErrorHandler = ({ reason }: PromiseRejectionEvent) => {
-      alert(reason)
-    }*/
 
     window.addEventListener("error", errorHandler);
     //window.addEventListener("unhandledrejection", asyncErrorHandler);
@@ -45,7 +37,7 @@ function App() {
 function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
   const [showOverlayPicker, setOverlayPicker] = useState(false);
   const [showDiags, setShowDiags] = useState(false);
-  const [overlay, setOverlay] = useState<Overlay | null>(defaultOverlay ?? null)
+  const [overlay, setOverlay] = useState<Overlay | null>(null)
   const ws = useWebsocketContext();
   const o = useOverlayContext();
 
@@ -66,6 +58,7 @@ function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
         ROTARIES_TEST,
         XYPAD_PERFORMANCE
       ]);
+      o.setByIndex(0);
 
     ws.connect(getEndpointUrl())
     return () => {
