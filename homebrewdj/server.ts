@@ -124,14 +124,14 @@ interface ListenOptions {
 class ClientSelector {
     clients: Map<number, UUID> = new Map();
     currentClientId = 0;
-    
+
     // gets incremented if client gets added
     nextClientNumber = 0;
 
     setBank(n: number) {
         this.currentClientId = n;
     }
-    setSub(n: number) {}
+    setSub(n: number) { }
 
     // brittle, but ok for now
     addClient(id: UUID) {
@@ -140,11 +140,24 @@ class ClientSelector {
     }
 
     removeClient(id: UUID) {
+        this.findClient(id, (n) => {
+            this.clients.delete(n);
+        })
+    }
+    private findClient(id: UUID, fn: (n: number) => void) {
         for (const [index, uuid] of this.clients.entries()) {
             if (uuid === id) {
-                this.clients.delete(index);
+                fn(index);
+                return;
             }
         }
+        throw new Error(`${id} not found`)
+    }
+
+    reorderId(newIndex: number, id: UUID) {
+        if (this.clients.has(newIndex)) throw new Error("newIndex is already taken")
+        this.removeClient(id);
+        this.clients.set(newIndex, id);
     }
 
     getIndex(num: number): UUID | null {
@@ -201,20 +214,6 @@ export class Server<T = AllowedPayloads> {
             signal: this.controller.signal,
             ...listenOptions
         });
-    }
-
-    /**
-     * 
-     * @deprecated
-     * @param num
-     * @returns 
-     */
-    getClientByNumber(num: number): WebSocket | null {
-        const found = this.clients.map.values().find((v, i) => {
-            return v.clientNumber == num
-        });
-        if (found) return found.ws;
-        return null;
     }
 
     /**
@@ -309,7 +308,7 @@ export const forwardWebsocketMessageToPorts = ({ msg, server, midiPort, oscPort 
                     velocity: msg.velocity
                 };
 
-                if (msg.velocity > 64) {
+                if (msg.velocity > 0) {
                     midiPort.sendMidi({
                         type: "NoteOn",
                         ...m
