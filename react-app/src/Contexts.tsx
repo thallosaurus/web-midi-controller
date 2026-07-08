@@ -1,29 +1,16 @@
 import { Overlay } from "@hdj/definitions";
-import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback, ConnectedPayload } from "@hdj/homebrewdj-web-client";
-import { Outgoing, PgrmDelta, WCallbacks } from "@hdj/widgets";
+import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback, ConnectedPayload, ClientNumberPayload } from "@hdj/homebrewdj-web-client";
+import { CCDelta, NoteDelta, OscDelta, Outgoing, PgrmDelta, WCallbacks } from "@hdj/widgets";
 import { createContext, useState, useContext, useRef, ReactNode, useEffect } from "react";
-
-type ProgramChangeHandler = (n: number) => void
-
-export class EventBus extends WCallbacks {
-    sender: Outgoing | null = null;
-    programChange: (ProgramChangeHandler) | null = null;
-
-    setSender(sender: Outgoing | null) {
-        this.sender = sender;
-    }
-
-    setProgramChangeHandler(handler: ProgramChangeHandler | null) {
-        this.programChange = handler
-    }
-}
+import { EventBus, ProgramChangeHandler } from "./EventBus";
 
 type WebsocketContextType = {
     ws: WebsocketClient<AllowedPayloads>,
     bus: EventBus,
     connectionState: ConnectionState,
     connectionId: string | null,
-    clientId: number,
+    clientId: number | null,
+    setProgramChangeHandler: (handler: ProgramChangeHandler | null) => void,
     connect: (uri: URL) => Promise<void>;
     disconnect: () => void;
 }
@@ -42,23 +29,22 @@ enum ConnectionState {
     Online = "connected"
 }
 
-
 export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
-    
+
     const [connectionId, setConnectionId] = useState<string | null>(null);
-    const [clientId, setClientId] = useState<number>(0);
+    const [clientId, setClientId] = useState<number | null>(null);
     const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
     const bus = useContext(EventBusContext);
     const wsRef = useRef(new WebsocketClient<AllowedPayloads>((id: string, msg: AllowedPayloads) => {
-        if (msg.type == "clientnumber") {
-            setClientId(msg.clientNumber);
-        } else {
-            bus.extInput(msg);
-        }
+        //console.log("wsRef", msg);
+        //if (msg.type == "clientnumber") {
+        //setClientId(msg.clientNumber);
+        bus.extInput(msg);
+        //}
     }))
     useEffect(() => {
         bus.setSender(wsRef.current);
-        bus.setProgramChangeHandler(setClientId)
+        bus.setProgramChangeHandler((n) => console.log("switching to ", n))
         return () => {
             bus.setSender(null);
             bus.setProgramChangeHandler(null)
@@ -71,6 +57,9 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         connectionId,
         connectionState,
         clientId,
+        setProgramChangeHandler: (handler: ProgramChangeHandler | null) => {
+            bus.setProgramChangeHandler(handler);
+        },
         connect: async (uri) => {
             setConnectionState(ConnectionState.Connecting);
             await new Promise((res, rej) => {
@@ -86,6 +75,7 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
                     close: () => {
                         setConnectionId(null);
                         setConnectionState(ConnectionState.Offline);
+                        setClientId(null)
                         rej();
                     }
                 })

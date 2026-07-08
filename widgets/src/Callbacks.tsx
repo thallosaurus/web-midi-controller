@@ -51,21 +51,21 @@ type OSCCallbackMap = Map<string, Map<string, OSCReceiveDataCallback>>;
 
 export type DeltaMessages = NoteDelta | CCDelta | OscDelta;
 
-interface NoteDelta {
+export interface NoteDelta {
     type: "note",
     channel: number,
     note: number,
     velocity: number
 }
 
-interface CCDelta {
+export interface CCDelta {
     type: "cc",
     channel: number,
     cc: number,
     value: number
 }
 
-interface OscDelta {
+export interface OscDelta {
     type: "osc"
     address: string,
     args: Array<any>
