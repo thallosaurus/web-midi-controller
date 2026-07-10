@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+struct OverlayStruct {
+    
+}
+
 let defaultOverlay: [String: Any] = [
     "id": "test",
     "name": "test overlay",
@@ -15,54 +19,57 @@ let defaultOverlay: [String: Any] = [
         "style": "",
         "cells": [
             [
-                "output": "midi",
-                "channel": 1,
-                "label": "test",
-                "mode": "absolute",
-                "type": "ccslider",
+                "type": "vert-mixer",
                 "id": NSNull(),
-                "vertical": false,
-                "cc": 3,
-                "value": NSNull()
+                "vert": [
+                    [
+                        "output": "midi",
+                        "channel": 1,
+                        "label": "test",
+                        "mode": "absolute",
+                        "type": "ccslider",
+                        "id": NSNull(),
+                        "vertical": true,
+                        "cc": 3,
+                        "value": NSNull()
+                    ],
+                    [
+                        "type": "notebutton",
+                        "output": "midi",
+                        "channel": 1,
+                        "label": "test btn",
+                        "mode": "trigger",
+                        "id": NSNull(),
+                        "note": 60,
+                        "value": NSNull()
+                    ]
+                ]
             ]
         ]
 ]
 
-let defaultOverlay_ = """
-    {
-       "id": "test",
-       "name": "test overlay",
-       "channel": null,
-       "program": null,
-       "style": "",
-       "cells": [
-          {
-             "output":"midi",
-             "channel":1,
-             "label":"test",
-             "mode":"absolute",
-             "type":"ccslider",
-             "id":null,
-             "vertical":false,
-             "cc":3,
-             "value":null
-          }
-       ]
-    }
-    """
-
 struct ContentView: View {
     let midi = MidiManager()
+    
+    /*let overlays: [[String: Any]] = [
+        defaultOverlay
+    ]*/
+    
     var body: some View {
-        WebView(midiManager: midi, overlay: defaultOverlay)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .ignoresSafeArea()
-        
-            .onAppear {
-                midi.printDestinations()
-                midi.destination(named: "Session 1")
+        NavigationStack {
+            List {
+                NavigationLink("test") {
+                    OverlayView(midi: midi, overlay: defaultOverlay)
+                        .navigationTitle("test overlay")
+                }
+
             }
-        
+        }
+        .onAppear {
+            midi.printDestinations()
+            //midi.destination(named: "Session 1")
+            midi.destination(named: "Model D")
+        }
     }
 }
 

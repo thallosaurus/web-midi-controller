@@ -131,7 +131,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DEST=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/dist\"\nmkdir -p \"$DEST\"\ncp -R \"$SRCROOT/../hdj-ios-web/dist/\"* \"$DEST\"\n";
+			shellScript = "export PATH=\"/opt/homebrew/bin:/usr/local/bin:$HOME/.nvm/versions/node/v26.1.0/bin:$PATH\"\ncd \"$SRCROOT/../hdj-ios-web\"\n#npm run build\n#$HOME/.nvm/versions/node/v26.1.0/bin/\nnpm run build\n#cd \"$SRCROOT\"\n\nDEST=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/dist\"\nmkdir -p \"$DEST\"\ncp -R \"$SRCROOT/../hdj-ios-web/dist/\"* \"$DEST\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -278,6 +278,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = HomebrewDJ;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -311,6 +313,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = HomebrewDJ;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

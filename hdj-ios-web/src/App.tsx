@@ -86,8 +86,6 @@ function App() {
   useEffect(() => {
     window.nativeOverlay = (json: object) => {
       console.log("Overlay received:", json);
-      //const o = JSON.parse(json);
-      //alert(JSON.stringify(o));
       setOverlay(json as Overlay)
     };
 

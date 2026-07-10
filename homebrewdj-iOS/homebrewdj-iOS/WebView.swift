@@ -8,6 +8,16 @@
 import SwiftUI
 import WebKit
 
+struct OverlayView: View {
+    let midi: MidiManager
+    let overlay: [String: Any]
+    var body: some View {
+        WebView(midiManager: midi, overlay: overlay)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea()
+    }
+}
+
 struct WebView: UIViewRepresentable {
     let midiManager: MidiManager
     let overlay: [String: Any]
@@ -98,11 +108,16 @@ struct WebView: UIViewRepresentable {
                        break
                    case "noteOn":
                        let channel = data["channel"]
-                       let note = data["sub"]
+                       let velocity = data["sub"]
+                       let note = data["main"]
+                       midiManager.noteOn(channel: uint8(channel), note: uint8(note), velocity: uint8(float(velocity) * 127))
                        break
                        
                    case "noteOff":
-                       
+                       let channel = data["channel"]
+                       let velocity = data["sub"]
+                       let note = data["main"]
+                       midiManager.noteOff(channel: uint8(channel), note: uint8(note), velocity: uint8(float(velocity) * 127))
                        break
                        
                    case "cc":

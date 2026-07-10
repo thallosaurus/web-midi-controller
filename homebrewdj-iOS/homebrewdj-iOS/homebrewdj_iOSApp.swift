@@ -12,6 +12,7 @@ struct homebrewdj_iOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .navigationTitle("Overlays")
         }
     }
 }
