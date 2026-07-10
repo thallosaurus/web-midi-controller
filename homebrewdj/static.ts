@@ -21,3 +21,8 @@ export const StaticHandler = async (context: Context) => {
         //console.log(e);
     }
 }
+
+export const OverlayHandler = async (context: Context) => {
+    context.response.status = 200;
+    context.response.body = JSON.stringify([])
+}

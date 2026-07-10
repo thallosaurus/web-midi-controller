@@ -1,7 +1,7 @@
 import { randomUUID, type UUID } from "node:crypto";
 import { Router, type Context, Application } from "oak";
 import type { AllowedPayloads } from "./client/protocol.ts";
-import { StaticAssets, StaticHandler } from "./static.ts";
+import { OverlayHandler, StaticAssets, StaticHandler } from "./static.ts";
 import type { CCPayload, MidiMessage } from "@hdj/midi-driver";
 import type { MidiDriver } from "@hdj/midi-driver/ffi";
 import type { OscDriver } from "./osc.ts";
@@ -95,6 +95,7 @@ export const WebsocketRouter = <T>(server: Server<T>, callback: HandlerCallback<
         //clients.nextClientNumber++;
     })
     router.get("/", StaticHandler)
+    router.get("/overlays", OverlayHandler)
     router.get("/manifest.json", StaticHandler)
     router.get("/assets/:file", StaticHandler)
     router.get("/icons/:file", StaticHandler)

@@ -42,6 +42,7 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
     const overlays = useContext(OverlayContext);
     const bus = useContext(EventBusContext);
+
     const wsRef = useRef(new WebsocketClient<AllowedPayloads>((id: string, msg: AllowedPayloads) => {
         //console.log("wsRef", msg);
         //if (msg.type == "clientnumber") {
@@ -81,8 +82,13 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
                         setConnectionId(p.id)
                         setClientId(p.clientNumber)
                         console.log(p);
-                        setConnectionState(ConnectionState.Online);
-                        res(p.id)
+                        fetch("/overlays").then(oo => {
+                            return oo.json();
+                        }).then(oo => {
+                            overlays.applyOverlays(oo)
+                            setConnectionState(ConnectionState.Online);
+                            res(p.id)
+                        })
                     },
                     close: () => {
                         setConnectionId(null);
