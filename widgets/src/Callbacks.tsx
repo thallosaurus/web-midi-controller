@@ -88,15 +88,15 @@ interface InternalCallbackMap {
     oscCallbackMap: OSCCallbackMap;
 }
 
-function isMidiNote(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiNoteProperties {
+export function isMidiNote(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiNoteProperties {
     return (def.output === "midi" && "note" in def)
 }
 
-function isMidiCC(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiCCProperties {
+export function isMidiCC(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiCCProperties {
     return (def.output === "midi" && "cc" in def)
 }
 
-function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
+export function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
     return (def.output === "osc")
 }
 

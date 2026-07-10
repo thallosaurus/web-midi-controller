@@ -1,5 +1,6 @@
 {
   "name": "@hdj/widgets",
+  "private": true,
   "version": "0.2.2",
   "license": "MIT",
   "main": "./dist/index.es.js",

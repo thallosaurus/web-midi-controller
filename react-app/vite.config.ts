@@ -9,6 +9,7 @@ process.env.VITE_VERSION = ver.version;
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "./",
   build: {
     sourcemap: true
   },

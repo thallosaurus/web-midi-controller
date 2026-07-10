@@ -8,7 +8,8 @@
         "midi-driver",
         "definitions",
         "overlay-editor",
-        "playground"
+        "playground",
+        "hdj-ios-web"
     ],
     "dependencies": {
         "node-osc": "^11.6.0"
