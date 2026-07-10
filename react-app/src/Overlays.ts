@@ -1,4 +1,5 @@
-import { ButtonMode, CCButtonProperties, CCSliderProperties, createCCSlider, createLaunchpadMatrix, createMidiCCButton, createMidiNoteButton, createRotaries, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, RotaryMode, RotarySliderProperties, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { CCSliderProperties, Overlay, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { createCCSlider, createLaunchpadMatrix, createMidiCCButton, createMidiNoteButton, createRotaries } from "@hdj/widgets";
 
 const TestOscWidget: Widget & CCSliderProperties = {
   output: "osc",
