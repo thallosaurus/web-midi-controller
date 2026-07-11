@@ -1,4 +1,4 @@
-use midir::{MidiInput, MidiOutput, PortInfoError};
+use midir::{MidiInput, MidiOutput};
 
 pub mod messages;
 pub mod system;

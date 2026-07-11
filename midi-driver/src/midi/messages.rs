@@ -72,32 +72,32 @@ pub struct ControlChangePayload {
 #[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 pub struct ChannelPressurePayload {
-        #[serde(flatten)]
-        midi: MidiPayload,
+    #[serde(flatten)]
+    midi: MidiPayload,
 
-        pressure: u8,
+    pressure: u8,
 }
 
 #[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 pub struct AftertouchPayload {
-        #[serde(flatten)]
-        midi: MidiPayload,
+    #[serde(flatten)]
+    midi: MidiPayload,
 
-        #[serde(flatten)]
-        note: NotePayload,
+    #[serde(flatten)]
+    note: NotePayload,
 }
 
 #[derive(Clone, Copy, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 pub struct SongPositionPointerPayload {
-    value: u16
+    value: u16,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, TS)]
 #[ts(export, export_to = "MidiPayload.ts")]
 pub struct SysExPayload {
-    data: Vec<u8>
+    data: Vec<u8>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, TS)]
@@ -126,17 +126,17 @@ impl From<Vec<u8>> for MidiMessage {
         match data.as_slice() {
             [0x90..=0x9F, note, vel] if *vel > 0 => {
                 let ch = data[0] - 0x90;
-                Self::NoteOn(NoteOnPayload { 
-midi: MidiPayload { channel: ch + 1 },
+                Self::NoteOn(NoteOnPayload {
+                    midi: MidiPayload { channel: ch + 1 },
                     note: NotePayload {
                         note: *note,
                         velocity: *vel,
-                    }
-                 })
+                    },
+                })
             }
             [0x80..=0x8F, note, _] => {
                 let ch = data[0] - 0x80;
-                Self::NoteOff(NoteOffPayload { 
+                Self::NoteOff(NoteOffPayload {
                     midi: MidiPayload { channel: ch + 1 },
                     note: NotePayload {
                         note: *note,
@@ -147,7 +147,7 @@ midi: MidiPayload { channel: ch + 1 },
             [0xC0..=0xCF, val] => {
                 // Program changes
                 let ch = data[0] - 0xC0;
-                Self::ProgramChange(ProgramChangePayload { 
+                Self::ProgramChange(ProgramChangePayload {
                     midi: MidiPayload { channel: ch + 1 },
                     value: *val,
                 })
@@ -172,7 +172,7 @@ midi: MidiPayload { channel: ch + 1 },
                         note: *note,
                         velocity: *vel,
                     },
-                    midi: MidiPayload { channel: ch },
+                    midi: MidiPayload { channel: ch + 1},
                 })
             }
 
@@ -192,7 +192,7 @@ midi: MidiPayload { channel: ch + 1 },
 
                 let value = ((*msb as u16) << 7) | (*lsb as u16);
                 Self::Pitchbend(PitchbendPayload {
-                    midi: MidiPayload { channel: ch },
+                    midi: MidiPayload { channel: ch + 1},
                     value,
                 })
             }
@@ -202,13 +202,13 @@ midi: MidiPayload { channel: ch + 1 },
             [0xFC] => Self::Stop,
             [0xF2, lsb, msb] => {
                 let value = ((*msb as u16) << 7) | (*lsb as u16);
-                Self::SongPositionPointer (SongPositionPointerPayload{ value })
+                Self::SongPositionPointer(SongPositionPointerPayload { value })
             }
             [0xF0, ..] => Self::SysEx(SysExPayload { data }),
             [0xD0..=0xDF, pressure] => {
                 let ch = data[0] - 0xD0;
-                Self::ChannelPressure (ChannelPressurePayload{
-                    midi: MidiPayload { channel: ch },
+                Self::ChannelPressure(ChannelPressurePayload {
+                    midi: MidiPayload { channel: ch + 1 },
                     pressure: *pressure,
                 })
             }
@@ -229,7 +229,7 @@ impl From<MidiMessage> for Vec<u8> {
             MidiMessage::ProgramChange(p) => {
                 vec![0xC0 + (p.midi.channel - 1), p.value]
             }
-            MidiMessage::ControlChange(p)=> {
+            MidiMessage::ControlChange(p) => {
                 vec![0xB0 + (p.midi.channel - 1), p.cc.cc, p.cc.value]
             }
             MidiMessage::Pitchbend(p) => {

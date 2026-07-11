@@ -1,5 +1,6 @@
 {
   "name": "@hdj/homebrewdj-web-client",
+  "private": true,
   "version": "0.2.0",
   "description": "Your package.",
   "repository": {
