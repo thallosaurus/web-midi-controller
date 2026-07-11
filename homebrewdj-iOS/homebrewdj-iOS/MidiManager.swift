@@ -7,11 +7,17 @@
 
 import Foundation
 import CoreMIDI
+import Combine
+import SwiftUI
 
-final class MidiManager {
 
+
+class MidiManager: ObservableObject {
+    @Published var dests: [( index: Int, name: String)] = []
+    
     private var client = MIDIClientRef()
     private var outputPort = MIDIPortRef()
+    private var endpoint: MIDIEndpointRef?
 
     init() {
         MIDIClientCreateWithBlock(
@@ -24,6 +30,12 @@ final class MidiManager {
             "Output" as CFString,
             &outputPort
         )
+        
+        endpoint = defaultDestination()
+    }
+    
+    func refreshDestinations() {
+        dests = destinations()
     }
 
     func destinations() -> [(index: Int, name: String)] {
@@ -45,6 +57,14 @@ final class MidiManager {
 
             return (index, name)
         }
+    }
+    
+    func setEndpoint(id: Int) {
+        guard MIDIGetNumberOfDestinations() > 0 else {
+            return
+        }
+        
+        endpoint = MIDIGetDestination(id)
     }
 
     func printDestinations() {
@@ -80,21 +100,20 @@ final class MidiManager {
         channel: UInt8,
         controller: UInt8,
         value: UInt8,
-        destination: MIDIEndpointRef? = nil
+        //destination: MIDIEndpointRef? = nil
     ) {
-
-        guard let destination = destination ?? defaultDestination() else {
-            print("No MIDI destination available")
+        guard let to = endpoint else {
+            print("no midi endpoint")
             return
         }
-
+        
         send(
             bytes: [
                 0xB0 | (channel & 0x0F),
                 controller,
                 value
             ],
-            to: destination
+            to: to
         )
     }
     
@@ -104,18 +123,18 @@ final class MidiManager {
         velocity: UInt8,
         destination: MIDIEndpointRef? = nil
     ) {
-        guard let destination = destination ?? defaultDestination() else {
-            print("No MIDI destination available")
+        guard let to = endpoint else {
+            print("no midi endpoint")
             return
         }
-
+        
         send(
             bytes: [
                 0x90 | (channel & 0x0F),
                 note,
                 velocity
             ],
-            to: destination
+            to: to
         )
     }
 
@@ -125,18 +144,18 @@ final class MidiManager {
         velocity: UInt8 = 0,
         destination: MIDIEndpointRef? = nil
     ) {
-        guard let destination = destination ?? defaultDestination() else {
-            print("No MIDI destination available")
+        guard let to = endpoint else {
+            print("no midi endpoint")
             return
         }
-
+        
         send(
             bytes: [
                 0x80 | (channel & 0x0F),
                 note,
                 velocity
             ],
-            to: destination
+            to: to
         )
     }
     
@@ -168,6 +187,26 @@ final class MidiManager {
                     listPtr
                 )
             }
+        }
+    }
+}
+
+struct MidiDestinationPicker: View {
+
+    let midiManager: MidiManager
+
+    @Binding var selectedDestination: Int
+
+    var body: some View {
+        Picker("MIDI Destination", selection: $selectedDestination) {
+            ForEach(midiManager.destinations(), id: \.index) { destination in
+                Text(destination.name)
+                    .tag(destination.index)
+            }
+        }
+        .pickerStyle(.menu)
+        .onChange(of: selectedDestination) {
+            midiManager.setEndpoint(id: selectedDestination)
         }
     }
 }

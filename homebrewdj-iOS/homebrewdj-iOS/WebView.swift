@@ -12,9 +12,15 @@ struct OverlayView: View {
     let midi: MidiManager
     let overlay: [String: Any]
     var body: some View {
-        WebView(midiManager: midi, overlay: overlay)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .ignoresSafeArea()
+        ZStack {
+            WebView(midiManager: midi, overlay: overlay)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+        }
+        .background(
+            //DisableBackSwipe()
+        )
+        .navigationBarBackButtonHidden(false)
     }
 }
 
