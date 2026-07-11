@@ -10,10 +10,9 @@ import CoreMIDI
 import Combine
 import SwiftUI
 
-
-
 class MidiManager: ObservableObject {
     @Published var dests: [( index: Int, name: String)] = []
+    @Published var current: Int = 0
     
     private var client = MIDIClientRef()
     private var outputPort = MIDIPortRef()
@@ -65,6 +64,7 @@ class MidiManager: ObservableObject {
         }
         
         endpoint = MIDIGetDestination(id)
+        current = id
     }
 
     func printDestinations() {

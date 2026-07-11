@@ -261,7 +261,7 @@ export abstract class WCallbacks {
         if (isMidiNote(def)) return this.registerNote(def, cb)
         if (isMidiCC(def)) return this.registerCC(def, cb)
         if (isOSC(def)) return this.registerOSC(def, cb)
-        throw new Error("unsupported properties")
+        throw new Error("unsupported properties " + JSON.stringify(def))
     }
 
     unregister(id: string, def: MidiNoteProperties | MidiCCProperties | osc) {
@@ -269,7 +269,7 @@ export abstract class WCallbacks {
         if (isMidiNote(def)) return this.unregisterNote(id, def)
         if (isMidiCC(def)) return this.unregisterCC(id, def)
         if (isOSC(def)) return this.unregisterOSC(id, def)
-        throw new Error("unsupported properties")
+        throw new Error("unsupported properties " + JSON.stringify(def))
     }
 
     send(def: MidiNoteProperties | MidiCCProperties | osc, v: number) {
@@ -338,7 +338,7 @@ export abstract class WCallbacks {
             this.extInput(msg);
             return
         }
-        throw new Error("unsupported properties")
+        throw new Error("unsupported properties " + JSON.stringify(def))
     }
 
     private runCallbacks(map: CallbackMap<ReceiveDataCallback>, value: number) {

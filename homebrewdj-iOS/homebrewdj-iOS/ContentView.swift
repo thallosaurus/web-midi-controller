@@ -7,30 +7,15 @@
 
 import SwiftUI
 
-/*
- "output": "midi",
- "channel": 1,
- "label": "test",
- "mode": "absolute",
- "type": "ccslider",
- "id": NSNull(),
- "vertical": true,
- "cc": 3,
- "value": NSNull()
- 
- "type": "notebutton",
- "output": "midi",
- "channel": 1,
- "label": "test btn",
- "mode": "trigger",
- "id": NSNull(),
- "note": 60,
- "value": NSNull()
- */
+enum AppScreen {
+    case home
+    case Overlay(OverlayStruct)
+    case settings
+}
 
 struct WidgetStruct: Codable {
     var id: String?
-    var type: String
+    let type: String
     var vert: [WidgetStruct]?
     var horiz: [WidgetStruct]?
     var grid: [WidgetStruct]?
@@ -52,47 +37,45 @@ struct OverlayStruct: Codable {
     var program: String?
     var style: String?
     var cells: [WidgetStruct]
-    //var cells: [String: Any]
 }
 
-let defaultOverlay: [String: Any] = [
-    "id": "test",
-    "name": "test overlay",
-        "channel": NSNull(),
-        "program": NSNull(),
-        "style": "",
-        "cells": [
-            [
-                "type": "vert-mixer",
-                "id": NSNull(),
-                "vert": [
-                    [
-                        "output": "midi",
-                        "channel": 1,
-                        "label": "test",
-                        "mode": "absolute",
-                        "type": "ccslider",
-                        "id": NSNull(),
-                        "vertical": true,
-                        "cc": 3,
-                        "value": NSNull()
-                    ],
-                    [
-                        "type": "notebutton",
-                        "output": "midi",
-                        "channel": 1,
-                        "label": "test btn",
-                        "mode": "trigger",
-                        "id": NSNull(),
-                        "note": 60,
-                        "value": NSNull()
-                    ]
-                ]
-            ]
-        ]
-]
+let dSlider = WidgetStruct(type: "ccslider", output: "midi", channel: 1, label: "test", mode: "absolute", vertical: true, cc: 3)
+let dNote = WidgetStruct(type: "notebutton", output: "midi", channel: 1, label: "test", mode: "trigger", note: 60)
+let dVert = WidgetStruct(type: "vert-mixer", vert: [dSlider, dNote])
+let dOverlay = OverlayStruct(id: "test", name: "test overlay", cells: [dVert])
 
 struct ContentView: View {
+    let midi = MidiManager()
+    
+    @State private var screen: AppScreen = .home
+    @State private var selectedDestination = 0
+    
+    var body: some View {
+        switch screen {
+        case .home:
+            HomeView(onOpen: {
+                screen = .Overlay(dOverlay)
+            }, onSettingsOpen: {
+                screen = .settings
+            })
+        case .Overlay(let o):
+            OverlayView(midi: midi, overlay: o, onBack: {
+                screen = .home
+            })
+            
+        case .settings:
+            VStack {
+                List {
+                    Section("Output") {
+                        MidiDestinationPicker(midiManager: midi, selectedDestination: $selectedDestination)
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct ContentViewOld: View {
     let midi = MidiManager()
     
     @State private var selectedDestination = 0
@@ -105,13 +88,10 @@ struct ContentView: View {
                         MidiDestinationPicker(midiManager: midi, selectedDestination: $selectedDestination)
                     }
                     NavigationLink("test") {
-                        OverlayView(midi: midi, overlay: defaultOverlay)
-                            .navigationTitle("test overlay")
+                        
                     }
                 }
-                
             }
-            
         }
         .onAppear {
             midi.printDestinations()

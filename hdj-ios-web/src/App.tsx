@@ -89,7 +89,9 @@ function App() {
       setOverlay(json as Overlay)
     };
 
-    callbacks.current.sender?.sendReady();
+    //setTimeout(() => {
+      callbacks.current.sender?.sendReady();
+    //}, 10000)
   }, [])
 
   return (

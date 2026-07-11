@@ -10,23 +10,43 @@ import WebKit
 
 struct OverlayView: View {
     let midi: MidiManager
-    let overlay: [String: Any]
+    let overlay: OverlayStruct
+    let onBack: () -> Void
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
             WebView(midiManager: midi, overlay: overlay)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
+                .padding()
+            
+            HStack {
+                Button(action: onBack) {
+                    HStack {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                }
+                Spacer()
+                Text(overlay.name)
+                    .bold()
+                Spacer()
+                Menu("Menu") {
+                    Menu("Output") {
+                        ForEach(midi.destinations(), id: \.index) { destination in
+                            Text(destination.name)
+                                .tag(destination.index)
+                        }
+                    }
+                }
+            }
+            .padding()
         }
-        .background(
-            //DisableBackSwipe()
-        )
-        .navigationBarBackButtonHidden(false)
     }
 }
 
 struct WebView: UIViewRepresentable {
     let midiManager: MidiManager
-    let overlay: [String: Any]
+    let overlay: OverlayStruct
     
     func makeCoordinator() -> Coordinator {
         Coordinator(manager: midiManager)
@@ -62,7 +82,7 @@ struct WebView: UIViewRepresentable {
             )
         }
 
-        context.coordinator.sendOverlay(json: overlay)
+        //context.coordinator.sendOverlay(json: overlay)
         context.coordinator.overlay = overlay
         //context.coordinator.midiManager = midiManager
         return webView
@@ -73,27 +93,33 @@ struct WebView: UIViewRepresentable {
     class Coordinator: NSObject, WKScriptMessageHandler {
         //var manager: MidiManager =
         var webView: WKWebView?
-        var overlay: [String: Any]?
+        var overlay: OverlayStruct?
         let midiManager: MidiManager
         
         init(manager: MidiManager) {
             midiManager = manager
         }
         
-        func sendOverlay(json: [String: Any?]) {
-            guard let d = try? JSONSerialization.data(withJSONObject: json),
+        func sendOverlay(overlay: OverlayStruct) {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            guard let data = try? encoder.encode(overlay) else {
+                print("invalid json")
+                return
+            }
+            
+            let str = String(data: data, encoding: .utf8)!
+            
+/*            guard let d = try? JSONSerialization.data(withJSONObject: json),
                   let j = String(data: d, encoding: .utf8)
             else {
                 print("invalid")
                 return
-            }
+            }*/
             
-            print(j)
+            print(str)
             
-            self.webView?.evaluateJavaScript(
-                """
-                window.nativeOverlay((\(j)));
-                """
+            self.webView?.evaluateJavaScript("window.nativeOverlay((\(str)))"
             )
         }
         
@@ -110,21 +136,19 @@ struct WebView: UIViewRepresentable {
                        guard let overlay else {
                            return
                        }
-                       sendOverlay(json: overlay)
-                       break
+                       sendOverlay(overlay: overlay)
+                       
                    case "noteOn":
                        let channel = data["channel"]
                        let velocity = data["sub"]
                        let note = data["main"]
                        midiManager.noteOn(channel: uint8(channel), note: uint8(note), velocity: uint8(float(velocity) * 127))
-                       break
                        
                    case "noteOff":
                        let channel = data["channel"]
                        let velocity = data["sub"]
                        let note = data["main"]
                        midiManager.noteOff(channel: uint8(channel), note: uint8(note), velocity: uint8(float(velocity) * 127))
-                       break
                        
                    case "cc":
                        let cc = data["main"]
@@ -132,9 +156,7 @@ struct WebView: UIViewRepresentable {
                        let value = data["sub"]
                        
                        midiManager.sendCC(channel: uint8(channel), controller: uint8(cc), value: uint8(float(value) * 127))
-                       break
-                       
-                
+
                    default:
                        print("unknown action")
                        break
