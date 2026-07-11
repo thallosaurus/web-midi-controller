@@ -154,6 +154,7 @@ struct WebView: UIViewRepresentable {
                        let cc = data["main"]
                        let channel = data["channel"]
                        let value = data["sub"]
+                       print(uint8(float(value) * 127))
                        
                        midiManager.sendCC(channel: uint8(channel), controller: uint8(cc), value: uint8(float(value) * 127))
 

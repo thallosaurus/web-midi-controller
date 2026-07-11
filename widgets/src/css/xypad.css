@@ -31,7 +31,7 @@
 }
 
 .xypad .label {
-    color: white;
+    color: var(--font);
     font-family: monospace;
     border: none;
 }

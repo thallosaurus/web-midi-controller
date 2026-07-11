@@ -39,7 +39,7 @@ struct OverlayStruct: Codable {
     var cells: [WidgetStruct]
 }
 
-let dSlider = WidgetStruct(type: "ccslider", output: "midi", channel: 1, label: "test", mode: "absolute", vertical: true, cc: 3)
+let dSlider = WidgetStruct(type: "ccslider", output: "midi", channel: 1, label: "test", mode: "absolute", vertical: false, cc: 3)
 let dNote = WidgetStruct(type: "notebutton", output: "midi", channel: 1, label: "test", mode: "trigger", note: 60)
 let dVert = WidgetStruct(type: "vert-mixer", vert: [dSlider, dNote])
 let dOverlay = OverlayStruct(id: "test", name: "test overlay", cells: [dVert])
