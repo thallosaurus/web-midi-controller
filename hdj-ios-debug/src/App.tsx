@@ -110,18 +110,7 @@ function App() {
 
   return (
     <>
-      <div style={{
-        display: "flex",
-        height: "100%",
-        width: "100%",
-        flexDirection: "column"
-      }}>
-        {overlay && <OverlayView o={overlay} callbacks={callbacks.current} style={{
-          width: "calc(100% - 2em)",
-          height: "calc(100% - 2em)",
-          padding: "1em"
-        }} />}
-      </div>
+      <h1>Debug</h1>
     </>
   )
 }

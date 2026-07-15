@@ -199,14 +199,15 @@ struct MidiDestinationPicker: View {
 
     var body: some View {
         Picker("MIDI Destination", selection: $selectedDestination) {
-            ForEach(midiManager.destinations(), id: \.index) { destination in
+            ForEach(midiManager.dests, id: \.index) { destination in
+                
                 Text(destination.name)
                     .tag(destination.index)
             }
         }
         .pickerStyle(.menu)
-        .onChange(of: selectedDestination) {
-            midiManager.setEndpoint(id: selectedDestination)
+        .onChange(of: selectedDestination) { _, newVal in
+            midiManager.setEndpoint(id: newVal)
         }
     }
 }

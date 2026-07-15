@@ -69,6 +69,9 @@ struct ContentView: View {
                     Section("Output") {
                         MidiDestinationPicker(midiManager: midi, selectedDestination: $selectedDestination)
                     }
+                    .onAppear {
+                        midi.refreshDestinations()
+                    }
                 }
             }
         }
