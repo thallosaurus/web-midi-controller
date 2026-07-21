@@ -36,8 +36,8 @@
     "npm:@types/react@^19.2.16": "19.2.17",
     "npm:@types/react@^19.2.17": "19.2.17",
     "npm:@vitejs/plugin-legacy@^8.0.2": "8.0.2_terser@5.48.0_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0_@types+node@24.13.3",
-    "npm:@vitejs/plugin-react@^4.4.1": "4.7.0_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0_@types+node@24.13.3_terser@5.48.0",
-    "npm:@vitejs/plugin-react@^4.6.0": "4.7.0_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0_@types+node@24.13.3_terser@5.48.0",
+    "npm:@vitejs/plugin-react@^4.4.1": "4.7.0_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0",
+    "npm:@vitejs/plugin-react@^4.6.0": "4.7.0_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0",
     "npm:@vitejs/plugin-react@^6.0.1": "6.0.3_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0_@types+node@24.13.3_terser@5.48.0",
     "npm:@vitejs/plugin-react@^6.0.2": "6.0.3_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0_@types+node@24.13.3_terser@5.48.0",
     "npm:@vitejs/plugin-react@^6.0.3": "6.0.3_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0_@types+node@24.13.3_terser@5.48.0",
@@ -1366,7 +1366,6 @@
     "@eslint-community/eslint-utils@4.9.1_eslint@9.39.4": {
       "integrity": "sha512-phrYmNiYppR7znFEdqgfWHXR6NCkZEK7hwWDHZUjit/2/U0r6XvkDl0SYnoM51Hq7FhCGdLDT6zxCCOY1hexsQ==",
       "dependencies": [
-        "eslint@9.39.4",
         "eslint-visitor-keys@3.4.3"
       ]
     },
@@ -2037,7 +2036,7 @@
         "vite@8.1.5_@types+node@24.13.3_esbuild@0.28.0_terser@5.48.0"
       ]
     },
-    "@vitejs/plugin-react@4.7.0_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0_@types+node@24.13.3_terser@5.48.0": {
+    "@vitejs/plugin-react@4.7.0_vite@8.1.5__@types+node@24.13.3__esbuild@0.28.0__terser@5.48.0": {
       "integrity": "sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA==",
       "dependencies": [
         "@babel/core",
@@ -3682,11 +3681,6 @@
       ]
     },
     "members": {
-      "clock": {
-        "dependencies": [
-          "jsr:@std/assert@1"
-        ]
-      },
       "definitions": {
         "dependencies": [
           "jsr:@std/assert@1"
