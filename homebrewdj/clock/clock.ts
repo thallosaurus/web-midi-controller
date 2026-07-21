@@ -1,23 +1,6 @@
-import { MidiDriver } from "@hdj/midi-driver/ffi";
+import type { MidiDriver } from "@hdj/midi-driver/ffi";
 import type { MidiMessage } from "@hdj/midi-driver";
-
-interface ControlState {
-  eventName: string
-}
-
-interface TickState {
-  tick: number,
-  timestamp: number,
-  delta: number,
-  //bpm: number
-}
-
-interface PositionState {
-  playing: boolean,
-  tick: number,
-  beat: number,
-  sixteenth: number
-}
+import type { PositionState, TickState, ControlState } from "./payloads.ts";
 
 type BeatEmitterCallback = (payload: PositionState) => void;
 type TickEmitterCallback = (payload: TickState) => void;
@@ -25,7 +8,7 @@ type ControlEmitterCallback = (payload: ControlState) => void;
 
 export const TICK_PER_FOUR_BEAT = 96;
 
-class MidiClock {
+export class MidiClock {
   private driver: MidiDriver
   private clockTick = 0;
   private stopped = true;
@@ -103,11 +86,7 @@ class MidiClock {
     }
   }
 
-  constructor(driver = new MidiDriver({
-    "inputName": "clock test input",
-    "outputName": "clock test output",
-    "useVirtual": true
-  }), bpmWindowSize = TICK_PER_FOUR_BEAT) {
+  constructor(driver: MidiDriver, bpmWindowSize = TICK_PER_FOUR_BEAT) {
     driver.addEventListener(event => {
       //console.log(event.detail);
       this.processClock(event.detail);
@@ -178,12 +157,8 @@ class MidiClock {
   }
 }
 
-const clock = new MidiClock();
+//const clock = new MidiClock();
 
-clock.addBeatListener(console.log);
+//clock.addBeatListener(console.log);
 //clock.addTickListener(console.log);
 //clock.addControlListener(console.log);
-
-Deno.addSignalListener("SIGINT", () => {
-  clock.close();
-});

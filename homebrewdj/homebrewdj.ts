@@ -5,8 +5,7 @@ import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { forwardMidiToServer, forwardWebsocketMessageToPorts, Server } from "./server.ts";
 import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
-//import { MidiMessage } from "../midi-driver/index.ts";
-//import type { MidiMessage } from "@hdj/midi-driver";
+import { MidiClock } from "./clock/clock.ts";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
@@ -19,6 +18,7 @@ interface HomebrewDJConfig {
     dawOutput: string;
     traktorInput: string;
     traktorOutput: string;
+    systemChannel: number;
 }
 
 /**
@@ -125,6 +125,8 @@ export class HomebrewDJControllerOnly {
 
     oscPort: OscDriver;
 
+    clock: MidiClock
+
     constructor(config_path = "./config.json", midiPort = new MidiDriver({
         inputName: "HomebrewDJ Controller Input",
         outputName: "HomebrewDJ Controller Output",
@@ -149,7 +151,7 @@ export class HomebrewDJControllerOnly {
             forwardMidiToServer({
                 t,
                 server: this.server,
-                systemChannel: 16   // move to config somewhere
+                systemChannel: config.systemChannel   // move to config somewhere
             })
         });
 
@@ -158,6 +160,17 @@ export class HomebrewDJControllerOnly {
             console.log("osc payload", msg);
             this.server.broadcast(msg);
         });
+
+        this.clock = new MidiClock(this.midiPort);
+        this.clock.addTickListener(p => {
+            // process ticks for sequencer
+        })
+        this.clock.addBeatListener((p) => {
+            this.server.broadcast({
+                type: "clock",
+                data: p
+            })
+        })
     }
 
     close() {

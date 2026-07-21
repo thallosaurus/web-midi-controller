@@ -5,7 +5,6 @@
         "./homebrewdj",
         "./launchpad-driver",
         "./midi-driver",
-        "./traktor-driver",
-        "./clock"
+        "./traktor-driver"
     ]
 }

@@ -1,3 +1,5 @@
+//import type { ClockPayloads } from "../clock/payloads.ts";
+
 export interface ConnectedPayload {
     type: "connection",
     id: string,
@@ -35,4 +37,34 @@ export interface OscMessagePayload {
     args: Array<any>
 }
 
-export type AllowedPayloads = CCMessagePayload | NoteMessagePayload | OscMessagePayload | ClientNumberPayload | ProgramChangeMessage;
+export interface ClockMessagePayload {
+    type: "clock",
+    data: ClockPayloads
+}
+
+export interface ControlState {
+  eventName: string
+}
+
+export interface TickState {
+  tick: number,
+  timestamp: number,
+  delta: number,
+  //bpm: number
+}
+
+export interface PositionState {
+  playing: boolean,
+  tick: number,
+  beat: number,
+  sixteenth: number
+}
+
+export type ClockPayloads = PositionState | TickState | ControlState;
+
+export type AllowedPayloads = CCMessagePayload
+    | NoteMessagePayload
+    | OscMessagePayload
+    | ClientNumberPayload
+    | ProgramChangeMessage
+    | ClockMessagePayload;
