@@ -1,6 +1,6 @@
 import type { MidiDriver } from "@hdj/midi-driver/ffi";
 import type { MidiMessage } from "@hdj/midi-driver";
-import type { PositionState, TickState, ControlState } from "./payloads.ts";
+import type { PositionState, TickState, ControlState } from "./client/protocol.ts";
 
 type BeatEmitterCallback = (payload: PositionState) => void;
 type TickEmitterCallback = (payload: TickState) => void;
@@ -49,6 +49,7 @@ export class MidiClock {
   private sendControlEvent(eventName: "Start" | "Stop" | "Continue") {
     this.emitter.dispatchEvent(new CustomEvent("control", {
       detail: {
+        type: "control",
         eventName
       }
     }))
@@ -69,6 +70,7 @@ export class MidiClock {
 
   get tickState(): TickState {
     return {
+      type: "tick",
       tick: this.clockTick,
       timestamp: this.lastTickTimestamp,
       delta: this.lastTickDelta,
@@ -79,6 +81,7 @@ export class MidiClock {
   get position(): PositionState {
     const tickInBar = this.clockTick % TICK_PER_FOUR_BEAT;
     return {
+      type: "position",
       playing: !this.stopped,
       tick: tickInBar,
       beat: Math.floor(tickInBar / 24),
@@ -147,7 +150,7 @@ export class MidiClock {
       case "Stop":
         this.stopped = true;
         this.sendControlEvent(ev.type)
-        this.sendBeatEvent();
+        //this.sendBeatEvent();
         this.bpmWindow = [];
         break;
     }

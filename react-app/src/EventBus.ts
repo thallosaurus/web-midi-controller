@@ -14,22 +14,25 @@ export class EventBus extends WCallbacks {
     setProgramChangeHandler(handler: ProgramChangeHandler | null) {
         this.programChange = handler
     }
+
     override extInput(msg: (NoteDelta | CCDelta | OscDelta | PgrmDelta | ClientNumberPayload | ClockMessagePayload)): void {
-        if (msg.type == "pgrm") {
-            //console.log("program change message", msg);
-            if (this.programChange) this.programChange(msg.value)
-            return;
-        }
-        if (msg.type == "clientnumber") {
-            console.log("disabled for now")
-            return;
-        }
+        switch (msg.type) {
+            case "pgrm":
+                if (this.programChange) this.programChange(msg.value)
+                break;
 
-        if (msg.type == "clock") {
-            console.log(msg.data);
-            return;
-        }
+            case "clientnumber":
+                console.log("disabled for now")
+                break;
 
-        super.extInput(msg);
+            case "clock":
+                console.log(msg.data);
+                break;
+            
+            default:
+                super.extInput(msg);
+                break;
+
+        }
     }
 }

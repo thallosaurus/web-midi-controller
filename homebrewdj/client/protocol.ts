@@ -43,21 +43,24 @@ export interface ClockMessagePayload {
 }
 
 export interface ControlState {
-  eventName: string
+    type: "control"
+    eventName: string
 }
 
 export interface TickState {
-  tick: number,
-  timestamp: number,
-  delta: number,
-  //bpm: number
+    type: "tick"
+    tick: number,
+    timestamp: number,
+    delta: number,
+    //bpm: number
 }
 
 export interface PositionState {
-  playing: boolean,
-  tick: number,
-  beat: number,
-  sixteenth: number
+    type: "position",
+    playing: boolean,
+    tick: number,
+    beat: number,
+    sixteenth: number
 }
 
 export type ClockPayloads = PositionState | TickState | ControlState;
