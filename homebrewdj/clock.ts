@@ -82,6 +82,7 @@ export class MidiClock {
     const tickInBar = this.clockTick % TICK_PER_FOUR_BEAT;
     return {
       type: "position",
+      total: Math.floor(this.clockTick / TICK_PER_FOUR_BEAT),
       playing: !this.stopped,
       tick: tickInBar,
       beat: Math.floor(tickInBar / 24),

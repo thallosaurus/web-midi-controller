@@ -59,6 +59,7 @@ export interface PositionState {
     type: "position",
     playing: boolean,
     tick: number,
+    total: number
     beat: number,
     sixteenth: number
 }

@@ -6,6 +6,7 @@ import { forwardMidiToServer, forwardWebsocketMessageToPorts, Server } from "./s
 import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
 import { MidiClock } from "./clock.ts";
+import { StepSequencer } from "./sequencer.ts";
 //import { MidiClock } from "./clock/clock.ts";
 
 /**
@@ -128,6 +129,8 @@ export class HomebrewDJControllerOnly {
 
     clock: MidiClock
 
+    sequencer: StepSequencer;
+
     constructor(config_path = "./config.json", midiPort = new MidiDriver({
         inputName: "HomebrewDJ Controller Input",
         outputName: "HomebrewDJ Controller Output",
@@ -136,6 +139,8 @@ export class HomebrewDJControllerOnly {
         this.midiPort = midiPort
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
+        this.sequencer = new StepSequencer(this.midiPort);
+
         this.server = new Server((msg: AllowedPayloads) => {
             forwardWebsocketMessageToPorts({
                 msg,
@@ -165,8 +170,11 @@ export class HomebrewDJControllerOnly {
         this.clock = new MidiClock(this.midiPort);
         this.clock.addTickListener(p => {
             // process ticks for sequencer
+            //console.log(p);
+            this.sequencer.tick(p);
         })
         this.clock.addControlListener(p => {
+            this.sequencer.control(p);
             this.server.broadcast({
                 type: "clock",
                 data: p
