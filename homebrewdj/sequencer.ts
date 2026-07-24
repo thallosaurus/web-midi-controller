@@ -1,36 +1,91 @@
 import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { ControlState, TickState } from "./client/protocol.ts";
 
-type Step = {
+
+interface SetStep {
+    type: "setStepOnSequence",
+    sequenceId: number,
+    stepId: number,
+    state: number
+}
+
+interface AddSequenceLane {
+    type: "addSequenceLane",
     note: number,
-    velocity?: number,
+    channel: number,
+    length?: number
+}
+
+interface RemoveLastSequenceLane {
+    type: "removeLastSequenceLane"
+}
+
+type MutationActions = SetStep | AddSequenceLane | RemoveLastSequenceLane
+
+type Step = {
+    velocity?: number
     active: boolean
 }
 
-type CachedNote = {
+const KICK = [
+    127, 0, 0, 0,
+    127, 0, 0, 0,
+    127, 0, 0, 0,
+    127, 0, 0, 0,
+]
+
+const SNARE = [
+    0, 0, 0, 0,
+    127, 0, 0, 0,
+    0, 0, 0, 0,
+    127, 0, 0, 0,
+]
+
+const HI_HAT = [
+    0, 0, 127, 0,
+    0, 0, 127, 0,
+    0, 0, 127, 0,
+    0, 0, 127, 0,
+]
+
+function createSteps(pattern: number[] = []) {
+    return pattern.map((v, i) => {
+        return {
+            //note,
+            velocity: v,
+            active: v > 0
+        }
+    })
+}
+
+function createEmptySteps(length = 16): Step[] {
+    const a = new Array(length).fill(0)
+    return createSteps(a)
+}
+
+//const TICKS_PER_STEP = 6;
+
+type Sequence = {
     note: number,
-    velocity: number,
-    channel: number
+    channel: number,
+    steps: Step[]
 }
-
-function createEmptySteps(note: number, length = 16, velocity = 127): Step[] {
-    const s = [];
-
-    for (let i = 0; i < length; i++) {
-        s.push({
-            note,
-            velocity,
-            active: false
-        })
+function createSequence(note = 36, channel = 1, steps = createEmptySteps()): Sequence {
+    return {
+        note,
+        channel,
+        steps
     }
-
-    return s;
 }
-
-const TICKS_PER_STEP = 6;
 
 export class StepSequencer {
-    private steps: Step[] = createEmptySteps(36);
+    //private steps: Step[] = createEmptySteps(36);
+    private sequences: Sequence[] = [
+        createSequence(36, 1, createSteps(KICK)),
+        createSequence(38, 1, createSteps(SNARE)),
+        createSequence(42, 1, createSteps(HI_HAT)),
+    ];
+
     private currentTick: number = 0;
     private currentStep = -1;
 
@@ -42,21 +97,42 @@ export class StepSequencer {
 
     constructor(midiPort: MidiDriver) {
         this.midi = midiPort
-
-        this.activateStep(0)
-        //this.activateStep(2)
-        this.activateStep(4)
-        this.activateStep(8)
-        this.activateStep(12)
-        //console.log(this)
+        console.log(this)
     }
 
-    activateStep(i: number, state = true) {
-        if (i > this.steps.length) {
+    loadSequences(s: Sequence[]) {
+        this.sequences = s;
+    }
+
+    private setStep(s: number, i: number, state = true) {
+        if (s > this.sequences.length) {
+            throw new Error("Sequence Index out of bounds")
+        }
+
+        if (i > this.sequences[s].steps.length) {
             throw new Error("Step Index out of bounds")
         }
 
-        this.steps[i].active = state
+        this.sequences[s].steps[i].active = state
+    }
+
+    mutate(action: MutationActions) {
+        //process actions on the steps
+        switch (action.type) {
+            case "setStepOnSequence":
+                this.setStep(action.sequenceId, action.stepId, action.state > 1)
+                break;
+            case "addSequenceLane":
+                this.sequences = [
+                    ...this.sequences,
+                    createSequence(action.note, action.channel, createEmptySteps(action.length ?? 16))
+                ]
+                break;
+
+            case "removeLastSequenceLane":
+                this.sequences.pop();
+                break;
+        }
     }
 
     tick(t: TickState) {
@@ -84,27 +160,34 @@ export class StepSequencer {
 
     private processTick() {
         //console.log(this.currentStep);
-        const s = Math.floor(this.currentTick / TICKS_PER_STEP) % 16;
+        const s = Math.floor(this.currentTick / 6) % 16;
         if (this.currentStep != s) {
             this.currentStep = s;
-            console.log(this.currentStep);
-            const step = this.steps[s];
-            if (step && step.active) {
-                console.log("playing", step)
-                this.midi.sendMidi({
-                    "type": "NoteOn",
-                    "note": step.note,
-                    "channel": 1,
-                    "velocity": step.velocity ?? 127,
-                })
 
-                this.midi.sendMidi({
-                    "type": "NoteOff",
-                    "note": step.note,
-                    "channel": 1,
-                    "velocity": 0
-                })
+            for (let s = 0; s < this.sequences.length; s++) {
+                const seq = this.sequences[s];
+                const step = seq.steps[this.currentStep];
+                if (step && step.active) {
+                    this.playStep(seq.channel, seq.note)
+                }
             }
         }
+    }
+
+    private playStep(channel: number, note: number) {
+        //console.log("playing", step)
+        this.midi.sendMidi({
+            "type": "NoteOn",
+            "note": note,
+            "channel": channel,
+            "velocity": 127,
+        })
+
+        this.midi.sendMidi({
+            "type": "NoteOff",
+            "note": note,
+            "channel": channel,
+            "velocity": 0
+        })
     }
 }
