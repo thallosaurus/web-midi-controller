@@ -1,7 +1,6 @@
 ﻿using System.Net;
+using Commons.Music.Midi;
 using Haukcode.RtpMidi;
-using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Multimedia;
 
 namespace RtpBridge;
 
@@ -12,15 +11,28 @@ internal static class Program
 
     public static async Task Main(string[] args)
     {
-        ListDevices();
+        var access = MidiAccessManager.Default;
+
+        ListDevices(access);
 
         Console.WriteLine("RTP Bridge starting...");
         await using var s = new RtpMidiSession("My Session CSharp");
         session = s;
 
-        var device = InputDevice.GetByName("Launchpad Pro MK3 LPProMK3 MIDI");
+        /*var device = InputDevice.GetByName("Launchpad Pro MK3 LPProMK3 MIDI");
         device.EventReceived += OnMidiEventReceived;
-        device.StartEventsListening();
+        device.StartEventsListening();*/
+        var inport = access.Inputs.FirstOrDefault(i => i.Name == "Launchpad Pro MK3 LPProMK3 MIDI") ?? access.Inputs.Last();
+        var input = access.OpenInputAsync(inport.Id).Result;
+        input.MessageReceived += async (obj, e) =>
+        {
+            Console.WriteLine($"{e.Timestamp} {e.Start} {e.Length} {e.Data[0].ToString("X")}");
+            if (session is not null)
+            {
+                //Console.WriteLine("sending bytes to session");
+                await session.SendMidiAsync(e.Data);
+            }
+        };
 
         session.MidiReceived.Subscribe(midiBytes =>
         {
@@ -32,7 +44,8 @@ internal static class Program
         {
             // call methods to clean up
             await session.DisconnectAsync();
-            device.Dispose();
+            await input.CloseAsync();
+            //device.Dispose();
         };
 
         try
@@ -45,7 +58,8 @@ internal static class Program
         {
             // graceful
             await session.DisconnectAsync();
-            device.Dispose();
+            await input.CloseAsync();
+            //device.Dispose();
         }
         catch (Exception ex)
         {
@@ -58,24 +72,25 @@ internal static class Program
         }
     }
 
-    private static void ListDevices()
+    private static void ListDevices(IMidiAccess access)
     {
         Console.WriteLine("Input Devices:");
-        foreach (var d in InputDevice.GetAll())
+        foreach (var d in access.Inputs)
         {
             Console.WriteLine($"- {d.Name}");
         }
 
         Console.WriteLine("Output Devices:");
-        foreach (var d in OutputDevice.GetAll())
+        foreach (var d in access.Outputs)
         {
             Console.WriteLine($"- {d.Name}");
         }
     }
 
-    private static async void OnMidiEventReceived(object? sender, MidiEventReceivedEventArgs e)
+    private static async void OnMidiEventReceived(object? sender, MidiEventAction e)
     {
-        var midiDevice = (MidiDevice?)sender;
+        //var midiDevice = (MidiDevice?)sender;
+        /*var midiDevice = (MidiDe)
         if (midiDevice is null)
         {
             Console.Error.WriteLine("midiDriver is null");
@@ -97,7 +112,7 @@ internal static class Program
                 //Console.WriteLine("sending bytes to session");
                 await session.SendMidiAsync(bytes);
             }
-        }
+        }*/
         //session.SendMidiAsync
     }
 }
