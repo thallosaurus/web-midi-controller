@@ -7,7 +7,6 @@ import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
 import { MidiClock } from "./clock.ts";
 import { StepSequencer } from "./sequencer.ts";
-//import { MidiClock } from "./clock/clock.ts";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
