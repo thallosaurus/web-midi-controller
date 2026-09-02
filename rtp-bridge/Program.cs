@@ -36,6 +36,8 @@ internal static class Program
             }
         };
 
+        session.EnableRecoveryJournal = false;
+
         session.MidiReceived.Subscribe(midiBytes =>
         {
             Console.WriteLine($"MIDI: {BitConverter.ToString(midiBytes.ToArray())}");
