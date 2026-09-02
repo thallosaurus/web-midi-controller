@@ -30,7 +30,9 @@ internal static class Program
             if (session is not null)
             {
                 //Console.WriteLine("sending bytes to session");
-                await session.SendMidiAsync(e.Data);
+                var data = e.Data.Take(e.Length).ToArray();
+                await session.SendMidiAsync(data);
+                Console.WriteLine($"SEND {data.Length}: {BitConverter.ToString(data)}");
             }
         };
 
