@@ -31,8 +31,17 @@ internal static class Program
             {
                 //Console.WriteLine("sending bytes to session");
                 var data = e.Data.Take(e.Length).ToArray();
-                await session.SendMidiAsync(data);
-                Console.WriteLine($"SEND {data.Length}: {BitConverter.ToString(data)}");
+                try
+                {
+
+                    await session.SendMidiAsync(data);
+                    Console.WriteLine($"SEND {data.Length}: {BitConverter.ToString(data)}");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error: {ex}");
+
+                }
             }
         };
 
@@ -58,9 +67,10 @@ internal static class Program
             Console.WriteLine("Running.");
             await Task.Delay(Timeout.Infinite);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
             // graceful
+            Console.Error.WriteLine($"Error: {ex}");
             await session.DisconnectAsync();
             await input.CloseAsync();
             //device.Dispose();
