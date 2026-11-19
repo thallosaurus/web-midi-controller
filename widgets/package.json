@@ -1,5 +1,6 @@
 {
   "name": "@hdj/widgets",
+  "private": true,
   "version": "0.2.2",
   "license": "MIT",
   "main": "./dist/index.es.js",
@@ -8,12 +9,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "build:diagram": "tsuml2 --glob './src/**/*.(ts|tsx)'"
   },
   "exports": {
     ".": {
-      "import": "./dist/index.es.js",
-      "types": "./dist/src/index.d.ts"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/index.es.js"
     },
     "./style.css": "./src/style.css"
   },
@@ -26,6 +28,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-legacy": "^8.0.2",
     "@vitejs/plugin-react": "^6.0.2",
+    "tsuml2": "^0.17.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.16",
     "vite-plugin-dts": "^5.0.2"

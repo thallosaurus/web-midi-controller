@@ -7,7 +7,9 @@
         "homebrewdj",
         "midi-driver",
         "definitions",
-        "overlay-editor"
+        "overlay-editor",
+        "playground",
+        "hdj-ios-web"
     ],
     "dependencies": {
         "node-osc": "^11.6.0"

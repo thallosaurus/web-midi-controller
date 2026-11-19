@@ -1,37 +1,27 @@
-import { Overlay } from "@hdj/definitions";
-import { WebsocketClient, AllowedPayloads, WebsocketMessageCallback, ConnectedPayload } from "@hdj/homebrewdj-web-client";
-import { Outgoing, PgrmDelta, WCallbacks } from "@hdj/widgets";
+import { WebsocketClient, AllowedPayloads, ConnectedPayload } from "@hdj/homebrewdj-web-client";
 import { createContext, useState, useContext, useRef, ReactNode, useEffect } from "react";
+import { EventBus } from "./EventBus";
+import { OverlayManager } from "./OverlayManager";
 
-type ProgramChangeHandler = (n: number) => void
-
-/** Connects widget value callbacks to the WebSocket sender and program selection. */
-export class EventBus extends WCallbacks {
-    sender: Outgoing | null = null;
-    programChange: (ProgramChangeHandler) | null = null;
-
-    /** Sets the outgoing transport used to send widget messages. */
-    setSender(sender: Outgoing | null) {
-        this.sender = sender;
-    }
-
-    /** Sets the handler that receives program or client selection changes. */
-    setProgramChangeHandler(handler: ProgramChangeHandler | null) {
-        this.programChange = handler
-    }
+export const OverlayContext = createContext<OverlayManager>(new OverlayManager());
+export function useOverlayContext() {
+    const ctx = useContext(OverlayContext);
+    if (!ctx) throw new Error("no overlaycontext loaded")
+    return ctx;
 }
+
+export const EventBusContext = createContext<EventBus>(new EventBus());
 
 type WebsocketContextType = {
     ws: WebsocketClient<AllowedPayloads>,
     bus: EventBus,
     connectionState: ConnectionState,
     connectionId: string | null,
-    clientId: number,
+    clientId: number | null,
+    //setProgramChangeHandler: (handler: ProgramChangeHandler | null) => void,
     connect: (uri: URL) => Promise<void>;
     disconnect: () => void;
 }
-
-export const EventBusContext = createContext<EventBus>(new EventBus());
 export const WebsocketContext = createContext<WebsocketContextType | null>(null);
 /** Returns the active WebSocket context or throws when no provider is mounted. */
 export function useWebsocketContext() {
@@ -46,27 +36,32 @@ enum ConnectionState {
     Online = "connected"
 }
 
-
-/** Owns the WebSocket client and exposes connection state and widget callbacks. */
 export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
-    
+
     const [connectionId, setConnectionId] = useState<string | null>(null);
-    const [clientId, setClientId] = useState<number>(0);
+    const [clientId, setClientId] = useState<number | null>(null);
     const [connectionState, setConnectionState] = useState(ConnectionState.Offline);
+    const overlays = useContext(OverlayContext);
     const bus = useContext(EventBusContext);
+
     const wsRef = useRef(new WebsocketClient<AllowedPayloads>((id: string, msg: AllowedPayloads) => {
-        if (msg.type == "clientnumber") {
-            setClientId(msg.clientNumber);
-        } else {
-            bus.extInput(msg);
-        }
+        //console.log("wsRef", msg);
+        //if (msg.type == "clientnumber") {
+        //setClientId(msg.clientNumber);
+        bus.extInput(msg);
+        //}
     }))
     useEffect(() => {
         bus.setSender(wsRef.current);
-        bus.setProgramChangeHandler(setClientId)
+
+        //bus.setProgramChangeHandler((n) => console.log("switching to ", n))
+        bus.setProgramChangeHandler(n => {
+            overlays.setByProgramId(n);
+        });
         return () => {
             bus.setSender(null);
-            bus.setProgramChangeHandler(null)
+            bus.setProgramChangeHandler(null);
+            //bus.setProgramChangeHandler(null)
         }
     }, [])
 
@@ -76,6 +71,9 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
         connectionId,
         connectionState,
         clientId,
+        /*setProgramChangeHandler: (handler: ProgramChangeHandler | null) => {
+            bus.setProgramChangeHandler(handler);
+        },*/
         connect: async (uri) => {
             setConnectionState(ConnectionState.Connecting);
             await new Promise((res, rej) => {
@@ -85,12 +83,18 @@ export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
                         setConnectionId(p.id)
                         setClientId(p.clientNumber)
                         console.log(p);
-                        setConnectionState(ConnectionState.Online);
-                        res(p.id)
+                        fetch("/overlays").then(oo => {
+                            return oo.json();
+                        }).then(oo => {
+                            overlays.applyOverlays(oo)
+                            setConnectionState(ConnectionState.Online);
+                            res(p.id)
+                        })
                     },
                     close: () => {
                         setConnectionId(null);
                         setConnectionState(ConnectionState.Offline);
+                        setClientId(null)
                         rej();
                     }
                 })

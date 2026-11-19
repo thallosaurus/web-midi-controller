@@ -50,17 +50,11 @@ const stringToElement = (d: Widget, k: string) => {
   };
 
 }
-/* export function SingleLayout({ def }: { def: Widget }) {
-
-  return <>
-    {stringToElement(def, uuid())}
-  </>
-} */
 
 /** Renders one widget definition as a React element. */
 export function WidgetCell({ def, k }: { def: Widget, k?: string }) {
   return <>
-    {stringToElement(def, def.id)}
+    {stringToElement(def, k)}
   </>
 }
 
@@ -72,11 +66,6 @@ export function SingleWidget({ children }: { children: Widget[] }) {
       return <WidgetCell def={def} k={k} />
     })}
   </>
-}
-
-/** Logs a widget value for local callback diagnostics. */
-function testCallback(def: any, v: number) {
-  console.log(def, v);
 }
 
 export interface WidgetProperties<T> {

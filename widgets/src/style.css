@@ -10,6 +10,20 @@
     --snapback: red;
 }
 
+@media (prefers-color-scheme: light) {
+    :root {
+        --background: white;
+        --font: black;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: black;
+        --font: white;
+    }
+}
+
 .overlay[data-overlay="view"] > * {
     align-items: center;
     -webkit-user-select: none;

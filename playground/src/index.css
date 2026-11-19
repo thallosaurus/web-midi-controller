@@ -1,0 +1,9 @@
+@keyframes slide-in {
+  from {
+    width: 0em;
+}
+
+to {
+    width: 50em;
+  }
+}

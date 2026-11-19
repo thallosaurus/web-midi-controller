@@ -1,4 +1,5 @@
-import { ButtonMode, CCButtonProperties, CCSliderProperties, GridMixerProperties, HorizontalMixerProperties, NoteButtonProperties, Overlay, RotaryMode, RotarySliderProperties, SliderMode, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { CCSliderProperties, Overlay, VerticalMixerProperties, Widget } from "@hdj/definitions";
+import { createCCSlider, createLaunchpadMatrix, createMidiCCButton, createMidiNoteButton, createRotaries } from "@hdj/widgets";
 
 const TestOscWidget: Widget & CCSliderProperties = {
   output: "osc",
@@ -70,7 +71,7 @@ export const VOLUME_SLIDER_OVERLAY: Overlay = {
 export const XYPAD_PERFORMANCE: Overlay = {
   "id": "xypad-performance",
   "name": "XYPad Performance",
-  program: null,
+  program: 1,
   channel: null,
   style: `#perf-mixer {
     width: 20% !important;
@@ -121,7 +122,7 @@ export const XYPAD_PERFORMANCE: Overlay = {
 export const XYPAD_OVERLAY: Overlay = {
   "id": "fullscreen-xy-pad",
   "name": "Fullscreen XY Pad",
-  "program": 0,
+  "program": null,
   "channel": null,
   "style": null,
   "cells": [
@@ -155,38 +156,6 @@ export const XYPAD_OVERLAY: Overlay = {
   ]
 }
 
-const DEFAULT_MATRIX_MAP = [
-  0, 1, 2, 3, 4, 5, 6, 16,
-  17, 18, 19, 20, 21, 22, 23, 24,
-  32, 33, 34, 35, 36, 37, 38, 39,
-  48, 49, 50, 51, 52, 53, 54, 55,
-  64, 65, 66, 67, 68, 69, 70, 71,
-  80, 81, 82, 83, 84, 85, 86, 87,
-  96, 97, 98, 99, 100, 101, 102, 103,
-  112, 113, 114, 115, 116, 117, 118, 119
-];
-
-const MPC_MATRIX_MAP = [
-  48, 49, 50, 51,
-  44, 45, 46, 47,
-  40, 41, 42, 43,
-  36, 37, 38, 39
-]
-
-/** Creates a MIDI rotary widget definition. */
-function createRotaries(label: string, ch: number, cc: number, mode: RotaryMode, htmlId: string | null = null): RotarySliderProperties & Widget {
-  return {
-    id: htmlId,
-    type: "rotary",
-    output: "midi",
-    cc,
-    channel: ch,
-    mode,
-    label,
-    value: null
-  }
-}
-
 export const ROTARIES_TEST: Overlay = {
   name: "Rotaries Test",
   channel: null,
@@ -198,29 +167,6 @@ export const ROTARIES_TEST: Overlay = {
     createRotaries("test", 1, 2, "relative"),
     createRotaries("test", 1, 3, "relative"),
   ],
-}
-
-/** Creates the four-by-four MIDI note matrix layout. */
-function createMPCMatrix(ch: number, htmlId = null): Widget & GridMixerProperties {
-  return createMatrix(ch, 4, 4, MPC_MATRIX_MAP, htmlId);
-}
-
-/** Creates the eight-by-eight Launchpad MIDI note matrix layout. */
-function createLaunchpadMatrix(ch: number, htmlId = null): Widget & GridMixerProperties {
-  return createMatrix(ch, 8, 8, DEFAULT_MATRIX_MAP, htmlId);
-}
-
-/** Builds a MIDI grid widget from dimensions and a note mapping. */
-function createMatrix(ch: number, w: number, h: number, a = DEFAULT_MATRIX_MAP, htmlId = null): GridMixerProperties & Widget {
-  return {
-    "id": htmlId,
-    "type": "grid-mixer",
-    "h": h,
-    "w": w,
-    "grid": a.map((v) => {
-      return createMidiNoteButton("", ch, v, "trigger")
-    })
-  }
 }
 
 export const MATRIX_OVERLAY: Overlay = {
@@ -251,53 +197,11 @@ export const MIDI_TEST_OVERLAY: Overlay = {
   ],
 };
 
-/** Creates a MIDI control-change slider widget definition. */
-function createCCSlider(label: string, channel: number, cc: number, mode: SliderMode, vertical: boolean, htmlId: string | null = null): CCSliderProperties & Widget {
-  return {
-    id: htmlId,
-    type: "ccslider",
-    output: "midi",
-    cc,
-    channel,
-    label,
-    mode,
-    vertical,
-    value: null,
-  }
-}
-
-/** Creates a MIDI note button widget definition. */
-function createMidiNoteButton(label: string, channel: number, note: number, mode: ButtonMode, htmlId: string | null = null): NoteButtonProperties & Widget {
-  return {
-    id: htmlId,
-    type: "notebutton",
-    output: "midi",
-    channel,
-    note,
-    label,
-    mode
-  }
-}
-
-/** Creates a MIDI control-change button widget definition. */
-function createMidiCCButton(label: string, channel: number, cc: number, mode: ButtonMode, htmlId: string | null = null): CCButtonProperties & Widget {
-  return {
-    id: htmlId,
-    type: "ccbutton",
-    output: "midi",
-    channel,
-    cc,
-    value: null,
-    label,
-    mode
-  }
-}
-
 export const ABLETON_OVERLAY: Overlay = {
   "id": "ableton_performance",
   "name": "Ableton Performance",
   "channel": null,
-  program: null,
+  "program": 0,
   style: `
   #ableton_performance #returns {
     height: 70% !important;

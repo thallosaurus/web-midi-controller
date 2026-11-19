@@ -1,10 +1,10 @@
-import { randomUUID, UUID } from "node:crypto";
-import { Router, Context, Application } from "oak";
-import { AllowedPayloads } from "./client/protocol.ts";
-import { StaticAssets } from "./static.ts";
-import { CCPayload, MidiMessage } from "@hdj/midi-driver";
-import { MidiDriver } from "@hdj/midi-driver/ffi";
-import { OscDriver } from "./osc.ts";
+import { randomUUID, type UUID } from "node:crypto";
+import { Router, type Context, Application } from "oak";
+import type { AllowedPayloads } from "./client/protocol.ts";
+import { OverlayHandler, StaticAssets, StaticHandler } from "./static.ts";
+import type { CCPayload, MidiMessage } from "@hdj/midi-driver";
+import type { MidiDriver } from "@hdj/midi-driver/ffi";
+import type { OscDriver } from "./osc.ts";
 
 //const isProgramChangeBank(msg: MidiMessage): def is 
 
@@ -33,19 +33,6 @@ export const isClientSelectorSub = (t: MidiMessage): boolean => {
 }
 
 /**
- * Serves the web application's static assets.
- *
- * @param context Oak request context.
- */
-const StaticHandler = async (context: Context) => {
-    //console.log(new URL(StaticAssets, import.meta.url).pathname)
-    await context.send({
-        root: new URL(StaticAssets, import.meta.url).pathname,
-        index: "index.html",
-    })
-}
-
-/**
  * Registers WebSocket event handlers for a newly connected client.
  *
  * @param clients Active client registry.
@@ -53,17 +40,21 @@ const StaticHandler = async (context: Context) => {
  * @param callback Message handler invoked for incoming payloads.
  * @returns Unique identifier assigned to the connection.
  */
-const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callback: HandlerCallback<T>) => {
+const WebsocketHandler = <T>(server: Server<T>, ws: WebSocket, callback: HandlerCallback<T>) => {
     const id = randomUUID();
 
-    ws.addEventListener("open", (ev) => {
+    ws.addEventListener("open", (_ev) => {
         console.log("new websocket connection with id", id);
+        server.clients.map.set(id, { ws, clientNumber: server.clients.nextClientNumber });
+
+        const clientNumber = server.clientSelector.addClient(id);
         ws.send(JSON.stringify({
             type: "connection",
             id,
-            clientNumber: clients.nextClientNumber
+            clientNumber
         }))
-        clients.nextClientNumber++;
+        //console.log(server.clientSelector);
+        //clients.nextClientNumber++;
         //console.log(clients);
     })
 
@@ -74,12 +65,13 @@ const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callbac
 
     ws.addEventListener("error", (v) => {
         console.log("error", (v as ErrorEvent).error);
-        clients.map.delete(id);
+        server.clients.map.delete(id);
     })
 
-    ws.addEventListener("close", (ev) => {
+    ws.addEventListener("close", (_ev) => {
         //console.log("close", id)
-        clients.map.delete(id);
+        server.clients.map.delete(id);
+        server.clientSelector.removeClient(id)
     })
 
     return id;
@@ -91,7 +83,7 @@ const WebsocketHandler = <T>(clients: WebSocketClientMap, ws: WebSocket, callbac
  * @param clients Active client registry.
  * @param callback Message handler invoked for incoming payloads.
  */
-export const WebsocketRouter = <T>(clients: WebSocketClientMap, callback: HandlerCallback<T>) => {
+export const WebsocketRouter = <T>(server: Server<T>, callback: HandlerCallback<T>) => {
     const router = new Router();
     router.get("/ws", (ctx) => {
         if (!ctx.isUpgradable) {
@@ -99,13 +91,14 @@ export const WebsocketRouter = <T>(clients: WebSocketClientMap, callback: Handle
         }
 
         const ws = ctx.upgrade();
-        const id = WebsocketHandler(clients, ws, callback);
-        clients.map.set(id, { ws, clientNumber: clients.nextClientNumber });
+        WebsocketHandler(server, ws, callback);
         //clients.nextClientNumber++;
     })
     router.get("/", StaticHandler)
+    router.get("/overlays", OverlayHandler)
     router.get("/manifest.json", StaticHandler)
     router.get("/assets/:file", StaticHandler)
+    router.get("/icons/:file", StaticHandler)
 
     return router;
 }
@@ -114,6 +107,76 @@ interface ListenOptions {
     port?: number,
     hostname?: string,
     systemChannel?: number
+}
+
+// ableton sends bank as cc 0,
+// sub as cc 32
+// and the program as programchange
+class ClientSelector {
+    assignments: Map<number, UUID> = new Map();
+    currentClientBank = 0;
+    currentClientSub = 0;
+
+    get clientBank() {
+        return this.currentClientBank
+    }
+
+    get clientSub() {
+        return this.currentClientSub
+    }
+
+    // gets incremented if client gets added
+    //nextClientNumber = 0;
+
+    setBank(n: number) {
+        this.currentClientBank = n;
+    }
+
+    setSub(n: number) {
+        this.currentClientSub = n;
+    }
+
+    // brittle, but ok for now
+    addClient(id: UUID): number | null {
+        for (let i = 0; i < 128; i++) {
+            if (this.assignments.has(i)) continue;
+            this.assignments.set(i, id);
+            return i;
+        }
+
+        throw new Error("no new client slots available")
+//        this.assignments.set(this.nextClientNumber, id)
+//        this.nextClientNumber++;
+    }
+
+    removeClient(id: UUID) {
+        this.findClientByUUID(id, (n) => {
+            this.assignments.delete(n);
+        })
+    }
+    private findClientByUUID(id: UUID, fn: (n: number) => void) {
+        for (const [index, uuid] of this.assignments.entries()) {
+            if (uuid === id) {
+                fn(index);
+                return;
+            }
+        }
+        throw new Error(`${id} not found`)
+    }
+
+    reorderId(newIndex: number, id: UUID) {
+        if (this.assignments.has(newIndex)) throw new Error("newIndex is already taken")
+        this.removeClient(id);
+        this.assignments.set(newIndex, id);
+    }
+
+    getIndex(num: number): UUID | null {
+        if (this.assignments.has(num)) {
+            return this.assignments.get(num)!
+        } else {
+            return null;
+        }
+    }
 }
 
 /**
@@ -126,7 +189,9 @@ export class Server<T = AllowedPayloads> {
     controller: AbortController;
     app: Application;
     clients: WebSocketClientMap = { map: new Map<UUID, { ws: WebSocket, clientNumber: number }>(), nextClientNumber: 0 };
-    selectedClientNumber = 0;
+
+    clientSelector = new ClientSelector();
+    //selectedClientNumber = 0;
 
     // 1-index based system channel
     //private systemMidiChannel: number;
@@ -145,7 +210,7 @@ export class Server<T = AllowedPayloads> {
 
         //this.systemMidiChannel = listenOptions.systemChannel ?? 16;
 
-        const ws = WebsocketRouter(this.clients, callback);
+        const ws = WebsocketRouter(this, callback);
         this.app.use(ws.routes());
         this.app.use(ws.allowedMethods());
         this.app.addEventListener("listen", (e) => {
@@ -161,15 +226,6 @@ export class Server<T = AllowedPayloads> {
         });
     }
 
-    /** Finds the WebSocket associated with a client number, if connected. */
-    getClientByNumber(num: number): WebSocket | null {
-        const found = this.clients.map.values().find((v, i) => {
-            return v.clientNumber == num
-        });
-        if (found) return found.ws;
-        return null;
-    }
-
     /**
      * Sends a message to all connected WebSocket clients.
      *
@@ -182,15 +238,22 @@ export class Server<T = AllowedPayloads> {
         });
     }
 
-    /** Serializes a payload and sends it to one WebSocket connection. */
+    private sendToId(id: UUID, msg: T) {
+        const i = this.clients.map.get(id);
+        if (i) this.sendToSocket(i.ws, msg);
+    }
+
     private sendToSocket(client: WebSocket, msg: T) {
         client.send(JSON.stringify(msg));
     }
 
     /** Sends a payload to the connected client with the given number. */
     sendToClient(num: number, msg: T) {
-        const client = this.getClientByNumber(num);
-        if (client) this.sendToSocket(client, msg);
+        //const client = this.getClientByNumber(num);
+        const i = this.clientSelector.getIndex(num);
+        if (i) {
+            this.sendToId(i, msg);
+        }
     }
 
     /**
@@ -204,12 +267,14 @@ export class Server<T = AllowedPayloads> {
     processSystemMessage(msg: MidiMessage): boolean {
         if (isClientSelectorBank(msg)) {
             const m = msg as CCPayload;
-            this.selectedClientNumber = m.value;
+            this.clientSelector.setBank(m.value);
+            //this.selectedClientNumber = m.value;
             console.log(this);
             return false;
         }
         if (isClientSelectorSub(msg)) {
             const m = msg as CCPayload;
+            this.clientSelector.setSub(m.value);
             //this.selectedClientNumber = m.value;
             return false;
         }
@@ -250,7 +315,7 @@ export const forwardWebsocketMessageToPorts = ({ msg, server, midiPort, oscPort 
                     velocity: msg.velocity
                 };
 
-                if (msg.velocity > 64) {
+                if (msg.velocity > 0) {
                     midiPort.sendMidi({
                         type: "NoteOn",
                         ...m
@@ -309,13 +374,9 @@ export const forwardMidiToServer = ({ t, server, systemChannel }: MidiForwardOpt
             break;
 
         case "ProgramChange":
-            //console.log(t);
-            // ableton sends bank as cc 0,
-            // sub as cc 32
-            // and the program as programchange
             {
                 if (isSystemMessage(t, systemChannel)) {
-                    server.sendToClient(server.selectedClientNumber, {
+                    server.sendToClient(server.clientSelector.clientBank, {
                         type: "pgrm",
                         value: t.value
                     });

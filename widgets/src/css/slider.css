@@ -16,7 +16,7 @@
 .ccslider button {
   width: 100%;
   background-color: transparent;
-  color: white;
+  color: var(--font);
   font-size: 1em;
   margin: .3em;
   font-family: monospace;

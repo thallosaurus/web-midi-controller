@@ -51,21 +51,21 @@ type OSCCallbackMap = Map<string, Map<string, OSCReceiveDataCallback>>;
 
 export type DeltaMessages = NoteDelta | CCDelta | OscDelta;
 
-interface NoteDelta {
+export interface NoteDelta {
     type: "note",
     channel: number,
     note: number,
     velocity: number
 }
 
-interface CCDelta {
+export interface CCDelta {
     type: "cc",
     channel: number,
     cc: number,
     value: number
 }
 
-interface OscDelta {
+export interface OscDelta {
     type: "osc"
     address: string,
     args: Array<any>
@@ -88,18 +88,15 @@ interface InternalCallbackMap {
     oscCallbackMap: OSCCallbackMap;
 }
 
-/** Checks whether a widget definition describes a MIDI note. */
-function isMidiNote(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiNoteProperties {
+export function isMidiNote(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiNoteProperties {
     return (def.output === "midi" && "note" in def)
 }
 
-/** Checks whether a widget definition describes a MIDI control change. */
-function isMidiCC(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiCCProperties {
+export function isMidiCC(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiCCProperties {
     return (def.output === "midi" && "cc" in def)
 }
 
-/** Checks whether a widget definition describes an OSC output. */
-function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
+export function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
     return (def.output === "osc")
 }
 
@@ -274,7 +271,7 @@ export abstract class WCallbacks {
         if (isMidiNote(def)) return this.registerNote(def, cb)
         if (isMidiCC(def)) return this.registerCC(def, cb)
         if (isOSC(def)) return this.registerOSC(def, cb)
-        throw new Error("unsupported properties")
+        throw new Error("unsupported properties " + JSON.stringify(def))
     }
 
     /** Removes a previously registered callback using its identifier and definition. */
@@ -283,7 +280,7 @@ export abstract class WCallbacks {
         if (isMidiNote(def)) return this.unregisterNote(id, def)
         if (isMidiCC(def)) return this.unregisterCC(id, def)
         if (isOSC(def)) return this.unregisterOSC(id, def)
-        throw new Error("unsupported properties")
+        throw new Error("unsupported properties " + JSON.stringify(def))
     }
 
     /** Sends a normalized widget value as the matching MIDI or OSC message. */
@@ -353,7 +350,7 @@ export abstract class WCallbacks {
             this.extInput(msg);
             return
         }
-        throw new Error("unsupported properties")
+        throw new Error("unsupported properties " + JSON.stringify(def))
     }
 
     /** Delivers a value to every callback in a registered input map. */

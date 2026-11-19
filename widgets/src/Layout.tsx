@@ -21,7 +21,7 @@ export function Panel({ id, type, style, children }: { id: string, type: string,
 export function Vertical({ def, children }: WidgetProperties<Widget & VerticalMixerProperties> & { children: ReactNode }) {
     //return (<div>{Layout(def.vert)}</div>)
     return <Panel id={def.id} type="vert-mixer" style={{
-        flexDirection: "column"
+        flexDirection: "column",
     }}>
         {children}
     </Panel>
@@ -30,7 +30,7 @@ export function Vertical({ def, children }: WidgetProperties<Widget & VerticalMi
 /** Arranges child widgets in a horizontal panel. */
 export function Horizontal({ def, children }: WidgetProperties<Widget & HorizontalMixerProperties> & { children: ReactNode }) {
     return <Panel id={def.id} type="horiz-mixer" style={{
-        flexDirection: "row"
+        flexDirection: "row",
     }}>
         {children}
     </Panel>

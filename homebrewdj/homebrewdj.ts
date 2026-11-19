@@ -5,7 +5,8 @@ import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { forwardMidiToServer, forwardWebsocketMessageToPorts, Server } from "./server.ts";
 import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
-import type { MidiMessage } from "@hdj/midi-driver";
+//import { MidiMessage } from "../midi-driver/index.ts";
+//import type { MidiMessage } from "@hdj/midi-driver";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
@@ -19,7 +20,6 @@ interface HomebrewDJConfig {
     traktorInput: string;
     traktorOutput: string;
 }
-
 
 /**
  * Main application controller.
@@ -65,9 +65,9 @@ export class HomebrewDJTraktorSetup {
                     {
                         const { note, channel, velocity } = msg;
                         if (channel == 1) {
-                            this.deckAAux.sendTraktorMidi(note, velocity > 64);
+                            this.deckAAux.sendTraktorMidi(note, velocity > 0);
                         } else if (channel == 2) {
-                            this.deckBAux.sendTraktorMidi(note, velocity > 64)
+                            this.deckBAux.sendTraktorMidi(note, velocity > 0)
                         }
                     }
                     break;
@@ -122,16 +122,16 @@ export class HomebrewDJTraktorSetup {
 /** Runs the web controller with virtual MIDI and OSC ports, without Traktor setup. */
 export class HomebrewDJControllerOnly {
     server: Server;
-    midiPort = new MidiDriver({
-        inputName: "HomebrewDJ Controller Input",
-        outputName: "HomebrewDJ Controller Output",
-        useVirtual: true
-    });
+    midiPort: MidiDriver;
 
     oscPort: OscDriver;
 
-    /** Loads application settings and starts the server and virtual input/output ports. */
-    constructor(config_path = "./config.json") {
+    constructor(config_path = "./config.json", midiPort = new MidiDriver({
+        inputName: "HomebrewDJ Controller Input",
+        outputName: "HomebrewDJ Controller Output",
+        useVirtual: true
+    })) {
+        this.midiPort = midiPort
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
         this.server = new Server((msg: AllowedPayloads) => {
@@ -153,6 +153,7 @@ export class HomebrewDJControllerOnly {
                 systemChannel: 16   // move to config somewhere
             })
         });
+
         this.oscPort = OscDriver.customHost("127.0.0.1", 8000);
         this.oscPort.addEventListener((msg: OscMessagePayload) => {
             console.log("osc payload", msg);
