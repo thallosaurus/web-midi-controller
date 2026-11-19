@@ -12,3 +12,15 @@ This code was primarily written without AI, but it was used in parts for the doc
 |[homebrewdj](./homebrewdj/)|Endpoint Configuration for HomebrewDJ|
 |[react-app](./react-app/)|Control WebUI for HomebrewDJ|
 |[definitions](./definitions/)|Definitions for the Overlays|
+
+## Quick Start
+Run the following commands in order:
+
+```bash
+cd definitions
+cargo test export_bindings
+cd ../midi-driver
+cargo test export_bindings
+
+
+```
