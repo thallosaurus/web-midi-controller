@@ -10,6 +10,7 @@ import "./index.css"
 import "@hdj/widgets/style.css"
 import { AssignDialog } from "./AssignDialog";
 
+/** Sets up the frontend providers and renders the default overlay view. */
 function App() {
   /*const eventbus = useRef<EventBus>(new EventBus());
   const process = (id: string, msg: AllowedPayloads) => {
@@ -42,6 +43,7 @@ function App() {
   )
 }
 
+/** Manages the active overlay, connection screen and frontend dialogs. */
 function MainView({ defaultOverlay }: { defaultOverlay?: Overlay }) {
   const [showOverlayPicker, setOverlayPicker] = useState(false);
   const [showDiags, setShowDiags] = useState(false);

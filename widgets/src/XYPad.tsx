@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { vibrate } from "./utils";
 import { useWidgetAction } from "./Callbacks";
 
+/** Limits a normalized axis value to the inclusive range from zero to one. */
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
+/** Renders a pointer-driven XY pad with a separate pressed-state output. */
 export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
     const [pressed, setPressed] = useState(false);
     const [valueX, setValueX] = useState(0);
@@ -15,15 +17,18 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
     const targetRef = useRef<HTMLDivElement | null>(null);
     const callbacks = useWidgetAction();
 
+    /** Sends the pad's pressed state through its widget callback. */
     const sendNoteUpdate = (s: boolean) => {
         callbacks.send(def, s ? 1 : 0);
     }
 
+    /** Sends both normalized axis values through their widget callbacks. */
     const sendAxisUpdate = (x, y) => {
         callbacks.send(def.x, x);
         callbacks.send(def.y, y);
     }
 
+    /** Converts pointer coordinates to normalized pad coordinates and sends them. */
     const update = ({ clientX, clientY }) => {
         const rect = targetRef.current.getBoundingClientRect();
 
@@ -35,6 +40,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
         sendAxisUpdate(x, y);
     }
 
+    /** Releases the active pointer and sends the pad's released state. */
     const end = ({ pointerId, target, }) => {
         if (pointerId !== activePointer.current) return;
         const el = target as HTMLDivElement;
@@ -44,6 +50,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
         sendNoteUpdate(false);
     }
 
+    /** Captures a pointer, updates the axes, and marks the pad as pressed. */
     const start = ({ pointerId, target, clientX, clientY }) => {
         if (activePointer.current !== null) return;
         vibrate();
@@ -55,6 +62,7 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
         sendNoteUpdate(true);
     };
 
+    /** Updates axis values while the active pointer moves across the pad. */
     const move = ({ pointerId, clientX, clientY }) => {
         if (pointerId !== activePointer.current) return;
         update({ clientX, clientY });
@@ -105,22 +113,26 @@ export function XYPad({ def }: WidgetProperties<XYPadProperties>) {
     )
 }
 
+/** Renders an XY pad on canvas and draws its axes and pointer marker. */
 export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
     const activePointer = useRef<number | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const state = useRef({ x: 0, y: 0, pressed: false });
     const callbacks = useWidgetAction();
 
+    /** Sends the canvas pad's pressed state through its widget callback. */
     const sendNoteUpdate = (s: boolean) => {
         callbacks.send(def, s ? 1 : 0);
         //setPressed(s);
     }
 
+    /** Sends both normalized axis values through their widget callbacks. */
     const sendAxisUpdate = (x, y) => {
         callbacks.send(def.x, x);
         callbacks.send(def.y, y);
     }
 
+    /** Resizes the canvas backing store and returns its scaled drawing context. */
     const resize = () => {
 
         const canvas = canvasRef.current;
@@ -150,6 +162,7 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
         };
     };
 
+    /** Converts pointer coordinates to normalized axes and redraws the pad. */
     const update = ({ clientX, clientY }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -165,6 +178,7 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
         draw(x, y, state.current.pressed);
     }
 
+    /** Captures a pointer, marks the pad pressed, and updates its position. */
     const start = ({ pointerId, clientX, clientY, target }) => {
 
         if (activePointer.current !== null) return;
@@ -177,6 +191,7 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
 
     };
 
+    /** Updates the pad position while its captured pointer moves. */
     const move = (e: React.PointerEvent<HTMLCanvasElement>) => {
         if (e.pointerId !== activePointer.current) return;
         update({
@@ -186,6 +201,7 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
 
     };
 
+    /** Releases the pointer, clears the pressed state, and redraws the pad. */
     const end = ({ pointerId, target }) => {
         if (pointerId !== activePointer.current) return;
         const el = target as HTMLCanvasElement;
@@ -197,6 +213,7 @@ export function CanvasXYPad({ def }: WidgetProperties<XYPadProperties>) {
 
     };
 
+    /** Draws the pad background, axis guides and current position marker. */
     const draw = (x: number, y: number, pressed: boolean) => {
         const canvas = canvasRef.current;
         if (!canvas) return;

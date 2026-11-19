@@ -1,3 +1,4 @@
+/** Creates a UUID using the browser API, with a local fallback. */
 export function uuid(): string {
   if (crypto && crypto.randomUUID) {
     return crypto.randomUUID()
@@ -6,6 +7,7 @@ export function uuid(): string {
   }
 }
 
+/** Generates a UUID-shaped identifier using random hexadecimal digits. */
 function pseudoUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
     const r = Math.random() * 16 | 0;
@@ -14,6 +16,7 @@ function pseudoUUID(): string {
   });
 }
 
+/** Reads the configured WebSocket endpoint or derives one from the current page. */
 export function getEndpointUrl() {
   let url;
   try {
@@ -25,6 +28,7 @@ export function getEndpointUrl() {
   return url;
 }
 
+/** Returns the configured frontend version, or the default version string. */
 export function getVersion() {
   return import.meta.env.VITE_VERSION ?? "0.0.0";
 }

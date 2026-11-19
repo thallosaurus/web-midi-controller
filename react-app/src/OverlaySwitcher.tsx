@@ -2,6 +2,7 @@ import { Overlay } from "@hdj/definitions";
 import { useRef, useLayoutEffect } from "react";
 import { VOLUME_SLIDER_OVERLAY, VOLUME_SLIDER_OVERLAY_NEW, XYPAD_OVERLAY, MATRIX_OVERLAY, ABLETON_OVERLAY, TRAKTOR_PERFORMANCE, TestOscOverlay, MIDI_TEST_OVERLAY, ROTARIES_TEST, XYPAD_PERFORMANCE } from "./Overlays";
 
+/** Displays the available overlays and reports the user's selection. */
 export function OverlaySwitcher({ showModal, closeSwitcher, setOverlay }: { showModal: boolean, closeSwitcher: () => void, setOverlay: (o: Overlay) => void }) {
   const overlays = useRef([
     VOLUME_SLIDER_OVERLAY_NEW,

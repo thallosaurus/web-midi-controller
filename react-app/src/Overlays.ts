@@ -21,6 +21,7 @@ export const TestOscOverlay: Overlay = {
   cells: [TestOscWidget]
 }
 
+/** Creates a vertical deck panel with a volume slider and mixer cue button. */
 function createDeck(ch: number): Widget & VerticalMixerProperties {
   return {
     id: "volume_deck" + ch,
@@ -172,6 +173,7 @@ const MPC_MATRIX_MAP = [
   36, 37, 38, 39
 ]
 
+/** Creates a MIDI rotary widget definition. */
 function createRotaries(label: string, ch: number, cc: number, mode: RotaryMode, htmlId: string | null = null): RotarySliderProperties & Widget {
   return {
     id: htmlId,
@@ -198,14 +200,17 @@ export const ROTARIES_TEST: Overlay = {
   ],
 }
 
+/** Creates the four-by-four MIDI note matrix layout. */
 function createMPCMatrix(ch: number, htmlId = null): Widget & GridMixerProperties {
   return createMatrix(ch, 4, 4, MPC_MATRIX_MAP, htmlId);
 }
 
+/** Creates the eight-by-eight Launchpad MIDI note matrix layout. */
 function createLaunchpadMatrix(ch: number, htmlId = null): Widget & GridMixerProperties {
   return createMatrix(ch, 8, 8, DEFAULT_MATRIX_MAP, htmlId);
 }
 
+/** Builds a MIDI grid widget from dimensions and a note mapping. */
 function createMatrix(ch: number, w: number, h: number, a = DEFAULT_MATRIX_MAP, htmlId = null): GridMixerProperties & Widget {
   return {
     "id": htmlId,
@@ -246,6 +251,7 @@ export const MIDI_TEST_OVERLAY: Overlay = {
   ],
 };
 
+/** Creates a MIDI control-change slider widget definition. */
 function createCCSlider(label: string, channel: number, cc: number, mode: SliderMode, vertical: boolean, htmlId: string | null = null): CCSliderProperties & Widget {
   return {
     id: htmlId,
@@ -260,6 +266,7 @@ function createCCSlider(label: string, channel: number, cc: number, mode: Slider
   }
 }
 
+/** Creates a MIDI note button widget definition. */
 function createMidiNoteButton(label: string, channel: number, note: number, mode: ButtonMode, htmlId: string | null = null): NoteButtonProperties & Widget {
   return {
     id: htmlId,
@@ -272,6 +279,7 @@ function createMidiNoteButton(label: string, channel: number, note: number, mode
   }
 }
 
+/** Creates a MIDI control-change button widget definition. */
 function createMidiCCButton(label: string, channel: number, cc: number, mode: ButtonMode, htmlId: string | null = null): CCButtonProperties & Widget {
   return {
     id: htmlId,
@@ -323,6 +331,7 @@ export const ABLETON_OVERLAY: Overlay = {
   ]
 };
 
+/** Creates a Traktor deck layout with loop, EQ and transport controls. */
 function createOneDeviceTraktorDeck(channel: number): VerticalMixerProperties & Widget {
   return {
     "type": "vert-mixer",

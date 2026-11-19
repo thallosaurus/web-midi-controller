@@ -6,18 +6,22 @@ import { useWidgetAction } from "./Callbacks";
 
 const MAX_LEVEL = 1.0;
 
+/** Converts a normalized value to a percentage for slider fill styles. */
 const growFactor = (value) => {
     return (value / MAX_LEVEL) * 100 + "%";
 }
 
+/** Creates the fill styles used for a vertically oriented slider. */
 const verticalFillStyle = (value, type: SliderMode) => {
     return { width: growFactor(value), borderRight: `1em solid var(--${type})`, height: "100%", left: 0 }
 }
 
+/** Creates the fill styles used for a horizontally oriented slider. */
 const horizontalFillStyle = (value, type: SliderMode) => {
     return { height: growFactor(value), borderTop: `1em solid var(--${type})`, width: "100%", bottom: 0 }
 }
 
+/** Returns the base CSS styles for a vertical slider. */
 const verticalSliderStyle = () => {
     return {
         width: "100%",
@@ -26,6 +30,7 @@ const verticalSliderStyle = () => {
     } as React.CSSProperties
 }
 
+/** Returns the base CSS styles for a horizontal slider. */
 const horizontalSliderStyle = () => {
     return {
         height: "100%",
@@ -34,6 +39,7 @@ const horizontalSliderStyle = () => {
     } as React.CSSProperties
 }
 
+/** Returns the container styles for a vertical control-change slider. */
 const verticalCCSliderStyle = () => {
     return {
         width: "100%",
@@ -41,6 +47,7 @@ const verticalCCSliderStyle = () => {
     }
 }
 
+/** Returns the container styles for a horizontal control-change slider. */
 const horizontalCCSliderStyle = () => {
     return {
         height: "100%",
@@ -50,6 +57,7 @@ const horizontalCCSliderStyle = () => {
 
 //const horizontal
 
+/** Renders a control-change slider with absolute, relative or snapback behavior. */
 export function Slider({ def }: WidgetProperties<CCSliderProperties>) {
     const [value, setValue] = useState(0);
 
@@ -60,6 +68,7 @@ export function Slider({ def }: WidgetProperties<CCSliderProperties>) {
 
     const callbacks = useWidgetAction();
 
+    /** Sends a normalized value for this slider definition. */
     const send = (v: number) => {
         callbacks.send(def, v);
     }
@@ -72,6 +81,7 @@ export function Slider({ def }: WidgetProperties<CCSliderProperties>) {
         }
     }, [])
 
+    /** Captures a pointer and records the starting coordinates and value. */
     const start = ({ currentTarget, pointerId, clientX, clientY }) => {
         //preventDefault();
         vibrate();
@@ -88,11 +98,13 @@ export function Slider({ def }: WidgetProperties<CCSliderProperties>) {
         update({ target: el, clientY, clientX });
     };
 
+    /** Updates the slider value while its active pointer moves. */
     const move = ({ target, clientY, clientX, pointerId }) => {
         if (pointerId !== activePointer.current) return;
         update({ target, clientY, clientX });
     };
 
+    /** Releases the pointer and resets or updates the slider on release. */
     const end = ({ target, pointerId, clientX, clientY }) => {
         if (pointerId !== activePointer.current) return;
 
@@ -107,6 +119,7 @@ export function Slider({ def }: WidgetProperties<CCSliderProperties>) {
         }
     };
 
+    /** Resets the slider value to zero and sends the reset value. */
     const reset = () => {
         //setValue((def.default_value ?? 0) / 127);
         setValue(0);
@@ -116,6 +129,7 @@ export function Slider({ def }: WidgetProperties<CCSliderProperties>) {
         //this.eventbus!.updateCC(this.prop.channel, this.prop.cc, def.default_value ?? 0);
     };
 
+    /** Computes a normalized slider value from pointer coordinates and mode. */
     const update = ({ target, clientY, clientX }) => {
         const rect = (target as HTMLElement).getBoundingClientRect();
 
