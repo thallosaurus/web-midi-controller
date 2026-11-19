@@ -3,7 +3,7 @@ import type { OscMessagePayload } from "./client/protocol.ts";
 
 function parse(msg: any[]): OscMessagePayload {
     return {
-        type: "oscmsg",
+        type: "osc",
         address: msg[0],
         args: msg.filter((v, i) => {
             return i != 0
