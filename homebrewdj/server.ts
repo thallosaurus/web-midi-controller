@@ -161,6 +161,7 @@ export class Server<T = AllowedPayloads> {
         });
     }
 
+    /** Finds the WebSocket associated with a client number, if connected. */
     getClientByNumber(num: number): WebSocket | null {
         const found = this.clients.map.values().find((v, i) => {
             return v.clientNumber == num
@@ -181,10 +182,12 @@ export class Server<T = AllowedPayloads> {
         });
     }
 
+    /** Serializes a payload and sends it to one WebSocket connection. */
     private sendToSocket(client: WebSocket, msg: T) {
         client.send(JSON.stringify(msg));
     }
 
+    /** Sends a payload to the connected client with the given number. */
     sendToClient(num: number, msg: T) {
         const client = this.getClientByNumber(num);
         if (client) this.sendToSocket(client, msg);
@@ -197,11 +200,7 @@ export class Server<T = AllowedPayloads> {
         this.controller.abort();
     }
 
-    /**
-     * 
-     * @param msg 
-     * @returns true if the processing should continue and forward it to clients, if applicable
-     */
+    /** Processes system-channel selector messages and reports whether forwarding should continue. */
     processSystemMessage(msg: MidiMessage): boolean {
         if (isClientSelectorBank(msg)) {
             const m = msg as CCPayload;
