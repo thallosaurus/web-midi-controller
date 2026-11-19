@@ -1,2 +1,4 @@
 webui
 .deno
+dist/
+docs/
