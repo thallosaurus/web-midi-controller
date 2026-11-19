@@ -12,6 +12,7 @@ interface ConnectRequest {
     close?: () => void
 }
 
+/** Manages a WebSocket connection and dispatches typed messages to callbacks. */
 export class WebsocketClient<T> {
     private ws: WebSocket | null = null
     private _id: string | null = null
@@ -23,10 +24,12 @@ export class WebsocketClient<T> {
     private outCounter = 0
     private inCounter = 0
 
+    /** Returns the identifier assigned by the server, or null before connection. */
     get id() {
         return this._id;
     }
 
+    /** Connects to the endpoint and resolves when the server identifies the client. */
     asyncConnect(endpoint: URL): Promise<ConnectedPayload> {
         return new Promise((open, close) => {
             this.connect({
@@ -37,6 +40,7 @@ export class WebsocketClient<T> {
         })
     }
 
+    /** Closes the active WebSocket connection, if one is open. */
     disconnect() {
         if (isWebsocketConnected(this.ws)) {
             this.ws.close();
@@ -46,6 +50,7 @@ export class WebsocketClient<T> {
         }
     }
 
+    /** Opens a WebSocket and installs handlers for connection and message events. */
     connect({ endpoint, open, close }: ConnectRequest) {
         const ws = new WebSocket(endpoint);
         ws.onopen = (ev) => {
@@ -87,6 +92,7 @@ export class WebsocketClient<T> {
         this.ws = ws;
     }
 
+    /** Creates a client with callbacks for messages and connection identifier changes. */
     constructor(
         handler: WebsocketMessageCallback<T>,
         connectionIdHandler: ((id: string | null) => void) | null = null,
@@ -97,6 +103,7 @@ export class WebsocketClient<T> {
         //handler(ws);
     }
 
+    /** Sends a payload over the open connection with timing and packet metadata. */
     send(data: T) {
         if (isWebsocketConnected(this.ws)) {
             this.ws.send(JSON.stringify({ ...data, "timestamp": performance.now(), packetNum: this.outCounter }))

@@ -7,6 +7,7 @@ import { CanvasXYPad, XYPad } from "./XYPad";
 import { Jogwheel } from "./Jogwheel";
 import { WCallbacks, WidgetActionContext } from "./Callbacks";
 
+/** Converts a widget definition into its matching React component. */
 const stringToElement = (d: Widget, k: string) => {
   console.log(d);
   switch (d.type) {
@@ -50,12 +51,14 @@ const stringToElement = (d: Widget, k: string) => {
 
 }
 
+/** Renders one widget definition as a React element. */
 export function WidgetCell({ def, k }: { def: Widget, k?: string }) {
   return <>
     {stringToElement(def, k)}
   </>
 }
 
+/** Renders a list of widget definitions. */
 export function SingleWidget({ children }: { children: Widget[] }) {
   return <>
     {children.map((def, key) => {
@@ -70,6 +73,7 @@ export interface WidgetProperties<T> {
   //callbacks: WidgetCallbacks,
 }
 
+/** Renders an overlay and provides its callback dispatcher to child widgets. */
 export function OverlayView({ o, callbacks, style }: { o: Overlay, callbacks: WCallbacks, style?: React.CSSProperties }) {
   return (
     <WidgetActionContext value={callbacks}>

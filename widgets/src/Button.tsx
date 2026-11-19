@@ -6,6 +6,7 @@ import { useWidgetAction } from "./Callbacks";
 
 type ButtonProperties = Widget & (NoteButtonProperties | CCButtonProperties);
 
+/** Renders a MIDI button in trigger or latch mode. */
 export function Button({ def }: WidgetProperties<ButtonProperties>) {
     const [value, setValue] = useState(0);
     const activePointer = useRef<number | null>(null);
@@ -21,6 +22,7 @@ export function Button({ def }: WidgetProperties<ButtonProperties>) {
         }
     }, [])
 
+    /** Starts pointer capture and sends the pressed state for trigger buttons. */
     const start = ({ currentTarget, pointerId }) => {
         vibrate();
         const el = currentTarget as HTMLElement;
@@ -34,6 +36,7 @@ export function Button({ def }: WidgetProperties<ButtonProperties>) {
 
     }
 
+    /** Ends pointer capture and sends the resulting trigger or latch state. */
     const end = ({ pointerId, currentTarget }) => {
         if (pointerId !== activePointer.current) return;
 

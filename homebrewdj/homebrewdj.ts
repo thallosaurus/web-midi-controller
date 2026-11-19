@@ -119,6 +119,7 @@ export class HomebrewDJTraktorSetup {
     }
 }
 
+/** Runs the web controller with virtual MIDI and OSC ports, without Traktor setup. */
 export class HomebrewDJControllerOnly {
     server: Server;
     midiPort: MidiDriver;
@@ -160,6 +161,7 @@ export class HomebrewDJControllerOnly {
         });
     }
 
+    /** Stops OSC, MIDI and server resources opened by this controller. */
     close() {
         this.oscPort.stop();
         this.midiPort.close();

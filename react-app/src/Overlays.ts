@@ -22,6 +22,7 @@ export const TestOscOverlay: Overlay = {
   cells: [TestOscWidget]
 }
 
+/** Creates a vertical deck panel with a volume slider and mixer cue button. */
 function createDeck(ch: number): Widget & VerticalMixerProperties {
   return {
     id: "volume_deck" + ch,
@@ -234,6 +235,7 @@ export const ABLETON_OVERLAY: Overlay = {
   ]
 };
 
+/** Creates a Traktor deck layout with loop, EQ and transport controls. */
 function createOneDeviceTraktorDeck(channel: number): VerticalMixerProperties & Widget {
   return {
     "type": "vert-mixer",

@@ -3,6 +3,7 @@ import { SingleWidget, WidgetProperties } from "./Parser";
 import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { useWidgetAction } from "./Callbacks";
 
+/** Renders a flex panel with the supplied identifier, class and styles. */
 export function Panel({ id, type, style, children }: { id: string, type: string, style: CSSProperties, children: ReactNode }) {
     return <div id={id} className={`widget ${type}`} style={{
         display: "flex",
@@ -16,6 +17,7 @@ export function Panel({ id, type, style, children }: { id: string, type: string,
     </div>
 }
 
+/** Arranges child widgets in a vertical panel. */
 export function Vertical({ def, children }: WidgetProperties<Widget & VerticalMixerProperties> & { children: ReactNode }) {
     //return (<div>{Layout(def.vert)}</div>)
     return <Panel id={def.id} type="vert-mixer" style={{
@@ -25,6 +27,7 @@ export function Vertical({ def, children }: WidgetProperties<Widget & VerticalMi
     </Panel>
 }
 
+/** Arranges child widgets in a horizontal panel. */
 export function Horizontal({ def, children }: WidgetProperties<Widget & HorizontalMixerProperties> & { children: ReactNode }) {
     return <Panel id={def.id} type="horiz-mixer" style={{
         flexDirection: "row",
@@ -34,6 +37,7 @@ export function Horizontal({ def, children }: WidgetProperties<Widget & Horizont
 
 }
 
+/** Arranges child widgets in the configured row and column grid. */
 export function Grid({ def, children }: WidgetProperties<Widget & GridMixerProperties> & { children: ReactNode }) {
     return (
         <Panel id={def.id} type="grid-mixer" style={{
@@ -45,6 +49,7 @@ export function Grid({ def, children }: WidgetProperties<Widget & GridMixerPrope
         </Panel>)
 }
 
+/** Displays the child panel selected by the shift control's current value. */
 export function ShiftArea({ def, children }: WidgetProperties<ShiftAreaProperties> & { children: ReactNode[] }) {
     const [shift, setShift] = useState(0);
     const callbacks = useWidgetAction();
@@ -78,6 +83,7 @@ export function ShiftArea({ def, children }: WidgetProperties<ShiftAreaPropertie
     </div>)*/
 }
 
+/** Renders a tabbed-area container around its child widgets. */
 export function TabbedArea({ def, children }: WidgetProperties<TabbedViewProperties> & { children: ReactNode }) {
     const [tab, setCurrentTab] = useState(0);
 

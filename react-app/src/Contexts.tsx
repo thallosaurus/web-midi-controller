@@ -23,6 +23,7 @@ type WebsocketContextType = {
     disconnect: () => void;
 }
 export const WebsocketContext = createContext<WebsocketContextType | null>(null);
+/** Returns the active WebSocket context or throws when no provider is mounted. */
 export function useWebsocketContext() {
     const ctx = useContext(WebsocketContext);
     if (!ctx) throw new Error("no websocketcontext loaded")

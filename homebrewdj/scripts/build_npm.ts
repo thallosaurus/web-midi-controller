@@ -24,6 +24,7 @@ await build({
       url: "https://github.com/thallosaurus/web-midi-controller/issues",
     },
   },
+  /** Runs optional packaging steps after the client build completes. */
   postBuild() {
     // steps to run after building and before running the tests
     //Deno.copyFileSync("LICENSE", "npm/LICENSE");

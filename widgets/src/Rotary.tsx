@@ -8,6 +8,7 @@ const sensitivity = 0.5;    // px -> value
 const MIN_ANGLE = -135;
 const MAX_ANGLE = 135;
 
+/** Renders a rotary control that sends its value as the pointer moves. */
 export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
     const lastX = useRef<number>(0);
     const active = useRef<boolean>(false);
@@ -21,8 +22,10 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
 
     const [value, setValue] = useState<number>(0);
 
+    /** Maps the current normalized value to the dial's display angle. */
     const angle = () => MIN_ANGLE + (value) * (MAX_ANGLE - MIN_ANGLE);
 
+    /** Begins pointer capture and records the initial horizontal position. */
     const touch_start = ({ target, pointerId, clientX }) => {
         const el = target as HTMLElement;
         el.setPointerCapture(pointerId);
@@ -32,6 +35,7 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         console.log(lastX, active);
     };
 
+    /** Updates the rotary value from horizontal pointer movement. */
     const touch_move = ({ clientX }) => {
         if (!active.current) return;
 
@@ -43,6 +47,7 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         callbacks.send(def, new_value)
     }
 
+    /** Ends pointer capture and resets snapback controls when released. */
     const touch_stop = ({ target, pointerId }) => {
         active.current = false;
         const el = target as HTMLElement;
@@ -63,6 +68,7 @@ export function Rotary({ def }: WidgetProperties<RotarySliderProperties>) {
         }
     }, [])
 
+    /** Creates the CSS custom property used to display a dial rotation. */
     const rotationStyle = (a) => { return { "--rotation": `${a}deg` } as React.CSSProperties }
 
     return (<div id={def.id} className="widget rotary" onPointerDown={touch_start} onPointerMove={touch_move} onPointerUp={touch_stop} onPointerCancel={touch_stop}>
