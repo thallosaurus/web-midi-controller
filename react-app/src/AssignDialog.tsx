@@ -3,6 +3,7 @@ import { useWebsocketContext } from "./Contexts";
 import { LookupResult } from "@hdj/widgets";
 import { AllowedPayloads, WebsocketClient } from "@hdj/homebrewdj-web-client";
 
+/** Renders one assignable MIDI address and its test-message button. */
 function entryToHtml(res: { type: "cc" | "note", sub: number }, i: number, ch: number, ws: WebsocketClient<AllowedPayloads>) {
     return <li key={"entry" + i + "channel" + ch}>
         <div style={{
@@ -38,6 +39,7 @@ function entryToHtml(res: { type: "cc" | "note", sub: number }, i: number, ch: n
     </li>
 }
 
+/** Renders the registered MIDI addresses grouped by channel. */
 function resultsToHtml(result: LookupResult, ws: WebsocketClient<AllowedPayloads>) {
     const r: ReactNode[] = [];
     result.midi.forEach((v, ch) => {
@@ -85,6 +87,7 @@ const fix = {
     margin: 0,
 } as CSSProperties;
 
+/** Displays registered widget addresses and lets users send test assignments. */
 export function AssignDialog({ showModal, closeDialog }: { showModal: boolean, closeDialog: () => void }) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const ws = useWebsocketContext();

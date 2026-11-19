@@ -7,6 +7,7 @@ export interface JogwheelState {
 
 }
 
+/** Renders a jogwheel control that sends direction based on pointer velocity. */
 export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
     const active = useRef<boolean>(false);
     const lastX = useRef<number>(0);
@@ -14,6 +15,7 @@ export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
 
     const callbacks = useWidgetAction();
 
+    /** Sends a direction value when velocity exceeds the configured deadzone. */
     const updateValue = (v: number) => {
         const abs = Math.abs(v);
 
@@ -28,6 +30,7 @@ export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
         }
     }
 
+    /** Captures a pointer and records its initial position and time. */
     const touch_start = ({ currentTarget, pointerId, clientX }) => {
         const el = currentTarget as HTMLElement;
         el.setPointerCapture(pointerId);
@@ -37,6 +40,7 @@ export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
         lastTime.current = performance.now();
     };
 
+    /** Converts pointer movement over elapsed time into jogwheel velocity. */
     const touch_move = ({ clientX }) => {
         if (!active) return;
 
@@ -55,6 +59,7 @@ export function Jogwheel({ def }: WidgetProperties<JogwheelProperties>) {
     };
 
 
+    /** Ends pointer capture for the active jogwheel gesture. */
     const touch_stop = ({ currentTarget, pointerId }) => {
         active.current = false;
         const el = currentTarget as HTMLElement;

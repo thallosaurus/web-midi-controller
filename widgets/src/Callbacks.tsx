@@ -88,18 +88,22 @@ interface InternalCallbackMap {
     oscCallbackMap: OSCCallbackMap;
 }
 
+/** Checks whether a widget definition describes a MIDI note. */
 function isMidiNote(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiNoteProperties {
     return (def.output === "midi" && "note" in def)
 }
 
+/** Checks whether a widget definition describes a MIDI control change. */
 function isMidiCC(def: MidiNoteProperties | MidiCCProperties | osc): def is MidiCCProperties {
     return (def.output === "midi" && "cc" in def)
 }
 
+/** Checks whether a widget definition describes an OSC output. */
 function isOSC(def: MidiNoteProperties | MidiCCProperties | osc): def is osc {
     return (def.output === "osc")
 }
 
+/** Checks whether value scaling configuration is present. */
 function hasScalingProperties(value: ValueProperties | null): value is ValueProperties {
     return value !== null
     //&& (Object.keys(value).includes("min") || Object.keys(value).includes("max") || Object.keys(value).includes("default"))
@@ -114,6 +118,7 @@ export interface LookupResult {
     midi: Map<number, MidiLookupResult[]>
 }
 
+/** Stores widget input callbacks and routes values to the outgoing message sender. */
 export abstract class WCallbacks {
     abstract sender: Outgoing | null;
 
@@ -123,6 +128,7 @@ export abstract class WCallbacks {
         oscCallbackMap: new Map(),
     }
 
+    /** Returns the MIDI note and control-change addresses currently registered. */
     lookup(): LookupResult {
         const midi = new Map<number, MidiLookupResult[]>();
         this.callbacks.ccCallbackMap.forEach((v, ch) => {
@@ -151,6 +157,7 @@ export abstract class WCallbacks {
         }
     }
 
+    /** Adds a callback for a MIDI note and returns its registration identifier. */
     private registerNote: MidiNoteRegisterFn = (def, cb) => {
 
         if (!this.callbacks.noteCallbackMap.has(def.channel)) {
@@ -168,6 +175,7 @@ export abstract class WCallbacks {
         return id
     }
 
+    /** Adds a callback for a MIDI control change and returns its identifier. */
     private registerCC: MidiCCRegisterFn = (def, cb) => {
         const { channel, cc } = def;
 
@@ -186,6 +194,7 @@ export abstract class WCallbacks {
         return id
     }
 
+    /** Removes a registered control-change callback and cleans up empty maps. */
     private unregisterCC: MidiCCUnregisterFn = (id, def) => {
         const { channel, cc } = def
         if (!this.callbacks.ccCallbackMap.has(channel)) {
@@ -210,6 +219,7 @@ export abstract class WCallbacks {
         //if (this.next) this.next.unregisterCC(id, def)
     }
 
+    /** Removes a registered note callback and cleans up empty maps. */
     private unregisterNote: MidiNoteUnregisterFn = (id, def) => {
         const { channel, note } = def;
 
@@ -236,6 +246,7 @@ export abstract class WCallbacks {
         //if (this.next) this.next.unregisterNote(id, def);
     }
 
+    /** Adds a callback for an OSC address and returns its registration identifier. */
     private registerOSC: OscRegisterFn = ({ address }, cb) => {
         if (!this.callbacks.oscCallbackMap.has(address)) {
             this.callbacks.oscCallbackMap.set(address, new Map());
@@ -248,6 +259,7 @@ export abstract class WCallbacks {
         return id
     }
 
+    /** Removes a callback registered for an OSC address. */
     private unregisterOSC: OscUnregisterFn = (id, { address }) => {
         if (!this.callbacks.oscCallbackMap.has(address)) {
             return;
@@ -256,6 +268,7 @@ export abstract class WCallbacks {
         oscMap?.delete(id);
     }
 
+    /** Registers an input callback for a MIDI or OSC widget definition. */
     register(def: MidiNoteProperties | MidiCCProperties | osc, cb: MIDIReceiveDataCallback | OSCReceiveDataCallback): WidgetId {
         console.log("registering", def)
         if (isMidiNote(def)) return this.registerNote(def, cb)
@@ -264,6 +277,7 @@ export abstract class WCallbacks {
         throw new Error("unsupported properties")
     }
 
+    /** Removes a previously registered callback using its identifier and definition. */
     unregister(id: string, def: MidiNoteProperties | MidiCCProperties | osc) {
         console.log("unregistering", def)
         if (isMidiNote(def)) return this.unregisterNote(id, def)
@@ -272,6 +286,7 @@ export abstract class WCallbacks {
         throw new Error("unsupported properties")
     }
 
+    /** Sends a normalized widget value as the matching MIDI or OSC message. */
     send(def: MidiNoteProperties | MidiCCProperties | osc, v: number) {
         if (isMidiNote(def)) {
             const c = this.callbacks.noteCallbackMap.get(def.channel).get(def.note);
@@ -341,12 +356,14 @@ export abstract class WCallbacks {
         throw new Error("unsupported properties")
     }
 
+    /** Delivers a value to every callback in a registered input map. */
     private runCallbacks(map: CallbackMap<ReceiveDataCallback>, value: number) {
         map?.callbacks.forEach((cb) => {
             cb(value)
         });
     }
 
+    /** Routes an incoming OSC value to callbacks registered for its address. */
     private externalOsc({ address, args }: OscDelta) {
         const c = this.callbacks.oscCallbackMap.get(address);
         c?.forEach((cb) => {
@@ -354,6 +371,7 @@ export abstract class WCallbacks {
         });
     }
 
+    /** Routes an incoming message to the registered widget callbacks. */
     extInput(msg: (NoteDelta | CCDelta | OscDelta | PgrmDelta)) {
         switch (msg.type) {
             case "note":
@@ -386,6 +404,7 @@ export abstract class WCallbacks {
 }
 
 export const WidgetActionContext = createContext<WCallbacks | null>(null);
+/** Returns the widget action dispatcher from the current React context. */
 export function useWidgetAction() {
     const bus = useContext(WidgetActionContext);
     if (!bus) throw new Error("Missing WidgetActionContext");

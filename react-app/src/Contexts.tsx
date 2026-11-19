@@ -5,14 +5,17 @@ import { createContext, useState, useContext, useRef, ReactNode, useEffect } fro
 
 type ProgramChangeHandler = (n: number) => void
 
+/** Connects widget value callbacks to the WebSocket sender and program selection. */
 export class EventBus extends WCallbacks {
     sender: Outgoing | null = null;
     programChange: (ProgramChangeHandler) | null = null;
 
+    /** Sets the outgoing transport used to send widget messages. */
     setSender(sender: Outgoing | null) {
         this.sender = sender;
     }
 
+    /** Sets the handler that receives program or client selection changes. */
     setProgramChangeHandler(handler: ProgramChangeHandler | null) {
         this.programChange = handler
     }
@@ -30,6 +33,7 @@ type WebsocketContextType = {
 
 export const EventBusContext = createContext<EventBus>(new EventBus());
 export const WebsocketContext = createContext<WebsocketContextType | null>(null);
+/** Returns the active WebSocket context or throws when no provider is mounted. */
 export function useWebsocketContext() {
     const ctx = useContext(WebsocketContext);
     if (!ctx) throw new Error("no websocketcontext loaded")
@@ -43,6 +47,7 @@ enum ConnectionState {
 }
 
 
+/** Owns the WebSocket client and exposes connection state and widget callbacks. */
 export const WebsocketProvider = ({ children }: { children: ReactNode }) => {
     
     const [connectionId, setConnectionId] = useState<string | null>(null);

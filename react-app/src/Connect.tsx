@@ -12,6 +12,7 @@ const buttonStyle: CSSProperties = {
   fontWeight: "bold"
 }
 
+/** Renders the form used to connect to a WebSocket host. */
 export function ConnectScreen() {
   const ws = useWebsocketContext();
   const [url, setUrl] = useState(getEndpointUrl().host);

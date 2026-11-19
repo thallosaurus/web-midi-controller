@@ -119,6 +119,7 @@ export class HomebrewDJTraktorSetup {
     }
 }
 
+/** Runs the web controller with virtual MIDI and OSC ports, without Traktor setup. */
 export class HomebrewDJControllerOnly {
     server: Server;
     midiPort = new MidiDriver({
@@ -129,6 +130,7 @@ export class HomebrewDJControllerOnly {
 
     oscPort: OscDriver;
 
+    /** Loads application settings and starts the server and virtual input/output ports. */
     constructor(config_path = "./config.json") {
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
@@ -158,6 +160,7 @@ export class HomebrewDJControllerOnly {
         });
     }
 
+    /** Stops OSC, MIDI and server resources opened by this controller. */
     close() {
         this.oscPort.stop();
         this.midiPort.close();
