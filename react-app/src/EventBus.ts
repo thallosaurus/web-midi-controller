@@ -1,4 +1,4 @@
-import { ClientNumberPayload } from "@hdj/homebrewdj-web-client";
+import { ClientNumberPayload, ClockMessagePayload } from "@hdj/homebrewdj-web-client";
 import { CCDelta, NoteDelta, OscDelta, Outgoing, PgrmDelta, WCallbacks } from "@hdj/widgets";
 
 export type ProgramChangeHandler = (n: number) => void
@@ -14,17 +14,25 @@ export class EventBus extends WCallbacks {
     setProgramChangeHandler(handler: ProgramChangeHandler | null) {
         this.programChange = handler
     }
-    override extInput(msg: (NoteDelta | CCDelta | OscDelta | PgrmDelta | ClientNumberPayload)): void {
-        if (msg.type == "pgrm") {
-            //console.log("program change message", msg);
-            if (this.programChange) this.programChange(msg.value)
-            return;
-        }
-        if (msg.type == "clientnumber") {
-            console.log("disabled for now")
-            return;
-        }
 
-        super.extInput(msg);
+    override extInput(msg: (NoteDelta | CCDelta | OscDelta | PgrmDelta | ClientNumberPayload | ClockMessagePayload)): void {
+        switch (msg.type) {
+            case "pgrm":
+                if (this.programChange) this.programChange(msg.value)
+                break;
+
+            case "clientnumber":
+                console.log("disabled for now")
+                break;
+
+            case "clock":
+                console.log(msg.data);
+                break;
+            
+            default:
+                super.extInput(msg);
+                break;
+
+        }
     }
 }

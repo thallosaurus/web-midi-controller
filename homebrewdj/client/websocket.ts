@@ -1,4 +1,4 @@
-import { ClientNumberPayload, ConnectedPayload } from "./protocol.ts";
+import type { ClientNumberPayload, ConnectedPayload } from "./protocol.ts";
 
 export type WebsocketMessageCallback<T> = (id: string, msg: T) => void;
 

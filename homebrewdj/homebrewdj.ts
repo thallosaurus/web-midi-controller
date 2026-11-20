@@ -5,8 +5,8 @@ import { MidiDriver } from "@hdj/midi-driver/ffi";
 import { forwardMidiToServer, forwardWebsocketMessageToPorts, Server } from "./server.ts";
 import type { AllowedPayloads, OscMessagePayload } from "./client/protocol.ts";
 import { OscDriver } from "./osc.ts";
-//import { MidiMessage } from "../midi-driver/index.ts";
-//import type { MidiMessage } from "@hdj/midi-driver";
+import { MidiClock } from "./clock.ts";
+import { StepSequencer } from "./sequencer.ts";
 
 /**
  * Configuration describing the MIDI endpoints used by HomebrewDJ.
@@ -19,6 +19,7 @@ interface HomebrewDJConfig {
     dawOutput: string;
     traktorInput: string;
     traktorOutput: string;
+    systemChannel: number;
 }
 
 /**
@@ -126,6 +127,10 @@ export class HomebrewDJControllerOnly {
 
     oscPort: OscDriver;
 
+    clock: MidiClock
+
+    sequencer: StepSequencer;
+
     constructor(config_path = "./config.json", midiPort = new MidiDriver({
         inputName: "HomebrewDJ Controller Input",
         outputName: "HomebrewDJ Controller Output",
@@ -134,6 +139,8 @@ export class HomebrewDJControllerOnly {
         this.midiPort = midiPort
         const file = Deno.readTextFileSync(config_path);
         const config: HomebrewDJConfig = JSON.parse(file);
+        this.sequencer = new StepSequencer(this.midiPort);
+
         this.server = new Server((msg: AllowedPayloads) => {
             forwardWebsocketMessageToPorts({
                 msg,
@@ -150,7 +157,7 @@ export class HomebrewDJControllerOnly {
             forwardMidiToServer({
                 t,
                 server: this.server,
-                systemChannel: 16   // move to config somewhere
+                systemChannel: config.systemChannel   // move to config somewhere
             })
         });
 
@@ -159,6 +166,26 @@ export class HomebrewDJControllerOnly {
             console.log("osc payload", msg);
             this.server.broadcast(msg);
         });
+
+        this.clock = new MidiClock(this.midiPort);
+        this.clock.addTickListener(p => {
+            // process ticks for sequencer
+            //console.log(p);
+            this.sequencer.tick(p);
+        })
+        this.clock.addControlListener(p => {
+            this.sequencer.control(p);
+            this.server.broadcast({
+                type: "clock",
+                data: p
+            })
+        })
+        this.clock.addBeatListener((p) => {
+            this.server.broadcast({
+                type: "clock",
+                data: p
+            })
+        })
     }
 
     /** Stops OSC, MIDI and server resources opened by this controller. */
